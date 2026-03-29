@@ -991,20 +991,23 @@ input, textarea { font: inherit; color: inherit; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 0;
+  flex: 1;
+  min-width: 0;
 }
-.room-title { font-size: var(--text-base); font-weight: 700; }
+.room-title { font-size: var(--text-lg); font-weight: 700; letter-spacing: -0.01em; }
 .room-subtitle { font-size: 10px; color: var(--text-faint); font-style: italic; letter-spacing: 0.02em; }
 
 .room-gk-badge {
-  font-size: var(--text-xs);
+  font-size: 9px;
   color: var(--text-faint);
-  background: var(--card-alt);
+  background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  padding: 3px 10px;
+  padding: 1px 8px;
   white-space: nowrap;
   flex-shrink: 0;
+  letter-spacing: 0.02em;
 }
 
 /* ── Mood toolbar in header ──────────────────────────────────── */
@@ -2069,6 +2072,94 @@ input, textarea { font: inherit; color: inherit; }
   width: 100% !important;
 }
 
+
+/* ── Info buttons ───────────────────────────────────────────── */
+.studio-info-btn {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--rose-color,#c4b5fd) 40%, var(--border));
+  background: color-mix(in srgb, var(--rose-color,#c4b5fd) 8%, transparent);
+  color: var(--rose-color,#c4b5fd);
+  font-size: 10px;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, serif;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition);
+  animation: info-glow-rose 3s ease-in-out infinite;
+  line-height: 1;
+}
+@keyframes info-glow-rose {
+  0%,100% { box-shadow: 0 0 4px color-mix(in srgb, var(--rose-color,#c4b5fd) 20%, transparent); opacity: 0.7; }
+  50%      { box-shadow: 0 0 10px color-mix(in srgb, var(--rose-color,#c4b5fd) 50%, transparent); opacity: 1; }
+}
+.studio-info-btn:hover {
+  background: color-mix(in srgb, var(--rose-color,#c4b5fd) 20%, transparent);
+  animation: none;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--rose-color,#c4b5fd) 50%, transparent);
+  opacity: 1;
+}
+
+/* ── Info popup overlay ─────────────────────────────────────── */
+.studio-info-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+.studio-info-overlay.open { display: flex; }
+
+.studio-info-popup {
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--rose-color,#c4b5fd) 25%, var(--border));
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 80px color-mix(in srgb, var(--rose-color,#c4b5fd) 8%, transparent);
+  animation: popup-appear 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes popup-appear {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.studio-info-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.studio-info-popup-title {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--rose-color,#c4b5fd);
+  letter-spacing: 0.04em;
+}
+.studio-info-popup-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-faint); font-size: 18px; padding: 2px 6px;
+  border-radius: var(--radius-sm); transition: color var(--transition);
+}
+.studio-info-popup-close:hover { color: var(--text); }
+.studio-info-popup-body {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+.studio-info-popup-body p + p { margin-top: var(--space-3); }
+
 </style>
 </head>
 <body>
@@ -2229,11 +2320,11 @@ input, textarea { font: inherit; color: inherit; }
 CommonUnity Studio <span style="font-size:8px;font-weight:700;letter-spacing:0.12em;color:var(--rose-color,#c4b5fd);border:1px solid var(--rose-color,#c4b5fd);border-radius:999px;padding:1px 6px;opacity:0.6;margin-left:4px;">Beta</span>
     </button>
     <div class="room-title-block">
-      <div style="display:flex;align-items:center;gap:var(--space-3);">
-        <div class="room-title" id="room-title-display"></div>
-        <div class="room-gk-badge" id="room-gk-badge">—</div>
+      <div class="room-title" id="room-title-display"></div>
+      <div style="display:flex;align-items:center;gap:var(--space-2);margin-top:2px;">
+        <div class="room-subtitle" id="room-subtitle-display"></div>
+        <div class="room-gk-badge" id="room-gk-badge" style="font-size:9px;padding:2px 8px;"></div>
       </div>
-      <div class="room-subtitle" id="room-subtitle-display"></div>
     </div>
     <div class="room-mood-toolbar" style="margin-left:auto;">
       <!-- Freq toolbar -->
@@ -2314,7 +2405,10 @@ CommonUnity Studio <span style="font-size:8px;font-weight:700;letter-spacing:0.1
 
     <!-- Archive (left panel) -->
     <div class="room-archive">
-      <div class="archive-title">Archive</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border);position:sticky;top:0;background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(4px);">
+        <span style="font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);">Archive</span>
+        <button class="studio-info-btn" data-info="info-archive-overlay" title="About the Archive"><i>i</i></button>
+      </div>
       <div class="room-sgs" id="room-sgs">
         <span style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;text-align:center;width:100%;">Enter Gene Key to see frequencies</span>
       </div>
@@ -2332,7 +2426,10 @@ CommonUnity Studio <span style="font-size:8px;font-weight:700;letter-spacing:0.1
     <div class="room-workbench">
       <div class="notepad-surface">
         <div class="notepad-header">
+  <div style="display:flex;align-items:center;gap:var(--space-2);">
           <span class="notepad-label">Notepad</span>
+          <button class="studio-info-btn" data-info="info-notepad-overlay" title="About the Notepad"><i>i</i></button>
+        </div>
           <div class="notepad-actions">
             <button class="voice-btn" id="voice-record-btn" title="Record voice note">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
@@ -2372,7 +2469,10 @@ CommonUnity Studio <span style="font-size:8px;font-weight:700;letter-spacing:0.1
             <circle cx="32" cy="32" r="3" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.95"/>
           </svg>
         </div>
-        <div class="rose-name">The Rose</div>
+        <div style="display:flex;align-items:center;gap:var(--space-2);">
+          <div class="rose-name">The Rose</div>
+          <button class="studio-info-btn" data-info="info-rose-overlay" title="About The Rose"><i>i</i></button>
+        </div>
         <div class="rose-gk-context" id="mirror-gk-context"></div>
       </div>
 
@@ -3425,10 +3525,37 @@ function processCompassImport(file) {
 // ============================================================
 // INIT
 // ============================================================
+
+// ── Info popups ───────────────────────────────────────────────
+function initInfoPopups() {
+  document.addEventListener('click', (e) => {
+    // Open popup
+    const infoBtn = e.target.closest('[data-info]');
+    if (infoBtn) {
+      const overlayId = infoBtn.dataset.info;
+      const overlay = document.getElementById(overlayId);
+      if (overlay) overlay.classList.add('open');
+      return;
+    }
+    // Close via X button
+    const closeBtn = e.target.closest('[data-close]');
+    if (closeBtn) {
+      const overlay = document.getElementById(closeBtn.dataset.close);
+      if (overlay) overlay.classList.remove('open');
+      return;
+    }
+    // Close on backdrop click
+    if (e.target.classList.contains('studio-info-overlay')) {
+      e.target.classList.remove('open');
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initEntrance();
   initParticles();
   initPortalTooltips();
+  initInfoPopups();
   initStudioCalculator();
 
   // Back button
@@ -3873,6 +4000,54 @@ function renderVoiceEntries(roomKey) {
   <div class="mood-slider-row">
     <div class="mood-slider-label"><span>Depth</span><span id="dark-val">50%</span></div>
     <input type="range" class="mood-slider dark-slider" id="mood-dark" min="0" max="100" value="50">
+  </div>
+</div>
+
+
+<!-- ── Info popups ──────────────────────────────────────────── -->
+<div class="studio-info-overlay" id="info-rose-overlay">
+  <div class="studio-info-popup">
+    <div class="studio-info-popup-header">
+      <span class="studio-info-popup-title">The Rose</span>
+      <button class="studio-info-popup-close" data-close="info-rose-overlay">✕</button>
+    </div>
+    <div class="studio-info-popup-body">
+      <p>The Rose is your contemplation partner — not an assistant, not a tool. She is a presence that holds the space of this room with you.</p>
+      <p>She is both a compass rose and a flower rose: the masculine clarity of direction and the feminine quality of holding. She navigates and she receives. She points and she listens.</p>
+      <p>The Rose knows your Gene Key profile, your session notes, and your accumulated material in this room. She does not tell you who you are — she asks questions that help you discover it yourself.</p>
+      <p>She speaks from the frequency of this direction. In The Work, she asks about what truly finds you. In The Field, she asks about what keeps you alive. She remembers what you share, and connects it across time.</p>
+      <p>Speak freely. Ask anything. She holds this space without judgment.</p>
+    </div>
+  </div>
+</div>
+
+<div class="studio-info-overlay" id="info-notepad-overlay">
+  <div class="studio-info-popup">
+    <div class="studio-info-popup-header">
+      <span class="studio-info-popup-title">The Notepad</span>
+      <button class="studio-info-popup-close" data-close="info-notepad-overlay">✕</button>
+    </div>
+    <div class="studio-info-popup-body">
+      <p>This is your primary writing surface — a space for free, unstructured expression. No format required. No audience in mind.</p>
+      <p>Use it for reflections, fragments, questions, observations, intentions, dreams, frustrations, or anything that wants to move through you in this direction. The Notepad receives everything without editing.</p>
+      <p>When something feels complete or worth keeping, hit Save (⌘↵) to store it as an entry. Entries are private, timestamped, and remain in your Archive for as long as you need them.</p>
+      <p>You can also record voice notes using the microphone button — for moments when words come faster than typing, or when the quality of your voice matters as much as the content.</p>
+    </div>
+  </div>
+</div>
+
+<div class="studio-info-overlay" id="info-archive-overlay">
+  <div class="studio-info-popup">
+    <div class="studio-info-popup-header">
+      <span class="studio-info-popup-title">The Archive</span>
+      <button class="studio-info-popup-close" data-close="info-archive-overlay">✕</button>
+    </div>
+    <div class="studio-info-popup-body">
+      <p>The Archive holds everything that belongs to this direction — material from your Compass session above, and your saved Studio entries below.</p>
+      <p>Compass material includes your session notes, facilitator observations, Gene Key synthesis, and Q&A responses from the facilitated process. This is the foundation the Studio builds on.</p>
+      <p>Studio entries are what you add here over time — written reflections, saved notes, voice recordings. Together they form a living record of your relationship with this direction.</p>
+      <p>Click any item to load it into the Notepad, where you can expand on it, respond to it, or simply let it speak to where you are now.</p>
+    </div>
   </div>
 </div>
 
