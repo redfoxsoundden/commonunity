@@ -2014,6 +2014,12 @@ input, textarea { font: inherit; color: inherit; }
     <div class="portal-facet bottom" data-room="field" title="The Field"></div>
     <div class="portal-facet left"   data-room="call"  title="The Call"></div>
 
+    <!-- Hover tooltip — shows room name on facet hover -->
+    <div class="portal-hover-tooltip" id="portal-hover-tooltip">
+      <span class="portal-hover-tooltip-name" id="tooltip-name"></span>
+      <span class="portal-hover-tooltip-sub" id="tooltip-sub"></span>
+    </div>
+
     <!-- Room labels that appear after first touch -->
     <div class="portal-room-labels">
       <span class="room-label work">The Work</span>
@@ -2705,6 +2711,52 @@ function restoreStudioCalcResults(d) {
   }
 }
 
+
+// ── Portal facet hover tooltips ───────────────────────────────
+function initPortalTooltips() {
+  const tooltip   = document.getElementById('portal-hover-tooltip');
+  const nameEl    = document.getElementById('tooltip-name');
+  const subEl     = document.getElementById('tooltip-sub');
+
+  const ROOM_META_TT = {
+    work:  { name: 'The Work',  sub: 'the work that finds you',        color: 'var(--work)'  },
+    lens:  { name: 'The Lens',  sub: 'the way you are here to perceive', color: 'var(--lens)'  },
+    field: { name: 'The Field', sub: 'your fertile ground',             color: 'var(--field)' },
+    call:  { name: 'The Call',  sub: 'the music within you',            color: 'var(--call)'  },
+  };
+
+  document.querySelectorAll('.portal-facet').forEach(facet => {
+    const room = facet.dataset.room;
+    const meta = ROOM_META_TT[room];
+    if (!meta || !tooltip) return;
+
+    facet.addEventListener('mouseenter', () => {
+      nameEl.textContent = meta.name;
+      subEl.textContent  = meta.sub;
+      tooltip.style.color = meta.color;
+      tooltip.classList.add('visible');
+
+      // Boost the matching room label
+      const lbl = document.querySelector('.room-label.' + room);
+      if (lbl) {
+        lbl.style.fontSize = '13px';
+        lbl.style.textShadow = '0 0 16px currentColor';
+        lbl.style.opacity = '1';
+      }
+    });
+
+    facet.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('visible');
+      const lbl = document.querySelector('.room-label.' + room);
+      if (lbl) {
+        lbl.style.fontSize = '';
+        lbl.style.textShadow = '';
+        lbl.style.opacity = '';
+      }
+    });
+  });
+}
+
 function initEntrance() {
   loadState();
 
@@ -3296,6 +3348,7 @@ function processCompassImport(file) {
 document.addEventListener('DOMContentLoaded', () => {
   initEntrance();
   initParticles();
+  initPortalTooltips();
   initStudioCalculator();
 
   // Back button
