@@ -1625,6 +1625,97 @@ input, textarea { font: inherit; color: inherit; }
 }
 
 
+
+/* ── Master hue slider ───────────────────────────────────────── */
+.mood-slider-h.hue {
+  background: linear-gradient(to right,
+    hsl(0,70%,55%), hsl(45,70%,55%), hsl(90,70%,55%),
+    hsl(135,70%,55%), hsl(180,70%,55%), hsl(225,70%,55%),
+    hsl(270,70%,55%), hsl(315,70%,55%), hsl(360,70%,55%));
+  width: 90px;
+}
+.mood-slider-h.hue::-webkit-slider-thumb { background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+
+/* ── Freq toolbar ────────────────────────────────────────────── */
+.freq-toolbar-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.freq-toolbar-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  padding: 3px 10px 3px 6px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.freq-toolbar-toggle:hover {
+  border-color: var(--rose-color,#c4b5fd);
+}
+.freq-toolbar-toggle.active {
+  border-color: var(--rose-color,#c4b5fd);
+  background: color-mix(in srgb, var(--rose-color,#c4b5fd) 10%, transparent);
+}
+.freq-toolbar-orb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--rose-color,#c4b5fd) 60%, white), var(--rose-color,#c4b5fd));
+  box-shadow: 0 0 5px var(--rose-color,#c4b5fd);
+  flex-shrink: 0;
+  transition: box-shadow 0.3s;
+}
+.freq-toolbar-orb.playing {
+  animation: orb-pulse 2s ease-in-out infinite;
+}
+.freq-toolbar-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.freq-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  background: color-mix(in srgb, var(--card) 95%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rose-color,#c4b5fd) 20%, var(--border));
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  padding: var(--space-4);
+  display: none;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 320px;
+}
+.freq-dropdown.open { display: flex; }
+
+.freq-dropdown-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.freq-dropdown-section { display: flex; flex-direction: column; gap: var(--space-1); }
+.freq-dropdown-label {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  opacity: 0.7;
+}
+
 </style>
 </head>
 <body>
@@ -1735,19 +1826,72 @@ input, textarea { font: inherit; color: inherit; }
       <div class="room-subtitle" id="room-subtitle-display"></div>
     </div>
     <div class="room-mood-toolbar">
-      <!-- Mood presets -->
-      <button class="mood-preset-pill" data-mood="deep-focus">Focus</button>
-      <button class="mood-preset-pill" data-mood="contemplation">Contemplate</button>
-      <button class="mood-preset-pill" data-mood="ceremony">Ceremony</button>
+      <!-- Freq toolbar -->
+      <div class="freq-toolbar-wrap" id="freq-toolbar-wrap">
+        <button class="freq-toolbar-toggle" id="freq-toolbar-toggle">
+          <div class="freq-toolbar-orb" id="freq-toolbar-orb"></div>
+          <span class="freq-toolbar-label" id="freq-toolbar-label">Frequencies</span>
+        </button>
+        <div class="freq-dropdown" id="freq-dropdown">
+          <div class="freq-dropdown-row">
+            <div class="freq-dropdown-section">
+              <div class="freq-dropdown-label">Chakra</div>
+              <div class="freq-presets" id="chakra-presets-tb">
+                <button class="freq-preset-btn" data-chakra="root"   data-l="256" data-r="256">Root</button>
+                <button class="freq-preset-btn" data-chakra="sacral" data-l="288" data-r="288">Sacral</button>
+                <button class="freq-preset-btn" data-chakra="solar"  data-l="320" data-r="320">Solar</button>
+                <button class="freq-preset-btn" data-chakra="heart"  data-l="341" data-r="341">Heart</button>
+                <button class="freq-preset-btn" data-chakra="throat" data-l="384" data-r="384">Throat</button>
+                <button class="freq-preset-btn" data-chakra="third"  data-l="426" data-r="426">Third Eye</button>
+                <button class="freq-preset-btn" data-chakra="crown"  data-l="480" data-r="480">Crown</button>
+              </div>
+            </div>
+          </div>
+          <div class="freq-dropdown-row">
+            <div class="freq-dropdown-section">
+              <div class="freq-dropdown-label">Brainwave</div>
+              <div class="freq-presets" id="brainwave-presets-tb">
+                <button class="freq-preset-btn" data-bw="delta"    data-beat="2"    title="Deep sleep">Delta</button>
+                <button class="freq-preset-btn" data-bw="theta"    data-beat="6"    title="Meditation">Theta</button>
+                <button class="freq-preset-btn" data-bw="alpha"    data-beat="10"   title="Relaxed focus">Alpha</button>
+                <button class="freq-preset-btn" data-bw="beta"     data-beat="20"   title="Alert">Beta</button>
+                <button class="freq-preset-btn" data-bw="gamma"    data-beat="40"   title="Peak">Gamma</button>
+                <button class="freq-preset-btn" data-bw="schumann" data-beat="7.83" title="Earth">Schumann</button>
+              </div>
+            </div>
+          </div>
+          <div class="freq-dropdown-row" style="align-items:center;gap:var(--space-4);">
+            <div class="freq-dropdown-section">
+              <div class="freq-dropdown-label">Left</div>
+              <div class="binaural-freq-display" id="binaural-l-display">200 Hz</div>
+              <input type="range" class="freq-knob" id="binaural-l" min="100" max="500" value="200" step="1">
+            </div>
+            <div class="freq-dropdown-section">
+              <div class="freq-dropdown-label">Right</div>
+              <div class="binaural-freq-display" id="binaural-r-display">210 Hz</div>
+              <input type="range" class="freq-knob" id="binaural-r" min="100" max="500" value="210" step="1">
+            </div>
+            <div class="freq-dropdown-section">
+              <div class="freq-dropdown-label">Beat</div>
+              <div class="binaural-freq-display" id="beat-display" style="font-size:9px;">10 Hz</div>
+            </div>
+            <div class="freq-dropdown-section" style="margin-left:auto;">
+              <div class="freq-dropdown-label">Volume</div>
+              <input type="range" id="freq-volume" min="0" max="100" value="40" step="1" style="-webkit-appearance:none;width:60px;height:3px;background:var(--border);border-radius:2px;cursor:pointer;outline:none;">
+            </div>
+            <button class="freq-preset-btn" id="freq-stop-btn" style="border-color:#f43f5e;color:#f43f5e;align-self:flex-end;">■ Stop</button>
+          </div>
+        </div>
+      </div>
       <div class="room-toolbar-divider"></div>
-      <!-- Inline sliders -->
+      <!-- Colour + atmosphere sliders -->
+      <div class="mood-toolbar-slider">
+        <span class="mood-toolbar-label">Hue</span>
+        <input type="range" class="mood-slider-h hue" id="mood-hue" min="0" max="360" value="220">
+      </div>
       <div class="mood-toolbar-slider">
         <span class="mood-toolbar-label">Glow</span>
         <input type="range" class="mood-slider-h glow" id="mood-glow" min="0" max="100" value="50">
-      </div>
-      <div class="mood-toolbar-slider">
-        <span class="mood-toolbar-label">Warm</span>
-        <input type="range" class="mood-slider-h warm" id="mood-warm" min="0" max="100" value="50">
       </div>
       <div class="mood-toolbar-slider">
         <span class="mood-toolbar-label">Depth</span>
@@ -2711,6 +2855,8 @@ function startTones(leftHz, rightHz, volume) {
 
   const orb = document.getElementById('freq-orb');
   if (orb) orb.classList.add('playing');
+  const tbOrb = document.getElementById('freq-toolbar-orb');
+  if (tbOrb) tbOrb.classList.add('playing');
   updateBeatDisplay();
 }
 
@@ -2720,6 +2866,8 @@ function stopTones() {
   isPlaying = false;
   const orb = document.getElementById('freq-orb');
   if (orb) orb.classList.remove('playing');
+  const tbOrb2 = document.getElementById('freq-toolbar-orb');
+  if (tbOrb2) tbOrb2.classList.remove('playing');
 }
 
 function updateToneFrequencies() {
@@ -2750,13 +2898,23 @@ function updateVolume() {
 }
 
 function initFrequencyEngine() {
-  const toggle = document.getElementById('freq-toggle');
-  const engine = document.getElementById('freq-engine');
-
-  // Toggle expand/collapse
-  toggle.addEventListener('click', () => {
-    engine.classList.toggle('collapsed');
-  });
+  // Toolbar toggle
+  const tbToggle = document.getElementById('freq-toolbar-toggle');
+  const tbDropdown = document.getElementById('freq-dropdown');
+  if (tbToggle && tbDropdown) {
+    tbToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      tbDropdown.classList.toggle('open');
+      tbToggle.classList.toggle('active', tbDropdown.classList.contains('open'));
+    });
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!tbToggle.contains(e.target) && !tbDropdown.contains(e.target)) {
+        tbDropdown.classList.remove('open');
+        tbToggle.classList.remove('active');
+      }
+    });
+  }
 
   // Chakra presets
   document.querySelectorAll('.freq-preset-btn[data-chakra]').forEach(btn => {
@@ -2770,7 +2928,7 @@ function initFrequencyEngine() {
       updateToneFrequencies();
       const vol = parseFloat(document.getElementById('freq-volume').value) / 100;
       startTones(l, r, vol);
-      document.getElementById('freq-engine-label').textContent = btn.textContent;
+      const lbl = document.getElementById('freq-toolbar-label') || document.getElementById('freq-engine-label'); if(lbl) lbl.textContent = btn.textContent;
     });
   });
 
@@ -2786,7 +2944,7 @@ function initFrequencyEngine() {
       updateToneFrequencies();
       const vol = parseFloat(document.getElementById('freq-volume').value) / 100;
       startTones(l, Math.min(r, 500), vol);
-      document.getElementById('freq-engine-label').textContent = btn.textContent + ' · ' + beat + ' Hz';
+      const lbl2 = document.getElementById('freq-toolbar-label') || document.getElementById('freq-engine-label'); if(lbl2) lbl2.textContent = btn.textContent;
     });
   });
 
@@ -2816,21 +2974,10 @@ function initFrequencyEngine() {
 
   document.getElementById('freq-volume').addEventListener('input', updateVolume);
 
-  // Reopen button
-  const reopenBtn = document.getElementById('freq-reopen-btn');
-  if (reopenBtn) {
-    reopenBtn.addEventListener('click', () => {
-      reopenBtn.style.display = 'none';
-      const eng = document.getElementById('freq-engine');
-      eng.style.display = 'flex';
-      eng.classList.add('collapsed');
-    });
-  }
-
   document.getElementById('freq-stop-btn').addEventListener('click', () => {
     stopTones();
     document.querySelectorAll('.freq-preset-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('freq-engine-label').textContent = 'Frequencies';
+    const lbl3 = document.getElementById('freq-toolbar-label') || document.getElementById('freq-engine-label'); if(lbl3) lbl3.textContent = 'Frequencies';
   });
 
   updateBeatDisplay();
@@ -3043,78 +3190,7 @@ function renderVoiceEntries(roomKey) {
 <!-- ============================================================
      FREQUENCY ENGINE (fixed bottom bar)
      ============================================================ -->
-<div class="freq-engine collapsed" id="freq-engine" style="display:flex;">
-  <div class="freq-engine-controls-row" style="display:flex;align-items:center;gap:var(--space-3);flex-shrink:0;">
-    <div class="freq-engine-toggle" id="freq-toggle" style="cursor:pointer;display:flex;align-items:center;gap:var(--space-2);">
-      <div class="freq-orb" id="freq-orb"></div>
-      <span class="freq-engine-label" id="freq-engine-label">Frequencies</span>
-    </div>
-    <button id="mood-toggle-btn" class="mood-toggle-btn" title="Mood">✦ Mood</button>
-    <button id="freq-close-btn" style="background:none;border:1px solid var(--border);border-radius:50%;color:var(--text-faint);font-size:12px;cursor:pointer;width:22px;height:22px;display:flex;align-items:center;justify-content:center;opacity:0.7;flex-shrink:0;transition:all 0.2s;" title="Close frequencies">✕</button>
-  </div>
 
-  <div class="mood-panel" id="mood-panel">
-
-    <!-- Chakra presets -->
-    <div class="freq-section">
-      <div class="freq-section-label">Chakra · Planetary</div>
-      <div class="freq-presets" id="chakra-presets">
-        <button class="freq-preset-btn" data-chakra="root"    data-l="256" data-r="256">Root</button>
-        <button class="freq-preset-btn" data-chakra="sacral"  data-l="288" data-r="288">Sacral</button>
-        <button class="freq-preset-btn" data-chakra="solar"   data-l="320" data-r="320">Solar</button>
-        <button class="freq-preset-btn" data-chakra="heart"   data-l="341" data-r="341">Heart</button>
-        <button class="freq-preset-btn" data-chakra="throat"  data-l="384" data-r="384">Throat</button>
-        <button class="freq-preset-btn" data-chakra="third"   data-l="426" data-r="426">Third Eye</button>
-        <button class="freq-preset-btn" data-chakra="crown"   data-l="480" data-r="480">Crown</button>
-      </div>
-    </div>
-
-    <!-- Brainwave presets -->
-    <div class="freq-section">
-      <div class="freq-section-label">Brainwave State</div>
-      <div class="freq-presets" id="brainwave-presets">
-        <button class="freq-preset-btn" data-bw="delta"  data-beat="2"  title="Deep sleep 0.5–4 Hz">Delta</button>
-        <button class="freq-preset-btn" data-bw="theta"  data-beat="6"  title="Meditation 4–8 Hz">Theta</button>
-        <button class="freq-preset-btn" data-bw="alpha"  data-beat="10" title="Relaxed focus 8–12 Hz">Alpha</button>
-        <button class="freq-preset-btn" data-bw="beta"   data-beat="20" title="Alert 12–30 Hz">Beta</button>
-        <button class="freq-preset-btn" data-bw="gamma"  data-beat="40" title="Peak performance 30+ Hz">Gamma</button>
-        <button class="freq-preset-btn" data-bw="schumann" data-beat="7.83" title="Earth resonance 7.83 Hz">Schumann</button>
-      </div>
-    </div>
-
-    <!-- Binaural L/R knobs -->
-    <div class="freq-section">
-      <div class="freq-section-label">Binaural · L / R</div>
-      <div class="binaural-row">
-        <div class="binaural-channel">
-          <div class="binaural-channel-label">L</div>
-          <div class="binaural-freq-display" id="binaural-l-display">200 Hz</div>
-          <input type="range" class="freq-knob" id="binaural-l" min="100" max="500" value="200" step="1">
-        </div>
-        <div class="binaural-channel">
-          <div class="binaural-channel-label">R</div>
-          <div class="binaural-freq-display" id="binaural-r-display">210 Hz</div>
-          <input type="range" class="freq-knob" id="binaural-r" min="100" max="500" value="210" step="1">
-        </div>
-        <div class="binaural-channel">
-          <div class="binaural-channel-label">Beat</div>
-          <div class="binaural-freq-display" id="beat-display" style="font-size:9px;">10 Hz<br><span style="font-size:8px;opacity:0.6;">Alpha</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Volume + stop -->
-    <div class="freq-section">
-      <div class="freq-section-label">Volume</div>
-      <div class="freq-volume">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-faint)"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
-        <input type="range" id="freq-volume" min="0" max="100" value="40" step="1">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-faint)"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-      </div>
-      <button class="freq-preset-btn" id="freq-stop-btn" style="margin-top:4px;border-color:#f43f5e;color:#f43f5e;">■ Stop</button>
-    </div>
-  </div>
-</div>
 
 <!-- ============================================================
      MOOD LIGHTING
