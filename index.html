@@ -89,6 +89,7 @@ html {
    ============================================================ */
 [data-theme="A"] {
   --bg:              #0b1120;
+  --bg-gradient:     radial-gradient(ellipse at 50% 40%, #131d3a 0%, #0b1120 65%);
   --card:            #111827;
   --card-alt:        #141e2e;
   --text:            #f1f5f9;
@@ -120,6 +121,7 @@ html {
    ============================================================ */
 [data-theme="B"] {
   --bg:              #2d1a0a;
+  --bg-gradient:     radial-gradient(ellipse at 50% 40%, #3d220c 0%, #2d1a0a 65%);
   --card:            #3d2510;
   --card-alt:        #4a2e14;
   --text:            #fef3dc;
@@ -150,6 +152,7 @@ html {
    ============================================================ */
 [data-theme="C"] {
   --bg:              #f7f4ef;
+  --bg-gradient:     radial-gradient(ellipse at 50% 40%, #fdfaf5 0%, #ede8df 70%);
   --card:            #fdfcfa;
   --card-alt:        #f2ede6;
   --text:            #2c2416;
@@ -184,6 +187,8 @@ body {
   font-size: var(--text-base);
   color: var(--text);
   background-color: var(--bg);
+  background-image: var(--bg-gradient, none);
+  background-attachment: fixed;
   line-height: 1.6;
   transition: background-color var(--transition), color var(--transition);
 }
@@ -907,10 +912,12 @@ button { cursor: pointer; background: none; border: none; }
 .compass-card.active {
   display: block;
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent-color, var(--setup-accent)) 25%, var(--border)),
-    0 8px 48px var(--card-glow, rgba(99,102,241,0.15)),
-    0 0 80px var(--card-glow, rgba(99,102,241,0.08)),
-    0 2px 8px rgba(0,0,0,0.3);
+    0 0 0 1px color-mix(in srgb, var(--accent-color, var(--setup-accent)) 35%, var(--border)),
+    0 8px 60px var(--card-glow-strong, rgba(99,102,241,0.28)),
+    0 0 120px var(--card-glow, rgba(99,102,241,0.14)),
+    0 0 200px color-mix(in srgb, var(--card-glow, rgba(99,102,241,0.07)) 60%, transparent),
+    0 2px 12px rgba(0,0,0,0.4);
+  transform: translateY(-2px);
 }
 
 .compass-card-header {
@@ -1764,9 +1771,9 @@ body.companion-mode .companion-mode-banner { display: block; }
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-faint);
+  border: 1px solid color-mix(in srgb, var(--accent-color, var(--setup-accent)) 40%, var(--border));
+  background: color-mix(in srgb, var(--accent-color, var(--setup-accent)) 8%, transparent);
+  color: var(--accent-color, var(--setup-accent));
   font-size: 0.7rem;
   font-weight: 700;
   cursor: pointer;
@@ -1777,12 +1784,22 @@ body.companion-mode .companion-mode-banner { display: block; }
   flex-shrink: 0;
   font-style: italic;
   font-family: Georgia, serif;
+  opacity: 0.75;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent-color, var(--setup-accent)) 20%, transparent);
+  animation: info-pulse 3s ease-in-out infinite;
+}
+@keyframes info-pulse {
+  0%, 100% { box-shadow: 0 0 4px color-mix(in srgb, var(--accent-color, var(--setup-accent)) 20%, transparent); opacity: 0.75; }
+  50%       { box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color, var(--setup-accent)) 45%, transparent); opacity: 1; }
 }
 
 .info-btn:hover {
   border-color: var(--accent-color, var(--setup-accent));
   color: var(--accent-color, var(--setup-accent));
-  background: color-mix(in srgb, var(--accent-color, var(--setup-accent)) 10%, transparent);
+  background: color-mix(in srgb, var(--accent-color, var(--setup-accent)) 18%, transparent);
+  opacity: 1;
+  animation: none;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent-color, var(--setup-accent)) 50%, transparent);
 }
 
 .point-info-panel {
@@ -2090,6 +2107,22 @@ body.companion-mode .companion-mode-banner { display: block; }
   gap: var(--space-3);
   align-items: center;
   flex-wrap: wrap;
+}
+
+
+/* ── Companion Profile menu item ─────────────────────────────────────────── */
+#menu-profile {
+  background: color-mix(in srgb, var(--setup-accent) 10%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--setup-accent) 20%, var(--border));
+  color: var(--text);
+  font-weight: 600;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+#menu-profile:hover {
+  background: color-mix(in srgb, var(--setup-accent) 18%, transparent);
+}
+#menu-profile svg {
+  color: var(--setup-accent);
 }
 
 .mt-4 { margin-top: var(--space-4); }
@@ -2503,6 +2536,11 @@ body.companion-mode .companion-mode-banner { display: block; }
       <div class="more-menu" id="more-menu">
         <button class="btn-more" id="btn-more" title="More options">···</button>
         <div class="more-dropdown" id="more-dropdown">
+          <button class="more-dropdown-item" id="menu-profile">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Companion Profile
+          </button>
+          <div class="more-dropdown-divider"></div>
           <button class="more-dropdown-item" id="btn-generate-all">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
             Generate Website Copy (All)
@@ -2525,10 +2563,6 @@ body.companion-mode .companion-mode-banner { display: block; }
           <button class="more-dropdown-item" id="btn-toggle-companion">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span id="companion-mode-label">Switch to Companion View</span>
-          </button>
-          <button class="more-dropdown-item" id="menu-profile">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            Companion Profile
           </button>
           <button class="more-dropdown-item" id="btn-show-welcome">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>
@@ -2579,7 +2613,7 @@ body.companion-mode .companion-mode-banner { display: block; }
           <div class="card-title" style="color:var(--work)">The Work</div>
           <button class="info-btn" data-info="work" title="About this direction"><i>i</i></button>
         </div>
-        <div class="card-law" style="color:var(--work);opacity:0.6">Law of Awareness</div>
+        <div class="card-law" style="color:var(--work);opacity:0.6">what you are here to do</div>
       </div>
     </div>
     <div class="point-info-panel" id="info-work">
@@ -2837,7 +2871,7 @@ body.companion-mode .companion-mode-banner { display: block; }
           <div class="card-title" style="color:var(--lens)">The Lens</div>
           <button class="info-btn" data-info="lens" title="About this direction"><i>i</i></button>
         </div>
-        <div class="card-law" style="color:var(--lens);opacity:0.6">Law of Clarity</div>
+        <div class="card-law" style="color:var(--lens);opacity:0.6">how you are here to see</div>
       </div>
     </div>
     <div class="point-info-panel" id="info-lens">
@@ -3089,7 +3123,7 @@ body.companion-mode .companion-mode-banner { display: block; }
           <div class="card-title" style="color:var(--field)">The Field</div>
           <button class="info-btn" data-info="field" title="About this direction"><i>i</i></button>
         </div>
-        <div class="card-law" style="color:var(--field);opacity:0.6">Law of Balance</div>
+        <div class="card-law" style="color:var(--field);opacity:0.6">where you are here to be</div>
       </div>
     </div>
     <div class="point-info-panel" id="info-field">
@@ -3341,7 +3375,7 @@ body.companion-mode .companion-mode-banner { display: block; }
           <div class="card-title" style="color:var(--call)">The Call</div>
           <button class="info-btn" data-info="call" title="About this direction"><i>i</i></button>
         </div>
-        <div class="card-law" style="color:var(--call);opacity:0.6">Law of Creation</div>
+        <div class="card-law" style="color:var(--call);opacity:0.6">why you are here to serve</div>
       </div>
     </div>
     <div class="point-info-panel" id="info-call">
@@ -3597,8 +3631,8 @@ body.companion-mode .companion-mode-banner { display: block; }
 <div id="ack-modal" style="
   display:none;position:fixed;inset:0;z-index:999;
   background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
-  align-items:center;justify-content:center;padding:var(--space-6);
-  overflow-y:auto;
+  align-items:flex-start;justify-content:center;padding:var(--space-6);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
 ">
   <div style="
     background:var(--card);border:1px solid var(--border);
@@ -6095,7 +6129,7 @@ function initProfileModal() {
 <!-- ============================================================
      PROFILE MODAL
      ============================================================ -->
-<div id="profile-modal" role="dialog" aria-modal="true" aria-label="Companion Profile" style="display:none;position:fixed;inset:0;z-index:200;align-items:flex-start;justify-content:center;padding:2rem 1rem;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);overflow-y:auto;">
+<div id="profile-modal" role="dialog" aria-modal="true" aria-label="Companion Profile" style="display:none;position:fixed;inset:0;z-index:200;align-items:flex-start;justify-content:center;padding:2rem 1rem;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);overflow-y:auto;-webkit-overflow-scrolling:touch;">
   <div class="profile-modal-inner">
     <div class="profile-modal-header">
       <span class="profile-modal-title">Companion Profile</span>
