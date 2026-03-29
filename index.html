@@ -4090,6 +4090,8 @@ function lookupGK(point) {
   }
 
   renderLineTheme(point, line);
+  // Keep SGS triad in sync whenever GK changes
+  updateSGSTriad(point);
 }
 
 // ============================================================
@@ -6070,29 +6072,40 @@ function updateSGSTriad(point) {
   const pt = state.points[point];
   if (!pt) return;
   const gkNum = parseInt(pt.gk_num);
+  const gkLine = parseInt(pt.gk_line);
   const gk = gkNum ? GENE_KEYS[gkNum] : null;
 
-  const empty  = document.getElementById(`sgs-${point}-empty`);
-  const shadowEl  = document.getElementById(`sgs-${point}-shadow`);
-  const giftEl    = document.getElementById(`sgs-${point}-gift`);
-  const siddhiEl  = document.getElementById(`sgs-${point}-siddhi`);
-  const sep1      = document.getElementById(`sgs-${point}-sep1`);
-  const sep2      = document.getElementById(`sgs-${point}-sep2`);
-  const shadowVal = document.getElementById(`sgs-${point}-shadow-val`);
-  const giftVal   = document.getElementById(`sgs-${point}-gift-val`);
-  const siddhiVal = document.getElementById(`sgs-${point}-siddhi-val`);
+  const triad = document.getElementById(`sgs-${point}`);
+  if (!triad) return;
 
   if (!gk) {
-    if (empty) empty.style.display = '';
-    [shadowEl, giftEl, siddhiEl, sep1, sep2].forEach(el => { if(el) el.style.display = 'none'; });
+    triad.innerHTML = `<span class="sgs-empty" id="sgs-${point}-empty">Enter a Gene Key in the Facilitator panel to see your Shadow, Gift &amp; Siddhi</span>`;
     return;
   }
 
-  if (empty) empty.style.display = 'none';
-  if (shadowVal) shadowVal.textContent = gk.shadow;
-  if (giftVal)   giftVal.textContent   = gk.gift;
-  if (siddhiVal) siddhiVal.textContent = gk.siddhi;
-  [shadowEl, giftEl, siddhiEl, sep1, sep2].forEach(el => { if(el) el.style.display = ''; });
+  const lineStr = gkLine && gkLine >= 1 && gkLine <= 6 ? ` · Line ${gkLine}` : '';
+
+  triad.innerHTML = `
+    <div class="sgs-item" style="min-width:auto;">
+      <span class="sgs-label" style="color:var(--accent-color,var(--setup-accent));">Gene Key</span>
+      <span class="sgs-value" style="color:var(--accent-color,var(--setup-accent));">GK ${gkNum}${lineStr}</span>
+    </div>
+    <span class="sgs-separator" style="opacity:0.3;">·</span>
+    <div class="sgs-item">
+      <span class="sgs-label shadow">Shadow</span>
+      <span class="sgs-value">${gk.shadow}</span>
+    </div>
+    <span class="sgs-separator" style="opacity:0.3;">·</span>
+    <div class="sgs-item">
+      <span class="sgs-label gift">Gift</span>
+      <span class="sgs-value">${gk.gift}</span>
+    </div>
+    <span class="sgs-separator" style="opacity:0.3;">·</span>
+    <div class="sgs-item">
+      <span class="sgs-label siddhi">Siddhi</span>
+      <span class="sgs-value">${gk.siddhi}</span>
+    </div>
+  `;
 }
 
 function updateAllSGSTriads() {
