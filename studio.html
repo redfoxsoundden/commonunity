@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="A">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonUnity Studio</title>
+<meta name="description" content="A living space for inner exploration and creative expression — four rooms, one for each dimension of your being.">
+<meta property="og:title" content="CommonUnity Studio">
+<meta property="og:description" content="A living space for inner exploration and creative expression.">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+:root {
+  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+  --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+  --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+  --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+  --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+
+  --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem;
+  --space-4: 1rem;    --space-5: 1.25rem; --space-6: 1.5rem;
+  --space-8: 2rem;    --space-10: 2.5rem; --space-12: 3rem;
+
+  --radius-sm: 0.375rem; --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  --transition: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 600ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* ============================================================
+   THEMES
+   ============================================================ */
+[data-theme="A"] {
+  --bg: #0b1120;
+  --bg-gradient: radial-gradient(ellipse at 50% 40%, #131d3a 0%, #0b1120 65%);
+  --card: #111827; --card-alt: #141e2e;
+  --text: #f1f5f9; --text-muted: #94a3b8; --text-faint: #475569;
+  --border: #1e293b; --input-bg: #0d1526;
+  --work: #f59e0b;  --lens: #6366f1; --field: #10b981; --call: #f43f5e;
+  --work-glow: rgba(245,158,11,0.2); --lens-glow: rgba(99,102,241,0.2);
+  --field-glow: rgba(16,185,129,0.2); --call-glow: rgba(244,63,94,0.2);
+  --btn-primary: #6366f1; --btn-primary-h: #818cf8;
+  --setup-accent: #6366f1;
+  --card-glow: rgba(99,102,241,0.12);
+  --card-glow-strong: rgba(99,102,241,0.28);
+  --rose-color: #c4b5fd;
+}
+[data-theme="B"] {
+  --bg: #2d1a0a;
+  --bg-gradient: radial-gradient(ellipse at 50% 40%, #3d220c 0%, #2d1a0a 65%);
+  --card: #3d2510; --card-alt: #4a2e14;
+  --text: #fef3dc; --text-muted: #c9a87a; --text-faint: #7a5a38;
+  --border: #5c3a1e; --input-bg: #251408;
+  --work: #f59e0b; --lens: #38bdf8; --field: #86efac; --call: #fb7185;
+  --work-glow: rgba(245,158,11,0.2); --lens-glow: rgba(56,189,248,0.2);
+  --field-glow: rgba(134,239,172,0.2); --call-glow: rgba(251,113,133,0.2);
+  --btn-primary: #ea8c1a; --btn-primary-h: #f59e0b;
+  --setup-accent: #ea8c1a;
+  --card-glow: rgba(234,140,26,0.13);
+  --card-glow-strong: rgba(234,140,26,0.28);
+  --rose-color: #fcd34d;
+}
+[data-theme="C"] {
+  --bg: #f7f4ef;
+  --bg-gradient: radial-gradient(ellipse at 50% 40%, #fdfaf5 0%, #ede8df 70%);
+  --card: #fdfcfa; --card-alt: #f2ede6;
+  --text: #2c2416; --text-muted: #7a6a52; --text-faint: #b8a98e;
+  --border: #e4ddd2; --input-bg: #f9f6f1;
+  --work: #b45309; --lens: #4f46e5; --field: #16803c; --call: #be185d;
+  --work-glow: rgba(180,83,9,0.15); --lens-glow: rgba(79,70,229,0.15);
+  --field-glow: rgba(22,128,60,0.15); --call-glow: rgba(190,24,93,0.15);
+  --btn-primary: #b45309; --btn-primary-h: #92400e;
+  --setup-accent: #b45309;
+  --card-glow: rgba(180,83,9,0.10);
+  --card-glow-strong: rgba(180,83,9,0.18);
+  --rose-color: #fb923c;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+body {
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text);
+  background-color: var(--bg);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--setup-accent); outline-offset: 3px; border-radius: var(--radius-sm); }
+::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+.screen { display: none; min-height: 100dvh; }
+.screen.active { display: flex; }
+
+/* ============================================================
+   ENTRANCE SCREEN
+   ============================================================ */
+#screen-entrance {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-4);
+  position: relative;
+}
+
+.entrance-wordmark {
+  position: absolute;
+  top: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.entrance-name {
+  position: absolute;
+  top: calc(var(--space-6) + 28px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  white-space: nowrap;
+  font-style: italic;
+}
+
+/* ── Origami Portal ───────────────────────────────────────────── */
+.portal-wrap {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  cursor: pointer;
+  margin-bottom: var(--space-8);
+}
+
+.portal-svg {
+  width: 100%;
+  height: 100%;
+  transition: transform var(--transition-slow);
+  animation: portal-breathe 8s ease-in-out infinite;
+}
+
+@keyframes portal-breathe {
+  0%, 100% { transform: rotate(0deg) scale(1);    filter: drop-shadow(0 0 12px rgba(129,140,248,0.3)); }
+  25%       { transform: rotate(5deg) scale(1.04); filter: drop-shadow(0 0 22px rgba(129,140,248,0.5)); }
+  50%       { transform: rotate(0deg) scale(1);    filter: drop-shadow(0 0 12px rgba(245,158,11,0.3)); }
+  75%       { transform: rotate(-5deg) scale(1.04);filter: drop-shadow(0 0 22px rgba(245,158,11,0.5)); }
+}
+
+.portal-wrap:hover .portal-svg {
+  animation: none;
+  transform: scale(1.06) rotate(45deg);
+  filter: drop-shadow(0 0 30px rgba(129,140,248,0.6));
+  transition: transform 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.8s ease;
+}
+
+.portal-wrap.unfolding .portal-svg {
+  animation: portal-unfold 1.5s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+@keyframes portal-unfold {
+  0%   { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 12px rgba(129,140,248,0.3)); }
+  40%  { transform: scale(1.15) rotate(45deg); filter: drop-shadow(0 0 40px rgba(196,181,253,0.7)); }
+  70%  { transform: scale(0.95) rotate(90deg); filter: drop-shadow(0 0 20px rgba(245,158,11,0.5)); }
+  100% { transform: scale(1) rotate(90deg); filter: drop-shadow(0 0 16px rgba(129,140,248,0.4)); }
+}
+
+/* Facet hit areas — invisible, positioned over each triangle */
+.portal-facet {
+  position: absolute;
+  width: 50%; height: 50%;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.portal-facet.top    { top: 0;   left: 25%; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+.portal-facet.right  { top: 25%; right: 0;  clip-path: polygon(0% 0%, 100% 50%, 0% 100%); }
+.portal-facet.bottom { bottom: 0; left: 25%; clip-path: polygon(0% 0%, 100% 0%, 50% 100%); }
+.portal-facet.left   { top: 25%; left: 0;   clip-path: polygon(100% 0%, 0% 50%, 100% 100%); }
+
+.portal-facet[data-room="work"]  { background: var(--work); }
+.portal-facet[data-room="lens"]  { background: var(--lens); }
+.portal-facet[data-room="field"] { background: var(--field); }
+.portal-facet[data-room="call"]  { background: var(--call); }
+
+.portal-wrap.doors-open .portal-facet { opacity: 0.15; }
+.portal-wrap.doors-open .portal-facet:hover { opacity: 0.35; }
+
+/* Room labels that appear when doors open */
+.portal-room-labels {
+  position: absolute;
+  inset: -60px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.portal-wrap.doors-open .portal-room-labels { opacity: 1; }
+
+.room-label {
+  position: absolute;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+.room-label.work  { top: 0;    left: 50%; transform: translateX(-50%); color: var(--work); }
+.room-label.lens  { top: 50%;  right: -10px; transform: translateY(-50%); color: var(--lens); }
+.room-label.field { bottom: 0; left: 50%; transform: translateX(-50%); color: var(--field); }
+.room-label.call  { top: 50%;  left: -10px; transform: translateY(-50%); color: var(--call); }
+
+/* ── Rose prompt ────────────────────────────────────────────── */
+.rose-prompt {
+  max-width: 380px;
+  text-align: center;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rose-prompt-text {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.7;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.rose-prompt-text.visible { opacity: 1; }
+
+.rose-byline {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  letter-spacing: 0.08em;
+  opacity: 0;
+  transition: opacity 0.5s ease 0.3s;
+}
+.rose-byline.visible { opacity: 1; }
+
+/* ── Entrance actions ────────────────────────────────────────── */
+.entrance-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.entrance-actions.visible { opacity: 1; }
+
+.btn-enter-room {
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: all var(--transition);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--card-alt);
+}
+.btn-enter-room:hover {
+  border-color: var(--setup-accent);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px var(--card-glow);
+}
+.btn-enter-room.primary {
+  background: var(--btn-primary);
+  border-color: var(--btn-primary);
+  color: white;
+}
+.btn-enter-room.primary:hover {
+  background: var(--btn-primary-h);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--btn-primary) 40%, transparent);
+}
+
+/* Import compass link */
+.compass-import-link {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  margin-top: var(--space-2);
+}
+.compass-import-link:hover { color: var(--text-muted); }
+
+/* ============================================================
+   ROOM SCREEN
+   ============================================================ */
+#screen-room {
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--space-4) var(--space-12);
+}
+
+/* ── Room Header ─────────────────────────────────────────────── */
+.room-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  z-index: 10;
+  gap: var(--space-4);
+}
+
+.room-back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-faint);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color var(--transition);
+}
+.room-back:hover { color: var(--text-muted); }
+.room-back svg { flex-shrink: 0; }
+
+.room-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.room-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+.room-subtitle {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.room-gk-badge {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  background: var(--card-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+/* ── Room Layout — three columns ─────────────────────────────── */
+.room-body {
+  display: grid;
+  grid-template-columns: 260px 1fr 320px;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-4);
+  min-height: calc(100dvh - 80px);
+}
+
+@media (max-width: 900px) {
+  .room-body { grid-template-columns: 1fr; }
+}
+
+/* ── Archive (left) ─────────────────────────────────────────── */
+.room-archive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.archive-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.archive-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.archive-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  opacity: 0.7;
+}
+
+.archive-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.6;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+}
+.archive-item:hover {
+  border-color: var(--accent-color, var(--setup-accent));
+  color: var(--text);
+}
+.archive-item .archive-item-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-color, var(--setup-accent));
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+.archive-item .archive-item-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.archive-empty {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  font-style: italic;
+  padding: var(--space-3);
+  text-align: center;
+}
+
+/* ── Workbench (centre) ─────────────────────────────────────── */
+.room-workbench {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.workbench-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workbench-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.workbench-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.workbench-btn {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-faint);
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  background: none;
+}
+.workbench-btn:hover {
+  color: var(--text);
+  border-color: var(--accent-color, var(--setup-accent));
+}
+.workbench-btn.primary {
+  background: var(--accent-color, var(--setup-accent));
+  border-color: var(--accent-color, var(--setup-accent));
+  color: white;
+}
+
+.workbench-textarea {
+  width: 100%;
+  min-height: 320px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  font-size: var(--text-base);
+  color: var(--text);
+  line-height: 1.8;
+  resize: vertical;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  font-family: var(--font-body);
+}
+.workbench-textarea:focus {
+  outline: none;
+  border-color: var(--accent-color, var(--setup-accent));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color, var(--setup-accent)) 12%, transparent);
+}
+.workbench-textarea::placeholder { color: var(--text-faint); }
+
+/* Workbench entries list */
+.workbench-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.workbench-entry {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.workbench-entry-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.workbench-entry-date {
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.05em;
+}
+.workbench-entry-delete {
+  color: var(--text-faint);
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition);
+}
+.workbench-entry-delete:hover { color: #f43f5e; }
+.workbench-entry-text {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* ── Mirror / Rose (right) ───────────────────────────────────── */
+.room-mirror {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: sticky;
+  top: 96px;
+  height: fit-content;
+  max-height: calc(100dvh - 120px);
+}
+
+.mirror-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.mirror-rose-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  animation: rose-pulse 4s ease-in-out infinite;
+}
+
+@keyframes rose-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--rose-color, #c4b5fd)) opacity(0.8); }
+  50%       { filter: drop-shadow(0 0 10px var(--rose-color, #c4b5fd)) opacity(1); }
+}
+
+.mirror-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.mirror-gk-context {
+  font-size: 10px;
+  color: var(--text-faint);
+  margin-left: auto;
+  font-style: italic;
+}
+
+.mirror-conversation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.mirror-message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mirror-message.rose .mirror-bubble {
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 8%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 20%, var(--border));
+  color: var(--text-muted);
+  font-style: italic;
+  align-self: flex-start;
+  border-radius: 4px 16px 16px 4px;
+}
+.mirror-message.user .mirror-bubble {
+  background: var(--card-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  align-self: flex-end;
+  border-radius: 16px 4px 4px 16px;
+}
+.mirror-bubble {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  max-width: 90%;
+}
+.mirror-sender {
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 var(--space-1);
+}
+.mirror-message.user .mirror-sender { text-align: right; }
+
+.mirror-input-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-end;
+}
+.mirror-input {
+  flex: 1;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--text);
+  resize: none;
+  min-height: 44px;
+  max-height: 120px;
+  transition: border-color var(--transition);
+  font-family: var(--font-body);
+}
+.mirror-input:focus {
+  outline: none;
+  border-color: var(--rose-color, #c4b5fd);
+}
+.mirror-input::placeholder { color: var(--text-faint); font-style: italic; }
+.mirror-send {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, transparent);
+  color: var(--rose-color, #c4b5fd);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.mirror-send:hover {
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, transparent);
+  transform: scale(1.05);
+}
+.mirror-send.loading { opacity: 0.5; pointer-events: none; }
+
+.mirror-rose-intro {
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+  font-style: italic;
+  text-align: center;
+  padding: var(--space-3);
+  line-height: 1.6;
+}
+
+/* ── SGS display in room ─────────────────────────────────────── */
+.room-sgs {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--accent-color, var(--setup-accent)) 5%, transparent);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--accent-color, var(--setup-accent)) 15%, var(--border));
+  flex-wrap: wrap;
+}
+.room-sgs-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.room-sgs-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.room-sgs-label.shadow { color: #ef4444; }
+.room-sgs-label.gift   { color: #ca8a04; }
+.room-sgs-label.siddhi { color: #a78bfa; }
+.room-sgs-value {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── Import modal ────────────────────────────────────────────── */
+#import-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+}
+#import-modal.open { display: flex; }
+.import-inner {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+}
+.import-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+.import-desc {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.import-dropzone {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.import-dropzone:hover { border-color: var(--setup-accent); }
+.import-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+.btn-secondary {
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--card-alt);
+  transition: all var(--transition);
+}
+.btn-secondary:hover { color: var(--text); border-color: var(--setup-accent); }
+
+/* ── Toast ───────────────────────────────────────────────────── */
+.studio-toast {
+  position: fixed;
+  bottom: var(--space-6);
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+}
+.studio-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.studio-footer {
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--text-faint);
+}
+.studio-footer a { color: var(--text-faint); text-decoration: none; }
+.studio-footer a:hover { color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SCREEN 1: ENTRANCE
+     ============================================================ -->
+<div id="screen-entrance" class="screen active">
+
+  <div class="entrance-wordmark">CommonUnity Studio</div>
+  <div class="entrance-name" id="entrance-name"></div>
+
+  <!-- The origami portal -->
+  <div class="portal-wrap" id="portal" title="Touch to open">
+    <svg class="portal-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="CommonUnity Studio">
+      <defs>
+        <radialGradient id="s-aura" cx="50%" cy="50%" r="50%">
+          <stop offset="55%" stop-color="#818cf8" stop-opacity="0"/>
+          <stop offset="78%" stop-color="#a5b4fc" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#c7d2fe" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="s-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#fef3c7" stop-opacity="0.9"/>
+          <stop offset="25%" stop-color="#fde68a" stop-opacity="0.5"/>
+          <stop offset="55%" stop-color="#c4b5fd" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#312e81" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="s-fold" color-interpolation-filters="sRGB" x="-6%" y="-6%" width="112%" height="112%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b"/>
+          <feColorMatrix in="b" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 28 -12" result="t"/>
+          <feComposite in="SourceGraphic" in2="t" operator="atop"/>
+        </filter>
+      </defs>
+      <circle cx="50" cy="50" r="50" fill="url(#s-aura)"/>
+      <g filter="url(#s-fold)">
+        <polygon points="50,5 95,50 5,50 50,43" fill="#b8a878" fill-opacity="0.75"/>
+        <polygon points="95,50 50,95 50,5 57,50" fill="#7c8fc4" fill-opacity="0.70"/>
+        <polygon points="50,95 5,50 95,50 50,57" fill="#6aaa8c" fill-opacity="0.68"/>
+        <polygon points="5,50 50,5 50,95 43,50" fill="#c47c8f" fill-opacity="0.68"/>
+      </g>
+      <g opacity="0.55">
+        <polygon points="50,22 72,43 28,43 50,38" fill="#e8d9a0" fill-opacity="0.5"/>
+        <polygon points="72,57 57,72 57,28 62,50" fill="#a8bce0" fill-opacity="0.45"/>
+        <polygon points="50,78 28,57 72,57 50,62" fill="#9dd4b4" fill-opacity="0.45"/>
+        <polygon points="28,43 43,28 43,72 38,50" fill="#dfa0b0" fill-opacity="0.42"/>
+      </g>
+      <circle cx="50" cy="50" r="15" fill="url(#s-glow)"/>
+      <circle cx="50" cy="50" r="1.5" fill="#fef9ee" fill-opacity="0.9"/>
+    </svg>
+
+    <!-- Invisible facet hit areas -->
+    <div class="portal-facet top"    data-room="work"  title="The Work"></div>
+    <div class="portal-facet right"  data-room="lens"  title="The Lens"></div>
+    <div class="portal-facet bottom" data-room="field" title="The Field"></div>
+    <div class="portal-facet left"   data-room="call"  title="The Call"></div>
+
+    <!-- Room labels that appear after first touch -->
+    <div class="portal-room-labels">
+      <span class="room-label work">The Work</span>
+      <span class="room-label lens">The Lens</span>
+      <span class="room-label field">The Field</span>
+      <span class="room-label call">The Call</span>
+    </div>
+  </div>
+
+  <!-- The Rose prompt -->
+  <div class="rose-prompt">
+    <p class="rose-prompt-text" id="rose-prompt-text"></p>
+    <span class="rose-byline" id="rose-byline">— The Rose</span>
+  </div>
+
+  <!-- Entrance actions (appear after portal interaction) -->
+  <div class="entrance-actions" id="entrance-actions">
+    <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;justify-content:center;">
+      <button class="btn-enter-room" data-room="work"  style="border-color:var(--work);color:var(--work);">The Work</button>
+      <button class="btn-enter-room" data-room="lens"  style="border-color:var(--lens);color:var(--lens);">The Lens</button>
+      <button class="btn-enter-room" data-room="field" style="border-color:var(--field);color:var(--field);">The Field</button>
+      <button class="btn-enter-room" data-room="call"  style="border-color:var(--call);color:var(--call);">The Call</button>
+    </div>
+    <button class="compass-import-link" id="btn-import-compass">Import from Compass session →</button>
+  </div>
+
+  <footer class="studio-footer" style="position:absolute;bottom:0;width:100%;">
+    <a href="https://hearthventurestudio.com" target="_blank">Hearth Venture Studio</a> &amp;
+    <a href="https://www.perplexity.ai/computer" target="_blank">Perplexity Computer</a>
+  </footer>
+
+</div><!-- /screen-entrance -->
+
+
+<!-- ============================================================
+     SCREEN 2: ROOM
+     ============================================================ -->
+<div id="screen-room" class="screen">
+
+  <div class="room-header">
+    <button class="room-back" id="btn-back-to-entrance">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+      Studio
+    </button>
+    <div class="room-title-block">
+      <div class="room-title" id="room-title-display"></div>
+      <div class="room-subtitle" id="room-subtitle-display"></div>
+    </div>
+    <div class="room-gk-badge" id="room-gk-badge">—</div>
+  </div>
+
+  <div class="room-body">
+
+    <!-- Archive -->
+    <div class="room-archive">
+      <div class="archive-title">Archive</div>
+      <div id="archive-compass-section" class="archive-section">
+        <div class="archive-section-label">From Compass</div>
+        <div id="archive-compass-items"></div>
+      </div>
+      <div class="archive-section">
+        <div class="archive-section-label">Studio Sessions</div>
+        <div id="archive-studio-items"></div>
+      </div>
+    </div>
+
+    <!-- Workbench -->
+    <div class="room-workbench">
+      <div class="workbench-header">
+        <span class="workbench-label">Workbench</span>
+        <div class="workbench-actions">
+          <button class="workbench-btn" id="btn-save-entry">Save entry</button>
+        </div>
+      </div>
+
+      <!-- SGS triad -->
+      <div class="room-sgs" id="room-sgs">
+        <span style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">Enter your Gene Key in the Compass to see your frequencies here</span>
+      </div>
+
+      <textarea class="workbench-textarea" id="workbench-input"
+        placeholder="This is your space. Write freely — reflections, questions, ideas, observations, intentions. Nothing needs to be structured here."></textarea>
+
+      <div class="workbench-entries" id="workbench-entries"></div>
+    </div>
+
+    <!-- Mirror / The Rose -->
+    <div class="room-mirror">
+      <div class="mirror-header">
+        <!-- Compass Rose SVG icon -->
+        <svg class="mirror-rose-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-opacity="0.2" stroke-width="1"/>
+          <!-- compass rose petals -->
+          <path d="M14 2 L16 12 L14 10 L12 12 Z" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.9"/>
+          <path d="M26 14 L16 16 L18 14 L16 12 Z" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.7"/>
+          <path d="M14 26 L12 16 L14 18 L16 16 Z" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.9"/>
+          <path d="M2 14 L12 12 L10 14 L12 16 Z" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.7"/>
+          <!-- inner petals -->
+          <path d="M14 6 L15.5 12 L14 11 L12.5 12 Z" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.4"/>
+          <path d="M22 14 L16 15.5 L17 14 L16 12.5 Z" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.4"/>
+          <path d="M14 22 L12.5 16 L14 17 L15.5 16 Z" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.4"/>
+          <path d="M6 14 L12 12.5 L11 14 L12 15.5 Z" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.4"/>
+          <circle cx="14" cy="14" r="2" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.9"/>
+        </svg>
+        <span class="mirror-title">The Rose</span>
+        <span class="mirror-gk-context" id="mirror-gk-context"></span>
+      </div>
+
+      <div class="mirror-conversation" id="mirror-conversation">
+        <p class="mirror-rose-intro" id="mirror-intro">
+          A contemplation partner for this direction.<br>Ask anything. Reflect freely. The Rose holds this space.
+        </p>
+      </div>
+
+      <div class="mirror-input-row">
+        <textarea class="mirror-input" id="mirror-input"
+          placeholder="Speak to the Rose…"
+          rows="2"></textarea>
+        <button class="mirror-send" id="mirror-send-btn" title="Send">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /room-body -->
+
+</div><!-- /screen-room -->
+
+
+<!-- ============================================================
+     IMPORT MODAL
+     ============================================================ -->
+<div id="import-modal">
+  <div class="import-inner">
+    <div class="import-title">Import Compass Session</div>
+    <p class="import-desc">Upload a Compass session JSON file to seed your Studio rooms with your existing material — notes, insights, Gene Keys, and Q&A responses.</p>
+    <div class="import-dropzone" id="import-dropzone">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-faint);margin:0 auto var(--space-2);display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span style="font-size:var(--text-xs);color:var(--text-muted);">Drop JSON or <span style="color:var(--setup-accent);text-decoration:underline;">browse</span></span>
+      <input type="file" id="import-file-input" accept=".json" style="display:none">
+    </div>
+    <div class="import-actions">
+      <button class="btn-secondary" id="import-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="studio-toast" id="studio-toast"></div>
+
+<script>
+// ============================================================
+// GENE KEYS DATA
+// ============================================================
+const GENE_KEYS = {
+  1:  { shadow:'Entropy',        gift:'Freshness',        siddhi:'Beauty' },
+  2:  { shadow:'Dislocation',    gift:'Orientation',      siddhi:'Unity' },
+  3:  { shadow:'Chaos',          gift:'Innovation',       siddhi:'Innocence' },
+  4:  { shadow:'Intolerance',    gift:'Understanding',    siddhi:'Forgiveness' },
+  5:  { shadow:'Impatience',     gift:'Patience',         siddhi:'Timelessness' },
+  6:  { shadow:'Conflict',       gift:'Diplomacy',        siddhi:'Peace' },
+  7:  { shadow:'Division',       gift:'Guidance',         siddhi:'Virtue' },
+  8:  { shadow:'Mediocrity',     gift:'Style',            siddhi:'Exquisiteness' },
+  9:  { shadow:'Inertia',        gift:'Determination',    siddhi:'Invincibility' },
+  10: { shadow:'Self-Obsession', gift:'Naturalness',      siddhi:'Being' },
+  11: { shadow:'Obscurity',      gift:'Idealism',         siddhi:'Light' },
+  12: { shadow:'Vanity',         gift:'Discrimination',   siddhi:'Purity' },
+  13: { shadow:'Discord',        gift:'Discernment',      siddhi:'Empathy' },
+  14: { shadow:'Compromise',     gift:'Competence',       siddhi:'Bounteousness' },
+  15: { shadow:'Dullness',       gift:'Magnetism',        siddhi:'Florescence' },
+  16: { shadow:'Indifference',   gift:'Versatility',      siddhi:'Mastery' },
+  17: { shadow:'Opinion',        gift:'Far-Sightedness',  siddhi:'Omniscience' },
+  18: { shadow:'Judgment',       gift:'Integrity',        siddhi:'Perfection' },
+  19: { shadow:'Co-Dependence',  gift:'Sensitivity',      siddhi:'Sacrifice' },
+  20: { shadow:'Superficiality', gift:'Self-Assurance',   siddhi:'Presence' },
+  21: { shadow:'Control',        gift:'Authority',        siddhi:'Valour' },
+  22: { shadow:'Dishonour',      gift:'Graciousness',     siddhi:'Grace' },
+  23: { shadow:'Complexity',     gift:'Simplicity',       siddhi:'Quintessence' },
+  24: { shadow:'Addiction',      gift:'Invention',        siddhi:'Silence' },
+  25: { shadow:'Constriction',   gift:'Acceptance',       siddhi:'Universal Love' },
+  26: { shadow:'Pride',          gift:'Artfulness',       siddhi:'Invisibility' },
+  27: { shadow:'Selfishness',    gift:'Altruism',         siddhi:'Selflessness' },
+  28: { shadow:'Purposelessness',gift:'Totality',         siddhi:'Immortality' },
+  29: { shadow:'Half-heartedness',gift:'Commitment',      siddhi:'Devotion' },
+  30: { shadow:'Desire',         gift:'Lightness',        siddhi:'Rapture' },
+  31: { shadow:'Arrogance',      gift:'Leadership',       siddhi:'Humility' },
+  32: { shadow:'Failure',        gift:'Preservation',     siddhi:'Veneration' },
+  33: { shadow:'Forgetting',     gift:'Mindfulness',      siddhi:'Revelation' },
+  34: { shadow:'Force',          gift:'Strength',         siddhi:'Majesty' },
+  35: { shadow:'Hunger',         gift:'Adventure',        siddhi:'Boundlessness' },
+  36: { shadow:'Turbulence',     gift:'Humanity',         siddhi:'Compassion' },
+  37: { shadow:'Weakness',       gift:'Equality',         siddhi:'Tenderness' },
+  38: { shadow:'Struggle',       gift:'Perseverance',     siddhi:'Honor' },
+  39: { shadow:'Provocation',    gift:'Dynamism',         siddhi:'Liberation' },
+  40: { shadow:'Exhaustion',     gift:'Resolve',          siddhi:'Divine Will' },
+  41: { shadow:'Fantasy',        gift:'Anticipation',     siddhi:'Emanation' },
+  42: { shadow:'Expectation',    gift:'Detachment',       siddhi:'Celebration' },
+  43: { shadow:'Deafness',       gift:'Insight',          siddhi:'Epiphany' },
+  44: { shadow:'Interference',   gift:'Teamwork',         siddhi:'Synarchy' },
+  45: { shadow:'Dominance',      gift:'Synthesis',        siddhi:'Communion' },
+  46: { shadow:'Seriousness',    gift:'Delight',          siddhi:'Ecstasy' },
+  47: { shadow:'Oppression',     gift:'Transmutation',    siddhi:'Transfiguration' },
+  48: { shadow:'Inadequacy',     gift:'Resourcefulness',  siddhi:'Wisdom' },
+  49: { shadow:'Reaction',       gift:'Revolution',       siddhi:'Rebirth' },
+  50: { shadow:'Corruption',     gift:'Equilibrium',      siddhi:'Harmony' },
+  51: { shadow:'Agitation',      gift:'Initiative',       siddhi:'Awakening' },
+  52: { shadow:'Stress',         gift:'Restraint',        siddhi:'Stillness' },
+  53: { shadow:'Immaturity',     gift:'Expansion',        siddhi:'Superabundance' },
+  54: { shadow:'Greed',          gift:'Aspiration',       siddhi:'Ascension' },
+  55: { shadow:'Victimisation',  gift:'Freedom',          siddhi:'Freedom' },
+  56: { shadow:'Distraction',    gift:'Enrichment',       siddhi:'Intoxication' },
+  57: { shadow:'Unease',         gift:'Intuition',        siddhi:'Clarity' },
+  58: { shadow:'Dissatisfaction',gift:'Vitality',         siddhi:'Bliss' },
+  59: { shadow:'Dishonesty',     gift:'Intimacy',         siddhi:'Transparency' },
+  60: { shadow:'Limitation',     gift:'Realism',          siddhi:'Justice' },
+  61: { shadow:'Psychosis',      gift:'Inspiration',      siddhi:'Sanctity' },
+  62: { shadow:'Intellect',      gift:'Precision',        siddhi:'Impeccability' },
+  63: { shadow:'Doubt',          gift:'Inquiry',          siddhi:'Truth' },
+  64: { shadow:'Confusion',      gift:'Imagination',      siddhi:'Illumination' },
+};
+
+const ROOM_META = {
+  work:  { title: 'The Work',  subtitle: 'the work that finds you',       color: '--work',  gkLabel: "Life's Work",  activation: 'CS' },
+  lens:  { title: 'The Lens',  subtitle: 'the way you are here to perceive', color: '--lens', gkLabel: 'Evolution',    activation: 'CE' },
+  field: { title: 'The Field', subtitle: 'your fertile ground',            color: '--field', gkLabel: 'Radiance',     activation: 'US' },
+  call:  { title: 'The Call',  subtitle: 'the music within you',           color: '--call',  gkLabel: 'Purpose',      activation: 'UE' },
+};
+
+const ROSE_OPENING_PROMPTS = [
+  "What is alive in you today that wants space to breathe?",
+  "Where are you currently operating — from habit, or from something deeper?",
+  "What question keeps returning to you, regardless of context?",
+  "What are you in the middle of that deserves more attention than it's getting?",
+  "What do you know to be true right now that you haven't yet said aloud?",
+  "What has surprised you about yourself recently?",
+  "Where is your energy going that it perhaps shouldn't be?",
+  "What would you do differently if you trusted yourself more completely?",
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const STORAGE_KEY = 'commonunity_studio_v1';
+
+let state = {
+  person: '',
+  theme: 'A',
+  compassData: null,  // imported Compass JSON
+  rooms: {
+    work:  { entries: [], mirrorHistory: [] },
+    lens:  { entries: [], mirrorHistory: [] },
+    field: { entries: [], mirrorHistory: [] },
+    call:  { entries: [], mirrorHistory: [] },
+  }
+};
+
+let currentRoom = null;
+let portalOpened = false;
+
+const API_BASE = 'https://commonunity-production.up.railway.app';
+
+// ── Storage ──────────────────────────────────────────────────
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) {
+      const parsed = JSON.parse(s);
+      state = { ...state, ...parsed };
+    }
+  } catch(e) {}
+}
+
+// ── Toast ─────────────────────────────────────────────────────
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('studio-toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), duration);
+}
+
+// ============================================================
+// ENTRANCE
+// ============================================================
+function initEntrance() {
+  loadState();
+
+  // Apply saved theme
+  document.documentElement.dataset.theme = state.theme || 'A';
+
+  // Show name if available
+  const nameEl = document.getElementById('entrance-name');
+  if (state.compassData?.companion) {
+    nameEl.textContent = `Welcome back, ${state.compassData.companion}`;
+  } else if (state.person) {
+    nameEl.textContent = `Welcome back, ${state.person}`;
+  }
+
+  // Portal interaction
+  const portal = document.getElementById('portal');
+  const actions = document.getElementById('entrance-actions');
+
+  portal.addEventListener('click', (e) => {
+    if (!portalOpened) {
+      // First touch — unfold
+      portalOpened = true;
+      portal.classList.add('unfolding');
+      setTimeout(() => {
+        portal.classList.remove('unfolding');
+        portal.classList.add('doors-open');
+        actions.classList.add('visible');
+        showRosePrompt();
+      }, 1400);
+    }
+  });
+
+  // Facet direct navigation
+  document.querySelectorAll('.portal-facet').forEach(facet => {
+    facet.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const room = facet.dataset.room;
+      if (portalOpened) {
+        enterRoom(room);
+      } else {
+        // First touch on a facet — open then enter
+        portalOpened = true;
+        portal.classList.add('unfolding');
+        setTimeout(() => {
+          portal.classList.remove('unfolding');
+          portal.classList.add('doors-open');
+          enterRoom(room);
+        }, 800);
+      }
+    });
+  });
+
+  // Room buttons
+  document.querySelectorAll('.btn-enter-room').forEach(btn => {
+    btn.addEventListener('click', () => enterRoom(btn.dataset.room));
+  });
+
+  // Import compass
+  document.getElementById('btn-import-compass').addEventListener('click', () => {
+    document.getElementById('import-modal').classList.add('open');
+  });
+
+  initImportModal();
+}
+
+function showRosePrompt() {
+  const promptEl = document.getElementById('rose-prompt-text');
+  const bylineEl = document.getElementById('rose-byline');
+
+  let prompt;
+  if (state.compassData) {
+    // Draw from compass material
+    const allRaw = Object.values(state.compassData.points || {})
+      .map(p => p?.raw || '').filter(Boolean).join(' ');
+    if (allRaw.length > 50) {
+      prompt = fetchRosePrompt(allRaw);
+      return;
+    }
+  }
+  // Fallback to curated prompts
+  prompt = ROSE_OPENING_PROMPTS[Math.floor(Math.random() * ROSE_OPENING_PROMPTS.length)];
+  promptEl.textContent = prompt;
+  promptEl.classList.add('visible');
+  bylineEl.classList.add('visible');
+}
+
+async function fetchRosePrompt(context) {
+  const promptEl = document.getElementById('rose-prompt-text');
+  const bylineEl = document.getElementById('rose-byline');
+
+  try {
+    const res = await fetch(`${API_BASE}/rose-prompt`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ context: context.slice(0, 2000) })
+    });
+    if (!res.ok) throw new Error();
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let text = '';
+    promptEl.classList.add('visible');
+    bylineEl.classList.add('visible');
+    function read() {
+      reader.read().then(({ done, value }) => {
+        if (done) return;
+        decoder.decode(value).split('\n').forEach(line => {
+          if (!line.startsWith('data: ')) return;
+          try {
+            const d = JSON.parse(line.slice(6));
+            if (d.chunk) { text += d.chunk; promptEl.textContent = text; }
+          } catch(e) {}
+        });
+        read();
+      });
+    }
+    read();
+  } catch(e) {
+    const p = ROSE_OPENING_PROMPTS[Math.floor(Math.random() * ROSE_OPENING_PROMPTS.length)];
+    promptEl.textContent = p;
+    promptEl.classList.add('visible');
+    bylineEl.classList.add('visible');
+  }
+}
+
+// ============================================================
+// ROOM
+// ============================================================
+function enterRoom(roomKey) {
+  currentRoom = roomKey;
+  const meta = ROOM_META[roomKey];
+
+  // Switch screens
+  document.getElementById('screen-entrance').classList.remove('active');
+  const roomScreen = document.getElementById('screen-room');
+  roomScreen.classList.add('active');
+
+  // Set accent color
+  roomScreen.style.setProperty('--accent-color', `var(${meta.color})`);
+  document.querySelector('.room-body').style.setProperty('--accent-color', `var(${meta.color})`);
+
+  // Header
+  document.getElementById('room-title-display').textContent = meta.title;
+  document.getElementById('room-title-display').style.color = `var(${meta.color})`;
+  document.getElementById('room-subtitle-display').textContent = meta.subtitle;
+
+  // GK badge
+  const gkNum = state.compassData?.points?.[roomKey]?.gk_num || '';
+  const gkLine = state.compassData?.points?.[roomKey]?.gk_line || '';
+  const badgeEl = document.getElementById('room-gk-badge');
+  if (gkNum) {
+    badgeEl.textContent = `${meta.gkLabel} · GK ${gkNum}${gkLine ? ` · Line ${gkLine}` : ''}`;
+    badgeEl.style.borderColor = `var(${meta.color})`;
+    badgeEl.style.color = `var(${meta.color})`;
+  } else {
+    badgeEl.textContent = `${meta.gkLabel}`;
+    badgeEl.style.borderColor = '';
+    badgeEl.style.color = '';
+  }
+
+  // SGS triad
+  renderRoomSGS(roomKey);
+
+  // Mirror context
+  const mirrorCtx = document.getElementById('mirror-gk-context');
+  const gkData = gkNum ? GENE_KEYS[parseInt(gkNum)] : null;
+  if (gkData) {
+    mirrorCtx.textContent = `GK ${gkNum} · ${gkData.shadow} → ${gkData.gift}`;
+  } else {
+    mirrorCtx.textContent = '';
+  }
+
+  // Archive
+  renderArchive(roomKey);
+
+  // Workbench entries
+  renderWorkbenchEntries(roomKey);
+
+  // Mirror history
+  renderMirrorHistory(roomKey);
+
+  // Rose opening message
+  initRoomRose(roomKey);
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+function renderRoomSGS(roomKey) {
+  const sgsEl = document.getElementById('room-sgs');
+  const gkNum = state.compassData?.points?.[roomKey]?.gk_num || '';
+  const gkData = gkNum ? GENE_KEYS[parseInt(gkNum)] : null;
+
+  if (!gkData) {
+    sgsEl.innerHTML = `<span style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">Enter your Gene Key in the Compass to see your frequencies here</span>`;
+    return;
+  }
+
+  sgsEl.innerHTML = `
+    <div class="room-sgs-item">
+      <span class="room-sgs-label shadow">Shadow</span>
+      <span class="room-sgs-value">${gkData.shadow}</span>
+    </div>
+    <div class="room-sgs-item">
+      <span class="room-sgs-label gift">Gift</span>
+      <span class="room-sgs-value">${gkData.gift}</span>
+    </div>
+    <div class="room-sgs-item">
+      <span class="room-sgs-label siddhi">Siddhi</span>
+      <span class="room-sgs-value">${gkData.siddhi}</span>
+    </div>
+  `;
+}
+
+function renderArchive(roomKey) {
+  const compassItems = document.getElementById('archive-compass-items');
+  const studioItems  = document.getElementById('archive-studio-items');
+  const pt = state.compassData?.points?.[roomKey];
+
+  compassItems.innerHTML = '';
+
+  if (!pt) {
+    compassItems.innerHTML = `<p class="archive-empty">No Compass data. Import a session to see your material here.</p>`;
+  } else {
+    const items = [];
+    if (pt.raw) items.push({ label: 'Session Notes', text: pt.raw });
+    if (pt.theme) items.push({ label: 'Core Theme', text: pt.theme });
+    if (pt.summary) items.push({ label: 'Public Summary', text: pt.summary });
+
+    // Q&A answers
+    const qa = pt.qa_answers || {};
+    Object.values(qa).filter(Boolean).forEach((ans, i) => {
+      if (ans.trim()) items.push({ label: `Reflection ${i+1}`, text: ans });
+    });
+
+    if (items.length === 0) {
+      compassItems.innerHTML = `<p class="archive-empty">No material yet for this direction in your Compass session.</p>`;
+    } else {
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'archive-item';
+        div.innerHTML = `<div class="archive-item-label">${item.label}</div><div class="archive-item-text">${item.text}</div>`;
+        div.addEventListener('click', () => {
+          document.getElementById('workbench-input').value = item.text;
+          document.getElementById('workbench-input').focus();
+        });
+        compassItems.appendChild(div);
+      });
+    }
+  }
+
+  // Studio entries in archive
+  const entries = state.rooms[roomKey]?.entries || [];
+  studioItems.innerHTML = '';
+  if (entries.length === 0) {
+    studioItems.innerHTML = `<p class="archive-empty">Your saved entries will appear here.</p>`;
+  } else {
+    entries.slice().reverse().forEach((entry, i) => {
+      const div = document.createElement('div');
+      div.className = 'archive-item';
+      div.innerHTML = `<div class="archive-item-label">${entry.date}</div><div class="archive-item-text">${entry.text}</div>`;
+      div.addEventListener('click', () => {
+        document.getElementById('workbench-input').value = entry.text;
+        document.getElementById('workbench-input').focus();
+      });
+      studioItems.appendChild(div);
+    });
+  }
+}
+
+function renderWorkbenchEntries(roomKey) {
+  const container = document.getElementById('workbench-entries');
+  const entries = state.rooms[roomKey]?.entries || [];
+  container.innerHTML = '';
+
+  entries.slice().reverse().forEach((entry, i) => {
+    const idx = entries.length - 1 - i;
+    const div = document.createElement('div');
+    div.className = 'workbench-entry';
+    div.innerHTML = `
+      <div class="workbench-entry-meta">
+        <span class="workbench-entry-date">${entry.date}</span>
+        <button class="workbench-entry-delete" data-idx="${idx}" title="Delete">✕</button>
+      </div>
+      <div class="workbench-entry-text">${entry.text}</div>
+    `;
+    div.querySelector('.workbench-entry-delete').addEventListener('click', () => {
+      state.rooms[roomKey].entries.splice(idx, 1);
+      saveState();
+      renderWorkbenchEntries(roomKey);
+      renderArchive(roomKey);
+    });
+    container.appendChild(div);
+  });
+}
+
+function renderMirrorHistory(roomKey) {
+  const conv = document.getElementById('mirror-conversation');
+  const intro = document.getElementById('mirror-intro');
+  const history = state.rooms[roomKey]?.mirrorHistory || [];
+
+  // Clear all existing messages (but keep intro)
+  conv.querySelectorAll('.mirror-message').forEach(m => m.remove());
+
+  if (history.length === 0) {
+    intro.style.display = '';
+  } else {
+    intro.style.display = 'none';
+    history.forEach(msg => appendMirrorMessage(msg.role, msg.text, false));
+  }
+  conv.scrollTop = conv.scrollHeight;
+}
+
+function appendMirrorMessage(role, text, save = true) {
+  const conv = document.getElementById('mirror-conversation');
+  document.getElementById('mirror-intro').style.display = 'none';
+
+  const div = document.createElement('div');
+  div.className = `mirror-message ${role}`;
+  div.innerHTML = `
+    <span class="mirror-sender">${role === 'rose' ? 'The Rose' : 'You'}</span>
+    <div class="mirror-bubble">${text}</div>
+  `;
+  conv.appendChild(div);
+  conv.scrollTop = conv.scrollHeight;
+
+  if (save && currentRoom) {
+    if (!state.rooms[currentRoom].mirrorHistory) state.rooms[currentRoom].mirrorHistory = [];
+    state.rooms[currentRoom].mirrorHistory.push({ role, text });
+    // Keep last 20 messages
+    if (state.rooms[currentRoom].mirrorHistory.length > 20) {
+      state.rooms[currentRoom].mirrorHistory = state.rooms[currentRoom].mirrorHistory.slice(-20);
+    }
+    saveState();
+  }
+}
+
+async function initRoomRose(roomKey) {
+  const history = state.rooms[roomKey]?.mirrorHistory || [];
+  if (history.length > 0) return; // Already has history, don't add opening
+
+  const meta = ROOM_META[roomKey];
+  const gkNum = state.compassData?.points?.[roomKey]?.gk_num || '';
+  const gkData = gkNum ? GENE_KEYS[parseInt(gkNum)] : null;
+  const pt = state.compassData?.points?.[roomKey];
+  const hasContext = pt && (pt.raw || pt.theme || pt.summary);
+
+  let opening;
+  if (gkData && hasContext) {
+    // Personalised opening — fetch from AI
+    try {
+      const res = await fetch(`${API_BASE}/rose-room-opening`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          room: roomKey,
+          room_title: meta.title,
+          room_subtitle: meta.subtitle,
+          gk_num: gkNum,
+          gk_shadow: gkData.shadow,
+          gk_gift: gkData.gift,
+          gk_siddhi: gkData.siddhi,
+          session_notes: pt?.raw?.slice(0, 1000) || '',
+          companion: state.compassData?.companion || ''
+        })
+      });
+      if (!res.ok) throw new Error();
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let text = '';
+
+      // Create message element early for streaming
+      document.getElementById('mirror-intro').style.display = 'none';
+      const div = document.createElement('div');
+      div.className = 'mirror-message rose';
+      div.innerHTML = `<span class="mirror-sender">The Rose</span><div class="mirror-bubble"></div>`;
+      document.getElementById('mirror-conversation').appendChild(div);
+      const bubble = div.querySelector('.mirror-bubble');
+
+      function read() {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            if (!state.rooms[roomKey].mirrorHistory) state.rooms[roomKey].mirrorHistory = [];
+            state.rooms[roomKey].mirrorHistory.push({ role: 'rose', text });
+            saveState();
+            return;
+          }
+          decoder.decode(value).split('\n').forEach(line => {
+            if (!line.startsWith('data: ')) return;
+            try {
+              const d = JSON.parse(line.slice(6));
+              if (d.chunk) { text += d.chunk; bubble.textContent = text; }
+            } catch(e) {}
+          });
+          read();
+        });
+      }
+      read();
+      return;
+    } catch(e) {}
+  }
+
+  // Fallback openings per room
+  const fallbacks = {
+    work:  "What is the work that is currently asking for your attention — not the work you feel you should be doing, but the work that keeps finding you?",
+    lens:  "What has life been consistently trying to show you lately — through your challenges, your conversations, your recurring questions?",
+    field: "How is your energy right now, honestly? What is restoring you, and what is quietly draining you?",
+    call:  "What is the deeper current beneath your current projects — what is actually trying to move through you right now?"
+  };
+  opening = fallbacks[roomKey];
+
+  setTimeout(() => appendMirrorMessage('rose', opening), 400);
+}
+
+// ============================================================
+// MIRROR — send message to The Rose
+// ============================================================
+async function sendMirrorMessage() {
+  const input = document.getElementById('mirror-input');
+  const sendBtn = document.getElementById('mirror-send-btn');
+  const msg = input.value.trim();
+  if (!msg || !currentRoom) return;
+
+  input.value = '';
+  appendMirrorMessage('user', msg);
+  sendBtn.classList.add('loading');
+
+  const meta = ROOM_META[currentRoom];
+  const gkNum = state.compassData?.points?.[currentRoom]?.gk_num || '';
+  const gkData = gkNum ? GENE_KEYS[parseInt(gkNum)] : null;
+  const pt = state.compassData?.points?.[currentRoom];
+
+  // Build context from history + compass material
+  const history = (state.rooms[currentRoom]?.mirrorHistory || []).slice(-8);
+  const sessionContext = pt?.raw || '';
+  const workbenchContext = (state.rooms[currentRoom]?.entries || []).slice(-3).map(e => e.text).join('\n\n');
+
+  try {
+    const res = await fetch(`${API_BASE}/rose-mirror`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: msg,
+        room: currentRoom,
+        room_title: meta.title,
+        room_subtitle: meta.subtitle,
+        gk_num: gkNum,
+        gk_shadow: gkData?.shadow || '',
+        gk_gift: gkData?.gift || '',
+        gk_siddhi: gkData?.siddhi || '',
+        session_notes: sessionContext.slice(0, 2000),
+        workbench_entries: workbenchContext.slice(0, 1000),
+        history: history,
+        companion: state.compassData?.companion || state.person || ''
+      })
+    });
+
+    if (!res.ok) throw new Error('Server error');
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let text = '';
+
+    const div = document.createElement('div');
+    div.className = 'mirror-message rose';
+    div.innerHTML = `<span class="mirror-sender">The Rose</span><div class="mirror-bubble"></div>`;
+    document.getElementById('mirror-conversation').appendChild(div);
+    const bubble = div.querySelector('.mirror-bubble');
+    const conv = document.getElementById('mirror-conversation');
+
+    function read() {
+      reader.read().then(({ done, value }) => {
+        if (done) {
+          sendBtn.classList.remove('loading');
+          if (!state.rooms[currentRoom].mirrorHistory) state.rooms[currentRoom].mirrorHistory = [];
+          state.rooms[currentRoom].mirrorHistory.push({ role: 'rose', text });
+          saveState();
+          return;
+        }
+        decoder.decode(value).split('\n').forEach(line => {
+          if (!line.startsWith('data: ')) return;
+          try {
+            const d = JSON.parse(line.slice(6));
+            if (d.chunk) { text += d.chunk; bubble.textContent = text; conv.scrollTop = conv.scrollHeight; }
+          } catch(e) {}
+        });
+        read();
+      });
+    }
+    read();
+  } catch(e) {
+    appendMirrorMessage('rose', 'Something interrupted the connection. Try again when you are ready.');
+    sendBtn.classList.remove('loading');
+  }
+}
+
+// ============================================================
+// WORKBENCH — save entry
+// ============================================================
+function saveWorkbenchEntry() {
+  if (!currentRoom) return;
+  const input = document.getElementById('workbench-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const entry = {
+    text,
+    date: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+  };
+  if (!state.rooms[currentRoom].entries) state.rooms[currentRoom].entries = [];
+  state.rooms[currentRoom].entries.push(entry);
+  saveState();
+  input.value = '';
+  renderWorkbenchEntries(currentRoom);
+  renderArchive(currentRoom);
+  showToast('Entry saved');
+}
+
+// ============================================================
+// COMPASS IMPORT
+// ============================================================
+function initImportModal() {
+  const modal = document.getElementById('import-modal');
+  const dropzone = document.getElementById('import-dropzone');
+  const fileInput = document.getElementById('import-file-input');
+  const cancelBtn = document.getElementById('import-cancel');
+
+  cancelBtn.addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = 'var(--setup-accent)'; });
+  dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = ''; });
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.style.borderColor = '';
+    if (e.dataTransfer.files[0]) processCompassImport(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e => {
+    if (e.target.files[0]) processCompassImport(e.target.files[0]);
+    fileInput.value = '';
+  });
+}
+
+function processCompassImport(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Validate it looks like a Compass session
+      if (!data.points) throw new Error('Not a Compass session file');
+      state.compassData = data;
+      if (data.companion) state.person = data.companion;
+      if (data.theme) {
+        state.theme = data.theme;
+        document.documentElement.dataset.theme = data.theme;
+      }
+      saveState();
+      document.getElementById('import-modal').classList.remove('open');
+      showToast(`Session imported — welcome, ${data.companion || 'explorer'}`);
+
+      // Update entrance name
+      const nameEl = document.getElementById('entrance-name');
+      if (data.companion) nameEl.textContent = `Welcome back, ${data.companion}`;
+
+      // Open portal if not already
+      if (!portalOpened) {
+        portalOpened = true;
+        const portal = document.getElementById('portal');
+        portal.classList.add('doors-open');
+        document.getElementById('entrance-actions').classList.add('visible');
+        showRosePrompt();
+      }
+    } catch(err) {
+      showToast('Could not read file — please use a Compass session JSON');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  initEntrance();
+
+  // Back button
+  document.getElementById('btn-back-to-entrance').addEventListener('click', () => {
+    document.getElementById('screen-room').classList.remove('active');
+    document.getElementById('screen-entrance').classList.add('active');
+    currentRoom = null;
+    window.scrollTo(0, 0);
+  });
+
+  // Save entry
+  document.getElementById('btn-save-entry').addEventListener('click', saveWorkbenchEntry);
+  document.getElementById('workbench-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) saveWorkbenchEntry();
+  });
+
+  // Mirror send
+  document.getElementById('mirror-send-btn').addEventListener('click', sendMirrorMessage);
+  document.getElementById('mirror-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMirrorMessage();
+    }
+  });
+});
+</script>
+</body>
+</html>

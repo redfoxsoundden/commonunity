@@ -839,3 +839,166 @@ async def serve_favicon():
     if fav.exists():
         return FileResponse(fav, media_type="image/svg+xml")
     return {"error": "Not found"}
+
+
+# ── Rose AI endpoints ─────────────────────────────────────────────────────────
+
+ROSE_SYSTEM = """You are The Rose — a contemplation partner within the CommonUnity Studio.
+
+The Rose is both a compass rose (navigator, orienter, pointer of direction) and a flower rose (warm presence, healing frequency, high vibration). You embody both the masculine clarity of direction and the feminine quality of holding space.
+
+Your nature:
+- Warm but not effusive. Precise but not clinical.
+- You ask more than you tell. You never flatter.
+- You speak in short, considered sentences. You leave space.
+- You hold the long view — connecting what someone is working on now to deeper patterns.
+- You never tell someone who they are. You ask questions that help them discover it themselves.
+- You are the quality of the best conversation someone has ever had — with someone who sees them clearly, is not trying to fix them, and trusts they already have what they need.
+- You never use the words: journey, impact, passion, empower, transform, dynamic, leverage, holistic, authentic, innovative, solutions, synergy, thrive, unlock, game-changer.
+- The tone is contemplative, not motivational. First person for the person, not for you.
+- Keep responses to 2-4 sentences maximum unless a longer response is clearly needed.
+
+Return plain text only. No markdown, no lists, no headers."""
+
+
+class RosePromptRequest(BaseModel):
+    context: str = ""
+
+class RoseRoomOpeningRequest(BaseModel):
+    room: str
+    room_title: str = ""
+    room_subtitle: str = ""
+    gk_num: str = ""
+    gk_shadow: str = ""
+    gk_gift: str = ""
+    gk_siddhi: str = ""
+    session_notes: str = ""
+    companion: str = ""
+
+class RoseMirrorRequest(BaseModel):
+    message: str
+    room: str
+    room_title: str = ""
+    room_subtitle: str = ""
+    gk_num: str = ""
+    gk_shadow: str = ""
+    gk_gift: str = ""
+    gk_siddhi: str = ""
+    session_notes: str = ""
+    workbench_entries: str = ""
+    history: list = []
+    companion: str = ""
+
+
+@app.post("/rose-prompt")
+async def rose_prompt(request: RosePromptRequest):
+    """Generate a Rose opening prompt for the Studio entrance, drawn from compass material."""
+
+    user_msg = f"""Based on the following session material, offer a single contemplative question or observation — 1-2 sentences — that would invite this person to begin their Studio session with genuine presence. Draw from what is actually in their material. Make it specific, not generic.
+
+Session material:
+{request.context[:2000]}
+
+Return only the question or observation — no preamble, no attribution."""
+
+    async def stream():
+        try:
+            with client.messages.stream(
+                model="claude-sonnet-4-5",
+                max_tokens=100,
+                system=ROSE_SYSTEM,
+                messages=[{"role": "user", "content": user_msg}]
+            ) as s:
+                for text in s.text_stream:
+                    yield f"data: {json.dumps({'chunk': text})}\n\n"
+            yield f"data: {json.dumps({'done': True})}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(stream(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.post("/rose-room-opening")
+async def rose_room_opening(request: RoseRoomOpeningRequest):
+    """Generate The Rose's opening message when entering a Studio room."""
+
+    gk_context = ""
+    if request.gk_num:
+        gk_context = f"\nGene Key {request.gk_num} — Shadow: {request.gk_shadow} · Gift: {request.gk_gift} · Siddhi: {request.gk_siddhi}"
+
+    user_msg = f"""You are opening a conversation in {request.room_title} — "{request.room_subtitle}".{gk_context}
+
+{"Session material for this direction:" + chr(10) + request.session_notes[:1000] if request.session_notes else "No session material yet for this direction."}
+
+Companion: {request.companion or "Unknown"}
+
+Offer a single opening question or observation (1-2 sentences) that invites this person into genuine reflection for this direction. Be specific — draw from the Gene Key and any session material provided. Do not be generic. Do not explain what the room is for."""
+
+    async def stream():
+        try:
+            with client.messages.stream(
+                model="claude-sonnet-4-5",
+                max_tokens=120,
+                system=ROSE_SYSTEM,
+                messages=[{"role": "user", "content": user_msg}]
+            ) as s:
+                for text in s.text_stream:
+                    yield f"data: {json.dumps({'chunk': text})}\n\n"
+            yield f"data: {json.dumps({'done': True})}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(stream(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.post("/rose-mirror")
+async def rose_mirror(request: RoseMirrorRequest):
+    """The Rose's ongoing conversation within a Studio room."""
+
+    gk_context = ""
+    if request.gk_num:
+        gk_context = f"\nThis room's Gene Key: {request.gk_num} — Shadow: {request.gk_shadow} · Gift: {request.gk_gift} · Siddhi: {request.gk_siddhi}"
+
+    system = ROSE_SYSTEM + f"""
+
+You are currently in {request.room_title} — "{request.room_subtitle}".{gk_context}
+
+{"Compass session material for this direction:" + chr(10) + request.session_notes if request.session_notes else ""}
+
+{"Recent workbench entries:" + chr(10) + request.workbench_entries if request.workbench_entries else ""}
+
+Hold everything this person has shared as context. Respond to their message with the quality of a wise, present contemplation partner. Ask the next question that genuinely matters. Or reflect back what you notice. Never give advice unless directly asked. Never summarise what they said back to them — move the conversation forward."""
+
+    # Build messages from history
+    messages = []
+    for msg in request.history[-8:]:
+        role = "assistant" if msg.get("role") == "rose" else "user"
+        messages.append({"role": role, "content": msg.get("text", "")})
+    messages.append({"role": "user", "content": request.message})
+
+    async def stream():
+        try:
+            with client.messages.stream(
+                model="claude-sonnet-4-5",
+                max_tokens=200,
+                system=system,
+                messages=messages
+            ) as s:
+                for text in s.text_stream:
+                    yield f"data: {json.dumps({'chunk': text})}\n\n"
+            yield f"data: {json.dumps({'done': True})}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(stream(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.get("/studio")
+async def serve_studio():
+    studio = pathlib.Path(__file__).parent / "studio.html"
+    if studio.exists():
+        return FileResponse(studio)
+    return {"error": "Studio not found"}
