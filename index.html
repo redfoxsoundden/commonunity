@@ -2392,18 +2392,22 @@ body.companion-mode .companion-mode-banner { display: block; }
             <div class="gk-result-item">
               <span class="gk-result-label">Life's Work</span>
               <span class="gk-result-val" id="gk-cs">—</span>
-            </div>
-            <div class="gk-result-item">
-              <span class="gk-result-label">Radiance</span>
-              <span class="gk-result-val" id="gk-us">—</span>
+              <span style="font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.06em;">The Work</span>
             </div>
             <div class="gk-result-item">
               <span class="gk-result-label">Evolution</span>
               <span class="gk-result-val" id="gk-ce">—</span>
+              <span style="font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.06em;">The Lens</span>
+            </div>
+            <div class="gk-result-item">
+              <span class="gk-result-label">Radiance</span>
+              <span class="gk-result-val" id="gk-us">—</span>
+              <span style="font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.06em;">The Field</span>
             </div>
             <div class="gk-result-item">
               <span class="gk-result-label">Purpose</span>
               <span class="gk-result-val" id="gk-ue">—</span>
+              <span style="font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.06em;">The Call</span>
             </div>
           </div>
         </div>
@@ -4371,8 +4375,8 @@ function calcGeneKeys() {
   // Pre-fill GK numbers into facilitator panels (only if not already set)
   const assignments = [
     { point: 'work',  val: csResult.gate },
-    { point: 'lens',  val: usResult.gate },
-    { point: 'field', val: ceResult.gate },
+    { point: 'lens',  val: ceResult.gate },
+    { point: 'field', val: usResult.gate },
     { point: 'call',  val: ueResult.gate },
   ];
   assignments.forEach(({ point, val }) => {
