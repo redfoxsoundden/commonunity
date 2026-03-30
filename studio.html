@@ -4521,9 +4521,11 @@ function renderWorkbenchEntries(roomKey) {
 
   entries.slice().reverse().forEach((entry, i) => {
     const idx = entries.length - 1 - i;
+    // Skip any corrupted entries with no text
+    if (!entry.text || entry.text === 'undefined') return;
     const div = document.createElement('div');
     div.className = 'workbench-entry';
-    const voiceTag = entry.type === 'voice' ? ' <span style="font-size:9px;color:var(--rose-color,#c4b5fd);letter-spacing:0.06em;opacity:0.7;">&#127908; transcribed</span>' : '';
+    const voiceTag = entry.type === 'voice' ? ' <span style="font-size:9px;color:var(--rose-color,#c4b5fd);letter-spacing:0.06em;opacity:0.7;">&#127908; voice</span>' : '';
     div.innerHTML = `
       <div class="workbench-entry-meta">
         <span class="workbench-entry-date">${entry.date}${voiceTag}</span>
@@ -5443,7 +5445,7 @@ const AMBIENT_URLS = {
   ocean:  'https://assets.mixkit.co/active_storage/sfx/2523/2523-preview.mp3',
   forest: 'https://assets.mixkit.co/active_storage/sfx/2516/2516-preview.mp3',
   fire:   'https://assets.mixkit.co/active_storage/sfx/1333/1333-preview.mp3',
-  birds: 'https://assets.mixkit.co/active_storage/sfx/2518/2518-preview.mp3',
+  birds: '/audio/birdsong.mp3',
 };
 
 let ambientAudioEl   = null;

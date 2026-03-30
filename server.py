@@ -1049,6 +1049,12 @@ Respond with precision and care. Ask the next question that genuinely matters. O
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
+# Serve audio files
+import os as _os
+_audio_dir = _os.path.join(_os.path.dirname(__file__), 'audio')
+if _os.path.isdir(_audio_dir):
+    app.mount("/audio", StaticFiles(directory=_audio_dir), name="audio")
+
 @app.get("/studio")
 async def serve_studio():
     studio = pathlib.Path(__file__).parent / "studio.html"
