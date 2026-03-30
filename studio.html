@@ -131,6 +131,41 @@ input, textarea { font: inherit; color: inherit; }
   overflow-y: auto;
 }
 
+/* ── Mobile: single column ────────────────────────────── */
+@media (max-width: 600px) {
+  #screen-entrance {
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 100dvh;
+    overflow-y: auto;
+  }
+  .entrance-left {
+    padding: var(--space-6) var(--space-4);
+    gap: var(--space-3);
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+  }
+  .entrance-right {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex: 1 1 auto;
+    border-left: none;
+    border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+    padding: var(--space-6) var(--space-5);
+    overflow-y: visible;
+  }
+  .portal-wrap {
+    width: min(260px, 72vw);
+    height: min(260px, 72vw);
+  }
+  .torus-canvas {
+    width: min(260px, 72vw);
+    height: min(260px, 72vw);
+  }
+}
+
 /* Left column — torus portal */
 .entrance-left {
   flex: 1;
