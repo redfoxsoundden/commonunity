@@ -245,6 +245,50 @@ input, textarea { font: inherit; color: inherit; }
   cursor: pointer;
 }
 
+.entrance-seed-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  opacity: 0.5;
+  padding: var(--space-2) 0;
+  text-align: left;
+  transition: opacity 0.3s ease;
+}
+.entrance-seed-btn:hover { opacity: 0.85; }
+.entrance-seed-btn.seeded { opacity: 0.35; }
+.entrance-seed-btn.pulse {
+  animation: seed-pulse 0.6s ease 3;
+  opacity: 1;
+}
+@keyframes seed-pulse {
+  0%,100% { opacity: 0.5; color: var(--text-faint); }
+  50% { opacity: 1; color: var(--rose-color,#c4b5fd); }
+}
+
+.entrance-seed-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease;
+  opacity: 0;
+}
+.entrance-seed-panel.open {
+  max-height: 480px;
+  opacity: 1;
+}
+.entrance-name-input {
+  width: 100%;
+  border-radius: var(--radius-full);
+  padding: var(--space-3) var(--space-4);
+  font-style: italic;
+}
+
 .entrance-session-links {
   display: flex;
   flex-direction: column;
@@ -2514,13 +2558,7 @@ input, textarea { font: inherit; color: inherit; }
       <div class="portal-facet bottom" data-room="field" title="The Field"></div>
       <div class="portal-facet left"   data-room="call"  title="The Call"></div>
 
-      <!-- Room labels -->
-      <div class="portal-room-labels">
-        <span class="room-label work">The Work</span>
-        <span class="room-label lens">The Lens</span>
-        <span class="room-label field">The Field</span>
-        <span class="room-label call">The Call</span>
-      </div>
+      <!-- Room labels removed — rooms revealed via buttons only -->
     </div>
 
     <!-- Room entry buttons — hidden until portal is touched, revealed via .visible class -->
@@ -2539,27 +2577,30 @@ input, textarea { font: inherit; color: inherit; }
   </div>
 
   <!-- Right sidebar -->
-  <div class="entrance-right">
+  <div class="entrance-right" id="entrance-right">
 
-    <div>
-      <div class="entrance-wordmark">CommonUnity Studio <span class="studio-beta">Beta</span></div>
-      <div class="entrance-name" id="entrance-name"></div>
-    </div>
+    <div class="entrance-wordmark">CommonUnity Studio <span class="studio-beta">Beta</span></div>
+    <div class="entrance-name" id="entrance-name"></div>
 
-    <!-- Name field -->
-    <div>
-      <input class="studio-calc-input" id="studio-person-name" type="text"
+    <!-- Seed prompt — tap to expand name + calculator -->
+    <button class="entrance-seed-btn" id="entrance-seed-btn">
+      <span id="entrance-seed-label">seed the rooms ↓</span>
+    </button>
+
+    <!-- Expandable seed panel -->
+    <div class="entrance-seed-panel" id="entrance-seed-panel">
+
+      <!-- Name field -->
+      <input class="studio-calc-input entrance-name-input" id="studio-person-name" type="text"
         placeholder="What shall I call you?"
-        autocomplete="off"
-        style="width:100%;border-radius:var(--radius-full);padding:var(--space-3) var(--space-4);font-style:italic;">
-    </div>
+        autocomplete="off">
 
-    <!-- Gene Keys Calculator — collapsed by default -->
-    <div class="studio-calc-section">
-      <div class="studio-calc-toggle" id="studio-calc-toggle">
-        <span class="studio-calc-toggle-label">When did you take your first breath?</span>
-        <span class="studio-calc-toggle-hint" id="studio-calc-hint">↓</span>
-      </div>
+      <!-- Gene Keys Calculator -->
+      <div class="studio-calc-section">
+        <div class="studio-calc-toggle" id="studio-calc-toggle">
+          <span class="studio-calc-toggle-label">When did you take your first breath?</span>
+          <span class="studio-calc-toggle-hint" id="studio-calc-hint">↓</span>
+        </div>
       <div class="studio-calc-body" id="studio-calc-body">
         <div class="studio-calc-row">
           <div class="studio-calc-field">
@@ -2601,11 +2642,13 @@ input, textarea { font: inherit; color: inherit; }
       </div>
     </div>
 
-    <!-- Session actions -->
+    </div><!-- /entrance-seed-panel -->
+
+    <!-- Session actions — always visible, minimal -->
     <div class="entrance-session-links">
       <button class="compass-import-link" id="btn-import-compass">Import from Compass →</button>
       <button class="compass-import-link" id="btn-studio-load-entrance">Load session →</button>
-      <button class="compass-import-link" id="btn-studio-save-entrance" style="opacity:0.4;">Save session →</button>
+      <button class="compass-import-link" id="btn-studio-save-entrance" style="opacity:0.3;">Save session →</button>
       <input type="file" id="studio-load-file-entrance" accept=".json" style="display:none">
     </div>
 
@@ -3350,6 +3393,34 @@ function initEntrance() {
     nameEl.textContent = `Welcome back, ${state.person}`;
   }
 
+  // Seed button toggle
+  const seedBtn   = document.getElementById('entrance-seed-btn');
+  const seedPanel = document.getElementById('entrance-seed-panel');
+  const seedLabel = document.getElementById('entrance-seed-label');
+  if (seedBtn && seedPanel) {
+    // Auto-open if no data yet
+    const hasData = state.person || state.compassData?.companion;
+    if (!hasData) {
+      seedPanel.classList.add('open');
+      seedLabel.textContent = 'seed the rooms ↑';
+    } else {
+      seedBtn.classList.add('seeded');
+      seedLabel.textContent = 'profile ready ✓';
+    }
+    seedBtn.addEventListener('click', () => {
+      const open = seedPanel.classList.toggle('open');
+      seedLabel.textContent = open ? 'seed the rooms ↑' : 'seed the rooms ↓';
+    });
+    // Mark seeded when name entered
+    const nameInput = document.getElementById('studio-person-name');
+    if (nameInput) nameInput.addEventListener('blur', () => {
+      if (nameInput.value.trim()) {
+        seedBtn.classList.add('seeded');
+        seedLabel.textContent = 'profile ready ✓';
+      }
+    });
+  }
+
   // Portal interaction
   const portal = document.getElementById('portal');
   const actions = document.getElementById('entrance-actions');
@@ -3541,6 +3612,30 @@ function enterRoom(roomKey) {
   currentRoom = roomKey;
   const meta = ROOM_META[roomKey];
 
+  // Soft gate: gently pulse sidebar if no name or GK data
+  const hasProfile = state.person || state.compassData?.companion;
+  const hasGK = state.compassData?.points && Object.values(state.compassData.points).some(p => p?.gk_num);
+  if (!hasProfile || !hasGK) {
+    const sBtn = document.getElementById('entrance-seed-btn');
+    const sPanel = document.getElementById('entrance-seed-panel');
+    const sLabel = document.getElementById('entrance-seed-label');
+    if (sBtn) {
+      sBtn.classList.add('pulse');
+      setTimeout(() => sBtn.classList.remove('pulse'), 2000);
+    }
+    if (sPanel && !sPanel.classList.contains('open')) {
+      sPanel.classList.add('open');
+      if (sLabel) sLabel.textContent = 'seed the rooms ↑';
+    }
+    // Allow entry after a 700ms pause (gives user a moment to notice)
+    setTimeout(() => doEnterRoom(roomKey, meta), 700);
+    return;
+  }
+
+  doEnterRoom(roomKey, meta);
+}
+
+function doEnterRoom(roomKey, meta) {
   // Switch screens
   document.getElementById('screen-entrance').classList.remove('active');
   const roomScreen = document.getElementById('screen-room');
@@ -4912,25 +5007,29 @@ function initTorusPortal() {
   let rotX = 0.48, rotY = 0, t = 0;
   let hovered = false, activated = false;
 
-  // Mouse parallax
+  // Mouse parallax — listen on portal-wrap (canvas is covered by facet overlays)
   let mouseX = 0, mouseY = 0;  // normalised -1..1
   let targetRotX = 0.48, targetRotY = 0;
-  canvas.addEventListener('mousemove', (e) => {
+  const portalWrapEl = document.getElementById('portal');
+
+  function updateMouse(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
-    mouseX = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
-    mouseY = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
+    mouseX = ((clientX - rect.left)  / rect.width  - 0.5) * 2;
+    mouseY = ((clientY - rect.top)   / rect.height - 0.5) * 2;
     hovered = true;
-  });
+  }
+
+  if (portalWrapEl) {
+    portalWrapEl.addEventListener('mousemove', (e) => updateMouse(e.clientX, e.clientY));
+    portalWrapEl.addEventListener('mouseenter', () => { hovered = true; });
+    portalWrapEl.addEventListener('mouseleave', () => { hovered = false; mouseX = 0; mouseY = 0; });
+    portalWrapEl.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      updateMouse(touch.clientX, touch.clientY);
+    }, { passive: true });
+  }
   canvas.addEventListener('mouseenter', () => hovered = true);
   canvas.addEventListener('mouseleave', () => { hovered = false; mouseX = 0; mouseY = 0; });
-
-  // Touch parallax
-  canvas.addEventListener('touchmove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    mouseX = ((touch.clientX - rect.left) / rect.width  - 0.5) * 2;
-    mouseY = ((touch.clientY - rect.top)  / rect.height - 0.5) * 2;
-  }, { passive: true });
 
   // Accelerate on portal open
   const portalEl = document.getElementById('portal');
