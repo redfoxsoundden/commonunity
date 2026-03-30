@@ -3246,8 +3246,87 @@ let state = {
     lens:  { entries: [], mirrorHistory: [] },
     field: { entries: [], mirrorHistory: [] },
     call:  { entries: [], mirrorHistory: [] },
-  }
+  },
+  sessionLog: [],        // appended on every session close
+  nexusMemory: ''        // compressed profile updated each session
 };
+
+// ============================================================
+// NEXUS CONTEXT HELPERS
+// ============================================================
+
+function buildCrossRoomSummary(excludeRoom) {
+  // Gather recent entries from all OTHER rooms — gives Nexus cross-room awareness
+  const parts = [];
+  const ROOM_NAMES = { work: 'The Work', lens: 'The Lens', field: 'The Field', call: 'The Call' };
+  ['work', 'lens', 'field', 'call'].forEach(key => {
+    if (key === excludeRoom) return;
+    const entries = state.rooms[key]?.entries || [];
+    const recent = entries.slice(-2).map(e => e.text).filter(Boolean);
+    const history = state.rooms[key]?.mirrorHistory || [];
+    const recentMsg = history.filter(m => m.role !== 'rose').slice(-1).map(m => m.text).filter(Boolean);
+    if (recent.length || recentMsg.length) {
+      let section = `${ROOM_NAMES[key]}:`;
+      if (recent.length) section += '\n' + recent.join('\n');
+      if (recentMsg.length) section += '\n[Nexus conversation]: ' + recentMsg.join(' ');
+      parts.push(section);
+    }
+  });
+  return parts.join('\n\n');
+}
+
+function buildSessionHistorySummary() {
+  // Last 5 sessions from log
+  const log = state.sessionLog || [];
+  if (!log.length) return '';
+  return log.slice(-5).map(s => {
+    const d = new Date(s.date);
+    const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const hour = d.getHours();
+    const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+    return `${dateStr} ${timeOfDay}: ${s.room} (${s.duration})${s.sound ? ' · ' + s.sound : ''}`;
+  }).join('\n');
+}
+
+function buildGKProfileLabels() {
+  // Full Gene Keys profile as Shadow→Gift→Siddhi strings for all four directions
+  const result = { gk_work: '', gk_lens: '', gk_field: '', gk_call: '' };
+  const keys = { work: 'gk_work', lens: 'gk_lens', field: 'gk_field', call: 'gk_call' };
+  Object.entries(keys).forEach(([room, key]) => {
+    const gkNum = state.compassData?.points?.[room]?.gk_num;
+    if (gkNum) {
+      const gk = GENE_KEYS[parseInt(gkNum)];
+      if (gk) result[key] = `GK${gkNum} (${gk.shadow} → ${gk.gift} → ${gk.siddhi})`;
+    }
+  });
+  return result;
+}
+
+function updateNexusMemory() {
+  // Build a compressed narrative of who this person is from available data
+  const name = state.person || state.compassData?.companion || '';
+  const gkLabels = buildGKProfileLabels();
+  const log = state.sessionLog || [];
+  const totalSessions = log.length;
+  const totalMinutes = Math.round(log.reduce((sum, s) => sum + (s.durationMs || 0), 0) / 60000);
+
+  // Collect all notepad entries across rooms for theme detection (last 10 total)
+  const allEntries = ['work','lens','field','call'].flatMap(r =>
+    (state.rooms[r]?.entries || []).slice(-3).map(e => e.text)
+  ).filter(Boolean).slice(-10);
+
+  const parts = [];
+  if (name) parts.push(`Name: ${name}`);
+  if (gkLabels.gk_work) parts.push(`The Work: ${gkLabels.gk_work}`);
+  if (gkLabels.gk_lens) parts.push(`The Lens: ${gkLabels.gk_lens}`);
+  if (gkLabels.gk_field) parts.push(`The Field: ${gkLabels.gk_field}`);
+  if (gkLabels.gk_call) parts.push(`The Call: ${gkLabels.gk_call}`);
+  if (totalSessions > 0) parts.push(`Sessions: ${totalSessions} · ${totalMinutes} min total`);
+  if (allEntries.length) parts.push(`Recent writing across rooms:\n${allEntries.join('\n').slice(0, 800)}`);
+
+  state.nexusMemory = parts.join('\n');
+  saveState();
+}
 
 let currentRoom = null;
 let portalOpened = false;
@@ -4033,8 +4112,12 @@ async function initRoomRose(roomKey) {
           gk_shadow: gkData.shadow,
           gk_gift: gkData.gift,
           gk_siddhi: gkData.siddhi,
-          session_notes: pt?.raw?.slice(0, 1000) || '',
-          companion: state.compassData?.companion || ''
+          session_notes: pt?.raw?.slice(0, 800) || '',
+          companion: state.compassData?.companion || state.person || '',
+          all_rooms_summary: buildCrossRoomSummary(roomKey),
+          session_history: buildSessionHistorySummary(),
+          nexus_memory: state.nexusMemory || '',
+          ...buildGKProfileLabels()
         })
       });
       if (!res.ok) throw new Error();
@@ -4103,10 +4186,19 @@ async function sendMirrorMessage() {
   const gkData = gkNum ? GENE_KEYS[parseInt(gkNum)] : null;
   const pt = state.compassData?.points?.[currentRoom];
 
-  // Build context from history + compass material
+  // Build context
   const history = (state.rooms[currentRoom]?.mirrorHistory || []).slice(-8);
   const sessionContext = pt?.raw || '';
   const workbenchContext = (state.rooms[currentRoom]?.entries || []).slice(-3).map(e => e.text).join('\n\n');
+
+  // — Cross-room summary: all four rooms' recent entries
+  const allRoomsSummary = buildCrossRoomSummary(currentRoom);
+
+  // — Session history summary from log
+  const sessionHistory = buildSessionHistorySummary();
+
+  // — Full GK profile labels
+  const gkLabels = buildGKProfileLabels();
 
   try {
     const res = await fetch(`${API_BASE}/rose-mirror`, {
@@ -4121,10 +4213,17 @@ async function sendMirrorMessage() {
         gk_shadow: gkData?.shadow || '',
         gk_gift: gkData?.gift || '',
         gk_siddhi: gkData?.siddhi || '',
-        session_notes: sessionContext.slice(0, 2000),
-        workbench_entries: workbenchContext.slice(0, 1000),
+        session_notes: sessionContext.slice(0, 800),
+        workbench_entries: workbenchContext.slice(0, 600),
         history: history,
-        companion: state.compassData?.companion || state.person || ''
+        companion: state.compassData?.companion || state.person || '',
+        all_rooms_summary: allRoomsSummary,
+        session_history: sessionHistory,
+        nexus_memory: state.nexusMemory || '',
+        gk_work: gkLabels.work,
+        gk_lens: gkLabels.lens,
+        gk_field: gkLabels.field,
+        gk_call: gkLabels.call
       })
     });
 
@@ -4411,9 +4510,9 @@ function stopOnAir(autoSave = true) {
   if (!state.sessionLog) state.sessionLog = [];
   state.sessionLog.push(logEntry);
 
-  // Auto-save
+  // Update Nexus memory with latest data, then auto-save
   if (autoSave) {
-    saveState();
+    updateNexusMemory();
     showToast(`Session saved · ${duration} in ${logEntry.room ? (logEntry.room[0].toUpperCase() + logEntry.room.slice(1)) : ''}`);
   }
 
