@@ -4361,6 +4361,9 @@ function doEnterRoom(roomKey, meta) {
   const roomScreen = document.getElementById('screen-room');
   roomScreen.classList.add('active');
 
+  // Wire ambient buttons now that screen is visible
+  if (typeof initAmbientButtons === 'function') initAmbientButtons();
+
   // Set accent color — also sync --rose-color so Nexus orb matches the room
   roomScreen.style.setProperty('--accent-color', `var(${meta.color})`);
   document.querySelector('.room-body').style.setProperty('--accent-color', `var(${meta.color})`);
@@ -5510,42 +5513,50 @@ function startAmbient(key) {
   if (label) label.textContent = key.charAt(0).toUpperCase() + key.slice(1);
 }
 
-// Ambient event delegation
-document.addEventListener('click', (e) => {
-  const ambBtn = e.target.closest('.freq-preset-btn[data-ambient]');
-  if (ambBtn) {
-    const key = ambBtn.dataset.ambient;
-    if (ambientActive === key) {
-      stopAmbient();
-      const label = document.getElementById('freq-toolbar-label');
-      if (label) label.textContent = 'Sound';
-    } else {
-      document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(b => b.classList.remove('active'));
-      ambBtn.classList.add('active');
-      startAmbient(key);
-    }
-    return;
-  }
-  if (e.target.closest('#ambient-stop-btn')) {
+// Ambient buttons wired directly — called from doEnterRoom after screen is visible
+function initAmbientButtons() {
+  document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(btn => {
+    // Remove any existing listener to avoid duplicates
+    btn.replaceWith(btn.cloneNode(true));
+  });
+  document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.ambient;
+      if (ambientActive === key) {
+        stopAmbient();
+        const label = document.getElementById('freq-toolbar-label');
+        if (label) label.textContent = 'Sound';
+      } else {
+        document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        startAmbient(key);
+      }
+    });
+  });
+
+  const stopBtn = document.getElementById('ambient-stop-btn');
+  if (stopBtn) stopBtn.onclick = () => {
     stopAmbient();
     const label = document.getElementById('freq-toolbar-label');
     if (label) label.textContent = 'Sound';
-  }
-  if (e.target.closest('#ambient-dice-btn')) {
+  };
+
+  const diceBtn = document.getElementById('ambient-dice-btn');
+  if (diceBtn) diceBtn.onclick = () => {
     const keys = [...Object.keys(AMBIENT_URLS), 'white', 'pink', 'brown'];
     const pick = keys[Math.floor(Math.random() * keys.length)];
     document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(b =>
       b.classList.toggle('active', b.dataset.ambient === pick));
     startAmbient(pick);
-  }
-});
+  };
 
-document.addEventListener('input', (e) => {
-  if (e.target.id !== 'ambient-volume') return;
-  const vol = parseFloat(e.target.value) / 100;
-  if (ambientNoiseGain?._ctx) ambientNoiseGain.gain.setTargetAtTime(vol * 0.45, ambientNoiseGain._ctx.currentTime, 0.1);
-  if (ambientAudioEl) ambientAudioEl.volume = Math.min(1, vol * 0.85);
-});
+  const volSlider = document.getElementById('ambient-volume');
+  if (volSlider) volSlider.oninput = () => {
+    const vol = parseFloat(volSlider.value) / 100;
+    if (ambientNoiseGain?._ctx) ambientNoiseGain.gain.setTargetAtTime(vol * 0.45, ambientNoiseGain._ctx.currentTime, 0.1);
+    if (ambientAudioEl) ambientAudioEl.volume = Math.min(1, vol * 0.85);
+  };
+}
 
 
 // ============================================================
