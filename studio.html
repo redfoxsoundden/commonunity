@@ -3191,7 +3191,7 @@ input, textarea { font: inherit; color: inherit; }
               <button class="freq-preset-btn" data-ambient="ocean"   title="Ocean waves">Ocean</button>
               <button class="freq-preset-btn" data-ambient="forest"  title="Forest & birdsong">Forest</button>
               <button class="freq-preset-btn" data-ambient="fire"    title="Hearth fire">Fire</button>
-              <button class="freq-preset-btn" data-ambient="stream"  title="Flowing stream">Stream</button>
+              <button class="freq-preset-btn" data-ambient="birds"  title="Birdsong">Birds</button>
               <button class="freq-preset-btn" data-ambient="white"   title="White noise">White</button>
               <button class="freq-preset-btn" data-ambient="pink"    title="Pink noise">Pink</button>
               <button class="freq-preset-btn" data-ambient="brown"   title="Brown noise">Brown</button>
@@ -5443,7 +5443,7 @@ const AMBIENT_URLS = {
   ocean:  'https://assets.mixkit.co/active_storage/sfx/2523/2523-preview.mp3',
   forest: 'https://assets.mixkit.co/active_storage/sfx/2516/2516-preview.mp3',
   fire:   'https://assets.mixkit.co/active_storage/sfx/1333/1333-preview.mp3',
-  stream: 'https://assets.mixkit.co/active_storage/sfx/2519/2519-preview.mp3',
+  birds: 'https://assets.mixkit.co/active_storage/sfx/2518/2518-preview.mp3',
 };
 
 let ambientAudioEl   = null;
@@ -6070,59 +6070,91 @@ function initVoiceNotes() {
 async function startRecording() {
   try {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
-      let finalTranscript = '';
-      const workbenchInput = document.getElementById('workbench-input');
-      recognition.onresult = (event) => {
-        let interim = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const t = event.results[i].transcript;
-          if (event.results[i].isFinal) finalTranscript += t + ' ';
-          else interim += t;
-        }
-        if (workbenchInput) workbenchInput.placeholder = (finalTranscript + interim).trim() || 'Listening…';
-      };
-      recognition.onerror = () => { showToast('Speech error — try again'); stopRecording(); };
-      recognition.onend = () => {
-        if (isRecording) {
-          if (finalTranscript.trim()) {
-            if (!state.rooms[currentRoom].entries) state.rooms[currentRoom].entries = [];
-            state.rooms[currentRoom].entries.push({ text: finalTranscript.trim(), date: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }), type: 'voice' });
-            saveState();
-            renderWorkbenchEntries(currentRoom);
-            renderArchive(currentRoom);
-            showToast('Voice note transcribed and saved');
-          }
-          if (workbenchInput) workbenchInput.placeholder = 'Write freely. Reflections, questions, fragments, intentions. This space is yours.';
-          stopRecording();
-        }
-      };
-      window._recognition = recognition;
-      recognition.start();
-      isRecording = true;
-      const btn = document.getElementById('voice-record-btn');
+    if (!SpeechRecognition) {
+      showToast('Speech recognition not supported — try Chrome or Edge');
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    let finalTranscript = '';
+    let intentionallyStopped = false;
+    const workbenchInput = document.getElementById('workbench-input');
+
+    recognition.onresult = (event) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i].transcript;
+        if (event.results[i].isFinal) finalTranscript += t + ' ';
+        else interim += t;
+      }
+      // Show live transcript in the input field (not placeholder)
+      const live = (finalTranscript + interim).trim();
+      if (workbenchInput) {
+        workbenchInput.value = live;
+        workbenchInput.dispatchEvent(new Event('input'));
+      }
+    };
+
+    recognition.onerror = (e) => {
+      if (e.error !== 'aborted') showToast('Speech error — try again');
+      stopRecording();
+    };
+
+    recognition.onend = () => {
+      const text = finalTranscript.trim();
+      if (text && !intentionallyStopped) {
+        // Auto-stopped by browser (silence timeout) — save what we got
+        if (workbenchInput) workbenchInput.value = text;
+        showToast('Transcribed — review and send when ready');
+      }
+      if (intentionallyStopped && text) {
+        // User pressed stop — text is already in input, they can edit and submit
+        if (workbenchInput) workbenchInput.value = text;
+        showToast('Voice captured — review and send when ready');
+      }
+      // Reset placeholder
+      if (workbenchInput && !workbenchInput.value) {
+        workbenchInput.placeholder = 'Write freely. Reflections, questions, fragments, intentions. This space is yours.';
+      }
+      stopRecording();
+    };
+
+    window._recognition = recognition;
+    window._recognitionStop = () => { intentionallyStopped = true; recognition.stop(); };
+    recognition.start();
+    isRecording = true;
+
+    const btn = document.getElementById('voice-record-btn');
+    if (btn) {
       btn.classList.add('recording');
       btn.title = 'Stop recording';
       btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>';
-      showToast('Listening — speak now…');
-    } else {
-      // Speech recognition not available — no audio fallback, notes are text only
-      showToast('Speech recognition is not supported on this browser. Try Chrome or Edge.');
     }
+    if (workbenchInput) {
+      workbenchInput.value = '';
+      workbenchInput.placeholder = 'Listening…';
+      workbenchInput.focus();
+    }
+    showToast('Listening — speak now…');
   } catch(e) {
     showToast('Microphone access denied');
   }
 }
 
 function stopRecording() {
-  if (window._recognition) { try { window._recognition.stop(); } catch(e) {} window._recognition = null; }
+  // Use intentional stop path if available
+  if (window._recognitionStop) { window._recognitionStop(); window._recognitionStop = null; }
+  else if (window._recognition) { try { window._recognition.stop(); } catch(e) {} window._recognition = null; }
   isRecording = false;
   const btn = document.getElementById('voice-record-btn');
-  if (btn) { btn.classList.remove('recording'); btn.title = 'Record voice note'; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>'; }
+  if (btn) {
+    btn.classList.remove('recording');
+    btn.title = 'Record voice note';
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+  }
 }
 
 function saveVoiceEntry(blob) {
