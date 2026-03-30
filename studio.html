@@ -252,21 +252,32 @@ input, textarea { font: inherit; color: inherit; }
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-faint);
-  opacity: 0.5;
+  color: var(--rose-color, #c4b5fd);
+  opacity: 0.7;
   padding: var(--space-2) 0;
   text-align: left;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, text-shadow 0.3s ease;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--rose-color,#c4b5fd) 40%, transparent);
+  animation: seed-btn-glow 4s ease-in-out infinite;
 }
-.entrance-seed-btn:hover { opacity: 0.85; }
-.entrance-seed-btn.seeded { opacity: 0.35; }
+@keyframes seed-btn-glow {
+  0%,100% { opacity: 0.6; text-shadow: 0 0 8px color-mix(in srgb, var(--rose-color,#c4b5fd) 35%, transparent); }
+  50%      { opacity: 1;   text-shadow: 0 0 18px color-mix(in srgb, var(--rose-color,#c4b5fd) 70%, transparent), 0 0 32px color-mix(in srgb, var(--rose-color,#c4b5fd) 25%, transparent); }
+}
+.entrance-seed-btn:hover { opacity: 1; }
+.entrance-seed-btn.seeded {
+  animation: none;
+  opacity: 0.3;
+  color: var(--text-faint);
+  text-shadow: none;
+  font-size: 9px;
+}
 .entrance-seed-btn.pulse {
   animation: seed-pulse 0.6s ease 3;
-  opacity: 1;
 }
 @keyframes seed-pulse {
-  0%,100% { opacity: 0.5; color: var(--text-faint); }
-  50% { opacity: 1; color: var(--rose-color,#c4b5fd); }
+  0%,100% { opacity: 0.6; color: var(--rose-color,#c4b5fd); }
+  50%      { opacity: 1;   color: #fff; text-shadow: 0 0 20px var(--rose-color,#c4b5fd); }
 }
 
 .entrance-seed-panel {
@@ -2619,7 +2630,7 @@ input, textarea { font: inherit; color: inherit; }
 
     <!-- Seed prompt — tap to expand name + calculator -->
     <button class="entrance-seed-btn" id="entrance-seed-btn">
-      <span id="entrance-seed-label">seed the rooms ↓</span>
+      <span id="entrance-seed-label">Studio Setup ↓</span>
     </button>
 
     <!-- Expandable seed panel -->
@@ -3434,25 +3445,23 @@ function initEntrance() {
   const seedPanel = document.getElementById('entrance-seed-panel');
   const seedLabel = document.getElementById('entrance-seed-label');
   if (seedBtn && seedPanel) {
-    // Auto-open if no data yet
+    // Always start closed — user taps to open
     const hasData = state.person || state.compassData?.companion;
-    if (!hasData) {
-      seedPanel.classList.add('open');
-      seedLabel.textContent = 'seed the rooms ↑';
-    } else {
+    if (hasData) {
       seedBtn.classList.add('seeded');
-      seedLabel.textContent = 'profile ready ✓';
+      seedLabel.textContent = 'Studio ready ✓';
     }
+    // Panel stays closed until clicked
     seedBtn.addEventListener('click', () => {
       const open = seedPanel.classList.toggle('open');
-      seedLabel.textContent = open ? 'seed the rooms ↑' : 'seed the rooms ↓';
+      seedLabel.textContent = open ? 'Studio Setup ↑' : 'Studio Setup ↓';
     });
     // Mark seeded when name entered
     const nameInput = document.getElementById('studio-person-name');
     if (nameInput) nameInput.addEventListener('blur', () => {
       if (nameInput.value.trim()) {
         seedBtn.classList.add('seeded');
-        seedLabel.textContent = 'profile ready ✓';
+        seedLabel.textContent = 'Studio ready ✓';
       }
     });
   }
@@ -3661,7 +3670,7 @@ function enterRoom(roomKey) {
     }
     if (sPanel && !sPanel.classList.contains('open')) {
       sPanel.classList.add('open');
-      if (sLabel) sLabel.textContent = 'seed the rooms ↑';
+      if (sLabel) sLabel.textContent = 'Studio Setup ↑';
     }
     // Allow entry after a 700ms pause (gives user a moment to notice)
     setTimeout(() => doEnterRoom(roomKey, meta), 700);
