@@ -274,15 +274,15 @@ input, textarea { font: inherit; color: inherit; }
 /* ── Origami Portal ───────────────────────────────────────────── */
 .portal-wrap {
   position: relative;
-  width: min(340px, 60vw);
-  height: min(340px, 60vw);
+  width: min(420px, 55vw);
+  height: min(420px, 55vw);
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .torus-canvas {
-  width: min(340px, 60vw);
-  height: min(340px, 60vw);
+  width: min(420px, 55vw);
+  height: min(420px, 55vw);
   display: block;
   cursor: pointer;
 }
@@ -594,10 +594,10 @@ input, textarea { font: inherit; color: inherit; }
   transform: translateX(12px);
 }
 .room-tile:hover {
-  border-color: var(--rose-color, #c4b5fd);
-  background: color-mix(in srgb, var(--rose-color,#c4b5fd) 8%, var(--card-alt));
+  border-color: var(--tile-color, var(--rose-color, #c4b5fd));
+  background: color-mix(in srgb, var(--tile-color, var(--rose-color,#c4b5fd)) 10%, var(--card-alt));
   transform: translateX(3px);
-  box-shadow: 0 2px 16px color-mix(in srgb, var(--rose-color,#c4b5fd) 20%, transparent);
+  box-shadow: 0 2px 16px color-mix(in srgb, var(--tile-color, var(--rose-color,#c4b5fd)) 25%, transparent);
 }
 .room-tile-gk {
   width: 32px;
@@ -3048,40 +3048,40 @@ input, textarea { font: inherit; color: inherit; }
     <div class="entrance-room-chooser" id="entrance-room-chooser">
       <div class="chooser-label">Choose your room</div>
 
-      <button class="room-tile" data-room="work">
-        <div class="room-tile-gk" id="rc-gk-work">14</div>
+      <button class="room-tile" data-room="work" style="--tile-color:var(--work)">
+        <div class="room-tile-gk" id="rc-gk-work" style="color:var(--work);border-color:color-mix(in srgb,var(--work) 50%,transparent);background:color-mix(in srgb,var(--work) 12%,transparent)">14</div>
         <div class="room-tile-info">
           <div class="room-tile-name">The Work</div>
           <div class="room-tile-tag">Life's Work &middot; GK <span class="rc-gk-num-work">14</span></div>
         </div>
-        <span class="room-tile-arrow">&rsaquo;</span>
+        <span class="room-tile-arrow" style="color:var(--work);opacity:0.6">&rsaquo;</span>
       </button>
 
-      <button class="room-tile" data-room="lens">
-        <div class="room-tile-gk" id="rc-gk-lens">8</div>
+      <button class="room-tile" data-room="lens" style="--tile-color:var(--lens)">
+        <div class="room-tile-gk" id="rc-gk-lens" style="color:var(--lens);border-color:color-mix(in srgb,var(--lens) 50%,transparent);background:color-mix(in srgb,var(--lens) 12%,transparent)">8</div>
         <div class="room-tile-info">
           <div class="room-tile-name">The Lens</div>
           <div class="room-tile-tag">Evolution &middot; GK <span class="rc-gk-num-lens">8</span></div>
         </div>
-        <span class="room-tile-arrow">&rsaquo;</span>
+        <span class="room-tile-arrow" style="color:var(--lens);opacity:0.6">&rsaquo;</span>
       </button>
 
-      <button class="room-tile" data-room="field">
-        <div class="room-tile-gk" id="rc-gk-field">29</div>
+      <button class="room-tile" data-room="field" style="--tile-color:var(--field)">
+        <div class="room-tile-gk" id="rc-gk-field" style="color:var(--field);border-color:color-mix(in srgb,var(--field) 50%,transparent);background:color-mix(in srgb,var(--field) 12%,transparent)">29</div>
         <div class="room-tile-info">
           <div class="room-tile-name">The Field</div>
           <div class="room-tile-tag">Radiance &middot; GK <span class="rc-gk-num-field">29</span></div>
         </div>
-        <span class="room-tile-arrow">&rsaquo;</span>
+        <span class="room-tile-arrow" style="color:var(--field);opacity:0.6">&rsaquo;</span>
       </button>
 
-      <button class="room-tile" data-room="call">
-        <div class="room-tile-gk" id="rc-gk-call">30</div>
+      <button class="room-tile" data-room="call" style="--tile-color:var(--call)">
+        <div class="room-tile-gk" id="rc-gk-call" style="color:var(--call);border-color:color-mix(in srgb,var(--call) 50%,transparent);background:color-mix(in srgb,var(--call) 12%,transparent)">30</div>
         <div class="room-tile-info">
           <div class="room-tile-name">The Call</div>
           <div class="room-tile-tag">Purpose &middot; GK <span class="rc-gk-num-call">30</span></div>
         </div>
-        <span class="room-tile-arrow">&rsaquo;</span>
+        <span class="room-tile-arrow" style="color:var(--call);opacity:0.6">&rsaquo;</span>
       </button>
     </div><!-- /entrance-room-chooser -->
 
@@ -3996,7 +3996,7 @@ function initEntrance() {
   const actions = document.getElementById('entrance-actions');
 
   // Hold-to-open ritual — mirrors Nexus awakening
-  const PORTAL_HOLD_MS = 1800;
+  const PORTAL_HOLD_MS = 3500;
   const PORTAL_CIRC = 2 * Math.PI * 185; // ring around 380px canvas (r~185 at viewBox scale)
   let portalHoldStart = null;
   let portalRafId = null;
@@ -5985,7 +5985,8 @@ function initTorusPortal() {
   if (!canvas) return;
 
   const DPR  = Math.min(window.devicePixelRatio || 1, 2);
-  const SIZE = 340;
+  // Match CSS size — read actual rendered size for crisp DPR scaling
+  const SIZE = Math.round(Math.min(420, window.innerWidth * 0.55));
   canvas.width  = SIZE * DPR;
   canvas.height = SIZE * DPR;
   canvas.style.width  = SIZE + 'px';
@@ -5994,11 +5995,10 @@ function initTorusPortal() {
   ctx.scale(DPR, DPR);
 
   const cx = SIZE / 2;
-  // Shift cy down slightly to compensate for rotX=0.48 forward tilt
-  // At rotX=0.48, the torus mass sits ~18px below geometric centre
-  const cy = SIZE / 2 + 18;
-  // Horn torus: R = r = 78
-  const R = 78, r = 78;
+  // Shift cy down to compensate for rotX=0.48 forward tilt
+  const cy = SIZE / 2 + Math.round(SIZE * 0.053);
+  // Horn torus: R = r, scaled to canvas size
+  const R = Math.round(SIZE * 0.23), r = Math.round(SIZE * 0.23);
   // Lean point counts — 960 total (was 3200), no per-frame sort
   const NT = 48, NP = 20;
   const FOV = 500, Z_OFF = 260;
