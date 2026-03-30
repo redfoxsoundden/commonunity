@@ -149,7 +149,7 @@ input, textarea { font: inherit; color: inherit; }
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   padding: var(--space-8) var(--space-6);
   border-left: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
   background: color-mix(in srgb, var(--card) 40%, transparent);
@@ -232,15 +232,15 @@ input, textarea { font: inherit; color: inherit; }
 /* ── Origami Portal ───────────────────────────────────────────── */
 .portal-wrap {
   position: relative;
-  width: 380px;
-  height: 380px;
+  width: min(340px, 60vw);
+  height: min(340px, 60vw);
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .torus-canvas {
-  width: 380px;
-  height: 380px;
+  width: min(340px, 60vw);
+  height: min(340px, 60vw);
   display: block;
   cursor: pointer;
 }
@@ -372,25 +372,9 @@ input, textarea { font: inherit; color: inherit; }
 }
 
 /* Facet hit areas — invisible, positioned over each triangle */
-.portal-facet {
-  position: absolute;
-  width: 50%; height: 50%;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.portal-facet.top    { top: 0;   left: 25%; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
-.portal-facet.right  { top: 25%; right: 0;  clip-path: polygon(0% 0%, 100% 50%, 0% 100%); }
-.portal-facet.bottom { bottom: 0; left: 25%; clip-path: polygon(0% 0%, 100% 0%, 50% 100%); }
-.portal-facet.left   { top: 25%; left: 0;   clip-path: polygon(100% 0%, 0% 50%, 100% 100%); }
-
-.portal-facet[data-room="work"]  { background: var(--work); }
-.portal-facet[data-room="lens"]  { background: var(--lens); }
-.portal-facet[data-room="field"] { background: var(--field); }
-.portal-facet[data-room="call"]  { background: var(--call); }
-
-.portal-wrap.doors-open .portal-facet { opacity: 0.1; transition: opacity 0.35s cubic-bezier(0.16,1,0.3,1); }
-.portal-wrap.doors-open .portal-facet:hover { opacity: 0.28; transition: opacity 0.15s ease; }
+/* Portal facets — hidden, kept for JS click compatibility only */
+.portal-facet { display: none !important; }
+.portal-wrap.doors-open .portal-facet { display: none !important; }
 
 /* Room labels that appear when doors open */
 .portal-room-labels {
@@ -510,6 +494,85 @@ input, textarea { font: inherit; color: inherit; }
   background: var(--btn-primary-h);
   box-shadow: 0 4px 20px color-mix(in srgb, var(--btn-primary) 40%, transparent);
 }
+
+/* ── Sidebar Room Chooser ──────────────────────────────────── */
+.entrance-room-chooser {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: chooser-in 0.5s ease both;
+}
+.entrance-room-chooser.visible {
+  display: flex;
+}
+@keyframes chooser-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.chooser-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding-bottom: var(--space-1);
+}
+.room-tile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  background: color-mix(in srgb, var(--card-alt) 70%, transparent);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+.room-tile:hover {
+  border-color: var(--rose-color, #c4b5fd);
+  background: color-mix(in srgb, var(--rose-color,#c4b5fd) 8%, var(--card-alt));
+  transform: translateX(3px);
+  box-shadow: 0 2px 16px color-mix(in srgb, var(--rose-color,#c4b5fd) 20%, transparent);
+}
+.room-tile-gk {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--rose-color,#c4b5fd) 40%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--rose-color, #c4b5fd);
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--rose-color,#c4b5fd) 10%, transparent);
+}
+.room-tile-info {
+  flex: 1;
+  min-width: 0;
+}
+.room-tile-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.room-tile-tag {
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+.room-tile-arrow {
+  color: var(--text-faint);
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.room-tile:hover .room-tile-arrow { transform: translateX(3px); color: var(--rose-color,#c4b5fd); }
 
 /* Import compass link */
 .compass-import-link {
@@ -1416,9 +1479,11 @@ input, textarea { font: inherit; color: inherit; }
   position: relative;
   transition: border-color 0.2s, transform 0.1s;
   overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
 }
 .vibe-preset-slot::before {
-  /* colour swatch — filled by JS */
   content: '';
   position: absolute;
   inset: 0;
@@ -1442,6 +1507,20 @@ input, textarea { font: inherit; color: inherit; }
   50%  { transform: scale(1.08); border-color: #fff; box-shadow: 0 0 12px var(--rose-color,#c4b5fd); }
   100% { transform: scale(1);    border-color: var(--rose-color,#c4b5fd); }
 }
+/* Delete hold — red ring sweeps over slot */
+.vibe-preset-slot.deleting::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #ef4444 25%, transparent);
+  border-radius: inherit;
+  animation: preset-deleting var(--delete-dur, 5s) linear forwards;
+}
+@keyframes preset-deleting {
+  0%   { opacity: 0; }
+  5%   { opacity: 1; }
+  100% { opacity: 1; background: color-mix(in srgb, #ef4444 60%, transparent); }
+}
 .vibe-preset-slot .preset-label {
   position: absolute;
   inset: 0;
@@ -1454,7 +1533,74 @@ input, textarea { font: inherit; color: inherit; }
   color: rgba(255,255,255,0.7);
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
   pointer-events: none;
+  z-index: 1;
 }
+
+/* ── Preset name row ─────────────────────────────────────── */
+.preset-name-row {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  animation: fadein-up 0.2s ease both;
+}
+.preset-name-row.visible { display: flex; }
+@keyframes fadein-up {
+  from { opacity:0; transform:translateY(4px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.preset-name-badge {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--rose-color,#c4b5fd);
+  opacity: 0.7;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.preset-name-input {
+  flex: 1;
+  height: 22px;
+  background: color-mix(in srgb, var(--card-alt) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 10px;
+  padding: 0 6px;
+  outline: none;
+  min-width: 0;
+}
+.preset-name-input:focus {
+  border-color: var(--rose-color,#c4b5fd);
+  box-shadow: 0 0 6px color-mix(in srgb,var(--rose-color,#c4b5fd) 30%, transparent);
+}
+.preset-name-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+  padding: 0;
+  line-height: 1;
+}
+.preset-name-btn:hover { transform: scale(1.15); }
+.preset-name-confirm {
+  border-color: color-mix(in srgb, var(--rose-color,#c4b5fd) 60%, transparent);
+  color: var(--rose-color,#c4b5fd);
+}
+.preset-name-confirm:hover { background: color-mix(in srgb,var(--rose-color,#c4b5fd) 20%, transparent); }
+.preset-name-cancel {
+  border-color: color-mix(in srgb, var(--border) 60%, transparent);
+  color: var(--text-faint);
+}
+.preset-name-cancel:hover { background: color-mix(in srgb, var(--border) 20%, transparent); }
 
 .mood-toolbar-slider {
   display: flex;
@@ -2744,27 +2890,22 @@ input, textarea { font: inherit; color: inherit; }
 
   <!-- Left: torus portal -->
   <div class="entrance-left">
-    <div class="portal-wrap" id="portal" title="Touch to open">
-      <div class="portal-hint" id="portal-hint">touch to open</div>
+    <div class="portal-wrap" id="portal" title="Hold to open">
+      <div class="portal-hint" id="portal-hint">hold to open</div>
       <canvas id="torus-canvas" class="torus-canvas" aria-label="CommonUnity Studio"></canvas>
-
-      <!-- Invisible facet hit areas -->
-      <div class="portal-facet top"    data-room="work"  title="The Work"></div>
-      <div class="portal-facet right"  data-room="lens"  title="The Lens"></div>
-      <div class="portal-facet bottom" data-room="field" title="The Field"></div>
-      <div class="portal-facet left"   data-room="call"  title="The Call"></div>
-
-      <!-- Room labels removed — rooms revealed via buttons only -->
+      <!-- Facets kept for JS compat, invisible -->
+      <div class="portal-facet top"    data-room="work"></div>
+      <div class="portal-facet right"  data-room="lens"></div>
+      <div class="portal-facet bottom" data-room="field"></div>
+      <div class="portal-facet left"   data-room="call"></div>
     </div>
 
-    <!-- Room entry buttons — hidden until portal is touched, revealed via .visible class -->
-    <div class="entrance-actions" id="entrance-actions">
-      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;justify-content:center;">
-        <button class="btn-enter-room" data-room="work"  style="border-color:var(--work);color:var(--work);">The Work</button>
-        <button class="btn-enter-room" data-room="lens"  style="border-color:var(--lens);color:var(--lens);">The Lens</button>
-        <button class="btn-enter-room" data-room="field" style="border-color:var(--field);color:var(--field);">The Field</button>
-        <button class="btn-enter-room" data-room="call"  style="border-color:var(--call);color:var(--call);">The Call</button>
-      </div>
+    <!-- entrance-actions kept for JS compat, visually hidden — rooms now in sidebar -->
+    <div class="entrance-actions" id="entrance-actions" style="display:none;">
+      <button class="btn-enter-room" data-room="work">The Work</button>
+      <button class="btn-enter-room" data-room="lens">The Lens</button>
+      <button class="btn-enter-room" data-room="field">The Field</button>
+      <button class="btn-enter-room" data-room="call">The Call</button>
     </div>
 
     <footer class="studio-footer" style="position:absolute;bottom:var(--space-5);left:0;right:0;text-align:center;">
@@ -2839,6 +2980,47 @@ input, textarea { font: inherit; color: inherit; }
     </div>
 
     </div><!-- /entrance-seed-panel -->
+
+    <!-- Room chooser — revealed after portal hold completes -->
+    <div class="entrance-room-chooser" id="entrance-room-chooser">
+      <div class="chooser-label">Choose your room</div>
+
+      <button class="room-tile" data-room="work">
+        <div class="room-tile-gk" id="rc-gk-work">14</div>
+        <div class="room-tile-info">
+          <div class="room-tile-name">The Work</div>
+          <div class="room-tile-tag">Life's Work &middot; GK <span class="rc-gk-num-work">14</span></div>
+        </div>
+        <span class="room-tile-arrow">&rsaquo;</span>
+      </button>
+
+      <button class="room-tile" data-room="lens">
+        <div class="room-tile-gk" id="rc-gk-lens">8</div>
+        <div class="room-tile-info">
+          <div class="room-tile-name">The Lens</div>
+          <div class="room-tile-tag">Evolution &middot; GK <span class="rc-gk-num-lens">8</span></div>
+        </div>
+        <span class="room-tile-arrow">&rsaquo;</span>
+      </button>
+
+      <button class="room-tile" data-room="field">
+        <div class="room-tile-gk" id="rc-gk-field">29</div>
+        <div class="room-tile-info">
+          <div class="room-tile-name">The Field</div>
+          <div class="room-tile-tag">Radiance &middot; GK <span class="rc-gk-num-field">29</span></div>
+        </div>
+        <span class="room-tile-arrow">&rsaquo;</span>
+      </button>
+
+      <button class="room-tile" data-room="call">
+        <div class="room-tile-gk" id="rc-gk-call">30</div>
+        <div class="room-tile-info">
+          <div class="room-tile-name">The Call</div>
+          <div class="room-tile-tag">Purpose &middot; GK <span class="rc-gk-num-call">30</span></div>
+        </div>
+        <span class="room-tile-arrow">&rsaquo;</span>
+      </button>
+    </div><!-- /entrance-room-chooser -->
 
     <!-- Session actions — always visible, minimal -->
     <div class="entrance-session-links">
@@ -3009,14 +3191,21 @@ input, textarea { font: inherit; color: inherit; }
             <div style="border-top:1px solid color-mix(in srgb,var(--border) 40%,transparent);padding-top:var(--space-2);">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
                 <span class="freq-dropdown-label">Presets</span>
-                <span style="font-size:9px;color:var(--text-faint);opacity:0.6;">hold to save</span>
+                <span style="font-size:9px;color:var(--text-faint);opacity:0.6;">hold · save &nbsp;/&nbsp; hold 5s · delete</span>
               </div>
               <div class="vibe-preset-strip" id="vibe-preset-strip">
-                <button class="vibe-preset-slot" data-slot="0" title="Hold to save current settings"></button>
-                <button class="vibe-preset-slot" data-slot="1" title="Hold to save current settings"></button>
-                <button class="vibe-preset-slot" data-slot="2" title="Hold to save current settings"></button>
-                <button class="vibe-preset-slot" data-slot="3" title="Hold to save current settings"></button>
-                <button class="vibe-preset-slot" data-slot="4" title="Hold to save current settings"></button>
+                <button class="vibe-preset-slot" data-slot="0" title="Click to recall · Hold to save · Hold 5s to delete"></button>
+                <button class="vibe-preset-slot" data-slot="1" title="Click to recall · Hold to save · Hold 5s to delete"></button>
+                <button class="vibe-preset-slot" data-slot="2" title="Click to recall · Hold to save · Hold 5s to delete"></button>
+                <button class="vibe-preset-slot" data-slot="3" title="Click to recall · Hold to save · Hold 5s to delete"></button>
+                <button class="vibe-preset-slot" data-slot="4" title="Click to recall · Hold to save · Hold 5s to delete"></button>
+              </div>
+              <!-- Preset name row — shown when a filled slot is active -->
+              <div class="preset-name-row" id="preset-name-row">
+                <span class="preset-name-badge" id="preset-name-badge">1</span>
+                <input class="preset-name-input" id="preset-name-input" type="text" placeholder="name this preset…" maxlength="24" autocomplete="off">
+                <button class="preset-name-btn preset-name-confirm" id="preset-name-confirm" title="Save name">✓</button>
+                <button class="preset-name-btn preset-name-cancel" id="preset-name-cancel" title="Cancel">×</button>
               </div>
             </div>
 
@@ -5067,9 +5256,27 @@ function initMoodLighting() {
     });
   });
 
-  // — Preset slots: click = recall, hold (600ms) = save —
-  const PRESET_HOLD_MS = 700;
-  const presets = JSON.parse(localStorage.getItem('cu_vibe_presets') || 'null') || Array(5).fill(null);
+  // ── Preset slots ────────────────────────────────────────────────────────────────────────
+  // click = recall  |  hold 700ms on EMPTY = save  |  hold 700ms on FILLED = save (overwrite)
+  // hold 5000ms on FILLED = delete
+  const PRESET_SAVE_MS   = 700;
+  const PRESET_DELETE_MS = 5000;
+
+  const presets      = JSON.parse(localStorage.getItem('cu_vibe_presets')  || 'null') || Array(5).fill(null);
+  const presetNames  = JSON.parse(localStorage.getItem('cu_vibe_preset_names') || 'null') || Array(5).fill('');
+
+  // Name-row DOM refs
+  const nameRow     = document.getElementById('preset-name-row');
+  const nameBadge   = document.getElementById('preset-name-badge');
+  const nameInput   = document.getElementById('preset-name-input');
+  const nameConfirm = document.getElementById('preset-name-confirm');
+  const nameCancel  = document.getElementById('preset-name-cancel');
+  let   activeNameSlot = null;   // index of the slot whose name is being edited
+
+  function persistPresets() {
+    localStorage.setItem('cu_vibe_presets',       JSON.stringify(presets));
+    localStorage.setItem('cu_vibe_preset_names',  JSON.stringify(presetNames));
+  }
 
   function renderPresets() {
     document.querySelectorAll('.vibe-preset-slot').forEach((slot, i) => {
@@ -5077,20 +5284,20 @@ function initMoodLighting() {
       const p = presets[i];
       if (p) {
         slot.classList.add('filled');
-        // Colour swatch: use hue + space to derive a preview colour
-        const swatchHue = (p.hue - 220 + p.warm * 0.28) % 360;
-        const swatchL = Math.max(8, Math.min(60, 8 + (p.space || 7) * 0.5));
-        slot.style.setProperty('--swatch', `hsl(${swatchHue},60%,${swatchL}%)`);
-        slot.style.cssText += ';';
+        const swatchHue = ((p.hue || 220) - 220 + (p.warm || 0) * 0.28 + 360) % 360;
+        const swatchL   = Math.max(8, Math.min(60, 8 + (p.space || 7) * 0.5));
         const inner = document.createElement('div');
         inner.style.cssText = `position:absolute;inset:0;background:hsl(${swatchHue},55%,${swatchL}%);opacity:0.9;border-radius:inherit;`;
         const lbl = document.createElement('span');
         lbl.className = 'preset-label';
-        lbl.textContent = i + 1;
+        // Show saved name truncated, or slot number
+        const nm = presetNames[i];
+        lbl.textContent = nm ? nm.slice(0, 6) : (i + 1);
         slot.appendChild(inner);
         slot.appendChild(lbl);
       } else {
         slot.classList.remove('filled');
+        slot.classList.remove('active-preset');
         slot.style.background = '';
         const lbl = document.createElement('span');
         lbl.className = 'preset-label';
@@ -5101,45 +5308,119 @@ function initMoodLighting() {
     });
   }
 
+  // ─ Name row helpers ─────────────────────────────────────────────────
+  function openNameRow(i) {
+    activeNameSlot = i;
+    nameBadge.textContent = presetNames[i] ? `· ${i+1}` : `${i+1}`;
+    nameInput.value = presetNames[i] || '';
+    nameInput.placeholder = `name preset ${i+1}…`;
+    nameRow.classList.add('visible');
+    setTimeout(() => nameInput.focus(), 50);
+  }
+
+  function closeNameRow() {
+    nameRow.classList.remove('visible');
+    activeNameSlot = null;
+    nameInput.value = '';
+  }
+
+  function commitName() {
+    if (activeNameSlot === null) return;
+    const val = nameInput.value.trim().slice(0, 24);
+    presetNames[activeNameSlot] = val;
+    persistPresets();
+    renderPresets();
+    closeNameRow();
+    showToast(val ? `Preset ${activeNameSlot+1} named “${val}”` : `Preset ${activeNameSlot+1} name cleared`);
+  }
+
+  nameConfirm.addEventListener('click', commitName);
+  nameCancel.addEventListener('click',  closeNameRow);
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') commitName();
+    if (e.key === 'Escape') closeNameRow();
+  });
+
+  // ─ Slot interaction ────────────────────────────────────────────────
   renderPresets();
 
-  let presetHoldTimer = null;
-  document.querySelectorAll('.vibe-preset-slot').forEach((slot, i) => {
-    // Click: recall preset
-    slot.addEventListener('click', () => {
-      if (presets[i]) {
-        applyVibeState(presets[i]);
-        document.querySelectorAll('.vibe-preset-slot').forEach(s => s.classList.remove('active-preset'));
-        slot.classList.add('active-preset');
-      }
-    });
+  let presetHoldTimer  = null;
+  let presetDeleteTimer = null;
+  let presetHoldStarted = false;  // distinguish click vs hold
 
-    // Hold: save current state into slot
-    slot.addEventListener('mousedown', () => {
-      presetHoldTimer = setTimeout(() => {
-        presets[i] = readVibeState();
-        localStorage.setItem('cu_vibe_presets', JSON.stringify(presets));
-        slot.classList.add('saving');
-        setTimeout(() => slot.classList.remove('saving'), 900);
-        renderPresets();
-        document.querySelectorAll('.vibe-preset-slot').forEach(s => s.classList.remove('active-preset'));
-        slot.classList.add('active-preset');
-        showToast(`Preset ${i + 1} saved`);
-      }, PRESET_HOLD_MS);
-    });
-    slot.addEventListener('mouseup',    () => clearTimeout(presetHoldTimer));
-    slot.addEventListener('mouseleave', () => clearTimeout(presetHoldTimer));
-    slot.addEventListener('touchstart', () => {
-      presetHoldTimer = setTimeout(() => {
-        presets[i] = readVibeState();
-        localStorage.setItem('cu_vibe_presets', JSON.stringify(presets));
-        slot.classList.add('saving');
-        setTimeout(() => slot.classList.remove('saving'), 900);
-        renderPresets();
-        showToast(`Preset ${i + 1} saved`);
-      }, PRESET_HOLD_MS);
-    }, { passive: true });
-    slot.addEventListener('touchend', () => clearTimeout(presetHoldTimer));
+  function cancelAllTimers() {
+    clearTimeout(presetHoldTimer);
+    clearTimeout(presetDeleteTimer);
+    presetHoldTimer  = null;
+    presetDeleteTimer = null;
+  }
+
+  document.querySelectorAll('.vibe-preset-slot').forEach((slot, i) => {
+
+    function startHold(e) {
+      cancelAllTimers();
+      presetHoldStarted = false;
+
+      if (presets[i]) {
+        // —— FILLED slot: hold 5s = delete, short release = click (recall + name) ——
+        slot.style.setProperty('--delete-dur', `${PRESET_DELETE_MS}ms`);
+        // Start visual feedback after short delay so clicks don't flash it
+        const deleteVisualTimer = setTimeout(() => {
+          if (presetDeleteTimer) slot.classList.add('deleting');
+        }, 200);
+        presetDeleteTimer = setTimeout(() => {
+          presetHoldStarted = true;
+          slot.classList.remove('deleting');
+          presets[i]      = null;
+          presetNames[i]  = '';
+          persistPresets();
+          renderPresets();
+          if (activeNameSlot === i) closeNameRow();
+          document.querySelectorAll('.vibe-preset-slot').forEach(s => s.classList.remove('active-preset'));
+          showToast(`Preset ${i+1} deleted`);
+        }, PRESET_DELETE_MS);
+      } else {
+        // —— EMPTY slot: hold 0.7s = save ——
+        presetHoldTimer = setTimeout(() => {
+          presetHoldStarted = true;
+          presets[i]     = readVibeState();
+          presetNames[i] = '';
+          persistPresets();
+          slot.classList.add('saving');
+          setTimeout(() => slot.classList.remove('saving'), 900);
+          renderPresets();
+          document.querySelectorAll('.vibe-preset-slot').forEach(s => s.classList.remove('active-preset'));
+          slot.classList.add('active-preset');
+          openNameRow(i);
+          showToast(`Preset ${i+1} saved — give it a name?`);
+        }, PRESET_SAVE_MS);
+      }
+    }
+
+    function endHold() {
+      const wasHeld = presetHoldStarted;
+      slot.classList.remove('deleting');
+      cancelAllTimers();
+      presetHoldStarted = false;
+
+      if (!wasHeld) {
+        if (presets[i]) {
+          // Click on filled slot: recall vibe + open name row
+          applyVibeState(presets[i]);
+          document.querySelectorAll('.vibe-preset-slot').forEach(s => s.classList.remove('active-preset'));
+          slot.classList.add('active-preset');
+          openNameRow(i);
+        }
+        // Click on empty slot: do nothing (hold to save)
+      }
+    }
+
+    slot.addEventListener('mousedown',  startHold);
+    slot.addEventListener('mouseup',    endHold);
+    slot.addEventListener('mouseleave', () => { slot.classList.remove('deleting'); cancelAllTimers(); presetHoldStarted = false; });
+    slot.addEventListener('touchstart', startHold, { passive: true });
+    slot.addEventListener('touchend',   endHold);
+    slot.addEventListener('touchcancel',() => { slot.classList.remove('deleting'); cancelAllTimers(); presetHoldStarted = false; });
   });
 
   // Space slider — controls background colour directly
@@ -5556,7 +5837,7 @@ function initTorusPortal() {
   if (!canvas) return;
 
   const DPR  = Math.min(window.devicePixelRatio || 1, 2);
-  const SIZE = 380;
+  const SIZE = 340;
   canvas.width  = SIZE * DPR;
   canvas.height = SIZE * DPR;
   canvas.style.width  = SIZE + 'px';
@@ -5565,9 +5846,8 @@ function initTorusPortal() {
   ctx.scale(DPR, DPR);
 
   const cx = SIZE / 2, cy = SIZE / 2;
-  // Horn torus: R = r — tube radius equals major radius
-  // Inner hole collapses to a singularity at centre
-  const R = 92, r = 92;
+  // Horn torus: R = r, kept small so projection stays circular not oval
+  const R = 78, r = 78;
   const N_THETA = 80, N_PHI = 40;
 
   let rotX = 0.48, rotY = 0, t = 0;
@@ -5625,8 +5905,8 @@ function initTorusPortal() {
     const z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
     const y2 =  y * Math.cos(rotX) - z1 * Math.sin(rotX);
     const z2 =  y * Math.sin(rotX) + z1 * Math.cos(rotX);
-    const fov = 700;
-    const scale = fov / (fov + z2 + 360);
+    const fov = 500;
+    const scale = fov / (fov + z2 + 260);
     return { sx: cx + x1 * scale, sy: cy + y2 * scale, depth: z2, scale };
   }
 
