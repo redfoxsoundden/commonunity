@@ -222,6 +222,12 @@ input, textarea { font: inherit; color: inherit; }
   flex-shrink: 0;
 }
 
+.torus-canvas {
+  width: 275px;
+  height: 275px;
+  display: block;
+  cursor: pointer;
+}
 .portal-svg {
   width: 100%;
   height: 100%;
@@ -2441,6 +2447,7 @@ input, textarea { font: inherit; color: inherit; }
 .studio-info-popup-title { font-size: var(--text-sm) !important; }
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
@@ -2455,44 +2462,10 @@ input, textarea { font: inherit; color: inherit; }
   <div class="entrance-wordmark">CommonUnity Studio <span class="studio-beta">Beta</span></div>
   <div class="entrance-name" id="entrance-name"></div>
 
-  <!-- The origami portal -->
+  <!-- Torus portal -->
   <div class="portal-wrap" id="portal" title="Touch to open">
     <div class="portal-hint" id="portal-hint">touch to open</div>
-    <svg class="portal-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="CommonUnity Studio">
-      <defs>
-        <radialGradient id="s-aura" cx="50%" cy="50%" r="50%">
-          <stop offset="55%" stop-color="#818cf8" stop-opacity="0"/>
-          <stop offset="78%" stop-color="#a5b4fc" stop-opacity="0.2"/>
-          <stop offset="100%" stop-color="#c7d2fe" stop-opacity="0"/>
-        </radialGradient>
-        <radialGradient id="s-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#fef3c7" stop-opacity="0.9"/>
-          <stop offset="25%" stop-color="#fde68a" stop-opacity="0.5"/>
-          <stop offset="55%" stop-color="#c4b5fd" stop-opacity="0.2"/>
-          <stop offset="100%" stop-color="#312e81" stop-opacity="0"/>
-        </radialGradient>
-        <filter id="s-fold" color-interpolation-filters="sRGB" x="-6%" y="-6%" width="112%" height="112%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="b"/>
-          <feColorMatrix in="b" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 28 -12" result="t"/>
-          <feComposite in="SourceGraphic" in2="t" operator="atop"/>
-        </filter>
-      </defs>
-      <circle cx="50" cy="50" r="50" fill="url(#s-aura)"/>
-      <g filter="url(#s-fold)">
-        <polygon points="50,5 95,50 5,50 50,43" fill="#b8a878" fill-opacity="0.75"/>
-        <polygon points="95,50 50,95 50,5 57,50" fill="#7c8fc4" fill-opacity="0.70"/>
-        <polygon points="50,95 5,50 95,50 50,57" fill="#6aaa8c" fill-opacity="0.68"/>
-        <polygon points="5,50 50,5 50,95 43,50" fill="#c47c8f" fill-opacity="0.68"/>
-      </g>
-      <g opacity="0.55">
-        <polygon points="50,22 72,43 28,43 50,38" fill="#e8d9a0" fill-opacity="0.5"/>
-        <polygon points="72,57 57,72 57,28 62,50" fill="#a8bce0" fill-opacity="0.45"/>
-        <polygon points="50,78 28,57 72,57 50,62" fill="#9dd4b4" fill-opacity="0.45"/>
-        <polygon points="28,43 43,28 43,72 38,50" fill="#dfa0b0" fill-opacity="0.42"/>
-      </g>
-      <circle cx="50" cy="50" r="15" fill="url(#s-glow)"/>
-      <circle cx="50" cy="50" r="1.5" fill="#fef9ee" fill-opacity="0.9"/>
-    </svg>
+    <canvas id="torus-canvas" class="torus-canvas" aria-label="CommonUnity Studio"></canvas>
 
     <!-- Invisible facet hit areas -->
     <div class="portal-facet top"    data-room="work"  title="The Work"></div>
@@ -4420,13 +4393,56 @@ function initRoseOrb() {
     if (rafId) cancelAnimationFrame(rafId);
     if (ring) ring.style.strokeDashoffset = CIRCUMFERENCE;
     holdStart = null;
+    rafId = null;
   }
 
-  orbWrap.addEventListener('mousedown', startHold);
-  orbWrap.addEventListener('touchstart', startHold, { passive: true });
-  orbWrap.addEventListener('mouseup', cancelHold);
-  orbWrap.addEventListener('mouseleave', cancelHold);
-  orbWrap.addEventListener('touchend', cancelHold);
+  // Remove any existing listeners to avoid stacking on room re-entry
+  const newOrb = orbWrap.cloneNode(true);
+  orbWrap.parentNode.replaceChild(newOrb, orbWrap);
+  const orb = document.getElementById('nexus-orb-wrap');
+  const ringEl = document.getElementById('nexus-ring-progress');
+
+  // Click = instant awaken (no hold required)
+  orb.addEventListener('click', (e) => {
+    if (nexusAwakened) return;
+    e.stopPropagation();
+    awakenNexus(mirror, row, hint, orb);
+  });
+
+  // Hold = progress ring fills, then awaken
+  orb.addEventListener('mousedown', (e) => {
+    if (nexusAwakened) return;
+    holdStart = Date.now();
+    orb.classList.add('holding');
+    function tick() {
+      if (!holdStart) return;
+      const elapsed = Date.now() - holdStart;
+      const progress = Math.min(elapsed / HOLD_MS, 1);
+      if (ringEl) ringEl.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+      if (progress < 1) { rafId = requestAnimationFrame(tick); }
+    }
+    rafId = requestAnimationFrame(tick);
+  });
+  orb.addEventListener('mouseup', cancelHold);
+  orb.addEventListener('touchstart', (e) => {
+    if (nexusAwakened) return;
+    holdStart = Date.now();
+    orb.classList.add('holding');
+    function tick() {
+      if (!holdStart) return;
+      const elapsed = Date.now() - holdStart;
+      const progress = Math.min(elapsed / HOLD_MS, 1);
+      if (ringEl) ringEl.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+      if (progress < 1) { rafId = requestAnimationFrame(tick); }
+    }
+    rafId = requestAnimationFrame(tick);
+  }, { passive: true });
+  orb.addEventListener('touchend', (e) => {
+    if (nexusAwakened) return;
+    cancelHold();
+    // Short tap on touch = awaken
+    awakenNexus(mirror, row, hint, orb);
+  });
 
   // Input focus/blur for active glow (post-awakening)
   input.addEventListener('focus', () => { if (mirror) mirror.classList.add('orb-active'); });
@@ -4672,5 +4688,103 @@ function renderVoiceEntries(roomKey) {
   </div>
 </div>
 
+<script>
+// ============================================================
+// TORUS PORTAL — Three.js
+// ============================================================
+function initTorusPortal() {
+  const canvas = document.getElementById('torus-canvas');
+  if (!canvas || typeof THREE === 'undefined') return;
+
+  const SIZE = 275;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(SIZE, SIZE);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 3.8);
+
+  // Torus geometry
+  const geometry = new THREE.TorusGeometry(1, 0.38, 24, 80);
+
+  // Wireframe overlay
+  const wireMat = new THREE.MeshBasicMaterial({
+    color: 0xc4b5fd,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.18
+  });
+  const wireframe = new THREE.Mesh(geometry, wireMat);
+  scene.add(wireframe);
+
+  // Main surface — subtle translucent
+  const surfMat = new THREE.MeshPhongMaterial({
+    color: 0x1a1040,
+    emissive: 0x3b0f6e,
+    emissiveIntensity: 0.3,
+    transparent: true,
+    opacity: 0.55,
+    side: THREE.DoubleSide,
+    shininess: 60
+  });
+  const torus = new THREE.Mesh(geometry, surfMat);
+  scene.add(torus);
+
+  // Lights
+  const ambLight = new THREE.AmbientLight(0x8b5cf6, 0.6);
+  scene.add(ambLight);
+  const pointLight1 = new THREE.PointLight(0xa78bfa, 2.0, 10);
+  pointLight1.position.set(2, 2, 2);
+  scene.add(pointLight1);
+  const pointLight2 = new THREE.PointLight(0x6ee7b7, 1.2, 10);
+  pointLight2.position.set(-2, -1, 1);
+  scene.add(pointLight2);
+
+  // State
+  let hovered = false;
+  let activated = false;
+  let time = 0;
+
+  canvas.addEventListener('mouseenter', () => hovered = true);
+  canvas.addEventListener('mouseleave', () => hovered = false);
+
+  // Listen for portal open to accelerate spin
+  const portalEl = document.getElementById('portal');
+  if (portalEl) {
+    const obs = new MutationObserver(() => {
+      if (portalEl.classList.contains('doors-open')) activated = true;
+    });
+    obs.observe(portalEl, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    time += 0.005;
+    const speed = activated ? 3.5 : hovered ? 1.8 : 1.0;
+    torus.rotation.x += 0.004 * speed;
+    torus.rotation.y += 0.007 * speed;
+    wireframe.rotation.x = torus.rotation.x;
+    wireframe.rotation.y = torus.rotation.y;
+
+    // Breathing glow
+    const pulse = 0.5 + 0.5 * Math.sin(time * 1.2);
+    surfMat.emissiveIntensity = activated ? 0.7 + 0.3 * pulse : 0.2 + 0.15 * pulse;
+    wireMat.opacity = activated ? 0.35 + 0.15 * pulse : 0.14 + 0.08 * pulse;
+    pointLight1.intensity = activated ? 3.0 + 1.0 * pulse : 1.8 + 0.4 * pulse;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+// Init after DOM + Three.js ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initTorusPortal);
+} else {
+  initTorusPortal();
+}
+</script>
 </body>
 </html>
