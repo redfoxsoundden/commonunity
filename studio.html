@@ -688,16 +688,7 @@ input, textarea { font: inherit; color: inherit; }
   white-space: pre-wrap;
 }
 
-/* ── Mirror / Rose (right) ───────────────────────────────────── */
-.room-mirror {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  position: sticky;
-  top: 96px;
-  height: fit-content;
-  max-height: calc(100dvh - 120px);
-}
+/* legacy .room-mirror block removed */
 
 .mirror-header {
   display: flex;
@@ -3445,6 +3436,9 @@ function enterRoom(roomKey) {
   // Nexus orb — awakening ritual (skip if room already has history)
   const hasHistory = (state.rooms[roomKey]?.mirrorHistory?.length || 0) > 0;
   nexusAwakened = hasHistory;
+  // Reset init flag so listeners can be added fresh
+  const nexusOrb = document.getElementById('nexus-orb-wrap');
+  if (nexusOrb) delete nexusOrb.dataset.nexusInit;
   setTimeout(initRoseOrb, 100);
 
   // Scroll to top
@@ -4396,17 +4390,21 @@ function initRoseOrb() {
     rafId = null;
   }
 
-  // Remove any existing listeners to avoid stacking on room re-entry
-  const newOrb = orbWrap.cloneNode(true);
-  orbWrap.parentNode.replaceChild(newOrb, orbWrap);
-  const orb = document.getElementById('nexus-orb-wrap');
+  const orb = orbWrap;
   const ringEl = document.getElementById('nexus-ring-progress');
 
-  // Click = instant awaken (no hold required)
+  // Mark orb as initialized to prevent duplicate listeners
+  if (orb.dataset.nexusInit === '1') return;
+  orb.dataset.nexusInit = '1';
+
+  // Click = instant awaken
   orb.addEventListener('click', (e) => {
     if (nexusAwakened) return;
     e.stopPropagation();
-    awakenNexus(mirror, row, hint, orb);
+    const h = document.getElementById('nexus-knock-hint');
+    const r = document.getElementById('mirror-input-row');
+    const m = document.getElementById('room-mirror');
+    awakenNexus(m, r, h, orb);
   });
 
   // Hold = progress ring fills, then awaken
