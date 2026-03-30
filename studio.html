@@ -3953,6 +3953,24 @@ function restoreStudioCalcResults(d) {
       }
     });
   }
+
+  // Update room tile GK numbers and badges with the calculated values
+  const tileMap = [
+    { room: 'work',  data: d.cs },
+    { room: 'lens',  data: d.ce },
+    { room: 'field', data: d.us },
+    { room: 'call',  data: d.ue },
+  ];
+  tileMap.forEach(({ room, data }) => {
+    if (!data) return;
+    const gate = data.gate;
+    // Badge circle
+    const badge = document.getElementById('rc-gk-' + room);
+    if (badge) badge.textContent = gate;
+    // Tag span
+    const numSpan = document.querySelector('.rc-gk-num-' + room);
+    if (numSpan) numSpan.textContent = gate;
+  });
 }
 
 
@@ -4894,9 +4912,11 @@ function studioLoadJSON(file) {
 // ============================================================
 // ON AIR — Session timer + auto-save + session log
 // ============================================================
-let sessionStartTime  = null;   // when current room session started
-let sessionTimerRaf   = null;   // rAF handle
-let sessionRoomKey    = null;   // room being timed
+let sessionStartTime   = null;   // when current room session started
+let sessionTimerRaf    = null;   // rAF handle
+let sessionRoomKey     = null;   // room being timed
+let sessionFadeTimeout = null;   // pending OFF AIR fade-out timer
+const MIN_SESSION_MS   = 5000;   // ignore sessions shorter than 5s
 
 function formatDuration(ms) {
   const s = Math.floor(ms / 1000);
@@ -4907,15 +4927,14 @@ function formatDuration(ms) {
 }
 
 function startOnAir(roomKey) {
+  // Cancel any pending OFF AIR fade-out from a previous session
+  if (sessionFadeTimeout) { clearTimeout(sessionFadeTimeout); sessionFadeTimeout = null; }
+
   sessionStartTime = Date.now();
   sessionRoomKey   = roomKey;
-  const pill  = document.getElementById('onair-pill');
-  const label = document.getElementById('onair-label');
-  const time  = document.getElementById('onair-time');
-  if (pill)  { pill.classList.remove('offair'); }
-  if (label) label.textContent = 'ON AIR';
-  if (time)  time.textContent = '0:00';
+  resetOnAirDisplay();
 
+  const time = document.getElementById('onair-time');
   function tick() {
     if (!sessionStartTime) return;
     const elapsed = Date.now() - sessionStartTime;
@@ -4928,26 +4947,33 @@ function startOnAir(roomKey) {
 
 function stopOnAir(autoSave = true) {
   if (!sessionStartTime) return;
-  const elapsed = Date.now() - sessionStartTime;
+  const elapsed  = Date.now() - sessionStartTime;
   const duration = formatDuration(elapsed);
+  const room     = sessionRoomKey;
 
-  // Log session
-  const logEntry = {
-    date:     new Date().toISOString(),
-    room:     sessionRoomKey,
-    duration: duration,
-    durationMs: elapsed,
-    sound:    document.getElementById('freq-toolbar-label')?.textContent || '',
-    hue:      document.getElementById('mood-hue')?.value || '',
-    warmth:   document.getElementById('mood-warm')?.value || '',
-  };
-  if (!state.sessionLog) state.sessionLog = [];
-  state.sessionLog.push(logEntry);
+  // Stop rAF timer immediately
+  if (sessionTimerRaf) { cancelAnimationFrame(sessionTimerRaf); sessionTimerRaf = null; }
+  sessionStartTime = null;
+  sessionRoomKey   = null;
 
-  // Update Nexus memory with latest data, then auto-save
-  if (autoSave) {
-    updateNexusMemory();
-    showToast(`Session saved · ${duration} in ${logEntry.room ? (logEntry.room[0].toUpperCase() + logEntry.room.slice(1)) : ''}`);
+  // Only log + save sessions that lasted at least 5 seconds
+  if (elapsed >= MIN_SESSION_MS) {
+    const logEntry = {
+      date:       new Date().toISOString(),
+      room:       room,
+      duration:   duration,
+      durationMs: elapsed,
+      sound:      document.getElementById('freq-toolbar-label')?.textContent || '',
+      hue:        document.getElementById('mood-hue')?.value || '',
+      warmth:     document.getElementById('mood-warm')?.value || '',
+    };
+    if (!state.sessionLog) state.sessionLog = [];
+    state.sessionLog.push(logEntry);
+
+    if (autoSave) {
+      updateNexusMemory();
+      showToast(`Session saved · ${duration} in ${room ? (room[0].toUpperCase() + room.slice(1)) : ''}`);
+    }
   }
 
   // OFF AIR visual
@@ -4958,21 +4984,23 @@ function stopOnAir(autoSave = true) {
   if (label) label.textContent = 'OFF AIR';
   if (time)  time.textContent = duration;
 
-  // Stop timer
-  if (sessionTimerRaf) { cancelAnimationFrame(sessionTimerRaf); sessionTimerRaf = null; }
-  sessionStartTime = null;
-  sessionRoomKey   = null;
-
-  // Fade OFF AIR back to invisible after 3s
-  setTimeout(() => {
+  // Fade OFF AIR after 3s — tracked so it can be cancelled if a new session starts
+  if (sessionFadeTimeout) clearTimeout(sessionFadeTimeout);
+  sessionFadeTimeout = setTimeout(() => {
     const p = document.getElementById('onair-pill');
     if (p) { p.style.opacity = '0'; p.style.transition = 'opacity 1s ease'; }
+    sessionFadeTimeout = null;
   }, 3000);
 }
 
 function resetOnAirDisplay() {
   const pill = document.getElementById('onair-pill');
-  if (pill) { pill.style.opacity = ''; pill.style.transition = ''; pill.classList.remove('offair'); }
+  if (pill) {
+    // Must clear inline opacity set by the OFF AIR fade-out timeout
+    pill.style.opacity = '1';
+    pill.style.transition = '';
+    pill.classList.remove('offair');
+  }
   const label = document.getElementById('onair-label');
   if (label) label.textContent = 'ON AIR';
   const time = document.getElementById('onair-time');
