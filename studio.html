@@ -139,9 +139,10 @@ input, textarea { font: inherit; color: inherit; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8);
+  padding: var(--space-6);
   position: relative;
   min-height: 100dvh;
+  gap: var(--space-6);
 }
 
 /* Right sidebar — inputs */
@@ -241,8 +242,8 @@ input, textarea { font: inherit; color: inherit; }
 }
 
 .torus-canvas {
-  width: 300px;
-  height: 300px;
+  width: 380px;
+  height: 380px;
   display: block;
   cursor: pointer;
 }
@@ -4742,7 +4743,7 @@ function initTorusPortal() {
   if (!canvas) return;
 
   const DPR  = Math.min(window.devicePixelRatio || 1, 2);
-  const SIZE = 300;
+  const SIZE = 380;
   canvas.width  = SIZE * DPR;
   canvas.height = SIZE * DPR;
   canvas.style.width  = SIZE + 'px';
@@ -4753,7 +4754,7 @@ function initTorusPortal() {
   const cx = SIZE / 2, cy = SIZE / 2;
   // Horn torus: R = r — tube radius equals major radius
   // Inner hole collapses to a singularity at centre
-  const R = 72, r = 72;
+  const R = 92, r = 92;
   const N_THETA = 80, N_PHI = 40;
 
   let rotX = 0.48, rotY = 0, t = 0;
@@ -4790,8 +4791,8 @@ function initTorusPortal() {
     const z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
     const y2 =  y * Math.cos(rotX) - z1 * Math.sin(rotX);
     const z2 =  y * Math.sin(rotX) + z1 * Math.cos(rotX);
-    const fov = 580;
-    const scale = fov / (fov + z2 + 300);
+    const fov = 700;
+    const scale = fov / (fov + z2 + 360);
     return { sx: cx + x1 * scale, sy: cy + y2 * scale, depth: z2, scale };
   }
 
@@ -4807,7 +4808,7 @@ function initTorusPortal() {
     // Ambient breath glow
     const pulse = 0.5 + 0.5 * Math.sin(t * 1.1);
     const glowA = activated ? 0.6 + 0.2 * pulse : 0.2 + 0.08 * pulse;
-    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, R + r + 20);
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, R + r + 30);
     grd.addColorStop(0,    `rgba(110, 70, 255, ${0.18 * glowA})`);
     grd.addColorStop(0.4,  `rgba(80,  50, 200, ${0.08 * glowA})`);
     grd.addColorStop(1,    'rgba(0,0,0,0)');
