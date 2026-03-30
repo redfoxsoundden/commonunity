@@ -3417,6 +3417,7 @@ function enterRoom(roomKey) {
 
   // Mirror context
   const mirrorCtx = document.getElementById('mirror-gk-context');
+  const gkNum = state.compassData?.points?.[roomKey]?.gk_num || '';
   const gkData = gkNum ? GENE_KEYS[parseInt(gkNum)] : null;
   if (gkData) {
     mirrorCtx.textContent = `GK ${gkNum} · ${gkData.shadow} → ${gkData.gift}`;
