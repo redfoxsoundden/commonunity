@@ -3177,55 +3177,94 @@ input, textarea { font: inherit; color: inherit; }
           <div class="freq-toolbar-orb" id="freq-toolbar-orb"></div>
           <span class="freq-toolbar-label" id="freq-toolbar-label">Sound</span>
         </button>
-        <div class="freq-dropdown vibe-dropdown" id="freq-dropdown">
-          <div class="freq-dropdown-row">
-            <div class="freq-dropdown-section">
-              <div class="freq-dropdown-label">Chakra</div>
-              <div class="freq-presets" id="chakra-presets-tb">
-                <button class="freq-preset-btn" data-chakra="root"   data-l="256" data-r="256">Root</button>
-                <button class="freq-preset-btn" data-chakra="sacral" data-l="288" data-r="288">Sacral</button>
-                <button class="freq-preset-btn" data-chakra="solar"  data-l="320" data-r="320">Solar</button>
-                <button class="freq-preset-btn" data-chakra="heart"  data-l="341" data-r="341">Heart</button>
-                <button class="freq-preset-btn" data-chakra="throat" data-l="384" data-r="384">Throat</button>
-                <button class="freq-preset-btn" data-chakra="third"  data-l="426" data-r="426">Third Eye</button>
-                <button class="freq-preset-btn" data-chakra="crown"  data-l="480" data-r="480">Crown</button>
-              </div>
+        <div class="freq-dropdown vibe-dropdown" id="freq-dropdown" style="min-width:320px;max-width:380px;">
+
+          <!-- ── AMBIENT SOUNDS ─────────────────────────────── -->
+          <div class="freq-dropdown-row" style="flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div class="freq-dropdown-label">Ambient</div>
+              <button class="freq-preset-btn" id="ambient-dice-btn" title="Random ambient sound"
+                style="padding:2px 8px;font-size:13px;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;">⚄</button>
+            </div>
+            <div class="freq-presets" id="ambient-presets">
+              <button class="freq-preset-btn" data-ambient="rain"    title="Rain">Rain</button>
+              <button class="freq-preset-btn" data-ambient="ocean"   title="Ocean waves">Ocean</button>
+              <button class="freq-preset-btn" data-ambient="forest"  title="Forest & birdsong">Forest</button>
+              <button class="freq-preset-btn" data-ambient="fire"    title="Hearth fire">Fire</button>
+              <button class="freq-preset-btn" data-ambient="stream"  title="Flowing stream">Stream</button>
+              <button class="freq-preset-btn" data-ambient="white"   title="White noise">White</button>
+              <button class="freq-preset-btn" data-ambient="pink"    title="Pink noise">Pink</button>
+              <button class="freq-preset-btn" data-ambient="brown"   title="Brown noise">Brown</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);margin-top:2px;">
+              <span class="freq-dropdown-label" style="white-space:nowrap;">Vol</span>
+              <input type="range" id="ambient-volume" min="0" max="100" value="40" step="1"
+                style="-webkit-appearance:none;flex:1;height:3px;background:var(--border);border-radius:2px;cursor:pointer;outline:none;">
+              <button class="freq-preset-btn" id="ambient-stop-btn" style="border-color:#f43f5e;color:#f43f5e;white-space:nowrap;">■ Stop</button>
             </div>
           </div>
-          <div class="freq-dropdown-row">
-            <div class="freq-dropdown-section">
-              <div class="freq-dropdown-label">Brainwave</div>
-              <div class="freq-presets" id="brainwave-presets-tb">
-                <button class="freq-preset-btn" data-bw="delta"    data-beat="2"    title="Deep sleep">Delta</button>
-                <button class="freq-preset-btn" data-bw="theta"    data-beat="6"    title="Meditation">Theta</button>
-                <button class="freq-preset-btn" data-bw="alpha"    data-beat="10"   title="Relaxed focus">Alpha</button>
-                <button class="freq-preset-btn" data-bw="beta"     data-beat="20"   title="Alert">Beta</button>
-                <button class="freq-preset-btn" data-bw="gamma"    data-beat="40"   title="Peak">Gamma</button>
-                <button class="freq-preset-btn" data-bw="schumann" data-beat="7.83" title="Earth">Schumann</button>
-              </div>
+
+          <div style="border-top:1px solid color-mix(in srgb,var(--border) 50%,transparent);margin:4px 0;"></div>
+
+          <!-- ── SACRED TONES ──────────────────────────────── -->
+          <div class="freq-dropdown-row" style="flex-direction:column;gap:6px;">
+            <div class="freq-dropdown-label">Sacred Tones</div>
+            <div class="freq-presets">
+              <button class="freq-preset-btn" data-tone="111"  title="111 Hz — cell regeneration, endorphins">111 Hz</button>
+              <button class="freq-preset-btn" data-tone="528"  title="528 Hz — love frequency, DNA repair">528 Hz</button>
             </div>
           </div>
-          <div class="freq-dropdown-row" style="align-items:center;gap:var(--space-4);">
-            <div class="freq-dropdown-section">
-              <div class="freq-dropdown-label">Left</div>
-              <div class="binaural-freq-display" id="binaural-l-display">200 Hz</div>
-              <input type="range" class="freq-knob" id="binaural-l" min="100" max="500" value="200" step="1">
+
+          <div style="border-top:1px solid color-mix(in srgb,var(--border) 50%,transparent);margin:4px 0;"></div>
+
+          <!-- ── PLANETARY OCTAVE (Planetware) ─────────────── -->
+          <div class="freq-dropdown-row" style="flex-direction:column;gap:6px;">
+            <div class="freq-dropdown-label">Planetary Octave <span style="opacity:0.5;font-weight:400;">Planetware</span></div>
+            <div class="freq-presets" id="planetary-presets">
+              <button class="freq-preset-btn" data-tone="194.18" title="194.18 Hz — Earth Day · Root chakra">Earth Day</button>
+              <button class="freq-preset-btn" data-tone="210.42" title="210.42 Hz — Moon synodic · Sacral">Moon</button>
+              <button class="freq-preset-btn" data-tone="126.22" title="126.22 Hz — Sun · Solar Plexus">Sun</button>
+              <button class="freq-preset-btn" data-tone="136.10" title="136.10 Hz — Earth Year / Om · Heart">Om / Earth</button>
+              <button class="freq-preset-btn" data-tone="141.27" title="141.27 Hz — Mercury · Throat">Mercury</button>
+              <button class="freq-preset-btn" data-tone="221.23" title="221.23 Hz — Venus · Third Eye">Venus</button>
+              <button class="freq-preset-btn" data-tone="172.06" title="172.06 Hz — Platonic Year · Crown">Platonic Yr</button>
             </div>
-            <div class="freq-dropdown-section">
-              <div class="freq-dropdown-label">Right</div>
-              <div class="binaural-freq-display" id="binaural-r-display">210 Hz</div>
-              <input type="range" class="freq-knob" id="binaural-r" min="100" max="500" value="210" step="1">
-            </div>
-            <div class="freq-dropdown-section">
-              <div class="freq-dropdown-label">Beat</div>
-              <div class="binaural-freq-display" id="beat-display" style="font-size:9px;">10 Hz</div>
-            </div>
-            <div class="freq-dropdown-section" style="margin-left:auto;">
-              <div class="freq-dropdown-label">Volume</div>
-              <input type="range" id="freq-volume" min="0" max="100" value="40" step="1" style="-webkit-appearance:none;width:60px;height:3px;background:var(--border);border-radius:2px;cursor:pointer;outline:none;">
-            </div>
-            <button class="freq-preset-btn" id="freq-stop-btn" style="border-color:#f43f5e;color:#f43f5e;align-self:flex-end;">■ Stop</button>
           </div>
+
+          <div style="border-top:1px solid color-mix(in srgb,var(--border) 50%,transparent);margin:4px 0;"></div>
+
+          <!-- ── BINAURAL (BRAINWAVE) ─────────────────────── -->
+          <div class="freq-dropdown-row" style="flex-direction:column;gap:6px;">
+            <div class="freq-dropdown-label">Binaural Beats</div>
+            <div class="freq-presets" id="brainwave-presets-tb">
+              <button class="freq-preset-btn" data-bw="delta"    data-beat="2"    title="Deep sleep">Delta</button>
+              <button class="freq-preset-btn" data-bw="theta"    data-beat="6"    title="Meditation">Theta</button>
+              <button class="freq-preset-btn" data-bw="alpha"    data-beat="10"   title="Relaxed focus">Alpha</button>
+              <button class="freq-preset-btn" data-bw="beta"     data-beat="20"   title="Alert">Beta</button>
+              <button class="freq-preset-btn" data-bw="gamma"    data-beat="40"   title="Peak">Gamma</button>
+              <button class="freq-preset-btn" data-bw="schumann" data-beat="7.83" title="Earth resonance">Schumann</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-3);">
+              <span class="freq-dropdown-label">L</span>
+              <input type="range" class="freq-knob" id="binaural-l" min="100" max="500" value="200" step="1" style="flex:1;">
+              <div class="binaural-freq-display" id="binaural-l-display">200</div>
+              <span class="freq-dropdown-label">R</span>
+              <input type="range" class="freq-knob" id="binaural-r" min="100" max="500" value="210" step="1" style="flex:1;">
+              <div class="binaural-freq-display" id="binaural-r-display">210</div>
+              <div class="binaural-freq-display" id="beat-display" style="font-size:9px;color:var(--rose-color,#c4b5fd);">10Δ</div>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid color-mix(in srgb,var(--border) 50%,transparent);margin:4px 0;"></div>
+
+          <!-- ── TONE VOLUME + STOP ───────────────────────── -->
+          <div style="display:flex;align-items:center;gap:var(--space-3);">
+            <span class="freq-dropdown-label" style="white-space:nowrap;">Tone vol</span>
+            <input type="range" id="freq-volume" min="0" max="100" value="40" step="1"
+              style="-webkit-appearance:none;flex:1;height:3px;background:var(--border);border-radius:2px;cursor:pointer;outline:none;">
+            <button class="freq-preset-btn" id="freq-stop-btn" style="border-color:#f43f5e;color:#f43f5e;white-space:nowrap;">■ Stop</button>
+          </div>
+
         </div>
       </div><!-- /freq-toolbar-wrap -->
 
@@ -3274,6 +3313,8 @@ input, textarea { font: inherit; color: inherit; }
             <div style="border-top:1px solid color-mix(in srgb,var(--border) 40%,transparent);padding-top:var(--space-2);">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
                 <span class="freq-dropdown-label">Presets</span>
+                <button class="freq-preset-btn" id="colour-dice-btn" title="Randomise colour"
+                  style="padding:0;font-size:13px;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">⚄</button>
                 <span style="font-size:9px;color:var(--text-faint);opacity:0.6;">hold · save &nbsp;/&nbsp; hold 5s · delete</span>
               </div>
               <div class="vibe-preset-strip" id="vibe-preset-strip">
@@ -5342,8 +5383,186 @@ function initFrequencyEngine() {
   document.getElementById('freq-stop-btn').addEventListener('click', () => {
     stopTones();
     document.querySelectorAll('.freq-preset-btn').forEach(b => b.classList.remove('active'));
-    
   });
+
+  // ── Pure tone buttons (Sacred + Planetary) ──────────────────
+  document.querySelectorAll('.freq-preset-btn[data-tone]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const freq = parseFloat(btn.dataset.tone);
+      document.querySelectorAll('.freq-preset-btn[data-tone]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const vol = parseFloat(document.getElementById('freq-volume').value) / 100;
+      // Play as mono tone (same freq both ears)
+      startTones(freq, freq, vol);
+      const label = document.getElementById('freq-toolbar-label');
+      if (label) label.textContent = btn.textContent.trim();
+    });
+  });
+
+  // ── Ambient sound engine ──────────────────────────────
+  // Noise generators use Web Audio; nature sounds stream from CDN
+  let ambientSource   = null;   // AudioBufferSourceNode or script processor
+  let ambientGainNode = null;
+  let ambientActive   = null;   // current ambient key
+
+  const AMBIENT_URLS = {
+    rain:   'https://cdn.pixabay.com/audio/2022/03/10/audio_1e82e415a8.mp3',
+    ocean:  'https://cdn.pixabay.com/audio/2022/03/15/audio_7c5ba70e71.mp3',
+    forest: 'https://cdn.pixabay.com/audio/2022/03/24/audio_32e7d5d49e.mp3',
+    fire:   'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6ff1af0.mp3',
+    stream: 'https://cdn.pixabay.com/audio/2022/11/22/audio_febc508520.mp3',
+  };
+
+  function stopAmbient() {
+    if (ambientSource) {
+      try { ambientSource.stop(); } catch(e) {}
+      ambientSource = null;
+    }
+    if (ambientGainNode) {
+      try { ambientGainNode.disconnect(); } catch(e) {}
+      ambientGainNode = null;
+    }
+    ambientActive = null;
+    document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(b => b.classList.remove('active'));
+  }
+
+  function generateNoise(type) {
+    // Ensure audio context
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    stopAmbient();
+
+    const bufferSize = audioCtx.sampleRate * 2;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      if (type === 'white') {
+        data[i] = white;
+      } else if (type === 'pink') {
+        b0=0.99886*b0+white*0.0555179; b1=0.99332*b1+white*0.0750759;
+        b2=0.96900*b2+white*0.1538520; b3=0.86650*b3+white*0.3104856;
+        b4=0.55000*b4+white*0.5329522; b5=-0.7616*b5-white*0.0168980;
+        data[i] = (b0+b1+b2+b3+b4+b5+b6+white*0.5362) * 0.11;
+        b6 = white * 0.115926;
+      } else { // brown
+        const prev = i > 0 ? data[i-1] : 0;
+        data[i] = (prev + (0.02 * white)) / 1.02;
+      }
+    }
+
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    src.loop = true;
+    const gain = audioCtx.createGain();
+    const vol = parseFloat(document.getElementById('ambient-volume').value) / 100 * 0.4;
+    gain.gain.value = vol;
+    src.connect(gain);
+    gain.connect(audioCtx.destination);
+    src.start();
+    ambientSource  = src;
+    ambientGainNode = gain;
+  }
+
+  async function playAmbientUrl(key, url) {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    stopAmbient();
+    try {
+      const resp = await fetch(url);
+      const arrBuf = await resp.arrayBuffer();
+      const audioBuf = await audioCtx.decodeAudioData(arrBuf);
+      const src = audioCtx.createBufferSource();
+      src.buffer = audioBuf;
+      src.loop = true;
+      const gain = audioCtx.createGain();
+      const vol = parseFloat(document.getElementById('ambient-volume').value) / 100 * 0.7;
+      gain.gain.value = vol;
+      src.connect(gain);
+      gain.connect(audioCtx.destination);
+      src.start();
+      ambientSource   = src;
+      ambientGainNode = gain;
+      ambientActive   = key;
+    } catch(e) {
+      showToast('Could not load ambient sound');
+    }
+  }
+
+  function startAmbient(key) {
+    ambientActive = key;
+    const label = document.getElementById('freq-toolbar-label');
+    if (label) label.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+    if (['white','pink','brown'].includes(key)) {
+      generateNoise(key);
+    } else if (AMBIENT_URLS[key]) {
+      if (label) label.textContent += '…';
+      playAmbientUrl(key, AMBIENT_URLS[key]).then(() => {
+        if (label) label.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+      });
+    }
+  }
+
+  document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.ambient;
+      if (ambientActive === key) {
+        stopAmbient();
+        const label = document.getElementById('freq-toolbar-label');
+        if (label) label.textContent = 'Sound';
+        return;
+      }
+      document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      startAmbient(key);
+    });
+  });
+
+  document.getElementById('ambient-volume').addEventListener('input', () => {
+    if (ambientGainNode) {
+      const isNoise = ['white','pink','brown'].includes(ambientActive);
+      const vol = parseFloat(document.getElementById('ambient-volume').value) / 100 * (isNoise ? 0.4 : 0.7);
+      ambientGainNode.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.1);
+    }
+  });
+
+  document.getElementById('ambient-stop-btn').addEventListener('click', () => {
+    stopAmbient();
+    const label = document.getElementById('freq-toolbar-label');
+    if (label) label.textContent = 'Sound';
+  });
+
+  // ── Ambient dice randomiser ─────────────────────────────
+  document.getElementById('ambient-dice-btn').addEventListener('click', () => {
+    const keys = Object.keys(AMBIENT_URLS).concat(['white','pink','brown']);
+    const pick  = keys[Math.floor(Math.random() * keys.length)];
+    document.querySelectorAll('.freq-preset-btn[data-ambient]').forEach(b => {
+      b.classList.toggle('active', b.dataset.ambient === pick);
+    });
+    startAmbient(pick);
+  });
+
+  // ── Colour dice randomiser ────────────────────────────
+  const colourDiceBtn = document.getElementById('colour-dice-btn');
+  if (colourDiceBtn) {
+    colourDiceBtn.addEventListener('click', () => {
+      const hue   = Math.round(Math.random() * 360);
+      const glow  = Math.round(30 + Math.random() * 70);
+      const dark  = Math.round(20 + Math.random() * 80);
+      const warm  = Math.round(Math.random() * 60);
+      const space = Math.round(Math.random() * 55); // keep in the darker half for safety
+      const text  = Math.round(50 + Math.random() * 50);
+      const hueEl   = document.getElementById('mood-hue');   if (hueEl)   { hueEl.value   = hue;   hueEl.dispatchEvent(new Event('input')); }
+      const glowEl  = document.getElementById('mood-glow');  if (glowEl)  { glowEl.value  = glow;  glowEl.dispatchEvent(new Event('input')); }
+      const darkEl  = document.getElementById('mood-dark');  if (darkEl)  { darkEl.value  = dark;  darkEl.dispatchEvent(new Event('input')); }
+      const warmEl  = document.getElementById('mood-warm');  if (warmEl)  { warmEl.value  = warm;  warmEl.dispatchEvent(new Event('input')); }
+      const spaceEl2 = document.getElementById('mood-space'); if (spaceEl2) { spaceEl2.value = space; spaceEl2.dispatchEvent(new Event('input')); }
+      const textEl  = document.getElementById('mood-text');  if (textEl)  { textEl.value  = text;  textEl.dispatchEvent(new Event('input')); }
+      document.querySelectorAll('.vibe-preset-slot').forEach(s => s.classList.remove('active-preset'));
+    });
+  }
 
   updateBeatDisplay();
 }
@@ -5625,33 +5844,72 @@ function initMoodLighting() {
   if (spaceEl) {
     spaceEl.addEventListener('input', () => {
       const v = parseInt(spaceEl.value); // 0–100
-      let bg;
+      let bg, lightness;
+
       if (v <= 5) {
-        // Pure black
-        const l = Math.round(v * 2);
-        bg = `hsl(0,0%,${l}%)`;
-      } else if (v <= 15) {
-        // Dark indigo (default zone)
-        const t = (v - 5) / 10;
-        const l = Math.round(5 + t * 7);
-        bg = `hsl(225,${Math.round(50 + t * 30)}%,${l}%)`;
-      } else if (v <= 50) {
-        // Sweep through hues at medium-dark lightness
-        const t = (v - 15) / 35;
+        // 0–5: pure black → near-black
+        lightness = Math.round(v * 2);
+        bg = `hsl(0,0%,${lightness}%)`;
+      } else if (v <= 20) {
+        // 5–20: deep indigo (default dark zone)
+        const t = (v - 5) / 15;
+        lightness = Math.round(5 + t * 8);
+        bg = `hsl(225,${Math.round(50 + t * 25)}%,${lightness}%)`;
+      } else if (v <= 45) {
+        // 20–45: dark coloured backgrounds
+        const t = (v - 20) / 25;
         const h = Math.round(t * 360);
-        bg = `hsl(${h},55%,${Math.round(8 + t * 8)}%)`;
-      } else if (v <= 90) {
-        // Mid to light
-        const t = (v - 50) / 40;
+        lightness = Math.round(10 + t * 10);
+        bg = `hsl(${h},50%,${lightness}%)`;
+      } else if (v <= 65) {
+        // 45–65: mid tones
+        const t = (v - 45) / 20;
         const h = Math.round(t * 360);
-        bg = `hsl(${h},40%,${Math.round(16 + t * 40)}%)`;
+        lightness = Math.round(22 + t * 28);
+        bg = `hsl(${h},38%,${lightness}%)`;
+      } else if (v <= 85) {
+        // 65–85: light pastels
+        const t = (v - 65) / 20;
+        const h = Math.round(t * 360);
+        lightness = Math.round(52 + t * 30);
+        bg = `hsl(${h},30%,${lightness}%)`;
       } else {
-        // Near-white
-        const t = (v - 90) / 10;
-        bg = `hsl(220,${Math.round(20 * (1-t))}%,${Math.round(56 + t * 40)}%)`;
+        // 85–100: near-white → pure white
+        const t = (v - 85) / 15;
+        lightness = Math.round(82 + t * 18);
+        bg = `hsl(220,${Math.round(18 * (1 - t))}%,${lightness}%)`;
       }
+
       document.documentElement.style.setProperty('--bg', bg);
       document.body.style.backgroundColor = bg;
+
+      // Adapt text + card colours for light backgrounds
+      const root = document.documentElement;
+      if (lightness > 55) {
+        // Light mode overrides
+        root.style.setProperty('--text',       'hsl(220,20%,15%)');
+        root.style.setProperty('--text-muted', 'hsl(220,15%,35%)');
+        root.style.setProperty('--text-faint', 'hsl(220,10%,55%)');
+        root.style.setProperty('--card',       'rgba(255,255,255,0.6)');
+        root.style.setProperty('--card-alt',   'rgba(255,255,255,0.4)');
+        root.style.setProperty('--border',     'rgba(0,0,0,0.12)');
+      } else if (lightness > 25) {
+        // Mid-tone: soften
+        root.style.setProperty('--text',       'hsl(0,0%,92%)');
+        root.style.setProperty('--text-muted', 'hsl(0,0%,72%)');
+        root.style.setProperty('--text-faint', 'hsl(0,0%,52%)');
+        root.style.setProperty('--card',       'rgba(0,0,0,0.25)');
+        root.style.setProperty('--card-alt',   'rgba(0,0,0,0.18)');
+        root.style.setProperty('--border',     'rgba(255,255,255,0.15)');
+      } else {
+        // Dark: restore defaults
+        root.style.removeProperty('--text');
+        root.style.removeProperty('--text-muted');
+        root.style.removeProperty('--text-faint');
+        root.style.removeProperty('--card');
+        root.style.removeProperty('--card-alt');
+        root.style.removeProperty('--border');
+      }
     });
   }
 
