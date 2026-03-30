@@ -4024,12 +4024,21 @@ function initEntrance() {
   }
 
   portal.addEventListener('mousedown', startPortalHold);
-  // mouseup cancels hold only if not completed — rooms stay if completed
-  portal.addEventListener('mouseup',   cancelPortalHold);
-  // mouseleave: don't cancel if already opened
+  // mouseup only cancels if hold has been running < 200ms (i.e. it's a quick click, not a genuine release)
+  portal.addEventListener('mouseup', () => {
+    if (portalOpened) return;
+    // If they held long enough to be mid-ring, keep going — only cancel if barely started
+    const elapsed = portalHoldStart ? Date.now() - portalHoldStart : 0;
+    if (elapsed < 200) cancelPortalHold();
+    // If elapsed >= 200ms they intentionally held — let tick() complete naturally
+  });
   portal.addEventListener('mouseleave', () => { if (!portalOpened) cancelPortalHold(); });
   portal.addEventListener('touchstart', startPortalHold, { passive: true });
-  portal.addEventListener('touchend',   () => { if (!portalOpened) cancelPortalHold(); });
+  portal.addEventListener('touchend', () => {
+    if (portalOpened) return;
+    const elapsed = portalHoldStart ? Date.now() - portalHoldStart : 0;
+    if (elapsed < 200) cancelPortalHold();
+  });
 
   // Hint text
   const hint = document.getElementById('portal-hint');
@@ -4055,9 +4064,14 @@ function initEntrance() {
     });
   });
 
-  // Room buttons
+  // Room buttons (hidden entrance-actions list, kept for compat)
   document.querySelectorAll('.btn-enter-room').forEach(btn => {
     btn.addEventListener('click', () => enterRoom(btn.dataset.room));
+  });
+
+  // Room tiles in sidebar chooser
+  document.querySelectorAll('.room-tile').forEach(tile => {
+    tile.addEventListener('click', () => enterRoom(tile.dataset.room));
   });
 
   // Import compass
