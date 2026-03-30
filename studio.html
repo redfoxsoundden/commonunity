@@ -1160,12 +1160,37 @@ input, textarea { font: inherit; color: inherit; }
   color: var(--text-faint);
 }
 
-/* ── Room switcher — four pills in header ────────────────── */
+/* ── Room selector frame ───────────────────────────── */
+.room-selector-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--accent-color,var(--setup-accent)) 18%, var(--border));
+  background: color-mix(in srgb, var(--card) 45%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-color,var(--setup-accent)) 6%, transparent);
+  backdrop-filter: blur(8px);
+  flex: 1;
+  min-width: 0;
+  transition: border-color 0.5s ease;
+}
+.room-selector-label {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+/* ── Room switcher pills ───────────────────────────── */
 .room-switcher {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  flex: 1;
   justify-content: center;
   min-width: 0;
 }
@@ -2807,12 +2832,15 @@ input, textarea { font: inherit; color: inherit; }
       <span class="onair-time" id="onair-time">0:00</span>
     </div>
 
-    <!-- Room switcher — four pills, active glows -->
-    <div class="room-switcher" id="room-switcher">
-      <button class="room-pill" data-room="work"  style="--pill-color:var(--work);--pill-glow:var(--work-glow);">The Work</button>
-      <button class="room-pill" data-room="lens"  style="--pill-color:var(--lens);--pill-glow:var(--lens-glow);">The Lens</button>
-      <button class="room-pill" data-room="field" style="--pill-color:var(--field);--pill-glow:var(--field-glow);">The Field</button>
-      <button class="room-pill" data-room="call"  style="--pill-color:var(--call);--pill-glow:var(--call-glow);">The Call</button>
+    <!-- Room selector frame -->
+    <div class="room-selector-frame">
+      <div class="room-selector-label">Choose Your Room</div>
+      <div class="room-switcher" id="room-switcher">
+        <button class="room-pill" data-room="work"  style="--pill-color:var(--work);--pill-glow:var(--work-glow);">The Work</button>
+        <button class="room-pill" data-room="lens"  style="--pill-color:var(--lens);--pill-glow:var(--lens-glow);">The Lens</button>
+        <button class="room-pill" data-room="field" style="--pill-color:var(--field);--pill-glow:var(--field-glow);">The Field</button>
+        <button class="room-pill" data-room="call"  style="--pill-color:var(--call);--pill-glow:var(--call-glow);">The Call</button>
+      </div>
     </div>
     <!-- Set Your Vibe panel -->
     <div class="vibe-panel" style="margin-left:auto;">
