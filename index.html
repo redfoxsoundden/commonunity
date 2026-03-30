@@ -2250,6 +2250,56 @@ body.companion-mode .companion-mode-banner { display: block; }
 }
 .profile-modal-close:hover { color: var(--text); }
 
+/* ── Layer 2 inspire buttons ───────────────────────────── */
+.inspire-l2-btn {
+  margin-top: 6px;
+  background: none;
+  border: 1px dashed color-mix(in srgb, var(--accent,#a78bfa) 40%, transparent);
+  border-radius: 6px;
+  color: var(--accent,#a78bfa);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.inspire-l2-btn:hover { opacity: 1; border-style: solid; }
+.inspire-l2-btn.loading { opacity: 0.4; cursor: wait; }
+.inspire-l2-suggestion {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--accent,#a78bfa) 8%, var(--surface-2,#1e1b2e));
+  border-left: 2px solid color-mix(in srgb, var(--accent,#a78bfa) 50%, transparent);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-muted, #c4b5fd);
+  display: none;
+}
+.inspire-l2-suggestion.visible { display: block; }
+.inspire-l2-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.inspire-l2-accept, .inspire-l2-dismiss {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid;
+}
+.inspire-l2-accept {
+  background: color-mix(in srgb, var(--accent,#a78bfa) 20%, transparent);
+  border-color: var(--accent,#a78bfa);
+  color: var(--accent,#a78bfa);
+}
+.inspire-l2-dismiss {
+  background: none;
+  border-color: color-mix(in srgb, var(--text-muted,#888) 40%, transparent);
+  color: var(--text-muted,#888);
+}
 </style>
 </head>
 
@@ -2757,15 +2807,21 @@ body.companion-mode .companion-mode-banner { display: block; }
       <div>
         <p class="layer-section-label">Core Theme</p>
         <input class="layer-input" type="text" data-key="work.theme" placeholder="The essential thread…">
+        <button class="inspire-l2-btn" data-inspire-l2="work.theme" title="AI draft from your profile">✨ Inspire</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-work-theme"></div>
       </div>
       <div>
         <p class="layer-section-label">Insight Blocks <span class="text-faint">(up to 5)</span></p>
         <div class="insight-blocks-list" id="work-insights"></div>
         <button class="btn-add" id="work-add-insight" style="margin-top:var(--space-3)">+ Add Insight</button>
+        <button class="inspire-l2-btn" data-inspire-l2="work.insight" title="AI draft insight from your profile" style="margin-top:var(--space-2);">✨ Inspire Insight</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-work-insight"></div>
       </div>
       <div>
         <p class="layer-section-label">Public Summary Statement</p>
         <textarea class="layer-textarea" data-key="work.summary" placeholder="A statement that captures the essence for sharing…" rows="4"></textarea>
+        <button class="inspire-l2-btn" data-inspire-l2="work.summary" title="AI draft summary from your profile">✨ Inspire Summary</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-work-summary"></div>
       </div>
     </div>
 
@@ -3012,15 +3068,21 @@ body.companion-mode .companion-mode-banner { display: block; }
       <div>
         <p class="layer-section-label">Core Theme</p>
         <input class="layer-input" type="text" data-key="lens.theme" placeholder="The essential thread…">
+        <button class="inspire-l2-btn" data-inspire-l2="lens.theme" title="AI draft from your profile">✨ Inspire</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-lens-theme"></div>
       </div>
       <div>
         <p class="layer-section-label">Insight Blocks <span class="text-faint">(up to 5)</span></p>
         <div class="insight-blocks-list" id="lens-insights"></div>
         <button class="btn-add" id="lens-add-insight" style="margin-top:var(--space-3)">+ Add Insight</button>
+        <button class="inspire-l2-btn" data-inspire-l2="lens.insight" title="AI draft insight from your profile" style="margin-top:var(--space-2);">✨ Inspire Insight</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-lens-insight"></div>
       </div>
       <div>
         <p class="layer-section-label">Public Summary Statement</p>
         <textarea class="layer-textarea" data-key="lens.summary" placeholder="A statement that captures the essence for sharing…" rows="4"></textarea>
+        <button class="inspire-l2-btn" data-inspire-l2="lens.summary" title="AI draft summary from your profile">✨ Inspire Summary</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-lens-summary"></div>
       </div>
     </div>
 
@@ -3264,15 +3326,21 @@ body.companion-mode .companion-mode-banner { display: block; }
       <div>
         <p class="layer-section-label">Core Theme</p>
         <input class="layer-input" type="text" data-key="field.theme" placeholder="The essential thread…">
+        <button class="inspire-l2-btn" data-inspire-l2="field.theme" title="AI draft from your profile">✨ Inspire</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-field-theme"></div>
       </div>
       <div>
         <p class="layer-section-label">Insight Blocks <span class="text-faint">(up to 5)</span></p>
         <div class="insight-blocks-list" id="field-insights"></div>
         <button class="btn-add" id="field-add-insight" style="margin-top:var(--space-3)">+ Add Insight</button>
+        <button class="inspire-l2-btn" data-inspire-l2="field.insight" title="AI draft insight from your profile" style="margin-top:var(--space-2);">✨ Inspire Insight</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-field-insight"></div>
       </div>
       <div>
         <p class="layer-section-label">Public Summary Statement</p>
         <textarea class="layer-textarea" data-key="field.summary" placeholder="A statement that captures the essence for sharing…" rows="4"></textarea>
+        <button class="inspire-l2-btn" data-inspire-l2="field.summary" title="AI draft summary from your profile">✨ Inspire Summary</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-field-summary"></div>
       </div>
     </div>
 
@@ -3516,15 +3584,21 @@ body.companion-mode .companion-mode-banner { display: block; }
       <div>
         <p class="layer-section-label">Core Theme</p>
         <input class="layer-input" type="text" data-key="call.theme" placeholder="The essential thread…">
+        <button class="inspire-l2-btn" data-inspire-l2="call.theme" title="AI draft from your profile">✨ Inspire</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-call-theme"></div>
       </div>
       <div>
         <p class="layer-section-label">Insight Blocks <span class="text-faint">(up to 5)</span></p>
         <div class="insight-blocks-list" id="call-insights"></div>
         <button class="btn-add" id="call-add-insight" style="margin-top:var(--space-3)">+ Add Insight</button>
+        <button class="inspire-l2-btn" data-inspire-l2="call.insight" title="AI draft insight from your profile" style="margin-top:var(--space-2);">✨ Inspire Insight</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-call-insight"></div>
       </div>
       <div>
         <p class="layer-section-label">Public Summary Statement</p>
         <textarea class="layer-textarea" data-key="call.summary" placeholder="A statement that captures the essence for sharing…" rows="4"></textarea>
+        <button class="inspire-l2-btn" data-inspire-l2="call.summary" title="AI draft summary from your profile">✨ Inspire Summary</button>
+        <div class="inspire-l2-suggestion" id="inspire-l2-call-summary"></div>
       </div>
     </div>
 
@@ -4846,6 +4920,7 @@ function init() {
   // Profile section
   initProfile();
   initInspireButtons();
+  initInspireLayer2Buttons();
   initBrandReference();
   initProfileModal();
   updateAllSGSTriads();
@@ -5001,10 +5076,17 @@ async function generateL3(point) {
 
   if (!btn || !statusEl) return;
 
-  // Threshold check
-  if (!meetsThreshold(point)) {
-    showToast('Add at least 50 words of session notes or complete the Synthesis first.', 4500);
+  // Quality check — warn if Layer 2 is thin but don’t block
+  const pt2 = state.points[point];
+  const hasL2 = (pt2.theme?.trim().length > 0) || (pt2.insights?.length > 0) || (pt2.summary?.trim().length > 20);
+  const hasL1 = (pt2.raw?.trim().split(/\s+/).filter(Boolean).length >= 50) ||
+                (pt2.qa_answers && Object.values(pt2.qa_answers).some(a => a?.trim().length > 10));
+  if (!hasL1 && !hasL2) {
+    showToast('Add session notes or use the ✨ Inspire buttons in Layer 2 first — the output will be generic without them.', 5000);
     return;
+  }
+  if (!hasL2) {
+    showToast('Layer 2 is empty — generating from session notes only. Use ✨ Inspire in Layer 2 for a richer result.', 4000);
   }
 
   // UI: enter generating state
@@ -5984,6 +6066,140 @@ function initInspireButtons() {
         sugg.classList.remove('visible');
         sugg.querySelector('.inspire-text').textContent = '';
       }
+    }
+  });
+}
+
+// ============================================================
+// LAYER 2 INSPIRE BUTTONS
+// ============================================================
+function getQAAnswers(point) {
+  const questions = [];
+  document.querySelectorAll(`[data-qa^="${point}."]`).forEach(el => {
+    const qEl = el.closest('.qa-pair')?.querySelector('.qa-question');
+    if (qEl && el.value.trim()) {
+      questions.push({ question: qEl.textContent.trim(), answer: el.value.trim() });
+    }
+  });
+  return questions;
+}
+
+function inspireLayer2(point, field) {
+  const suggId = `inspire-l2-${point}-${field}`;
+  const sugg   = document.getElementById(suggId);
+  const btn    = document.querySelector(`[data-inspire-l2="${point}.${field}"]`);
+  if (!sugg || !btn) return;
+
+  btn.classList.add('loading');
+  sugg.classList.remove('visible');
+  sugg.innerHTML = '';
+
+  const pt      = state.points[point] || {};
+  const gkNum   = pt.gk_num   || '';
+  const gkData  = gkNum ? (GENE_KEYS[parseInt(gkNum)] || {}) : {};
+
+  const payload = {
+    point,
+    field,
+    companion:     state.companion || '',
+    session_notes: pt.raw || '',
+    qa_answers:    getQAAnswers(point),
+    gk_num:    String(gkNum),
+    gk_line:   String(pt.gk_line || ''),
+    gk_shadow: gkData.shadow  || '',
+    gk_gift:   gkData.gift    || '',
+    gk_siddhi: gkData.siddhi  || '',
+  };
+
+  let accumulated = '';
+
+  fetch(`${API_BASE}/inspire-layer2`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(res => {
+    if (!res.ok) throw new Error('Server error');
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    function read() {
+      reader.read().then(({ done, value }) => {
+        if (done) { btn.classList.remove('loading'); return; }
+        const lines = decoder.decode(value).split('\n');
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.chunk) {
+              accumulated += data.chunk;
+              sugg.innerHTML = `
+                <div class="inspire-l2-text">${accumulated}</div>
+                <div class="inspire-l2-actions">
+                  <button class="inspire-l2-accept" data-accept-l2="${point}.${field}">Use this</button>
+                  <button class="inspire-l2-dismiss" data-dismiss-l2="${point}.${field}">Dismiss</button>
+                </div>`;
+              sugg.classList.add('visible');
+            }
+            if (data.done) btn.classList.remove('loading');
+          } catch(e) {}
+        }
+        read();
+      });
+    }
+    read();
+  }).catch(() => {
+    sugg.innerHTML = '<div style="color:var(--text-muted);font-size:11px;">Could not connect. Try again.</div>';
+    sugg.classList.add('visible');
+    btn.classList.remove('loading');
+  });
+}
+
+function initInspireLayer2Buttons() {
+  document.addEventListener('click', (e) => {
+    // Inspire L2 button
+    const l2Btn = e.target.closest('[data-inspire-l2]');
+    if (l2Btn) {
+      const [point, field] = l2Btn.dataset.inspireL2.split('.');
+      inspireLayer2(point, field);
+      return;
+    }
+    // Accept — fill the field
+    const acceptBtn = e.target.closest('[data-accept-l2]');
+    if (acceptBtn) {
+      const [point, field] = acceptBtn.dataset.acceptL2.split('.');
+      const sugg = document.getElementById(`inspire-l2-${point}-${field}`);
+      const text = sugg?.querySelector('.inspire-l2-text')?.textContent?.trim();
+      if (!text) return;
+      if (field === 'theme') {
+        const el = document.querySelector(`[data-key="${point}.theme"]`);
+        if (el) { el.value = text; el.dispatchEvent(new Event('input')); }
+      } else if (field === 'summary') {
+        const el = document.querySelector(`[data-key="${point}.summary"]`);
+        if (el) { el.value = text; el.dispatchEvent(new Event('input')); }
+      } else if (field === 'insight') {
+        // Add as a new insight block
+        const addBtn = document.getElementById(`${point}-add-insight`);
+        if (addBtn) {
+          addBtn.click();
+          // Fill the last insight block that was just created
+          setTimeout(() => {
+            const blocks = document.querySelectorAll(`#${point}-insights .insight-block-text`);
+            if (blocks.length) {
+              const last = blocks[blocks.length - 1];
+              last.value = text;
+              last.dispatchEvent(new Event('input'));
+            }
+          }, 100);
+        }
+      }
+      if (sugg) sugg.classList.remove('visible');
+      return;
+    }
+    // Dismiss
+    const dismissL2 = e.target.closest('[data-dismiss-l2]');
+    if (dismissL2) {
+      const [point, field] = dismissL2.dataset.dismissL2.split('.');
+      const sugg = document.getElementById(`inspire-l2-${point}-${field}`);
+      if (sugg) { sugg.classList.remove('visible'); sugg.innerHTML = ''; }
     }
   });
 }

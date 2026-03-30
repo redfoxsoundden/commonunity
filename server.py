@@ -1049,6 +1049,91 @@ Respond with precision and care. Ask the next question that genuinely matters. O
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
+# ── Layer 2 inspire endpoint ─────────────────────────────────────────────
+class InspireLayer2Request(BaseModel):
+    point: str          # "work" | "lens" | "field" | "call"
+    field: str          # "theme" | "insight" | "summary"
+    companion: str = ""
+    session_notes: str = ""
+    qa_answers: list = []   # list of {question, answer} dicts
+    gk_num: str = ""
+    gk_line: str = ""
+    gk_shadow: str = ""
+    gk_gift: str = ""
+    gk_siddhi: str = ""
+
+INSPIRE_L2_SYSTEM = """You are a synthesis companion in the CommonUnity facilitation methodology.
+
+You are helping someone distil their own reflections into clear, resonant language for their personal compass profile. You are not interpreting for them — you are offering a first draft they can refine.
+
+For THEME: Write one clear sentence (8–15 words) capturing the essential thread of this compass point. Grounded, specific, first-person or third-person as appropriate.
+
+For INSIGHT: Write one insight block (2–3 sentences) — a specific observation about how this person operates in this direction. Concrete, not abstract.
+
+For SUMMARY: Write 2–3 sentences for public sharing — clear, resonant, professional. Something they'd be proud to have on their website or profile.
+
+Draw directly on the Gene Key profile and any answers provided. Make it feel specific to this person.
+Return plain text only. No markdown, no labels, no preamble."""
+
+@app.post("/inspire-layer2")
+async def inspire_layer2(request: InspireLayer2Request):
+    """Generate a Layer 2 synthesis field draft from GK profile + QA answers."""
+
+    point_names = {"work": "The Work (Life's Work)", "lens": "The Lens (Evolution)",
+                   "field": "The Field (Radiance)", "call": "The Call (Purpose)"}
+    point_label = point_names.get(request.point, request.point)
+
+    gk_parts = []
+    if request.gk_num:
+        gk_parts.append(f"Gene Key {request.gk_num} · Line {request.gk_line}")
+        if request.gk_shadow: gk_parts.append(f"Shadow: {request.gk_shadow}")
+        if request.gk_gift:   gk_parts.append(f"Gift: {request.gk_gift}")
+        if request.gk_siddhi: gk_parts.append(f"Siddhi: {request.gk_siddhi}")
+
+    qa_text = ""
+    if request.qa_answers:
+        qa_lines = []
+        for item in request.qa_answers:
+            if item.get("answer", "").strip():
+                qa_lines.append(f"Q: {item['question']}\nA: {item['answer']}")
+        if qa_lines:
+            qa_text = "\n\n".join(qa_lines)
+
+    field_instructions = {
+        "theme": "Write the Core Theme: one clear sentence capturing the essential thread.",
+        "insight": "Write one Insight Block: 2–3 sentences of a specific, concrete observation.",
+        "summary": "Write the Public Summary: 2–3 sentences suitable for a website or profile."
+    }
+
+    user_msg = f"""Compass point: {point_label}
+Companion: {request.companion or 'Unknown'}
+
+Gene Key profile: {' · '.join(gk_parts) if gk_parts else 'Not provided'}
+
+{f'Session notes:{chr(10)}{request.session_notes[:2000]}' if request.session_notes.strip() else ''}
+
+{f'Reflections:{chr(10)}{qa_text}' if qa_text else 'No written reflections yet.'}
+
+Task: {field_instructions.get(request.field, 'Write a synthesis.')}"""
+
+    async def stream():
+        try:
+            with client.messages.stream(
+                model="claude-sonnet-4-5",
+                max_tokens=200,
+                system=INSPIRE_L2_SYSTEM,
+                messages=[{"role": "user", "content": user_msg}]
+            ) as s:
+                for text in s.text_stream:
+                    yield f"data: {json.dumps({'chunk': text})}\n\n"
+            yield f"data: {json.dumps({'done': True})}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(stream(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
 # Serve audio files
 import os as _os
 _audio_dir = _os.path.join(_os.path.dirname(__file__), 'audio')
