@@ -6088,13 +6088,13 @@ async function startRecording() {
     recognition.onresult = (event) => {
       let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const t = event.results[i].transcript;
+        // Access [0] for first alternative — required on Safari/webkit
+        const t = (event.results[i][0] || event.results[i]).transcript || '';
         if (event.results[i].isFinal) finalTranscript += t + ' ';
         else interim += t;
       }
-      // Show live transcript in the input field (not placeholder)
       const live = (finalTranscript + interim).trim();
-      if (workbenchInput) {
+      if (workbenchInput && live) {
         workbenchInput.value = live;
         workbenchInput.dispatchEvent(new Event('input'));
       }
