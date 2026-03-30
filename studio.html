@@ -5218,11 +5218,18 @@ function startTones(leftHz, rightHz, volume) {
   leftOsc.frequency.setValueAtTime(leftHz,  audioCtx.currentTime);
   rightOsc.frequency.setValueAtTime(rightHz, audioCtx.currentTime);
 
-  // Left → channel 0, Right → channel 1
   leftOsc.connect(leftGain);
   rightOsc.connect(rightGain);
-  leftGain.connect(merger, 0, 0);
-  rightGain.connect(merger, 0, 1);
+
+  if (leftHz === rightHz) {
+    // Mono tone — connect both directly to destination (no stereo merger needed)
+    leftGain.connect(audioCtx.destination);
+    rightGain.connect(audioCtx.destination);
+  } else {
+    // Binaural — left ear / right ear via channel merger
+    leftGain.connect(merger, 0, 0);
+    rightGain.connect(merger, 0, 1);
+  }
 
   leftOsc.start();
   rightOsc.start();
@@ -5432,11 +5439,11 @@ function initFrequencyEngine() {
 
   function generateNoise(type) {
     stopAmbient();
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    // Use a fresh AudioContext for noise to avoid merger conflicts
+    const nCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    const rate = audioCtx.sampleRate;
-    const buf  = audioCtx.createBuffer(1, rate * 3, rate);
+    const rate = nCtx.sampleRate;
+    const buf  = nCtx.createBuffer(1, rate * 3, rate);
     const data = buf.getChannelData(0);
     let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
     for (let i = 0; i < data.length; i++) {
@@ -5453,15 +5460,19 @@ function initFrequencyEngine() {
         data[i] = ((i > 0 ? data[i-1] : 0) + 0.02 * w) / 1.02;
       }
     }
-    const src  = audioCtx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    const gain = audioCtx.createGain();
+    const src  = nCtx.createBufferSource();
+    src.buffer = buf;
+    src.loop   = true;
+    const gain = nCtx.createGain();
     gain.gain.value = parseFloat(document.getElementById('ambient-volume').value) / 100 * 0.45;
-    src.connect(gain); gain.connect(audioCtx.destination);
+    src.connect(gain);
+    gain.connect(nCtx.destination);
     src.start();
     ambientNoiseSrc  = src;
     ambientNoiseGain = gain;
     ambientActive    = type;
+    // Store ref for volume control
+    ambientNoiseGain._ctx = nCtx;
   }
 
   function playAmbientUrl(key, url) {
@@ -5505,11 +5516,11 @@ function initFrequencyEngine() {
 
   document.getElementById('ambient-volume').addEventListener('input', () => {
     const vol = parseFloat(document.getElementById('ambient-volume').value) / 100;
-    if (ambientNoiseGain && audioCtx) {
-      ambientNoiseGain.gain.setTargetAtTime(vol * 0.45, audioCtx.currentTime, 0.1);
+    if (ambientNoiseGain && ambientNoiseGain._ctx) {
+      ambientNoiseGain.gain.setTargetAtTime(vol * 0.45, ambientNoiseGain._ctx.currentTime, 0.1);
     }
     if (ambientAudioEl) {
-      ambientAudioEl.volume = vol * 0.85;
+      ambientAudioEl.volume = Math.min(1, vol * 0.85);
     }
   });
 
