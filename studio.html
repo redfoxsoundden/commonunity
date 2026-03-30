@@ -3010,8 +3010,8 @@ input, textarea { font: inherit; color: inherit; }
           <label class="studio-calc-label">Place of birth</label>
           <input class="studio-calc-input" id="studio-pob" type="text" placeholder="City, Country…">
         </div>
-        <button class="studio-calc-btn" id="studio-calc-btn">Reveal my profile</button>
-        <div class="studio-calc-results" id="studio-calc-results">
+        <button class="studio-calc-btn" id="studio-calc-btn">Activate my profile</button>
+        <div class="studio-calc-results" id="studio-calc-results" style="display:none !important;">
           <div class="studio-calc-result-item" id="s-gk-cs">
             <span class="studio-calc-result-label">Life's Work</span>
             <span class="studio-calc-result-point">The Work</span>
@@ -3891,7 +3891,15 @@ function studioCalcGeneKeys() {
   }
 
   restoreStudioCalcResults(state.birthData);
-  showToast('Profile activated');
+  showToast('Profile ready — your rooms are seeded');
+
+  // Close the seed panel — no results to show, rooms are populated
+  const panel = document.getElementById('entrance-seed-panel');
+  const label = document.getElementById('entrance-seed-label');
+  const seedBtn = document.getElementById('entrance-seed-btn');
+  if (panel) panel.classList.remove('open');
+  if (label) label.textContent = 'Studio Setup ↓';
+  if (seedBtn) { seedBtn.classList.add('seeded'); }
 
   // Update Rose prompt with new context
   // showRosePrompt() — removed, Nexus prompt not shown on entrance
