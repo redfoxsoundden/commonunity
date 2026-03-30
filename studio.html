@@ -185,16 +185,19 @@ input, textarea { font: inherit; color: inherit; }
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: var(--space-8) var(--space-6);
+  padding: var(--space-6) var(--space-6) var(--space-8);
   border-left: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
   background: color-mix(in srgb, var(--card) 40%, transparent);
   backdrop-filter: blur(8px);
-  gap: var(--space-5);
+  gap: var(--space-4);
   overflow-y: auto;
+  overflow-x: hidden;
   height: 100dvh;
+  max-height: 100dvh;
   position: sticky;
   top: 0;
   align-self: flex-start;
+  box-sizing: border-box;
 }
 
 .entrance-wordmark {
@@ -347,7 +350,8 @@ input, textarea { font: inherit; color: inherit; }
   opacity: 0;
 }
 .entrance-seed-panel.open {
-  max-height: 820px;
+  max-height: 1200px;  /* tall enough to never clip */
+  overflow: visible;   /* let sidebar scroll handle overflow */
   opacity: 1;
 }
 .entrance-name-input {
