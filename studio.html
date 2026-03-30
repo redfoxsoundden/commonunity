@@ -294,7 +294,7 @@ input, textarea { font: inherit; color: inherit; }
   text-align: center;
 }
 .portal-wrap:hover .portal-hint { opacity: 1; }
-.portal-wrap.doors-open .portal-hint { display: none; }
+.portal-wrap.doors-open .portal-hint { opacity: 1 !important; display: block; font-size: 9px; letter-spacing: 0.12em; }
 .portal-wrap.portal-holding { transform: scale(1.04); transition: transform 0.15s ease; }
 .portal-wrap.portal-holding .torus-canvas { filter: brightness(1.3); }
 
@@ -1588,7 +1588,7 @@ input, textarea { font: inherit; color: inherit; }
   border-radius: var(--radius-xl);
   border: 1px solid color-mix(in srgb, var(--accent-color,var(--setup-accent)) 20%, var(--border));
   background: color-mix(in srgb, var(--card) 65%, transparent);
-  backdrop-filter: blur(8px);
+  /* No backdrop-filter — causes repaint lag when typing in Nexus input */
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--accent-color,var(--setup-accent)) 8%, transparent),
     0 4px 32px rgba(0,0,0,0.2),
@@ -1607,15 +1607,24 @@ input, textarea { font: inherit; color: inherit; }
 }
 
 /* Rose sanctuary header */
+/* Flat panel header matching Archive and Notepad */
+.nexus-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  flex-shrink: 0;
+}
+
 .rose-orb-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-6) var(--space-4) var(--space-4);
+  padding: var(--space-4) var(--space-4) var(--space-3);
   gap: var(--space-2);
   flex-shrink: 0;
   position: relative;
-  /* No background — room-mirror gradient handles atmosphere */
 }
 .rose-orb-header::after {
   content: '';
@@ -2728,6 +2737,13 @@ input, textarea { font: inherit; color: inherit; }
               <span class="freq-dropdown-label" style="white-space:nowrap;min-width:44px;">Warmth</span>
               <input type="range" class="mood-slider-h warm" id="mood-warm" min="0" max="100" value="0" style="flex:1;">
             </div>
+            <div class="mood-toolbar-slider" style="flex-direction:row;align-items:center;gap:var(--space-3);width:100%;">
+              <span class="freq-dropdown-label" style="white-space:nowrap;min-width:44px;">Space</span>
+              <input type="range" id="mood-space" min="0" max="100" value="7"
+                style="flex:1;-webkit-appearance:none;height:3px;border-radius:2px;outline:none;cursor:pointer;
+                background:linear-gradient(to right,#000 0%,#1a0a2e 15%,#0b1120 25%,#0d2a1e 45%,#1a1a0a 65%,#2a0a0a 85%,#fff 100%);"
+              >
+            </div>
           </div>
         </div>
       </div><!-- /colour-pill-wrap -->
@@ -2788,6 +2804,14 @@ input, textarea { font: inherit; color: inherit; }
     <!-- The Nexus (right panel) -->
     <div class="room-mirror" id="room-mirror">
       <div class="rose-surface">
+
+      <!-- Flat header bar — matches Archive and Notepad -->
+      <div class="nexus-panel-header">
+        <span class="notepad-label">The Nexus</span>
+        <button class="studio-info-btn" data-info="info-rose-overlay" title="About The Nexus"><i>i</i></button>
+      </div>
+
+      <!-- Orb area — centred below header -->
       <div class="rose-orb-header">
         <div class="rose-orb-wrap nexus-orb-dormant" id="nexus-orb-wrap" title="Hold to open the Nexus">
           <div class="rose-orb-ring-2"></div>
@@ -2843,10 +2867,6 @@ input, textarea { font: inherit; color: inherit; }
             <circle cx="32" cy="32" r="2.5" fill="var(--rose-color, #c4b5fd)" fill-opacity="0.9"/>
             <circle cx="32" cy="32" r="5" fill="color-mix(in srgb, var(--rose-color, #c4b5fd) 25%, transparent)"/>
           </svg>
-        </div>
-        <div style="display:flex;align-items:center;gap:var(--space-2);">
-          <div class="rose-name">The Nexus</div>
-          <button class="studio-info-btn" data-info="info-rose-overlay" title="About The Nexus"><i>i</i></button>
         </div>
         <div class="rose-gk-context" id="mirror-gk-context"></div>
       </div>
@@ -3340,14 +3360,21 @@ function initEntrance() {
   let portalHoldStart = null;
   let portalRafId = null;
 
-  // Create progress ring SVG overlay on portal
+  // Create glowing progress ring SVG overlay on portal
   const portalRingEl = document.createElement('div');
   portalRingEl.id = 'portal-hold-ring';
   portalRingEl.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:5;';
   portalRingEl.innerHTML = `<svg viewBox="0 0 380 380" style="width:100%;height:100%;transform:rotate(-90deg)">
-    <circle id="portal-ring-progress" cx="190" cy="190" r="185"
-      fill="none" stroke="rgba(167,139,250,0.75)" stroke-width="2"
+    <defs>
+      <filter id="ring-glow">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <circle id="portal-ring-progress" cx="190" cy="190" r="182"
+      fill="none" stroke="rgba(167,139,250,0.9)" stroke-width="2.5"
       stroke-linecap="round"
+      filter="url(#ring-glow)"
       stroke-dasharray="${PORTAL_CIRC}"
       stroke-dashoffset="${PORTAL_CIRC}"
       style="transition:stroke-dashoffset 0.05s linear;"/>
@@ -3355,12 +3382,29 @@ function initEntrance() {
   portal.appendChild(portalRingEl);
   const portalRingProgress = document.getElementById('portal-ring-progress');
 
+  // Animate ring glow pulse
+  let ringGlowT = 0;
+  function animRingGlow() {
+    if (!portalOpened && portalHoldStart) {
+      ringGlowT += 0.08;
+      const pulse = 0.7 + 0.3 * Math.sin(ringGlowT * 3);
+      if (portalRingProgress) portalRingProgress.style.stroke = `rgba(167,139,250,${pulse})`;
+    }
+    requestAnimationFrame(animRingGlow);
+  }
+  requestAnimationFrame(animRingGlow);
+
   function openPortal() {
     if (portalOpened) return;
     portalOpened = true;
-    portalRingEl.style.display = 'none';
+    portal.classList.remove('portal-holding');
+    // Ring stays visible briefly then fades
+    setTimeout(() => { portalRingEl.style.transition = 'opacity 0.5s'; portalRingEl.style.opacity = '0'; }, 400);
     portal.classList.add('doors-open');
     actions.classList.add('visible');
+    // Update hint
+    const hint = document.getElementById('portal-hint');
+    if (hint) { hint.style.opacity = '1'; hint.textContent = 'choose a direction'; }
   }
 
   function cancelPortalHold() {
@@ -3387,12 +3431,14 @@ function initEntrance() {
   }
 
   portal.addEventListener('mousedown', startPortalHold);
+  // mouseup cancels hold only if not completed — rooms stay if completed
   portal.addEventListener('mouseup',   cancelPortalHold);
-  portal.addEventListener('mouseleave',cancelPortalHold);
+  // mouseleave: don't cancel if already opened
+  portal.addEventListener('mouseleave', () => { if (!portalOpened) cancelPortalHold(); });
   portal.addEventListener('touchstart', startPortalHold, { passive: true });
-  portal.addEventListener('touchend',   (e) => { cancelPortalHold(); openPortal(); }); // tap on touch = open
+  portal.addEventListener('touchend',   () => { if (!portalOpened) cancelPortalHold(); });
 
-  // Hint text update
+  // Hint text
   const hint = document.getElementById('portal-hint');
   if (hint) hint.textContent = 'hold to open';
 
@@ -4435,6 +4481,42 @@ function initMoodLighting() {
     });
   });
 
+  // Space slider — controls background colour directly
+  // 0 = black, 7 = default navy, 50 = mid-colour, 100 = near-white
+  const spaceEl = document.getElementById('mood-space');
+  if (spaceEl) {
+    spaceEl.addEventListener('input', () => {
+      const v = parseInt(spaceEl.value); // 0–100
+      let bg;
+      if (v <= 5) {
+        // Pure black
+        const l = Math.round(v * 2);
+        bg = `hsl(0,0%,${l}%)`;
+      } else if (v <= 15) {
+        // Dark indigo (default zone)
+        const t = (v - 5) / 10;
+        const l = Math.round(5 + t * 7);
+        bg = `hsl(225,${Math.round(50 + t * 30)}%,${l}%)`;
+      } else if (v <= 50) {
+        // Sweep through hues at medium-dark lightness
+        const t = (v - 15) / 35;
+        const h = Math.round(t * 360);
+        bg = `hsl(${h},55%,${Math.round(8 + t * 8)}%)`;
+      } else if (v <= 90) {
+        // Mid to light
+        const t = (v - 50) / 40;
+        const h = Math.round(t * 360);
+        bg = `hsl(${h},40%,${Math.round(16 + t * 40)}%)`;
+      } else {
+        // Near-white
+        const t = (v - 90) / 10;
+        bg = `hsl(220,${Math.round(20 * (1-t))}%,${Math.round(56 + t * 40)}%)`;
+      }
+      document.documentElement.style.setProperty('--bg', bg);
+      document.body.style.backgroundColor = bg;
+    });
+  }
+
   // Close freq engine button
   const closeBtn = document.getElementById('freq-close-btn');
   if (closeBtn) {
@@ -4830,8 +4912,25 @@ function initTorusPortal() {
   let rotX = 0.48, rotY = 0, t = 0;
   let hovered = false, activated = false;
 
+  // Mouse parallax
+  let mouseX = 0, mouseY = 0;  // normalised -1..1
+  let targetRotX = 0.48, targetRotY = 0;
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = ((e.clientX - rect.left) / rect.width  - 0.5) * 2;
+    mouseY = ((e.clientY - rect.top)  / rect.height - 0.5) * 2;
+    hovered = true;
+  });
   canvas.addEventListener('mouseenter', () => hovered = true);
-  canvas.addEventListener('mouseleave', () => hovered = false);
+  canvas.addEventListener('mouseleave', () => { hovered = false; mouseX = 0; mouseY = 0; });
+
+  // Touch parallax
+  canvas.addEventListener('touchmove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    mouseX = ((touch.clientX - rect.left) / rect.width  - 0.5) * 2;
+    mouseY = ((touch.clientY - rect.top)  / rect.height - 0.5) * 2;
+  }, { passive: true });
 
   // Accelerate on portal open
   const portalEl = document.getElementById('portal');
@@ -4870,8 +4969,19 @@ function initTorusPortal() {
     requestAnimationFrame(draw);
     t += 0.007;
     const speed = activated ? 2.6 : hovered ? 1.5 : 0.85;
+
+    // Mouse parallax: target rotation influenced by cursor position
+    if (hovered) {
+      targetRotY = rotY + mouseX * 0.4;  // nudge Y toward mouse X
+      targetRotX = 0.48 - mouseY * 0.3;  // nudge X toward mouse Y
+    } else {
+      targetRotX = 0.48 + 0.07 * Math.sin(t * 0.22);
+      // targetRotY just keeps spinning
+    }
+    // Auto-spin Y always, parallax adds on top
     rotY += 0.006 * speed;
-    rotX  = 0.48 + 0.07 * Math.sin(t * 0.22);
+    // Smoothly interpolate X tilt
+    rotX += (targetRotX - rotX) * 0.04;
 
     ctx.clearRect(0, 0, SIZE, SIZE);
 
