@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Hatha Surya Namaskar</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #FAF8F4;
+      --dark:      #2C3A4A;
+      --saffron:   #C8622A;
+      --gold:      #B8872E;
+      --text:      #2C1A08;
+      --muted:     #8B6040;
+      --rule:      #E2D5C3;
+    }
+
+    html, body { width: 100%; height: 100%; background: var(--dark); overflow: hidden; }
+
+    /* ── DECK ── */
+    .deck { width: 100vw; height: 100vh; position: relative; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: none;
+      background: var(--bg);
+    }
+    .slide.active { display: flex; flex-direction: column; }
+
+    /* ── COVER ── */
+    .cover {
+      background: var(--dark);
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+      padding: 48px 40px;
+      height: 100vh;
+    }
+    .cover-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      opacity: 0.45;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .cover > *:not(.cover-bg) { position: relative; z-index: 1; }
+    .cover-om   { font-size: 72px; color: var(--gold); line-height: 1; margin-top: 8px; }
+    .cover-title {
+      font-family: Georgia, serif;
+      font-size: clamp(30px, 5vw, 58px);
+      color: #FAF8F4;
+      letter-spacing: 1px;
+    }
+    .cover-sub  {
+      font-family: Georgia, serif;
+      font-size: 13px;
+      color: var(--gold);
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
+    .cover-rule {
+      width: 80px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+    }
+    .cover-note {
+      font-family: Georgia, serif;
+      font-size: 13px;
+      color: var(--muted);
+      font-style: italic;
+      text-align: center;
+      line-height: 1.8;
+    }
+    .cover-btn {
+      margin-top: 8px;
+      background: var(--saffron);
+      border: none;
+      color: #fff;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 13px 38px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .cover-btn:hover { opacity: .82; }
+    .cover-credit {
+      font-family: Georgia, serif;
+      font-size: 9px;
+      color: rgba(250,248,244,0.35);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 12px;
+    }
+    .nav-btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(200,98,42,0.5);
+      color: var(--saffron);
+      font-weight: normal;
+      opacity: 0.75;
+    }
+    .nav-btn-ghost:hover { opacity: 1; }
+
+    /* ── POSE SLIDE LAYOUT ── */
+    /* Three horizontal bands: top-bar | body | bottom-bar */
+    .top-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 52px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .top-left  { display: flex; align-items: center; gap: 10px; }
+    .top-om    { font-size: 18px; color: var(--saffron); }
+    .top-label { font-family: Georgia, serif; font-size: 11px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
+    .dots      { display: flex; gap: 5px; align-items: center; }
+    .dot       { width: 6px; height: 6px; border-radius: 50%; background: var(--rule); transition: background .3s; }
+    .dot.done  { background: var(--gold); }
+    .dot.now   { background: var(--saffron); transform: scale(1.35); }
+
+    /* body = image left, info right */
+    .slide-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: row;
+    }
+
+    /* IMAGE PANEL — left 55% */
+    .img-panel {
+      width: 55%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px 24px 32px;
+      background: var(--bg);
+    }
+    .img-panel img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* INFO PANEL — right 45% */
+    .info-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 32px 36px 32px 28px;
+      border-left: 1px solid var(--rule);
+      gap: 0;
+    }
+
+    .breath-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--dark);
+      color: #FAF8F4;
+      font-family: Georgia, serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 40px;
+      width: fit-content;
+      margin-bottom: 20px;
+    }
+    .breath-icon { font-size: 14px; }
+
+    .sanskrit {
+      font-family: Georgia, serif;
+      font-size: clamp(22px, 3vw, 36px);
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .english {
+      font-family: Georgia, serif;
+      font-size: clamp(11px, 1.2vw, 14px);
+      color: var(--saffron);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+
+    .divider {
+      width: 40px; height: 1px;
+      background: var(--gold);
+      margin-bottom: 24px;
+    }
+
+    .tips-label {
+      font-family: Georgia, serif;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .tips {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .tips li {
+      font-family: Georgia, serif;
+      font-size: clamp(12px, 1.1vw, 14px);
+      color: var(--text);
+      line-height: 1.55;
+      padding-left: 14px;
+      position: relative;
+    }
+    .tips li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--saffron);
+    }
+
+    /* TEACHER CUE */
+    .breath-pill { order: 1; }
+    .sanskrit      { order: 2; }
+    .english       { order: 3; }
+    .divider       { order: 4; }
+    .cue           { order: 5; }
+    .tips-label    { order: 6; }
+    .tips          { order: 7; }
+
+    .cue {
+      margin-top: 12px;
+      margin-bottom: 4px;
+      padding: 13px 16px;
+      border-left: 3px solid var(--gold);
+      background: rgba(184,135,46,0.06);
+      border-radius: 0 4px 4px 0;
+      font-family: Georgia, serif;
+      font-size: clamp(13px, 1.2vw, 15px);
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* BOTTOM NAV */
+    .bot-bar {
+      flex-shrink: 0;
+      height: 52px;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+    }
+    .nav-btn {
+      background: var(--saffron);
+      border: none;
+      color: #fff;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 10px 28px;
+      border-radius: 3px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: opacity .2s;
+    }
+    .nav-btn:hover:not(:disabled) { opacity: .82; }
+    .nav-btn:disabled { opacity: .2; cursor: default; }
+    .slide-count { font-family: Georgia, serif; font-size: 12px; color: var(--muted); letter-spacing: 2px; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+      /* Cover tweaks */
+      .cover { padding: 32px 24px; gap: 14px; }
+      .cover-title { font-size: clamp(26px, 8vw, 40px); }
+
+      /* Stack slide body vertically */
+      .slide-body { flex-direction: column; overflow-y: auto; }
+
+      /* Image: compact strip at top */
+      .img-panel {
+        width: 100%;
+        height: 38vh;
+        padding: 12px 16px 8px;
+        flex-shrink: 0;
+      }
+      .img-panel img { max-height: 100%; }
+
+      /* Info panel: scrollable below image */
+      .info-panel {
+        flex: 1;
+        justify-content: flex-start;
+        padding: 16px 20px 20px;
+        border-left: none;
+        border-top: 1px solid var(--rule);
+        overflow-y: auto;
+        gap: 0;
+      }
+
+      /* Tighten up info content */
+      .sanskrit { font-size: clamp(22px, 6vw, 32px); margin-top: 6px; }
+      .english  { font-size: 11px; letter-spacing: 3px; }
+      .cue      { font-size: 13px; margin-top: 10px; margin-bottom: 2px; padding: 10px 12px; }
+      .tips li  { font-size: 12px; }
+      .tips-label { font-size: 9px; margin-top: 10px; }
+
+      /* Nav bar */
+      .bot-bar { padding: 0 16px; height: 56px; }
+      .nav-btn { font-size: 13px; padding: 8px 18px; }
+      .slide-count { font-size: 11px; }
+
+      /* Top bar */
+      .top-bar { padding: 0 16px; }
+      .dots { display: none; } /* too many dots on small screen */
+      .top-label { font-size: 10px; letter-spacing: 2px; }
+    }
+
+    /* KEYBOARD HINT */
+    .key-hint {
+      display: block;
+      text-align: center;
+      font-size: 11px;
+      color: #3A2010;
+      letter-spacing: 1px;
+      padding-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ════════════════════════════════════ -->
+<!-- COVER                                -->
+<!-- ════════════════════════════════════ -->
+<div class="slide cover active" id="slide-0">
+  <img class="cover-bg" src="cover-photo.jpg" alt="" />
+  <div class="cover-om">ॐ</div>
+  <div class="cover-title">Hatha Surya Namaskar</div>
+  <div class="cover-sub">Traditional Sun Salutation · 12 Poses</div>
+  <div class="cover-rule"></div>
+  <button class="cover-btn" onclick="goTo(1)">Begin</button>
+  <div class="cover-credit">Created by Markus Lehto &amp; Koda &middot; Rishikesh 2026</div>
+</div>
+
+<!-- ════════════════════════════════════ -->
+<!-- POSE MACRO (repeated 12×)           -->
+<!-- ════════════════════════════════════ -->
+
+<!-- 1 -->
+<div class="slide" id="slide-1">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 1 of 12</span></div>
+    <div class="dots" id="dots-1"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-01-pranamasana.png" alt="Pranamasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↓</span> Exhale</div>
+      <div class="sanskrit">Pranamasana</div>
+      <div class="english">Prayer Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+                                                                                    <ul class="tips">
+        <li>Feet together, big toes and inner heels touching — weight evenly distributed across all four corners of both feet</li>
+        <li>Palms joined at Anahata chakra — thumbs lightly pressing the sternum, fingers pointing upward</li>
+        <li>Spine tall and vertical, shoulders drawn back and down — chest naturally open without forcing</li>
+        <li>Soften the gaze or close the eyes — breathe naturally and set your sankalpa (intention) for the practice</li>
+      </ul>
+      <div class="cue">Stand at the top of your mat. Feet together, spine long. Exhale, bring palms together at the heart in Pranamasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()" disabled>← Back</button>
+    <span class="slide-count">1 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 2 -->
+<div class="slide" id="slide-2">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 2 of 12</span></div>
+    <div class="dots" id="dots-2"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-02-hasta-utthanasana.png" alt="Hasta Utthanasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↑</span> Inhale</div>
+      <div class="sanskrit">Hasta Utthanasana</div>
+      <div class="english">Raised Arms Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Arms sweep up beside the ears — inner upper arms brushing or nearly touching the sides of the head</li>
+        <li>Backbend initiates from the thoracic spine and upper chest — the lumbar does not over-compress</li>
+        <li>Pelvis stays neutral — do not push the hips forward or allow the lower back to collapse into a deep arch</li>
+        <li>Gaze follows the hands upward and tilts slightly back, in line with the natural arc of the spine</li>
+      </ul>
+      <div class="cue">Inhale, sweep the arms up beside the ears, gently arch back, lifting the chest — Hasta Utthanasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">2 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="slide" id="slide-3">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 3 of 12</span></div>
+    <div class="dots" id="dots-3"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-03-padahastasana.png" alt="Padahastasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↓</span> Exhale</div>
+      <div class="sanskrit">Padahastasana</div>
+      <div class="english">Hand to Foot Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Fold from the hip joints, not the waist — lead the movement with the chest and lengthen the front body as you descend</li>
+        <li>Palms flat on the floor or fingertips beside the feet — in the traditional Rishikesh sequence, the aim is palms fully grounded</li>
+        <li>Kneecaps draw up as the quadriceps engage — legs are straight but not hyper-extended; knees may soften if hamstrings are tight</li>
+        <li>Crown of the head releases toward the shins — neck completely relaxed, no tension in the throat or jaw</li>
+      </ul>
+      <div class="cue">Exhale, fold from the hips, bring hands down beside the feet, head towards the knees — Padahastasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">3 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="slide" id="slide-4">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 4 of 12</span></div>
+    <div class="dots" id="dots-4"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-04-ashwa-sanchalanasana.png" alt="Ashwa Sanchalanasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↑</span> Inhale</div>
+      <div class="sanskrit">Ashwa Sanchalanasana</div>
+      <div class="english">Equestrian Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Right leg steps back as far as possible — right knee rests on the mat, top of the foot flat on the floor</li>
+        <li>Left knee is directly above the left ankle — shin vertical, forming approximately a 90° angle at the knee</li>
+        <li>Fingertips press into the floor on either side of the left foot — spine long, pelvis sinking toward the earth</li>
+        <li>Chest lifts and opens, spine extends, chin slightly raised — soft gaze forward and gently upward, Ajna chakra engaged</li>
+      </ul>
+      <div class="cue">Inhale, step the right leg back into a low lunge, right knee on the mat, chest open, look forward — Ashwa Sanchalanasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">4 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="slide" id="slide-5">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 5 of 12</span></div>
+    <div class="dots" id="dots-5"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-05-parvatasana.png" alt="Parvatasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↓</span> Exhale</div>
+      <div class="sanskrit">Parvatasana</div>
+      <div class="english">Mountain Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Left foot steps back to join the right — feet hip-width apart or together depending on practice tradition, heels pressing firmly toward the floor</li>
+        <li>Hips lift high toward the ceiling — body forms a clear inverted V, weight distributed evenly between hands and feet</li>
+        <li>Spine lengthens from tailbone to crown — back is flat rather than rounded; tailbone reaches upward and back</li>
+        <li>Head released between the upper arms, ears in line with the biceps — neck long and relaxed, no compression in the cervical spine</li>
+      </ul>
+      <div class="cue">Exhale, step the left foot back, lift the hips up and back into an inverted V — Parvatasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">5 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 6 -->
+<div class="slide" id="slide-6">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 6 of 12</span></div>
+    <div class="dots" id="dots-6"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-06-ashtanga-namaskara.png" alt="Ashtanga Namaskara"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">—</span> Retain / Exhale</div>
+      <div class="sanskrit">Ashtanga Namaskara</div>
+      <div class="english">Eight-Limbed Salutation</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Eight points contact the mat: two feet (toes tucked), two knees, two palms, chest, and chin — this is Ashtanga Namaskara, the prostration pose</li>
+        <li>Hips remain lifted off the floor — the body does not lie flat; the pelvis stays raised between the knees and the chest</li>
+        <li>Elbows draw in close to the ribcage, pointing straight back — forearms remain roughly vertical</li>
+        <li>Transition flows from Parvatasana by lowering knees first, then chest, then chin to the mat — movement is controlled, not a collapse</li>
+      </ul>
+      <div class="cue">Hold the breath, lower knees, chest and chin to the mat, hips slightly lifted — Ashtanga Namaskara.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">6 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 7 -->
+<div class="slide" id="slide-7">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 7 of 12</span></div>
+    <div class="dots" id="dots-7"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-07-bhujangasana.png" alt="Bhujangasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↑</span> Inhale</div>
+      <div class="sanskrit">Bhujangasana</div>
+      <div class="english">Cobra Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Palms are flat on the mat beside the lower ribs — fingers spread, elbows hugging the sides of the torso</li>
+        <li>Chest slides forward along the mat before lifting — this gliding action protects the lumbar and opens the upper chest correctly</li>
+        <li>Elbows retain a visible bend — this is Bhujangasana (Cobra), not Urdhva Mukha Svanasana; the navel remains in contact with or close to the floor</li>
+        <li>Shoulders roll back and down, collarbones broad — no shrugging; the back muscles, not the arms, do the lifting work</li>
+      </ul>
+      <div class="cue">Inhale, slide the chest forward, roll the shoulders back, lift the heart into Bhujangasana, elbows close to the body.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">7 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 8 -->
+<div class="slide" id="slide-8">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 8 of 12</span></div>
+    <div class="dots" id="dots-8"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-08-parvatasana.png" alt="Parvatasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↓</span> Exhale</div>
+      <div class="sanskrit">Parvatasana</div>
+      <div class="english">Mountain Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Toes tuck under, press firmly through the palms — exhale as the hips lift up and back into the inverted V</li>
+        <li>Exact mirror of Pose 5 — re-establish the same alignment: long flat spine, tailbone high, heels descending</li>
+        <li>Pause for a breath in the pose — feel the gentle traction in the spine as the sitting bones draw away from the hands</li>
+        <li>Heels press down toward the floor — this lengthens the hamstrings and calves progressively with each round</li>
+      </ul>
+      <div class="cue">Exhale, tuck the toes, lift the hips back up into Parvatasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">8 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 9 -->
+<div class="slide" id="slide-9">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 9 of 12</span></div>
+    <div class="dots" id="dots-9"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-09-ashwa-sanchalanasana.png" alt="Ashwa Sanchalanasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↑</span> Inhale</div>
+      <div class="sanskrit">Ashwa Sanchalanasana</div>
+      <div class="english">Equestrian Pose — other leg</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Right foot steps forward between the hands — foot arrives fully between the palms, not short; adjust if needed</li>
+        <li>Left knee rests on the mat, top of the left foot flat on the floor — direct mirror of Pose 4 on the opposite side</li>
+        <li>Right knee stays directly over the right ankle — do not allow the knee to drift inward or forward past the toes</li>
+        <li>Chest lifts, spine lengthens, gaze soft and forward — the same quality of open-hearted extension as the first lunge</li>
+      </ul>
+      <div class="cue">Inhale, step the right foot forward between the hands, back knee down, chest open — Ashwa Sanchalanasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">9 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 10 -->
+<div class="slide" id="slide-10">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 10 of 12</span></div>
+    <div class="dots" id="dots-10"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-10-padahastasana.png" alt="Padahastasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↓</span> Exhale</div>
+      <div class="sanskrit">Padahastasana</div>
+      <div class="english">Hand to Foot Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Left foot steps forward to meet the right — feet together, weight evenly balanced, hands remain on the floor</li>
+        <li>Direct mirror of Pose 3 — re-establish the same Padahastasana: hip-fold, long spine, quadriceps engaged</li>
+        <li>Knees may soften slightly if the hamstrings are tight — honour the body without forcing; the pose deepens over time</li>
+        <li>Crown of the head surrenders toward the shins — gravity does the work; do not pull or force the descent</li>
+      </ul>
+      <div class="cue">Exhale, bring the back foot forward, feet together, fold into Padahastasana, head towards the knees.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">10 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 11 -->
+<div class="slide" id="slide-11">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 11 of 12</span></div>
+    <div class="dots" id="dots-11"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-11-hasta-utthanasana.png" alt="Hasta Utthanasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↑</span> Inhale</div>
+      <div class="sanskrit">Hasta Utthanasana</div>
+      <div class="english">Raised Arms Pose</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Rise with a long, flat back — arms sweep forward and up as the torso ascends, maintaining length throughout the spine</li>
+        <li>Direct mirror of Pose 2 — re-enter the same gentle upper-thoracic backbend, arms beside the ears</li>
+        <li>Feel the full elongation of the body from the soles of the feet to the tips of the fingers at the top of the movement</li>
+        <li>Pelvis remains neutral at the crest of the pose — avoid over-arching the lumbar; the lift comes from the thoracic and chest</li>
+      </ul>
+      <div class="cue">Inhale, press the feet, rise up with a long spine, sweep arms up, gentle backbend — Hasta Utthanasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">11 / 12</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 12 -->
+<div class="slide" id="slide-12">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Pose 12 of 12</span></div>
+    <div class="dots" id="dots-12"></div>
+  </div>
+  <div class="slide-body">
+    <div class="img-panel"><img src="pose-12-pranamasana.png" alt="Pranamasana"></div>
+    <div class="info-panel">
+      <div class="breath-pill"><span class="breath-icon">↓</span> Exhale</div>
+      <div class="sanskrit">Pranamasana</div>
+      <div class="english">Prayer Pose — Return</div>
+      <div class="divider"></div>
+      <div class="tips-label">Alignment &amp; Tips</div>
+            <ul class="tips">
+        <li>Exhale as the palms draw back to Anjali Mudra at the heart — one complete half-round is finished</li>
+        <li>Stand completely still for a full breath — observe the warmth, the heartbeat, and any shift in energy (prana)</li>
+        <li>This completes one half-cycle; repeat the entire sequence leading with the left leg in Poses 4 and 9 to complete one full round</li>
+        <li>Pranamasana — bow inward with awareness before beginning the next round or closing the practice</li>
+      </ul>
+      <div class="cue">Exhale, bring the palms back to the heart center, return to Pranamasana.</div></div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">12 / 12</span>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="nav-btn nav-btn-ghost" onclick="goTo(0)" title="Return to home">⌂ Home</button>
+      <button class="nav-btn" onclick="goTo(1)">⟳ Repeat</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<script>
+  const TOTAL = 12;
+  let current = 0;
+
+  function goTo(n) {
+    document.getElementById('slide-' + current).classList.remove('active');
+    current = n;
+    document.getElementById('slide-' + current).classList.add('active');
+    renderDots();
+  }
+  function next() { if (current < TOTAL) goTo(current + 1); }
+  function prev() { if (current > 1)     goTo(current - 1); }
+
+  function renderDots() {
+    for (let i = 1; i <= TOTAL; i++) {
+      const c = document.getElementById('dots-' + i);
+      if (!c) continue;
+      c.innerHTML = '';
+      for (let j = 1; j <= TOTAL; j++) {
+        const d = document.createElement('div');
+        d.className = 'dot' + (j < i ? ' done' : j === i ? ' now' : '');
+        c.appendChild(d);
+      }
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight','ArrowDown',' '].includes(e.key)) {
+      e.preventDefault();
+      current === 0 ? goTo(1) : next();
+    }
+    if (['ArrowLeft','ArrowUp'].includes(e.key)) {
+      e.preventDefault();
+      prev();
+    }
+  });
+
+  renderDots();
+</script>
+</body>
+</html>
