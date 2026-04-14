@@ -308,12 +308,16 @@
       /* Stack slide body vertically */
       .slide-body { flex-direction: column; overflow-y: auto; }
 
-      /* Image: compact strip at top */
+      /* Image: compact strip at top — shrinks on scroll */
       .img-panel {
         width: 100%;
-        height: 38vh;
-        padding: 12px 16px 8px;
+        height: 28vh;
+        padding: 8px 16px 6px;
         flex-shrink: 0;
+        transition: height 0.35s ease;
+      }
+      .img-panel.scrolled {
+        height: 16vh;
       }
       .img-panel img { max-height: 100%; }
 
@@ -746,6 +750,9 @@
     current = n;
     document.getElementById('slide-' + current).classList.add('active');
     renderDots();
+    // Reset scroll shrink state on slide change
+    document.querySelectorAll('.img-panel.scrolled').forEach(p => p.classList.remove('scrolled'));
+    document.querySelectorAll('.info-panel').forEach(p => { p.scrollTop = 0; });
   }
   function next() { if (current < TOTAL) goTo(current + 1); }
   function prev() { if (current > 1)     goTo(current - 1); }
@@ -775,6 +782,27 @@
   });
 
   renderDots();
+
+  // Mobile: shrink image panel as user scrolls into the info panel
+  function attachScrollShrink() {
+    const isMobile = () => window.innerWidth <= 640;
+    document.querySelectorAll('.info-panel').forEach(panel => {
+      panel.addEventListener('scroll', () => {
+        if (!isMobile()) return;
+        const slide = panel.closest('.slide');
+        if (!slide) return;
+        const imgPanel = slide.querySelector('.img-panel');
+        if (!imgPanel) return;
+        if (panel.scrollTop > 10) {
+          imgPanel.classList.add('scrolled');
+        } else {
+          imgPanel.classList.remove('scrolled');
+        }
+      }, { passive: true });
+    });
+  }
+
+  attachScrollShrink();
 </script>
 </body>
 </html>
