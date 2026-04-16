@@ -50,7 +50,7 @@
       display: none;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: center;
       gap: 0;
       background: var(--dark);
       position: relative;
@@ -68,17 +68,25 @@
     }
     .home-gradient {
       position: absolute; inset: 0;
-      background: linear-gradient(to bottom, transparent 30%, rgba(30,24,16,0.72) 65%, rgba(30,24,16,0.92) 100%);
+      background: linear-gradient(to bottom, rgba(30,24,16,0.82) 0%, rgba(30,24,16,0.55) 28%, transparent 40%, transparent 62%, rgba(30,24,16,0.60) 78%, rgba(30,24,16,0.88) 100%);
       z-index: 0;
     }
-    .home-content {
-      position: relative; z-index: 1;
+    .home-top {
+      position: absolute; top: 0; left: 0; right: 0;
+      z-index: 1;
       display: flex; flex-direction: column;
       align-items: center;
-      gap: 20px;
-      padding: 28px 32px 44px;
-      max-width: 620px;
-      width: 100%;
+      gap: 10px;
+      padding: 32px 32px 24px;
+      text-align: center;
+    }
+    .home-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 32px 36px;
       text-align: center;
     }
     .home-om   { font-size: 68px; color: var(--gold); line-height: 1; }
@@ -94,6 +102,13 @@
       color: var(--gold);
       letter-spacing: 5px;
       text-transform: uppercase;
+    }
+    .home-with {
+      font-family: Georgia, serif;
+      font-size: clamp(13px, 1.5vw, 18px);
+      color: rgba(250,248,244,0.65);
+      font-style: italic;
+      letter-spacing: 0.5px;
     }
     .home-rule {
       width: 60px; height: 1px;
@@ -539,11 +554,14 @@
 <div id="home" class="active">
   <img class="home-bg" src="cover-photo.jpg" alt="" />
   <div class="home-gradient"></div>
-  <div class="home-content">
+  <div class="home-top">
     <div class="home-om">ॐ</div>
     <div class="home-title">Ashtanga Vinyasa</div>
     <div class="home-sub">Sun Salutations</div>
     <div class="home-rule"></div>
+    <div class="home-with">with Shubhaum Chauhan</div>
+  </div>
+  <div class="home-bottom">
     <div class="home-note">Select a series to begin your practice</div>
     <div class="series-grid">
       <div class="series-card card-a" onclick="startSeries('a')">
@@ -562,7 +580,7 @@
         <div class="card-count">18 vinyasa</div>
       </div>
     </div>
-    <div class="home-credit">Shubhaum Chauhan &middot; Rishikesh 2026</div>
+    <div class="home-credit">Created by HearthVS &middot; Images by Shubhaum Chauhan &middot; Rishikesh 2026</div>
   </div>
 </div>
 
