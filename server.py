@@ -1153,6 +1153,10 @@ _ashtanga_teacher_dir = _os.path.join(_os.path.dirname(__file__), 'ashtanga-viny
 if _os.path.isdir(_ashtanga_teacher_dir):
     app.mount("/ashtanga-vinyasa-teacher", StaticFiles(directory=_ashtanga_teacher_dir, html=True), name="ashtanga-vinyasa-teacher")
 
+_ashtanga_exam_dir = _os.path.join(_os.path.dirname(__file__), 'ashtanga-exam-class')
+if _os.path.isdir(_ashtanga_exam_dir):
+    app.mount("/ashtanga-exam-class", StaticFiles(directory=_ashtanga_exam_dir, html=True), name="ashtanga-exam-class")
+
 @app.get("/studio")
 async def serve_studio():
     studio = pathlib.Path(__file__).parent / "studio.html"
