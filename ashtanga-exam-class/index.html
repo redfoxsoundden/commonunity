@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Ashtanga Vinyasa · Exam Class · Mira Yogashala 2026</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #FAF8F4;
+      --dark:    #2C3A4A;
+      --terra:   #C8622A;
+      --gold:    #B8872E;
+      --text:    #2C1A08;
+      --muted:   #8B6040;
+      --rule:    #E2D5C3;
+      --ammo:    #2A6B8C;   /* teal — Ammo */
+      --thanu:   #5C7A3E;   /* forest green — Thanusha */
+      --markus:  #C8622A;   /* terracotta — Markus */
+      --group:   #7A5C3A;   /* warm brown — Group */
+    }
+
+    /* ─── GLOBAL ─── */
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--dark);
+      font-family: Georgia, serif;
+    }
+
+    @media (max-width: 640px) {
+      html, body { overflow: visible; height: auto; }
+    }
+
+    /* ─── DECK ─── */
+    .deck { width: 100vw; height: 100vh; position: relative; }
+
+    @media (max-width: 640px) {
+      .deck { height: auto; min-height: 100vh; }
+    }
+
+    /* ─── SLIDE BASE ─── */
+    .slide {
+      position: absolute; inset: 0;
+      display: none;
+      background: var(--bg);
+    }
+    .slide.active { display: flex; flex-direction: column; }
+
+    @media (max-width: 640px) {
+      .slide { position: static; min-height: 100vh; }
+      .slide.active { display: flex; flex-direction: column; }
+    }
+
+    /* ═══════════════════════════════════
+       COVER SLIDE
+    ═══════════════════════════════════ */
+    .cover {
+      background: var(--dark);
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+      padding: 48px 40px;
+      height: 100vh;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .cover { height: 100svh; min-height: 600px; }
+    }
+
+    .cover-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+      opacity: 0.45;
+      z-index: 0;
+    }
+    .cover-gradient {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom,
+        rgba(30,24,16,0.85) 0%,
+        rgba(30,24,16,0.50) 30%,
+        transparent 45%,
+        transparent 58%,
+        rgba(30,24,16,0.65) 78%,
+        rgba(30,24,16,0.92) 100%);
+      z-index: 1;
+    }
+    .cover > *:not(.cover-bg):not(.cover-gradient) { position: relative; z-index: 2; }
+
+    .cover-badge {
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      padding: 5px 18px;
+      border: 1px solid rgba(250,248,244,0.4);
+      border-radius: 40px;
+      color: rgba(250,248,244,0.75);
+    }
+    .cover-om   { font-size: 72px; color: var(--gold); line-height: 1; }
+    .cover-title {
+      font-size: clamp(26px, 5vw, 50px);
+      color: #FAF8F4;
+      letter-spacing: 1px;
+      line-height: 1.2;
+    }
+    .cover-sub {
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
+    .cover-rule {
+      width: 70px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+    }
+    .cover-instructors {
+      font-size: clamp(13px, 1.6vw, 17px);
+      color: rgba(250,248,244,0.70);
+      font-style: italic;
+      line-height: 2;
+      letter-spacing: 0.3px;
+    }
+    .cover-instructors span {
+      font-style: normal;
+      color: rgba(250,248,244,0.90);
+      font-size: 1.05em;
+    }
+    .cover-note {
+      font-size: 12px;
+      color: rgba(250,248,244,0.45);
+      font-style: italic;
+      line-height: 1.8;
+    }
+    .cover-begin {
+      margin-top: 8px;
+      background: var(--terra);
+      border: none;
+      color: #fff;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 13px 40px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .cover-begin:hover { opacity: .82; }
+    .cover-credit {
+      font-size: 9px;
+      color: rgba(250,248,244,0.22);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* ═══════════════════════════════════
+       SECTION HEADER SLIDE
+    ═══════════════════════════════════ */
+    .section-slide {
+      background: var(--dark);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 18px;
+      text-align: center;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .section-slide .cover-bg {
+      opacity: 0.25;
+    }
+    .section-slide > *:not(.cover-bg):not(.cover-gradient) { position: relative; z-index: 2; }
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      padding: 4px 16px;
+      border-radius: 40px;
+      border: 1px solid rgba(250,248,244,0.3);
+      color: rgba(250,248,244,0.6);
+    }
+    .section-title {
+      font-size: clamp(28px, 5vw, 54px);
+      color: #FAF8F4;
+      letter-spacing: 1px;
+      line-height: 1.2;
+    }
+    .section-sub {
+      font-size: 13px;
+      color: rgba(250,248,244,0.55);
+      font-style: italic;
+      letter-spacing: 0.5px;
+      max-width: 480px;
+    }
+    .section-rule {
+      width: 60px; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(250,248,244,0.4), transparent);
+    }
+    .section-instructor-badge {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 5px 20px;
+      border-radius: 40px;
+      color: #fff;
+      margin-top: 4px;
+    }
+
+    /* ═══════════════════════════════════
+       CONTENT SLIDE (two-panel)
+    ═══════════════════════════════════ */
+    /* ── NAV BAR ── */
+    .slide-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: var(--dark);
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-btn {
+      background: transparent;
+      border: 1px solid rgba(250,248,244,0.2);
+      color: rgba(250,248,244,0.75);
+      font-family: Georgia, serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background .18s, border-color .18s;
+    }
+    .nav-btn:hover { background: rgba(250,248,244,0.08); border-color: rgba(250,248,244,0.4); }
+    .nav-btn.primary {
+      background: var(--terra);
+      border-color: var(--terra);
+      color: #fff;
+    }
+    .nav-btn.primary:hover { opacity: .85; }
+    .nav-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .nav-slide-num {
+      font-size: 10px;
+      color: rgba(250,248,244,0.35);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .nav-dots {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .nav-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(250,248,244,0.2);
+      transition: background .2s;
+    }
+    .nav-dot.active { background: var(--terra); }
+    .nav-dot.section-dot { background: rgba(250,248,244,0.45); width: 4px; height: 4px; }
+
+    /* ── CONTENT BODY ── */
+    .slide-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    @media (max-width: 640px) {
+      .slide-body { flex-direction: column; overflow: visible; }
+    }
+
+    /* LEFT PANEL */
+    .panel-left {
+      width: 45%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F0EBE2;
+      padding: 32px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 640px) {
+      .panel-left { width: 100%; min-height: 280px; padding: 24px; }
+    }
+
+    .pose-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* RIGHT PANEL */
+    .panel-right {
+      flex: 1;
+      padding: 36px 36px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 640px) {
+      .panel-right { padding: 24px 20px 32px; overflow-y: visible; }
+    }
+
+    .pose-num {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .pose-sanskrit {
+      font-size: clamp(20px, 3vw, 32px);
+      color: var(--text);
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+    }
+    .pose-english {
+      font-size: clamp(13px, 1.4vw, 16px);
+      color: var(--muted);
+      font-style: italic;
+      margin-top: -8px;
+    }
+    .pose-variants {
+      font-size: 12px;
+      color: var(--terra);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: -4px;
+    }
+    .pose-rule {
+      width: 40px; height: 1px;
+      background: var(--rule);
+      margin: 4px 0;
+    }
+    .tips-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tips-list li {
+      font-size: clamp(13px, 1.3vw, 15px);
+      color: var(--text);
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .tips-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+      font-size: 12px;
+      top: 3px;
+    }
+
+    /* Teacher cue gold box */
+    .cue-box {
+      background: rgba(184,135,46,0.10);
+      border-left: 3px solid var(--gold);
+      padding: 12px 16px;
+      border-radius: 0 4px 4px 0;
+      margin-top: 4px;
+    }
+    .cue-label {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .cue-text {
+      font-size: clamp(13px, 1.3vw, 15px);
+      color: var(--text);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* Instructor tag */
+    .instructor-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 40px;
+      border: 1px solid;
+      align-self: flex-start;
+      margin-top: auto;
+    }
+    .tag-ammo    { color: var(--ammo);   border-color: var(--ammo);   }
+    .tag-thanu   { color: var(--thanu);  border-color: var(--thanu);  }
+    .tag-markus  { color: var(--markus); border-color: var(--markus); }
+    .tag-group   { color: var(--group);  border-color: var(--group);  }
+
+    /* ═══════════════════════════════════
+       SIMPLE INFO SLIDE (no image)
+    ═══════════════════════════════════ */
+    .info-slide {
+      flex-direction: column;
+      background: var(--bg);
+    }
+    .info-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 52px;
+      gap: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .info-body { padding: 28px 24px; }
+    }
+
+    .info-title {
+      font-size: clamp(24px, 3.5vw, 40px);
+      color: var(--text);
+      letter-spacing: 0.5px;
+      line-height: 1.25;
+    }
+    .info-sub {
+      font-size: 13px;
+      color: var(--muted);
+      font-style: italic;
+    }
+    .info-rule {
+      width: 40px; height: 1px;
+      background: var(--rule);
+    }
+    .info-content {
+      font-size: clamp(14px, 1.4vw, 16px);
+      color: var(--text);
+      line-height: 1.9;
+    }
+    .info-content strong {
+      color: var(--terra);
+      font-style: normal;
+    }
+
+    /* Flow table for sun sal slides */
+    .flow-table {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      font-size: clamp(13px, 1.3vw, 15px);
+      color: var(--text);
+      padding: 8px 14px;
+      background: rgba(200,98,42,0.05);
+      border-radius: 4px;
+    }
+    .flow-row .step-num {
+      font-size: 10px;
+      color: var(--terra);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      min-width: 50px;
+      flex-shrink: 0;
+    }
+    .flow-row .step-name { flex: 1; }
+    .flow-row .step-breath {
+      font-size: 11px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Mantra text slide */
+    .mantra-text {
+      font-size: clamp(15px, 1.8vw, 20px);
+      color: var(--text);
+      line-height: 2.1;
+      font-style: italic;
+    }
+    .mantra-translation {
+      font-size: clamp(12px, 1.2vw, 14px);
+      color: var(--muted);
+      line-height: 1.9;
+      margin-top: 4px;
+    }
+
+    /* ─── CLOSING / SHAVASANA ─── */
+    .closing-slide {
+      background: var(--dark);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      text-align: center;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
+    }
+    .closing-slide .cover-bg { opacity: 0.2; }
+    .closing-slide > *:not(.cover-bg):not(.cover-gradient) { position: relative; z-index: 2; }
+    .closing-title {
+      font-size: clamp(26px, 4vw, 48px);
+      color: #FAF8F4;
+      letter-spacing: 1px;
+      line-height: 1.25;
+    }
+    .closing-sub {
+      font-size: 14px;
+      color: rgba(250,248,244,0.55);
+      font-style: italic;
+      max-width: 440px;
+      line-height: 1.8;
+    }
+    .closing-om {
+      font-size: 80px;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .closing-mantra {
+      font-size: clamp(14px, 1.6vw, 18px);
+      color: rgba(250,248,244,0.85);
+      line-height: 2.1;
+      font-style: italic;
+      max-width: 560px;
+    }
+    .closing-mantra-translation {
+      font-size: 13px;
+      color: rgba(250,248,244,0.5);
+      line-height: 1.9;
+      max-width: 500px;
+    }
+
+    /* ─── HOME / REPEAT BUTTONS at end ─── */
+    .end-btns {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    .end-btn {
+      font-family: Georgia, serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 11px 30px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: opacity .2s, background .2s;
+      border: none;
+    }
+    .end-btn.primary   { background: var(--terra); color: #fff; }
+    .end-btn.ghost     { background: transparent; border: 1px solid rgba(250,248,244,0.3); color: rgba(250,248,244,0.65); }
+    .end-btn:hover { opacity: .82; }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: var(--terra);
+      transition: width .3s;
+      z-index: 100;
+    }
+
+    /* ─── COVER COLLAGE ─── */
+    .cover-collage {
+      position: absolute; inset: 0;
+      display: flex;
+      z-index: 0;
+    }
+    .collage-panel {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    .collage-panel img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 15%;
+      display: block;
+    }
+    .collage-panel::after {
+      content: '';
+      position: absolute; inset: 0;
+    }
+    .collage-ammo::after   { background: rgba(42,107,140,0.40); }
+    .collage-thanu::after  { background: rgba(92,122,62,0.40); }
+    .collage-markus::after { background: rgba(200,98,42,0.40); }
+    .collage-gradient {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom,
+        rgba(20,16,10,0.80) 0%,
+        rgba(20,16,10,0.25) 25%,
+        transparent 42%,
+        transparent 58%,
+        rgba(20,16,10,0.50) 75%,
+        rgba(20,16,10,0.90) 100%);
+      z-index: 1;
+    }
+
+    /* ─── COVER TRIO AVATARS ─── */
+    .cover-trio {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+    .cover-trio-person {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .cover-trio-avatar {
+      width: 76px; height: 76px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      border: 2px solid rgba(250,248,244,0.5);
+    }
+    .cover-trio-name {
+      font-family: Georgia, serif;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(250,248,244,0.85);
+    }
+
+    /* ─── INSTRUCTOR AVATAR (slide panels) ─── */
+    .instructor-avatar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar-img {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      border: 2px solid;
+      flex-shrink: 0;
+    }
+    .avatar-ammo   { border-color: var(--ammo); }
+    .avatar-thanu  { border-color: var(--thanu); }
+    .avatar-markus { border-color: var(--markus); }
+    .avatar-label { display: flex; flex-direction: column; gap: 2px; }
+    .avatar-name  { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
+    .avatar-role  { font-size: 11px; font-style: italic; color: var(--muted); }
+    .tag-ammo  .avatar-name { color: var(--ammo); }
+    .tag-thanu .avatar-name { color: var(--thanu); }
+    .tag-markus .avatar-name { color: var(--markus); }
+
+    /* Keyboard hint */
+    .key-hint {
+      position: fixed;
+      bottom: 14px;
+      right: 18px;
+      font-family: Georgia, serif;
+      font-size: 10px;
+      color: rgba(44,58,74,0.4);
+      letter-spacing: 1px;
+      pointer-events: none;
+      z-index: 50;
+    }
+    @media (max-width: 640px) { .key-hint { display: none; } }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="key-hint">← → keys to navigate</div>
+
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 0 — COVER -->
+  <div class="slide cover active" id="slide-0">
+    <div class="cover-collage">
+      <div class="collage-panel collage-ammo">
+        <img src="ammo-new.jpg" alt="Ammo" style="object-position:center 30%;" />
+      </div>
+      <div class="collage-panel collage-thanu">
+        <img src="thanu-new.jpg" alt="Thanusha" style="object-position:center 30%;" />
+      </div>
+      <div class="collage-panel collage-markus">
+        <img src="markus-new.jpg" alt="Markus" style="object-position:center 30%;" />
+      </div>
+    </div>
+    <div class="collage-gradient"></div>
+    <div class="cover-badge">Mira Yogashala · Rishikesh 2026</div>
+    <div class="cover-om">ॐ</div>
+    <div class="cover-title">Ashtanga Vinyasa<br>Exam Class</div>
+    <div class="cover-sub">90-Minute Teaching Practice</div>
+    <div class="cover-rule"></div>
+    <div class="cover-trio">
+      <div class="cover-trio-person">
+        <img src="avatar-ammo.png" class="cover-trio-avatar" style="border-color:rgba(42,107,140,0.9);" alt="Ammo" />
+        <div class="cover-trio-name">Ammo</div>
+      </div>
+      <div class="cover-trio-person">
+        <img src="avatar-thanu.png" class="cover-trio-avatar" style="border-color:rgba(92,122,62,0.9);" alt="Thanusha" />
+        <div class="cover-trio-name">Thanusha</div>
+      </div>
+      <div class="cover-trio-person">
+        <img src="avatar-markus.png" class="cover-trio-avatar" style="border-color:rgba(200,98,42,0.9);" alt="Markus" />
+        <div class="cover-trio-name">Markus</div>
+      </div>
+    </div>
+    <div class="cover-note">15 asanas · Sun Salutations A &amp; B · Standing Sequence</div>
+    <button class="cover-begin" onclick="goTo(1)">Begin →</button>
+    <div class="cover-credit">Hearth Venture Studio &amp; Koda · Rishikesh 2026</div>
+  </div>
+
+  <!-- SLIDE 1 — INTRODUCTION (all three, Ammo leads) -->
+  <div class="slide info-slide" id="slide-1">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(0)">⌂ Home</button>
+      <div class="nav-center"><div class="nav-slide-num">Opening · 1 of 6</div></div>
+      <button class="nav-btn primary" onclick="goTo(2)">Next →</button>
+    </nav>
+    <div class="info-body">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:4px;">
+        <div class="instructor-avatar">
+          <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" />
+          <div class="avatar-label tag-ammo">
+            <div class="avatar-name">Ammo</div>
+            <div class="avatar-role">Leads Introduction</div>
+          </div>
+        </div>
+        <div class="instructor-avatar">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" />
+          <div class="avatar-label tag-thanu"><div class="avatar-name">Thanusha</div></div>
+        </div>
+        <div class="instructor-avatar">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" />
+          <div class="avatar-label tag-markus"><div class="avatar-name">Markus</div></div>
+        </div>
+      </div>
+      <div class="info-title">Introduction</div>
+      <div class="info-rule"></div>
+      <div class="info-content">
+        <strong>Names</strong><br>
+        Welcome the students. Introduce the three instructors:<br>
+        Ammo &nbsp;·&nbsp; Thanusha &nbsp;·&nbsp; Markus
+      </div>
+      <div class="info-rule"></div>
+      <div class="info-content">
+        <strong>Instructions</strong><br>
+        Set the intention for the practice. Briefly outline the class format and what students can expect. All three instructors are present — each will offer a few words to set the stage.
+      </div>
+      <div class="info-rule"></div>
+      <div class="info-content">
+        <strong>Flow</strong><br>
+        Opening OMs → Opening Prayer → Joint Movements → Sun Salutations A &amp; B → Standing Sequence → Closing
+      </div>
+      <div class="cue-box">
+        <div class="cue-label">Teacher Cue — Ammo</div>
+        <div class="cue-text">"Welcome, everyone. My name is Ammo, and joining me today are Thanusha and Markus. Together we will guide you through a 90-minute Ashtanga Vinyasa practice."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — THREE OMs MEDITATION (Markus) -->
+  <div class="slide info-slide" id="slide-2">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(1)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Opening · 2 of 6</div></div>
+      <button class="nav-btn primary" onclick="goTo(3)">Next →</button>
+    </nav>
+    <div class="info-body">
+      <div class="instructor-avatar">
+        <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" />
+        <div class="avatar-label tag-markus">
+          <div class="avatar-name">Markus</div>
+          <div class="avatar-role">Three OMs · Meditation</div>
+        </div>
+      </div>
+      <div class="info-title">Three OMs — Opening Meditation</div>
+      <div class="info-rule"></div>
+      <div class="info-content">
+        <strong>Hand Placement — Añjali Mudrā</strong><br>
+        Bring the palms together at the heart centre (Anahata Chakra). Fingers point upward, thumbs rest lightly against the sternum. Allow the hands to touch but not press. Soften the shoulders, close the eyes, and relax the face.
+      </div>
+      <div class="info-rule"></div>
+      <div class="info-content">
+        <strong>The Three OMs</strong><br>
+        Take a full breath in through the nose. On the exhale, chant <em>OM</em> — feeling the vibration begin in the belly, rise through the chest, and dissolve at the crown. Let it fade completely into silence. Pause in that stillness before the next inhale. Repeat three times, each round going a little deeper.
+      </div>
+      <div class="cue-box">
+        <div class="cue-label">Teacher Cue — Markus</div>
+        <div class="cue-text">"Bring your hands together at your heart centre. Feel the thumbs rest against your sternum. Close your eyes. Take a full breath in… and together: <em>OMmmm…</em> Let it fade completely. Rest in the silence. Again…"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — OPENING PRAYER (Thanusha) -->
+  <div class="slide info-slide" id="slide-3">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(2)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Opening · 3 of 6</div></div>
+      <button class="nav-btn primary" onclick="goTo(4)">Next →</button>
+    </nav>
+    <div class="info-body">
+      <div class="instructor-avatar">
+        <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" />
+        <div class="avatar-label tag-thanu">
+          <div class="avatar-name">Thanusha</div>
+          <div class="avatar-role">Opening Prayer</div>
+        </div>
+      </div>
+      <div class="info-title">Opening Prayer</div>
+      <div class="info-sub">Ashtanga Vinyasa Invocation</div>
+      <div class="info-rule"></div>
+      <div class="mantra-text">
+        Vande Gurūṇāṁ Caraṇāravinde<br>
+        Sandarśita Svātma Sukhāva Bodhe<br>
+        Niḥśreyase Jāṅgalikāyamāne<br>
+        Saṁsāra Hālāhala Mohaśāntyai<br><br>
+        Ābāhu Puruṣākāraṁ<br>
+        Śaṅkhacakrāsi Dhāriṇam<br>
+        Sahasra Śirasaṁ Śvetaṁ<br>
+        Praṇamāmi Patañjalim
+      </div>
+      <div class="mantra-translation">
+        I bow to the lotus feet of the Gurus, the awakening happiness of one's own self revealed,<br>
+        beyond better, acting like the jungle physician, pacifying delusion, the poison of Saṁsāra.<br><br>
+        Taking the form of a man to the shoulders, holding a conch, a discus, and a sword,<br>
+        one thousand heads white, to Patañjali I salute.
+      </div>
+      <div class="cue-box">
+        <div class="cue-label">Teacher Cue — Thanusha</div>
+        <div class="cue-text">Recite the invocation once together with the students. Remain in Añjali Mudrā. Keep the voice soft and unified.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 — JOINT MOVEMENTS (Ammo) -->
+  <div class="slide info-slide" id="slide-4">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(3)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Opening · 4 of 6</div></div>
+      <button class="nav-btn primary" onclick="goTo(5)">Next →</button>
+    </nav>
+    <div class="info-body">
+      <div class="instructor-avatar">
+        <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" />
+        <div class="avatar-label tag-ammo">
+          <div class="avatar-name">Ammo</div>
+          <div class="avatar-role">Joint Movements</div>
+        </div>
+      </div>
+      <div class="info-title">Joint Movements</div>
+      <div class="info-sub">Preparatory warm-up</div>
+      <div class="info-rule"></div>
+      <div class="flow-table">
+        <div class="flow-row"><div class="step-name">Neck rolls — both directions</div><div class="step-breath">slow &amp; mindful</div></div>
+        <div class="flow-row"><div class="step-name">Shoulder circles</div><div class="step-breath">forward &amp; back</div></div>
+        <div class="flow-row"><div class="step-name">Wrist rotations</div><div class="step-breath">both directions</div></div>
+        <div class="flow-row"><div class="step-name">Hip circles</div><div class="step-breath">both directions</div></div>
+        <div class="flow-row"><div class="step-name">Knee circles</div><div class="step-breath">both directions</div></div>
+        <div class="flow-row"><div class="step-name">Ankle rotations</div><div class="step-breath">both directions</div></div>
+      </div>
+      <div class="cue-box">
+        <div class="cue-label">Teacher Cue — Ammo</div>
+        <div class="cue-text">Move gently and slowly. Bring awareness to the breath. Let the body warm from the inside out.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 — SUN SALUTATION A (Group) -->
+  <div class="slide info-slide" id="slide-5">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(4)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Opening · 5 of 6</div></div>
+      <button class="nav-btn primary" onclick="goTo(6)">Next →</button>
+    </nav>
+    <div class="info-body">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:4px;">
+        <div class="instructor-avatar">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" />
+          <div class="avatar-label tag-thanu"><div class="avatar-name">Thanusha</div></div>
+        </div>
+        <div class="instructor-avatar">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" />
+          <div class="avatar-label tag-markus"><div class="avatar-name">Markus</div></div>
+        </div>
+        <div class="instructor-avatar">
+          <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" />
+          <div class="avatar-label tag-ammo"><div class="avatar-name">Ammo</div></div>
+        </div>
+      </div>
+      <div class="info-title">Surya Namaskar A</div>
+      <div class="info-sub">Sun Salutation A — Demo first, then each instructor leads</div>
+      <div class="info-rule"></div>
+      <div class="flow-table">
+        <div class="flow-row"><div class="step-num"><strong>Ekam</strong></div><div class="step-name">Urdhva Hastasana — Arms raised</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Dve</strong></div><div class="step-name">Uttanasana — Standing forward fold</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Trīṇi</strong></div><div class="step-name">Ardha Uttanasana — Half lift</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Catvāri</strong></div><div class="step-name">Chaturanga Dandasana — Low plank</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Pañca</strong></div><div class="step-name">Urdhva Mukha Svanasana — Upward facing dog</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Ṣaṭ</strong></div><div class="step-name">Adho Mukha Svanasana — Downward facing dog · 5 breaths</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Sapta</strong></div><div class="step-name">Ardha Uttanasana — Half lift</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Aṣṭau</strong></div><div class="step-name">Uttanasana — Forward fold</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Nava</strong></div><div class="step-name">Samasthiti — Return to standing</div><div class="step-breath">Inhale</div></div>
+      </div>
+      <div class="cue-box">
+        <div class="cue-label">Teacher Cue</div>
+        <div class="cue-text">Demo one full round together first, then each instructor leads one round. Keep the breath loud and audible for students to follow.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — SUN SALUTATION B (Group) -->
+  <div class="slide info-slide" id="slide-6">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(5)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Opening · 6 of 6</div></div>
+      <button class="nav-btn primary" onclick="goTo(7)">Next →</button>
+    </nav>
+    <div class="info-body">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:4px;">
+        <div class="instructor-avatar">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" />
+          <div class="avatar-label tag-thanu"><div class="avatar-name">Thanusha</div></div>
+        </div>
+        <div class="instructor-avatar">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" />
+          <div class="avatar-label tag-markus"><div class="avatar-name">Markus</div></div>
+        </div>
+        <div class="instructor-avatar">
+          <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" />
+          <div class="avatar-label tag-ammo"><div class="avatar-name">Ammo</div></div>
+        </div>
+      </div>
+      <div class="info-title">Surya Namaskar B</div>
+      <div class="info-sub">Sun Salutation B — Demo first, then each instructor leads</div>
+      <div class="info-rule"></div>
+      <div class="flow-table">
+        <div class="flow-row"><div class="step-num"><strong>Ekam</strong></div><div class="step-name">Utkatasana — Chair pose / Fierce pose</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Dve</strong></div><div class="step-name">Uttanasana — Standing forward fold</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Trīṇi</strong></div><div class="step-name">Ardha Uttanasana — Half lift</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Catvāri</strong></div><div class="step-name">Chaturanga Dandasana — Low plank</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Pañca</strong></div><div class="step-name">Urdhva Mukha Svanasana — Upward facing dog</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Ṣaṭ</strong></div><div class="step-name">Adho Mukha Svanasana — Downward facing dog</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Sapta</strong></div><div class="step-name">Virabhadrasana A — Warrior I (right side)</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Aṣṭau–Daśa</strong></div><div class="step-name">Chaturanga → Upward dog → Downward dog</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Ekādaśa</strong></div><div class="step-name">Virabhadrasana A — Warrior I (left side)</div><div class="step-breath">Inhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Dvādaśa–Caturdaśa</strong></div><div class="step-name">Chaturanga → Upward dog → Downward dog</div><div class="step-breath">Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Pañcadaśa</strong></div><div class="step-name">Ardha Uttanasana → Uttanasana</div><div class="step-breath">Inhale / Exhale</div></div>
+        <div class="flow-row"><div class="step-num"><strong>Ṣoḍaśa</strong></div><div class="step-name">Utkatasana — Chair pose → Samasthiti</div><div class="step-breath">Inhale / Exhale</div></div>
+      </div>
+      <div class="cue-box">
+        <div class="cue-label">Teacher Cue</div>
+        <div class="cue-text">Same format as A — demo together, then each instructor leads one round. Virabhadrasana holds for one full breath each side.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 — SECTION HEADER: STANDING SEQUENCE -->
+  <div class="slide section-slide" id="slide-7">
+    <img src="cover-photo.jpg" class="cover-bg" alt="" />
+    <div class="cover-gradient"></div>
+    <div class="section-label">Standing Sequence</div>
+    <div class="section-title">Asanas 1–15</div>
+    <div class="section-rule"></div>
+    <div class="section-sub">Each instructor teaches 5 asanas. Transitions not counted.</div>
+    <nav style="display:flex;gap:12px;margin-top:16px;z-index:2;position:relative;">
+      <button class="nav-btn" onclick="goTo(6)" style="color:rgba(250,248,244,0.7);">← Back</button>
+      <button class="nav-btn primary" onclick="goTo(8)">Begin Sequence →</button>
+    </nav>
+  </div>
+
+  <!-- SLIDE 8 — ASANA 1: PADANGUSTHASANA (Ammo) -->
+  <div class="slide" id="slide-8">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(7)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 1 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(9)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#2A6B8C;">Ammo</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-padangustasana-nobg.png" alt="Padangusthasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 1</div>
+        <div class="pose-sanskrit">Padangusthasana</div>
+        <div class="pose-english">Big Toe Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>Stand with feet hip-width apart, big toes parallel</li>
+          <li>Hinge at the hips, keeping the spine long as you fold</li>
+          <li>Wrap the first two fingers around each big toe</li>
+          <li>On each inhale lengthen the spine; on each exhale deepen the fold</li>
+          <li>Keep the legs straight but not locked — micro-bend if needed</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Ammo</div>
+          <div class="cue-text">"Press the feet into the earth, lift the kneecaps, and fold from the hip crease — not the lower back. Let gravity do the work. Five breaths."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9 — ASANA 2: PADAHASTHASANA (Ammo) -->
+  <div class="slide" id="slide-9">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(8)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 2 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(10)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#2A6B8C;">Ammo</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-padahastasana-nobg.png" alt="Padahasthasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 2</div>
+        <div class="pose-sanskrit">Padahasthasana</div>
+        <div class="pose-english">Hand Under Foot Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>From Padangusthasana — release the toes and slide both hands under the feet, palms up</li>
+          <li>Toes touch the wrist crease; weight forward on the balls of the feet</li>
+          <li>Keep knees soft or straight — work at your own edge</li>
+          <li>Crown of the head releases toward the earth</li>
+          <li>Five steady Ujjayi breaths</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Ammo</div>
+          <div class="cue-text">"Slide the hands under the feet, toes touching the wrist. Allow the weight to shift slightly forward. Breathe length into the spine with every inhale."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10 — ASANA 3: UTTHITA TRIKONASANA (Thanusha) -->
+  <div class="slide" id="slide-10">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(9)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 3 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(11)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#5C7A3E;">Thanusha</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-trikonasana-nobg.png" alt="Utthita Trikonasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 3</div>
+        <div class="pose-sanskrit">Utthita Trikonasana</div>
+        <div class="pose-english">Extended Triangle Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>Wide-legged stance — feet about 1 metre apart</li>
+          <li>Right foot turns out 90°, left foot turns in slightly</li>
+          <li>Extend the torso over the right leg; hand to shin, floor, or block</li>
+          <li>Left arm reaches straight up — both arms form one line</li>
+          <li>Gaze to the upper hand (Hasta Drishti) or forward if neck is sensitive</li>
+          <li>Repeat on the left side</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Thanusha</div>
+          <div class="cue-text">"Lengthen both sides of the waist equally. Root down through the outer edge of the back foot. Reach long through the fingertips before you lower."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11 — ASANA 4: PRASARITA PADOTTANASANA (Thanusha) -->
+  <div class="slide" id="slide-11">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(10)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 4 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(12)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#5C7A3E;">Thanusha</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-prasarita-nobg.png" alt="Prasarita Padottanasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 4</div>
+        <div class="pose-sanskrit">Prasarita Padottanasana</div>
+        <div class="pose-english">Wide-Legged Standing Forward Fold</div>
+        <div class="pose-variants">Variations A · B · C · D</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li><strong>A</strong> — Hands on the floor shoulder-width; crown of head toward the earth</li>
+          <li><strong>B</strong> — Hands on hips; fold deeply, spine long, crown drops</li>
+          <li><strong>C</strong> — Fingers interlaced behind the back; arms arc overhead as you fold</li>
+          <li><strong>D</strong> — Index and middle finger wrap big toes; elbows widen; deep fold</li>
+          <li>Feet parallel throughout; inner arches lift</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Thanusha</div>
+          <div class="cue-text">"Each variation deepens the surrender. Let the crown of the head be heavy. Press the outer edges of the feet into the mat and breathe space into the hamstrings."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12 — ASANA 5: PARSVOTTANASANA (Ammo) -->
+  <div class="slide" id="slide-12">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(11)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 5 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(13)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#2A6B8C;">Ammo</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-parsvottanasana-nobg.png" alt="Parsvottanasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 5</div>
+        <div class="pose-sanskrit">Parsvottanasana</div>
+        <div class="pose-english">Intense Side Stretch / Pyramid Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>Step one foot forward — feet staggered about 1 metre apart</li>
+          <li>Square the hips toward the front foot</li>
+          <li>Hands in Paschima Namaskar (reverse prayer) or hold elbows behind the back</li>
+          <li>Fold forward over the front leg, spine long</li>
+          <li>Keep the back heel grounded; front foot parallel</li>
+          <li>Repeat on the left side</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Ammo</div>
+          <div class="cue-text">"Square both hips before folding. Lengthen the back of the front leg. Think of it as a standing split forward — precise and grounded."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- SLIDE 13 — ASANA 6: ARDHA BADDHA PADMOTTANASANA (Markus) -->
+  <div class="slide" id="slide-13">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(12)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 6 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(14)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#C8622A;">Markus</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-ardha-baddha-nobg.png" alt="Ardha Baddha Padmottanasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 6</div>
+        <div class="pose-sanskrit">Ardha Baddha Padmottanasana</div>
+        <div class="pose-english">Half Bound Lotus Forward Fold</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>Place the right foot in half lotus on the left thigh</li>
+          <li>Bind the right arm behind the back to hold the right big toe</li>
+          <li>Ground down through the standing left foot</li>
+          <li>Fold forward, left hand to the floor or shin</li>
+          <li>Keep the standing knee soft; gaze at the nose (Nasagrai Drishti)</li>
+          <li>Repeat on the left side</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Markus</div>
+          <div class="cue-text">"This is a balance and hip opener combined. Find your stillness before you fold. If the lotus is not available, a simple tree leg variation is fine."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- SLIDE 14 — TRANSITION: SUN SALUTATION C + DANDASANA (Markus) -->
+  <div class="slide info-slide" id="slide-14">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(13)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Transition</div></div>
+      <button class="nav-btn primary" onclick="goTo(15)">Next →</button>
+    </nav>
+    <div class="info-body">
+      <div class="instructor-avatar">
+        <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" />
+        <div class="avatar-label tag-markus">
+          <div class="avatar-name">Markus</div>
+          <div class="avatar-role">Sun Salutation C · Transition</div>
+        </div>
+      </div>
+      <div class="info-title">Surya Namaskar C</div>
+      <div class="info-sub">18 Vinyasa · Bridge to the seated sequence</div>
+      <div class="info-rule"></div>
+      <div class="info-content" style="font-size:14px;line-height:1.7;">
+        <strong>Samasthiti</strong> — Stand at the top of the mat. Feet together, Ujjayi breath established. Set your intention.<br><br>
+        <strong>Ekam — Inhale</strong> — Sweep the arms overhead, palms join, gentle upper backbend. Gaze to the thumbs.<br><br>
+        <strong>Dve — Exhale</strong> — Swan dive forward and down into Uttanasana. Hands to the floor, crown releases.<br><br>
+        <strong>Trīṇi — Inhale</strong> — Half lift: Ardha Uttanasana. Spine long and flat, chest draws forward.<br><br>
+        <strong>Catvāri — Exhale</strong> — Step or jump back, lower to Chaturanga Dandasana. Body in one line, elbows 90°.<br><br>
+        <strong>Pañca — Inhale</strong> — Roll over the toes into Urdhva Mukha Svanasana. Chest open, thighs off the floor.<br><br>
+        <strong>Ṣaṭ — Exhale</strong> — Lift the hips back to Adho Mukha Svanasana. Take one breath here.<br><br>
+        <strong>Sapta — Exhale / Aṣṭau — Inhale</strong> — Step the right foot forward, rise into Virabhadrasana I. Back heel grounds, hips square, arms overhead. <em>Hold 5 breaths.</em><br><br>
+        <strong>Continuing</strong> — Exhale, jump back to Chaturanga → Inhale, Upward Dog → Exhale, Downward Dog. Pivot to face the back of the mat.<br><br>
+        <strong>Virabhadrasana I — Left</strong> — Step left foot forward, rise up. Arms overhead, front knee over ankle. <em>Hold 5 breaths.</em><br><br>
+        <strong>Open to Virabhadrasana II</strong> — Open the arms wide, hips rotate to the side. Left leg forward. <em>Hold 5 breaths.</em><br><br>
+        <strong>Pivot — Virabhadrasana II Right</strong> — Pivot 180° to face the front. Right leg forward, arms wide. <em>Hold 5 breaths.</em><br><br>
+        <strong>Exhale</strong> — Jump back to Chaturanga → Inhale, Upward Dog → Exhale, Downward Dog. <em>Prepare for jump-through.</em><br><br>
+        <strong>Jump-Through</strong> — From Downward Dog, bend the knees, engage Mula and Uddiyana Bandha. Swing both legs forward between the hands, cross-legged or straight through, and land seated without touching the floor.
+      </div>
+      <div class="info-rule"></div>
+      <div class="cue-box" style="background:rgba(184,135,46,0.08);border-left-color:#B8872E;">
+        <div class="cue-label" style="color:#B8872E;">Dandasana — Staff Pose</div>
+        <div class="cue-text">Land seated with both legs extended. Sit tall — spine vertical, crown lifting. Feet flexed, inner thighs pressing down, hands flat beside the hips. Gaze to the nose (Nasagrai Drishti). Take 5 steady Ujjayi breaths. This is the foundation for the seated sequence.</div>
+      </div>
+      <div class="cue-box">
+        <div class="cue-label">Teacher Cue — Markus</div>
+        <div class="cue-text">"After Ardha Baddha Padmottanasana, we move into Sun Salutation C — 18 vinyasa. This bridges us from standing all the way down to the floor. Meet me in Dandasana and we continue with the seated sequence."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 15 — ASANA 7: PASCHIMOTTANASANA (Markus) -->
+  <div class="slide" id="slide-15">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(14)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 7 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(16)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#C8622A;">Markus</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-paschimottanasana-nobg.png" alt="Paschimottanasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 7</div>
+        <div class="pose-sanskrit">Paschimottanasana</div>
+        <div class="pose-english">Seated Forward Fold</div>
+        <div class="pose-variants">Variations A · B · C</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li><strong>A</strong> — Index and middle fingers hook around big toes; elbows lift and widen on the exhale</li>
+          <li><strong>B</strong> — Hands hold the outer edges of the feet; chin moves toward shins</li>
+          <li><strong>C</strong> — Hands clasped around the feet; deep forward fold, chest to thighs</li>
+          <li>Begin from Dandasana; hinge forward from the hips, not the waist</li>
+          <li>Five breaths in each variation; gaze at the feet (Padhayoragrai Drishti)</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Markus</div>
+          <div class="cue-text">"Lead from the heart, not the head. On each exhale, allow the belly to soften toward the thighs. Let the breath be your teacher here."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 16 — ASANA 8: PURVATTANASANA (Markus) -->
+  <div class="slide" id="slide-16">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(15)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 8 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(17)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#C8622A;">Markus</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-purvattanasana-nobg.png" alt="Purvattanasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 8</div>
+        <div class="pose-sanskrit">Purvattanasana</div>
+        <div class="pose-english">Upward Plank / Reverse Tabletop Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>From Dandasana — hands behind hips, fingers pointing forward</li>
+          <li>On inhale, press into the hands and feet, lift the hips to the sky</li>
+          <li>Point the toes; feet together or hip-width apart</li>
+          <li>Head can release back gently if the neck is comfortable</li>
+          <li>Engage the glutes and core; avoid collapsing into the lower back</li>
+          <li>Five breaths; gaze at the third eye (Broomadhye Drishti)</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Markus</div>
+          <div class="cue-text">"This is the counter-pose to Paschimottanasana. Open the front body. Feel the chest expand and the heart lift toward the sky."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 17 — ASANA 9: URDHVA DHANURASANA (Thanusha) -->
+  <div class="slide" id="slide-17">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(16)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 9 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(18)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#5C7A3E;">Thanusha</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-urdhva-dhanurasana-nobg.png" alt="Urdhva Dhanurasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 9</div>
+        <div class="pose-sanskrit">Urdhva Dhanurasana</div>
+        <div class="pose-english">Upward Bow / Wheel Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>Lie on the back — feet hip-width, knees above ankles</li>
+          <li>Hands beside the ears, fingers pointing toward the shoulders</li>
+          <li>First press up onto the crown; then fully straighten the arms</li>
+          <li>Press the feet firmly down; inner thighs parallel</li>
+          <li>Three rounds; rest in Bridge or Knees-to-Chest between rounds</li>
+        </ul>
+        <div class="cue-box" style="background:rgba(92,122,62,0.08);border-left-color:#5C7A3E;"><div class="cue-label" style="color:#5C7A3E;">Counter Pose — Paschimattanasana</div><div class="cue-text">Follow immediately with a seated forward fold — 8–10 slow breaths. Allow the spine to decompress and release after the back-bend. Soften the belly; breathe into the back body.</div></div>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Thanusha</div>
+          <div class="cue-text">"A full back-bend — prepare the body with care. Wheel or Bridge are both valid. After each round, come down slowly and draw the knees to the chest."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 18 — COUNTER-POSE: PASCHIMATTANASANA (Thanusha) -->
+  <div class="slide" id="slide-18">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(17)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Counter-Pose</div></div>
+      <button class="nav-btn primary" onclick="goTo(19)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#5C7A3E;">Thanusha</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-paschimottanasana-nobg.png" alt="Paschimattanasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num" style="color:#5C7A3E;">Counter-Pose</div>
+        <div class="pose-sanskrit">Paścimattānāsana</div>
+        <div class="pose-english">Seated Forward Fold</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>From lying down — sit up into Dandasana; legs extended, spine tall</li>
+          <li>Inhale: lengthen the spine; exhale: fold forward from the hips</li>
+          <li>Hold the big toes, outer feet, or place hands on the shins</li>
+          <li>Allow the spine to round naturally; release the back of the neck</li>
+          <li>Breathe deeply into the back body — 8 to 10 slow Ujjayi breaths</li>
+          <li>Each exhale: soften the belly and release a little deeper</li>
+        </ul>
+        <div class="cue-box" style="background:rgba(92,122,62,0.08);border-left-color:#5C7A3E;">
+          <div class="cue-label" style="color:#5C7A3E;">Teacher Cue — Thanusha</div>
+          <div class="cue-text">"After the intensity of Urdhva Dhanurasana the spine needs to decompress. Don't rush — let the body melt forward with each exhale. This is not a stretch; it is a surrender. Stay for a full 8–10 breaths before we continue."</div>
+        </div>
+        <div class="cue-box">
+          <div class="cue-label">Notes</div>
+          <div class="cue-text">Paschimattanasana is the prescribed counter-pose in Ashtanga Vinyasa after any deep back-bend. It neutralises the lumbar spine and calms the nervous system before continuing to the closing sequence.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 19 — ASANA 10: SALAMBA SARVANGASANA (Ammo) -->
+  <div class="slide" id="slide-19">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(18)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 10 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(20)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#2A6B8C;">Ammo</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-halasana-nobg.png" alt="Salamba Sarvangasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 10</div>
+        <div class="pose-sanskrit">Salamba Sarvangasana</div>
+        <div class="pose-english">Supported Shoulderstand</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>From lying down — roll the legs overhead and support the back with both hands</li>
+          <li>Elbows shoulder-width on the mat; hands spread wide on the back</li>
+          <li>Body is vertical — hips stacked over shoulders, feet over hips</li>
+          <li>Chin presses gently into the chest (Jalandhara Bandha)</li>
+          <li>Gaze at the big toes; hold for 10–25 breaths</li>
+          <li>Never turn the head while in this pose</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Ammo</div>
+          <div class="cue-text">"Walk the hands toward the shoulder blades for more support. Engage Mula and Uddiyana Bandha. Feel the cooling, calming effect of the inversion."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 19 — ASANA 11: HALASANA (Ammo) -->
+  <div class="slide" id="slide-20">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(19)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 11 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(21)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-ammo.png" class="avatar-img avatar-ammo" alt="Ammo" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#2A6B8C;">Ammo</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-halasana2-nobg.png" alt="Halasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 11</div>
+        <div class="pose-sanskrit">Halasana</div>
+        <div class="pose-english">Plough Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>From Sarvangasana — lower the feet to the floor overhead</li>
+          <li>Legs straight; toes flex toward the floor if they don't reach</li>
+          <li>Interlace the fingers on the mat behind the back; roll the shoulders under</li>
+          <li>Continue the chin-lock; gaze at the navel (Nabi Drishti)</li>
+          <li>Hold for 8–10 breaths; breathe into the back body</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Ammo</div>
+          <div class="cue-text">"Keep the back of the neck long — do not press the chin aggressively. Halasana stretches the entire posterior chain. Breathe slowly and deeply."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 20 — ASANA 12: KARNAPIDASANA (Markus) -->
+  <div class="slide" id="slide-21">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(20)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 12 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(22)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#C8622A;">Markus</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-karnapidasana-nobg.png" alt="Karnapidasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 12</div>
+        <div class="pose-sanskrit">Karnapidasana</div>
+        <div class="pose-english">Ear Pressure Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>From Halasana — bend the knees and lower them toward the ears</li>
+          <li>Knees press gently against or beside the ears</li>
+          <li>Arms can remain interlaced on the floor or wrap around the knees</li>
+          <li>The body forms a tight, compact shape — chin toward chest</li>
+          <li>Gaze at the navel; hold for 8 breaths</li>
+          <li>Stimulates the parasympathetic nervous system — deeply inward</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Markus</div>
+          <div class="cue-text">"Allow the external world to go quiet. Ears covered, breath slow, body folded. Just listen to your own heartbeat."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 21 — ASANA 13: URDHVA PADMASANA (Markus) -->
+  <div class="slide" id="slide-22">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(21)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 13 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(23)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#C8622A;">Markus</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-urdhva-padmasana-nobg.png" alt="Urdhva Padmasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 13</div>
+        <div class="pose-sanskrit">Urdhva Padmasana</div>
+        <div class="pose-english">Upward Lotus Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>From Sarvangasana — cross the legs into Padmasana (full lotus) while inverted</li>
+          <li>Hands support the knees or hold the lotus from below</li>
+          <li>Keep the spine vertical and the hips over the shoulders</li>
+          <li>Gaze at the big toes or close the eyes</li>
+          <li>Hold for 8–10 breaths; then slowly lower down</li>
+          <li>If lotus is unavailable, keep legs straight or use half-lotus</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Markus</div>
+          <div class="cue-text">"Bring the lotus into the sky. Take your time coming down — roll the spine slowly, vertebra by vertebra."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 22 — ASANA 14: MATSYASANA (Thanusha) -->
+  <div class="slide" id="slide-23">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(22)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 14 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(24)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#5C7A3E;">Thanusha</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-matsyasana-nobg.png" alt="Matsyasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 14</div>
+        <div class="pose-sanskrit">Matsyasana</div>
+        <div class="pose-english">Fish Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>Lie on the back — legs extended, hands tucked under the hips, palms down</li>
+          <li>Press the elbows into the mat and arch the upper back</li>
+          <li>Crown of the head rests lightly on the floor; chest lifts high</li>
+          <li>Legs are active — feet together, toes pointing</li>
+          <li>Gaze at the third eye; hold for 5–8 breaths</li>
+          <li>Counter-pose to Sarvangasana and Halasana — opens the throat and chest</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Thanusha</div>
+          <div class="cue-text">"The weight is on the elbows, not the head. Lift the chest as high as you can. Breathe into the front of the throat — this is the counter to the inversions."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 23 — ASANA 15: UTTANA PADASANA (Thanusha) -->
+  <div class="slide" id="slide-24">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(23)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Asana 15 of 15</div></div>
+      <button class="nav-btn primary" onclick="goTo(25)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-thanu.png" class="avatar-img avatar-thanu" alt="Thanusha" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#5C7A3E;">Thanusha</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-uttana-padasana-nobg.png" alt="Uttana Padasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num">Asana 15</div>
+        <div class="pose-sanskrit">Uttana Padasana</div>
+        <div class="pose-english">Raised Leg Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>From Matsyasana — keep the upper back arched and chest lifted</li>
+          <li>Raise both legs to approximately 45° from the floor</li>
+          <li>Arms extend alongside the legs, pointing toward the feet</li>
+          <li>Lower back stays connected to the mat; core engaged</li>
+          <li>Gaze at the toes; hold for 5–8 breaths</li>
+          <li>Release slowly — lower the legs and head together on an exhale</li>
+        </ul>
+        <div class="cue-box">
+          <div class="cue-label">Teacher Cue — Thanusha</div>
+          <div class="cue-text">"Keep the chest open and the back arched as you raise the legs. This is a powerful core and chest opener combined. Breathe fully into the ribcage."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 25 — ŚAVĀSANA (Markus) -->
+  <div class="slide" id="slide-25">
+    <nav class="slide-nav">
+      <button class="nav-btn" onclick="goTo(24)">← Back</button>
+      <div class="nav-center"><div class="nav-slide-num">Closing</div></div>
+      <button class="nav-btn primary" onclick="goTo(26)">Next →</button>
+    </nav>
+    <div class="slide-body">
+      <div class="panel-left" style="background:#F7F4F0;overflow:hidden;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;width:100%;justify-content:center;">
+          <img src="avatar-markus.png" class="avatar-img avatar-markus" alt="Markus" style="width:52px;height:52px;" />
+          <span style="font-family:Georgia,serif;font-size:13px;font-weight:bold;color:#C8622A;">Markus</span>
+        </div>
+        <div style="width:100%;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          <img src="pose-savasana-nobg.png" alt="Shavasana" style="max-width:100%;max-height:480px;object-fit:contain;display:block;" />
+        </div>
+      </div>
+      <div class="panel-right">
+        <div class="pose-num" style="color:#C8622A;">Closing</div>
+        <div class="pose-sanskrit">Śavāsana</div>
+        <div class="pose-english">Corpse Pose</div>
+        <div class="pose-rule"></div>
+        <ul class="tips-list">
+          <li>Come to lie flat on your back; feet hip-width, let them fall open</li>
+          <li>Arms rest slightly away from the body, palms facing up</li>
+          <li>Close the eyes; release all effort — breath becomes natural</li>
+          <li>Body completely still; allow the nervous system to integrate</li>
+          <li>Hold for 5–7 minutes — longer if the practice was intense</li>
+        </ul>
+        <div class="cue-box" style="background:rgba(200,98,42,0.08);border-left-color:#C8622A;">
+          <div class="cue-label" style="color:#C8622A;">Teacher Cue — Markus</div>
+          <div class="cue-text">"Come to lie on your back. Let the feet fall open, arms resting beside the body, palms facing up. Close the eyes. There is nothing to do. Simply be. Allow the body to fully absorb the practice."</div>
+        </div>
+        <div class="cue-box">
+          <div class="cue-label">Notes</div>
+          <div class="cue-text">Śavāsana is the most important posture of the practice. The integration that happens here is not optional — it is the harvest of everything that came before. Stay for a minimum of 5 minutes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 26 — CLOSING PRAYER: ASHTANGA MANTRA (Thanusha) -->
+  <div class="slide closing-slide" id="slide-26">
+    <img src="cover-photo.jpg" class="cover-bg" alt="" />
+    <div class="cover-gradient"></div>
+    <div class="section-label" style="z-index:2;position:relative;">Closing Prayer · Thanusha</div>
+    <div class="closing-mantra" style="font-size:16px;line-height:2;margin-top:4px;">
+      svasti prajābhyaḥ paripālayantāṁ<br>
+      nyāyena mārgeṇa mahīṁ mahīśāḥ<br>
+      gobrahmaṇebhyaḥ śubhamastu nityaṁ<br>
+      lokāḥ samastāḥ sukhino bhavantu
+    </div>
+    <div class="cover-rule" style="background:linear-gradient(to right,transparent,rgba(250,248,244,0.35),transparent);width:80px;margin:10px auto;"></div>
+    <div class="closing-mantra-translation">
+      May all people be well governed and protected.<br>
+      May rulers rule the earth on the path of righteousness.<br>
+      May there always be good fortune for all beings.<br>
+      May all beings everywhere be happy and free.
+    </div>
+    <nav style="display:flex;gap:12px;margin-top:16px;z-index:2;position:relative;">
+      <button class="nav-btn" onclick="goTo(25)" style="color:rgba(250,248,244,0.7);">← Back</button>
+      <button class="nav-btn primary" onclick="goTo(27)">OMs →</button>
+    </nav>
+  </div>
+
+  <!-- SLIDE 27 — CLOSING OMs + SHANTI (All Three) -->
+  <div class="slide closing-slide" id="slide-27">
+    <img src="cover-photo.jpg" class="cover-bg" alt="" />
+    <div class="cover-gradient"></div>
+    <div class="closing-om" style="font-size:36px;margin-bottom:0;">ॐ</div>
+    <div class="closing-title" style="font-size:22px;margin-top:4px;">Three Closing OMs</div>
+    <div class="closing-sub" style="margin-bottom:10px;">Each offering one OM · Hands in Añjali Mudrā</div>
+
+    <!-- Three instructors, each with their OM and closing line -->
+    <div style="z-index:2;position:relative;display:flex;align-items:flex-start;justify-content:center;gap:28px;margin:6px 0;flex-wrap:wrap;">
+
+      <!-- Ammo -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;max-width:160px;">
+        <img src="avatar-ammo.png" style="width:68px;height:68px;border-radius:50%;border:2px solid rgba(42,107,140,0.85);" alt="Ammo" />
+        <div style="font-family:Georgia,serif;font-size:13px;color:rgba(250,248,244,0.85);font-weight:bold;">Ammo</div>
+        <div style="font-family:Georgia,serif;font-size:26px;color:rgba(184,135,46,0.85);line-height:1;">ॐ</div>
+        <div style="font-family:Georgia,serif;font-size:12px;color:rgba(250,248,244,0.65);text-align:center;font-style:italic;line-height:1.5;">"Hari Om Ji — may your practice carry you forward."</div>
+      </div>
+
+      <!-- Thanusha -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;max-width:160px;">
+        <img src="avatar-thanu.png" style="width:68px;height:68px;border-radius:50%;border:2px solid rgba(92,122,62,0.85);" alt="Thanusha" />
+        <div style="font-family:Georgia,serif;font-size:13px;color:rgba(250,248,244,0.85);font-weight:bold;">Thanusha</div>
+        <div style="font-family:Georgia,serif;font-size:26px;color:rgba(184,135,46,0.85);line-height:1;">ॐ</div>
+        <div style="font-family:Georgia,serif;font-size:12px;color:rgba(250,248,244,0.65);text-align:center;font-style:italic;line-height:1.5;">"Lokāḥ samastāḥ sukhino bhavantu — Namaste."</div>
+      </div>
+
+      <!-- Markus -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;max-width:160px;">
+        <img src="avatar-markus.png" style="width:68px;height:68px;border-radius:50%;border:2px solid rgba(200,98,42,0.85);" alt="Markus" />
+        <div style="font-family:Georgia,serif;font-size:13px;color:rgba(250,248,244,0.85);font-weight:bold;">Markus</div>
+        <div style="font-family:Georgia,serif;font-size:26px;color:rgba(184,135,46,0.85);line-height:1;">ॐ</div>
+        <div style="font-family:Georgia,serif;font-size:12px;color:rgba(250,248,244,0.65);text-align:center;font-style:italic;line-height:1.5;">"The light in me honours the light in you. Namaste."</div>
+      </div>
+
+    </div>
+
+    <!-- 3 Shantis -->
+    <div style="z-index:2;position:relative;margin-top:12px;text-align:center;">
+      <div style="font-family:Georgia,serif;font-size:19px;color:rgba(184,135,46,0.9);letter-spacing:0.06em;line-height:2;">
+        śāntiḥ &nbsp;·&nbsp; śāntiḥ &nbsp;·&nbsp; śāntiḥ
+      </div>
+      <div style="font-family:Georgia,serif;font-size:11px;color:rgba(250,248,244,0.45);font-style:italic;margin-top:2px;letter-spacing:0.04em;">
+        Peace in body · Peace in mind · Peace in spirit
+      </div>
+    </div>
+
+    <nav style="display:flex;gap:12px;margin-top:12px;z-index:2;position:relative;">
+      <button class="nav-btn" onclick="goTo(26)" style="color:rgba(250,248,244,0.7);">← Back</button>
+      <button class="nav-btn" onclick="goTo(0)" style="color:rgba(250,248,244,0.7);">⌂ Home</button>
+    </nav>
+  </div>
+
+</div><!-- /.deck -->
+
+<script>
+  const TOTAL = 28; // slides 0–27
+  let current = 0;
+
+  function goTo(n) {
+    if (n < 0 || n >= TOTAL) return;
+    const slides = document.querySelectorAll('.slide');
+    slides.forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('slide-' + n);
+    if (target) {
+      target.classList.add('active');
+      current = n;
+      updateProgress();
+      window.scrollTo(0, 0);
+    }
+  }
+
+  function updateProgress() {
+    const pct = (current / (TOTAL - 1)) * 100;
+    const bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = pct + '%';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(current - 1);
+  });
+
+  updateProgress();
+</script>
+</body>
+</html>
