@@ -551,6 +551,127 @@
       text-transform: uppercase;
     }
 
+    /* ── INTRO SLIDE (Hero & Threads) ── */
+    .intro-wrap {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 0;
+      overflow: hidden;
+    }
+    .wb-col {
+      padding: 28px 32px 28px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: rgba(184,135,46,0.035);
+      border-right: 1px solid var(--rule);
+    }
+    .wb-label {
+      font-family: Georgia, serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .wb-block {
+      background: #2C1A08;
+      color: #F4E9D4;
+      padding: 22px 24px;
+      border-radius: 4px;
+      font-family: 'Courier New', ui-monospace, monospace;
+      line-height: 1.55;
+      font-size: clamp(11px, 1vw, 13.5px);
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      position: relative;
+    }
+    .wb-block::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border: 1px dashed rgba(244,233,212,0.15);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .wb-h {
+      color: #E8A860;
+      letter-spacing: 2.5px;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      display: block;
+      margin-top: 10px;
+    }
+    .wb-h:first-child { margin-top: 0; }
+    .wb-line { display: block; }
+    .wb-line.hero { font-size: 120%; color: #F4E9D4; margin: 4px 0 2px; }
+    .wb-line.hero-en { color: #D6B080; font-style: italic; margin-bottom: 6px; }
+    .wb-line.ci { color: #D6B080; margin: 4px 0; }
+    .wb-line.thread { margin: 2px 0; padding-left: 2px; }
+    .wb-line.thread .wb-num { color: #E8A860; margin-right: 6px; }
+    .wb-line.sthira { color: #D6B080; font-style: italic; font-size: 92%; padding-left: 22px; }
+
+    .cues-col {
+      padding: 28px 44px 28px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow-y: auto;
+    }
+    .cues-title {
+      font-family: Georgia, serif;
+      font-size: clamp(20px, 2.2vw, 28px);
+      color: var(--saffron);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .cues-sub {
+      font-family: Georgia, serif;
+      font-size: 10.5px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .cue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .cue-item {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+    .cue-num {
+      font-family: Georgia, serif;
+      font-size: 18px;
+      color: var(--gold);
+      text-align: center;
+      padding-top: 2px;
+      border-right: 1px solid var(--rule);
+      padding-right: 8px;
+    }
+    .cue-body {
+      font-family: Georgia, serif;
+      color: var(--text);
+    }
+    .cue-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--saffron);
+      margin-bottom: 4px;
+    }
+    .cue-text {
+      font-size: clamp(11px, 1vw, 13px);
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .cue-text em { font-style: italic; color: var(--muted); }
+
     /* BOTTOM NAV */
     .bot-bar {
       flex-shrink: 0;
@@ -678,6 +799,26 @@
       }
       .map-total { font-size: 10px; }
 
+      /* Intro slide on mobile */
+      .intro-wrap {
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+        flex: none;
+      }
+      .wb-col {
+        padding: 18px 18px 14px;
+        border-right: none;
+        border-bottom: 1px solid var(--rule);
+      }
+      .wb-block { padding: 16px 16px; font-size: 11.5px; }
+      .cues-col { padding: 18px 18px 36px; overflow: visible; }
+      .cues-title { font-size: clamp(20px, 6vw, 26px); }
+      .cues-sub { font-size: 9.5px; margin-bottom: 14px; }
+      .cue-item { grid-template-columns: 26px 1fr; gap: 8px; }
+      .cue-num { font-size: 15px; padding-right: 6px; }
+      .cue-text { font-size: 12px; }
+
       .sanskrit { font-size: clamp(20px, 5.5vw, 28px); margin-top: 4px; }
       .english  { font-size: 11px; letter-spacing: 3px; }
       .cue      { font-size: 13px; padding: 10px 12px; }
@@ -793,13 +934,95 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">1 / 21</span>
+    <span class="slide-count">1 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
-<!-- 2 · Welcome & Yogena Chittasya -->
+<!-- 2 · Hero & Threads (whiteboard intro) -->
 <div class="slide" id="slide-2">
+  <div class="top-bar">
+    <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Introduction · Whiteboard</span></div>
+    <div class="top-right">Today's Hero &amp; How We'll Open</div>
+  </div>
+  <div class="intro-wrap">
+    <div class="wb-col">
+      <div class="wb-label">On the whiteboard</div>
+      <div class="wb-block">
+        <span class="wb-h">Today's Hero</span>
+        <span class="wb-line hero">Setu Bandha Sarvangāsana</span>
+        <span class="wb-line hero-en">Bridge Pose</span>
+
+        <span class="wb-h">Contraindications</span>
+        <span class="wb-line ci">neck · lower back · shoulders</span>
+        <span class="wb-line ci">pregnancy · high BP</span>
+
+        <span class="wb-h">Threads</span>
+        <span class="wb-line thread"><span class="wb-num">1.</span>Foundation → Lift</span>
+        <span class="wb-line thread"><span class="wb-num">2.</span>Breath as the teacher</span>
+        <span class="wb-line thread"><span class="wb-num">3.</span>Pūrva ↔ Paścima</span>
+        <span class="wb-line thread"><span class="wb-num">4.</span>Sthira sukham āsanam</span>
+        <span class="wb-line sthira">steady · comfortable</span>
+      </div>
+    </div>
+    <div class="cues-col">
+      <div class="cues-title">Opening Narrative</div>
+      <div class="cues-sub">Verbal Cues · In Build-Up Order</div>
+      <div class="cue-list">
+        <div class="cue-item">
+          <div class="cue-num">1</div>
+          <div class="cue-body">
+            <div class="cue-label">Welcome · frame the hour</div>
+            <div class="cue-text">"Today we'll move through a 65-minute Hatha practice that builds toward one peak pose — Setu Bandha Sarvangāsana, Bridge."</div>
+          </div>
+        </div>
+        <div class="cue-item">
+          <div class="cue-num">2</div>
+          <div class="cue-body">
+            <div class="cue-label">Name the hero</div>
+            <div class="cue-text">"<em>Setu</em> means bridge, <em>bandha</em> means lock. Everything we do today is construction — warming, opening, integrating — so the bridge can rise with ease."</div>
+          </div>
+        </div>
+        <div class="cue-item">
+          <div class="cue-num">3</div>
+          <div class="cue-body">
+            <div class="cue-label">Offer the safety net</div>
+            <div class="cue-text">"If you have a neck, lower-back, or shoulder concern — or if you're pregnant or managing blood pressure — catch my eye. We'll modify together. No pose is worth forcing."</div>
+          </div>
+        </div>
+        <div class="cue-item">
+          <div class="cue-num">4</div>
+          <div class="cue-body">
+            <div class="cue-label">Thread · Foundation → Lift</div>
+            <div class="cue-text">"Every pose today begins by rooting down. Before you rise, press into what's beneath you — feet, seat, or hands. Lift is the response to grounding, never a substitute for it."</div>
+          </div>
+        </div>
+        <div class="cue-item">
+          <div class="cue-num">5</div>
+          <div class="cue-body">
+            <div class="cue-label">Threads · Breath &amp; Pūrva ↔ Paścima</div>
+            <div class="cue-text">"Let the breath lead, not the count. And notice the dialogue we're building — we'll warm <em>Paścima</em>, the back body, first. Then we'll open <em>Pūrva</em>, the front body, toward Bridge. Front and back in conversation."</div>
+          </div>
+        </div>
+        <div class="cue-item">
+          <div class="cue-num">6</div>
+          <div class="cue-body">
+            <div class="cue-label">Close the intro · Sthira sukham āsanam</div>
+            <div class="cue-text">"Patañjali gives us two words for asana: <em>sthira</em> — steady — and <em>sukham</em> — comfortable. If the face tightens, you've gone too far. Find the edge. Don't cross it. Let's begin."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-bar">
+    <button class="nav-btn" onclick="prev()">← Back</button>
+    <span class="slide-count">2 / 22</span>
+    <button class="nav-btn" onclick="next()">Next →</button>
+  </div>
+</div>
+
+<!-- 3 · Welcome & Yogena Chittasya -->
+<div class="slide" id="slide-3">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 1 of 20</span></div>
     <div class="top-right">Opening</div>
@@ -842,13 +1065,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()" disabled>← Back</button>
-    <span class="slide-count">2 / 21</span>
+    <span class="slide-count">3 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 2 · Ujjayi Pranayama -->
-<div class="slide" id="slide-3">
+<div class="slide" id="slide-4">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 2 of 20</span></div>
     <div class="top-right">Pranayama</div>
@@ -877,13 +1100,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">3 / 21</span>
+    <span class="slide-count">4 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 3 · Joint Warm-Up -->
-<div class="slide" id="slide-4">
+<div class="slide" id="slide-5">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 3 of 20</span></div>
     <div class="top-right">Warm-Up</div>
@@ -913,13 +1136,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">4 / 21</span>
+    <span class="slide-count">5 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 4 · Surya Namaskar Demo -->
-<div class="slide" id="slide-5">
+<div class="slide" id="slide-6">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 4 of 20</span></div>
     <div class="top-right">Demo</div>
@@ -961,13 +1184,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">5 / 21</span>
+    <span class="slide-count">6 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 5 · Surya Namaskar Practice -->
-<div class="slide" id="slide-6">
+<div class="slide" id="slide-7">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 5 of 20</span></div>
     <div class="top-right">Practice</div>
@@ -1001,13 +1224,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">6 / 21</span>
+    <span class="slide-count">7 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 6 · Cat-Cow -->
-<div class="slide" id="slide-7">
+<div class="slide" id="slide-8">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 6 of 20</span></div>
     <div class="top-right">Spine</div>
@@ -1037,13 +1260,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">7 / 21</span>
+    <span class="slide-count">8 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 7 · Parsva Balasana -->
-<div class="slide" id="slide-8">
+<div class="slide" id="slide-9">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 7 of 20</span></div>
     <div class="top-right">Thoracic Open</div>
@@ -1074,13 +1297,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">8 / 21</span>
+    <span class="slide-count">9 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 8 · Down Dog -->
-<div class="slide" id="slide-9">
+<div class="slide" id="slide-10">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 8 of 20</span></div>
     <div class="top-right">Down Dog</div>
@@ -1110,13 +1333,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">9 / 21</span>
+    <span class="slide-count">10 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 9 · Anjaneyasana -->
-<div class="slide" id="slide-10">
+<div class="slide" id="slide-11">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 9 of 20</span></div>
     <div class="top-right">Low Lunge</div>
@@ -1146,13 +1369,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">10 / 21</span>
+    <span class="slide-count">11 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 10 · Salabhasana -->
-<div class="slide" id="slide-11">
+<div class="slide" id="slide-12">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 10 of 20</span></div>
     <div class="top-right">Locust</div>
@@ -1182,13 +1405,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">11 / 21</span>
+    <span class="slide-count">12 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 11 · Bhujangasana -->
-<div class="slide" id="slide-12">
+<div class="slide" id="slide-13">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 11 of 20</span></div>
     <div class="top-right">Cobra</div>
@@ -1218,13 +1441,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">12 / 21</span>
+    <span class="slide-count">13 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 12 · Warrior I → Pyramid -->
-<div class="slide" id="slide-13">
+<div class="slide" id="slide-14">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 12 of 20</span></div>
     <div class="top-right">Standing Pair</div>
@@ -1259,13 +1482,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">13 / 21</span>
+    <span class="slide-count">14 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 13 · Utkatasana -->
-<div class="slide" id="slide-14">
+<div class="slide" id="slide-15">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 13 of 20</span></div>
     <div class="top-right">Chair</div>
@@ -1295,13 +1518,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">14 / 21</span>
+    <span class="slide-count">15 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 14 · Eka Pada Bridge Prep -->
-<div class="slide" id="slide-15">
+<div class="slide" id="slide-16">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 14 of 20</span></div>
     <div class="top-right">Bridge Prep</div>
@@ -1331,13 +1554,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">15 / 21</span>
+    <span class="slide-count">16 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 15 · Setu Bandha Sarvangasana (PEAK) -->
-<div class="slide" id="slide-16">
+<div class="slide" id="slide-17">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 15 of 20 · Peak</span></div>
     <div class="top-right">Bridge</div>
@@ -1374,13 +1597,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">16 / 21</span>
+    <span class="slide-count">17 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 16 · Apanasana -->
-<div class="slide" id="slide-17">
+<div class="slide" id="slide-18">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 16 of 20</span></div>
     <div class="top-right">Release</div>
@@ -1409,13 +1632,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">17 / 21</span>
+    <span class="slide-count">18 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 17 · Supta Matsyendrasana -->
-<div class="slide" id="slide-18">
+<div class="slide" id="slide-19">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 17 of 20</span></div>
     <div class="top-right">Twist</div>
@@ -1444,13 +1667,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">18 / 21</span>
+    <span class="slide-count">19 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 18 · Supta Baddha Konasana -->
-<div class="slide" id="slide-19">
+<div class="slide" id="slide-20">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 18 of 20</span></div>
     <div class="top-right">Open</div>
@@ -1480,13 +1703,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">19 / 21</span>
+    <span class="slide-count">20 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 19 · Shavasana -->
-<div class="slide" id="slide-20">
+<div class="slide" id="slide-21">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 19 of 20</span></div>
     <div class="top-right">Rest</div>
@@ -1520,13 +1743,13 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">20 / 21</span>
+    <span class="slide-count">21 / 22</span>
     <button class="nav-btn" onclick="next()">Next →</button>
   </div>
 </div>
 
 <!-- 20 · Closing -->
-<div class="slide" id="slide-21">
+<div class="slide" id="slide-22">
   <div class="top-bar">
     <div class="top-left"><span class="top-om">ॐ</span><span class="top-label">Segment 20 of 20</span></div>
     <div class="top-right">Closing</div>
@@ -1568,7 +1791,7 @@
   </div>
   <div class="bot-bar">
     <button class="nav-btn" onclick="prev()">← Back</button>
-    <span class="slide-count">21 / 21</span>
+    <span class="slide-count">22 / 22</span>
     <div style="display:flex;gap:10px;align-items:center;">
       <button class="nav-btn nav-btn-ghost" onclick="goTo(0)" title="Return to home">⌂ Home</button>
       <button class="nav-btn" onclick="goTo(1)">⟳ Repeat</button>
@@ -1579,7 +1802,7 @@
 </div><!-- /deck -->
 
 <script>
-  const TOTAL = 21;
+  const TOTAL = 22;
   let current = 0;
 
   function goTo(n) {
