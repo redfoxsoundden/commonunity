@@ -14,7 +14,7 @@ export async function seedDatabase() {
     {
       id: "TF-PW-ROOT", name: "Planetware Root", type: "fork", weighting: "weighted",
       frequency: 194.18, lineage: "Planetware", imageFilename: "TF-PW-ROOT_main.png",
-      audioFilename: "TF-PW-ROOT_audio.wav",
+      audioFilename: "TF-PW-ROOT.mp3",
       masterExplainer: "Earth Day frequency fork for root chakra activation — dynamic, vitalizing, and grounding.",
       healingBenefits: JSON.stringify(["grounding","nervous-system-support","circulation-support","energetic-clearing","relaxation"]),
       sessionRole: JSON.stringify(["opener","body-anchor","stabilizer"]),
@@ -29,7 +29,7 @@ export async function seedDatabase() {
     {
       id: "TF-PW-SACRAL", name: "Planetware Sacral", type: "fork", weighting: "weighted",
       frequency: 210.42, lineage: "Planetware", imageFilename: "TF-PW-SACRAL_main.png",
-      audioFilename: "TF-PW-SACRAL_audio.wav",
+      audioFilename: "TF-PW-SACRAL.mp3",
       masterExplainer: "Synodic Moon frequency for sacral chakra — supports creative flow, emotional balance, and glandular regulation.",
       healingBenefits: JSON.stringify(["emotional-clearing","circulation-support","lymphatic-support","relaxation","integration"]),
       sessionRole: JSON.stringify(["body-anchor","bridge-tone","integrator"]),
@@ -44,7 +44,7 @@ export async function seedDatabase() {
     {
       id: "TF-PW-SOLAR", name: "Planetware Solar Plexus", type: "fork", weighting: "weighted",
       frequency: 126.22, lineage: "Planetware", imageFilename: "TF-PW-SOLAR_main.png",
-      audioFilename: "TF-PW-SOLAR_audio.wav",
+      audioFilename: "TF-PW-SOLAR.mp3",
       masterExplainer: "Sun Tone frequency for solar plexus — centering, clarifying, with a transcendental quality.",
       healingBenefits: JSON.stringify(["focus","coherence","emotional-clearing","energetic-clearing","meditation-support"]),
       sessionRole: JSON.stringify(["body-anchor","fine-tuner","bridge-tone"]),
@@ -59,7 +59,7 @@ export async function seedDatabase() {
     {
       id: "TF-PW-HEART", name: "Planetware Heart (OM)", type: "fork", weighting: "weighted",
       frequency: 136.10, lineage: "Planetware", imageFilename: "TF-PW-HEART_main.png",
-      audioFilename: "TF-PW-HEART_audio.wav",
+      audioFilename: "TF-PW-HEART.mp3",
       masterExplainer: "Earth Year / OM frequency — the central heart tone used in opener/closer ceremonies. Relaxing, soothing, deeply balancing.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","relaxation","nervous-system-support","vagal-tone-support","meditation-support","integration"]),
       sessionRole: JSON.stringify(["opener","closer","body-anchor","integrator","stabilizer"]),
@@ -74,7 +74,7 @@ export async function seedDatabase() {
     {
       id: "TF-PW-THROAT", name: "Planetware Throat", type: "fork", weighting: "weighted",
       frequency: 141.27, lineage: "Planetware", imageFilename: "TF-PW-THROAT_main.png",
-      audioFilename: "TF-PW-THROAT_audio.wav",
+      audioFilename: "TF-PW-THROAT.mp3",
       masterExplainer: "Mercury frequency for throat chakra — supports communication, expression, and the intellectual-communicative principle.",
       healingBenefits: JSON.stringify(["expression-support","focus","coherence","energetic-clearing","meditation-support"]),
       sessionRole: JSON.stringify(["body-anchor","fine-tuner","bridge-tone"]),
@@ -89,7 +89,7 @@ export async function seedDatabase() {
     {
       id: "TF-PW-3RD", name: "Planetware Third Eye", type: "fork", weighting: "weighted",
       frequency: 221.23, lineage: "Planetware", imageFilename: "TF-PW-3RD_main.png",
-      audioFilename: "TF-PW-3RD_audio.wav",
+      audioFilename: "TF-PW-3RD.mp3",
       masterExplainer: "Venus frequency for third eye — aspiration toward higher love, harmony, and intuitive clarity.",
       healingBenefits: JSON.stringify(["intuitive-support","focus","coherence","meditation-support","emotional-clearing"]),
       sessionRole: JSON.stringify(["fine-tuner","halo-layer","bridge-tone","accent"]),
@@ -104,7 +104,7 @@ export async function seedDatabase() {
     {
       id: "TF-PW-CROWN", name: "Planetware Crown", type: "fork", weighting: "weighted",
       frequency: 172.06, lineage: "Planetware", imageFilename: "TF-PW-CROWN_main.png",
-      audioFilename: "TF-PW-CROWN_audio.wav",
+      audioFilename: "TF-PW-CROWN.mp3",
       masterExplainer: "Platonic Year frequency for crown chakra — cheerfulness, clarity of spirit, cosmic unity consciousness. Antidepressive.",
       healingBenefits: JSON.stringify(["coherence","meditation-support","integration","emotional-clearing","sleep-support","intuitive-support"]),
       sessionRole: JSON.stringify(["halo-layer","closer","integrator","accent"]),
@@ -120,7 +120,7 @@ export async function seedDatabase() {
     {
       id: "TF-OTTO-128", name: "Otto 128", type: "fork", weighting: "weighted",
       frequency: 128, lineage: "Independent / classic bodywork fork", imageFilename: "TF-OTTO-128_main.png",
-      audioFilename: "TF-OTTO-128_audio.wav",
+      audioFilename: "TF-OTTO-128.mp3",
       masterExplainer: "Weighted body fork used to settle the system through deep vibration, ease tension, and stimulate the parasympathetic response.",
       healingBenefits: JSON.stringify(["grounding","relaxation","tension-relief","pain-support","nervous-system-support","circulation-support","bone-tissue-support","vagal-tone-support"]),
       sessionRole: JSON.stringify(["opener","body-anchor","stabilizer","spot-treatment"]),
@@ -133,7 +133,7 @@ export async function seedDatabase() {
     {
       id: "TF-OM-136W", name: "OM 136.1 Weighted", type: "fork", weighting: "weighted",
       frequency: 136.10, lineage: "Independent / OM fork", imageFilename: "TF-OM-136W_main.png",
-      audioFilename: "TF-OM-136W_audio.wav",
+      audioFilename: "TF-OM-136W.mp3",
       masterExplainer: "Weighted aluminum OM fork at the Earth Year frequency — practitioner's personal fork for the opener/closer co-chanting ceremony.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","relaxation","nervous-system-support","vagal-tone-support","meditation-support","integration"]),
       sessionRole: JSON.stringify(["opener","closer","body-anchor","stabilizer","integrator"]),
@@ -148,7 +148,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SLIDER", name: "Sonic Slider", type: "fork", weighting: "weighted",
       frequency: 93.96, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SLIDER_main.png",
-      audioFilename: "TF-BT-SLIDER_audio.wav",
+      audioFilename: "TF-BT-SLIDER.mp3",
       masterExplainer: "Weighted Schumann-based body fork used to settle the system and bring coherent earth-pulse vibration into body and field.",
       healingBenefits: JSON.stringify(["grounding","nervous-system-support","relaxation","fascia-release","circulation-support","lymphatic-support","pain-support","energetic-clearing"]),
       sessionRole: JSON.stringify(["opener","body-anchor","stabilizer","bridge-tone","integrator"]),
@@ -162,7 +162,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SCHU-62", name: "Schumann 62 Hz", type: "fork", weighting: "weighted",
       frequency: 62.64, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SCHU-62_main.png",
-      audioFilename: "TF-BT-SCHU-62_audio.wav",
+      audioFilename: "TF-BT-SCHU-62.mp3",
       masterExplainer: "Deep Schumann resonance fork (×8) — profound grounding, field stabilization, and subconscious access.",
       healingBenefits: JSON.stringify(["grounding","relaxation","nervous-system-support","meditation-support","sleep-support","energetic-clearing"]),
       sessionRole: JSON.stringify(["opener","body-anchor","stabilizer","bridge-tone"]),
@@ -176,7 +176,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SCHU-54", name: "Schumann 54 Hz", type: "fork", weighting: "weighted",
       frequency: 54.81, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SCHU-54_main.png",
-      audioFilename: "TF-BT-SCHU-54_audio.wav",
+      audioFilename: "TF-BT-SCHU-54.mp3",
       masterExplainer: "Sub-bass Schumann fork (×7) — deepest grounding in the kit; access to ancestral and foundational field layers.",
       healingBenefits: JSON.stringify(["grounding","relaxation","nervous-system-support","meditation-support","sleep-support"]),
       sessionRole: JSON.stringify(["body-anchor","stabilizer","opener"]),
@@ -189,7 +189,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-FIB-144W", name: "Fibonacci 144 Weighted", type: "fork", weighting: "weighted",
       frequency: 144, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-144W_main.png",
-      audioFilename: "TF-BT-FIB-144W_audio.wav",
+      audioFilename: "TF-BT-FIB-144W.mp3",
       masterExplainer: "Weighted Fibonacci body fork — applies sacred-geometry resonance to the physical body for structural and energetic coherence.",
       healingBenefits: JSON.stringify(["coherence","integration","nervous-system-support","relaxation","bone-tissue-support","energetic-clearing"]),
       sessionRole: JSON.stringify(["body-anchor","fine-tuner","bridge-tone","integrator"]),
@@ -203,7 +203,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-FIB-89", name: "Fibonacci 89 Hz", type: "fork", weighting: "weighted",
       frequency: 89, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-89_main.png",
-      audioFilename: "TF-BT-FIB-89_audio.wav",
+      audioFilename: "TF-BT-FIB-89.mp3",
       masterExplainer: "Lower Fibonacci body fork — deep phi-ratio resonance for root and sacral zones, structural release, and nervous system bridging.",
       healingBenefits: JSON.stringify(["grounding","coherence","nervous-system-support","integration","fascia-release","relaxation"]),
       sessionRole: JSON.stringify(["body-anchor","bridge-tone","stabilizer"]),
@@ -215,7 +215,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-FIB-144U", name: "Fibonacci 144 Unweighted", type: "fork", weighting: "unweighted",
       frequency: 144, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-144U_main.png",
-      audioFilename: "TF-BT-FIB-144U_audio.wav",
+      audioFilename: "TF-BT-FIB-144U.mp3",
       masterExplainer: "Unweighted Fibonacci field fork — extends phi-ratio resonance into the biofield for scanning and spatial coherence work.",
       healingBenefits: JSON.stringify(["coherence","energetic-clearing","integration","nervous-system-support","intuitive-support"]),
       sessionRole: JSON.stringify(["field-scanner","fine-tuner","halo-layer","harmonic-support"]),
@@ -226,7 +226,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SOL-174", name: "Solfeggio 174 Hz", type: "fork", weighting: "unweighted",
       frequency: 174, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-174_main.png",
-      audioFilename: "TF-BT-SOL-174_audio.wav",
+      audioFilename: "TF-BT-SOL-174.mp3",
       masterExplainer: "The 'workhorse' of Biofield Tuning — primary unweighted field fork for full-field scanning, distortion detection, and energy combing.",
       healingBenefits: JSON.stringify(["energetic-clearing","pain-support","nervous-system-support","relaxation","grounding","fascia-release"]),
       sessionRole: JSON.stringify(["field-scanner","distortion-locator","opener","body-anchor","integrator"]),
@@ -239,7 +239,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SOL-417", name: "Solfeggio 417 Hz", type: "fork", weighting: "unweighted",
       frequency: 417, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-417_main.png",
-      audioFilename: "TF-BT-SOL-417_audio.wav",
+      audioFilename: "TF-BT-SOL-417.mp3",
       masterExplainer: "Solfeggio 'facilitating change' fork — used after 174 to refine resolved zones and dissolve stuck patterns.",
       healingBenefits: JSON.stringify(["energetic-clearing","emotional-clearing","integration","coherence","focus"]),
       sessionRole: JSON.stringify(["fine-tuner","integrator","bridge-tone","accent"]),
@@ -252,7 +252,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SOL-528", name: "Solfeggio 528 Hz", type: "fork", weighting: "unweighted",
       frequency: 528, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-528_main.png",
-      audioFilename: "TF-BT-SOL-528_audio.wav",
+      audioFilename: "TF-BT-SOL-528.mp3",
       masterExplainer: "The 'Love / Miracle / Repair' Solfeggio frequency — coherence, DNA resonance, and heart-field activation.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","integration","emotional-clearing","meditation-support","sleep-support"]),
       sessionRole: JSON.stringify(["fine-tuner","integrator","halo-layer","closer","accent"]),
@@ -264,7 +264,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-222", name: "BT 222 Hz", type: "fork", weighting: "unweighted",
       frequency: 222, lineage: "Biofield Tuning", imageFilename: "TF-BT-222_main.png",
-      audioFilename: "TF-BT-222_audio.wav",
+      audioFilename: "TF-BT-222.mp3",
       masterExplainer: "Unweighted Biofield Tuning field fork at 222 Hz — fine upper-field work, throat and third-eye zone resonance.",
       healingBenefits: JSON.stringify(["expression-support","intuitive-support","focus","coherence","energetic-clearing"]),
       sessionRole: JSON.stringify(["fine-tuner","field-scanner","halo-layer","accent"]),
@@ -276,7 +276,7 @@ export async function seedDatabase() {
     {
       id: "BOWL-111", name: "Singing Bowl 111 Hz", type: "bowl", weighting: "n/a",
       frequency: 111, lineage: "Independent", imageFilename: "BOWL-111_main.png",
-      audioFilename: "BOWL-111_audio.wav",
+      audioFilename: "BOWL-111.mp3",
       masterExplainer: "Deep 111 Hz bowl — sacred geometry frequency associated with neural coherence, theta-state access, and cellular regeneration.",
       healingBenefits: JSON.stringify(["nervous-system-support","meditation-support","sleep-support","relaxation","coherence","integration"]),
       sessionRole: JSON.stringify(["opener","body-anchor","spatial-wash","closer"]),
@@ -289,7 +289,7 @@ export async function seedDatabase() {
     {
       id: "BOWL-272", name: "Singing Bowl 272 Hz", type: "bowl", weighting: "n/a",
       frequency: 272, frequencyHarmonic: 771, lineage: "Independent", imageFilename: "BOWL-272_main.png",
-      audioFilename: "BOWL-272_audio.wav",
+      audioFilename: "BOWL-272.mp3",
       masterExplainer: "Mid-range bowl at 272 Hz with 771 Hz harmonic — solar plexus / throat zone bridge, clarity and expression support.",
       healingBenefits: JSON.stringify(["focus","expression-support","coherence","emotional-clearing","integration","relaxation"]),
       sessionRole: JSON.stringify(["body-anchor","bridge-tone","spatial-wash","harmonic-support"]),
@@ -300,7 +300,7 @@ export async function seedDatabase() {
     {
       id: "BOWL-385", name: "Singing Bowl 385 Hz", type: "bowl", weighting: "n/a",
       frequency: 385.5, frequencyHarmonic: 1087, lineage: "Independent", imageFilename: "BOWL-385_main.png",
-      audioFilename: "BOWL-385_audio.wav",
+      audioFilename: "BOWL-385.mp3",
       masterExplainer: "Heart-to-throat range bowl — warmth, expression, and opening themes in the mid-upper frequency range.",
       healingBenefits: JSON.stringify(["heart-opening","expression-support","coherence","emotional-clearing","relaxation","meditation-support"]),
       sessionRole: JSON.stringify(["bridge-tone","spatial-wash","harmonic-support","integrator"]),
@@ -312,7 +312,7 @@ export async function seedDatabase() {
     {
       id: "BOWL-429", name: "Singing Bowl 429 Hz", type: "bowl", weighting: "n/a",
       frequency: 429, frequencyHarmonic: 1176, lineage: "Independent", imageFilename: "BOWL-429_main.png",
-      audioFilename: "BOWL-429_audio.wav",
+      audioFilename: "BOWL-429.mp3",
       masterExplainer: "Upper mid-range bowl in the throat-third eye zone — clarity, communication, and refined intuitive support.",
       healingBenefits: JSON.stringify(["expression-support","intuitive-support","focus","coherence","emotional-clearing"]),
       sessionRole: JSON.stringify(["bridge-tone","fine-tuner","spatial-wash","harmonic-support"]),
@@ -323,7 +323,7 @@ export async function seedDatabase() {
     {
       id: "BOWL-528", name: "Singing Bowl 528 Hz", type: "bowl", weighting: "n/a",
       frequency: 528, lineage: "Independent", imageFilename: "BOWL-528_main.png",
-      audioFilename: "BOWL-528_audio.wav",
+      audioFilename: "BOWL-528.mp3",
       masterExplainer: "Love / Miracle bowl at 528 Hz — heart coherence, DNA resonance, deep restoration and transformation.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","integration","emotional-clearing","meditation-support","sleep-support","energetic-clearing"]),
       sessionRole: JSON.stringify(["bridge-tone","spatial-wash","closer","integrator","halo-layer"]),
@@ -336,7 +336,7 @@ export async function seedDatabase() {
     {
       id: "BELL-771", name: "Tibetan Bell 771 Hz", type: "bell", weighting: "n/a",
       frequency: 771, lineage: "Independent", imageFilename: "BELL-771_main.png",
-      audioFilename: "BELL-771_audio.wav",
+      audioFilename: "BELL-771.mp3",
       masterExplainer: "High-frequency Tibetan bell — sharp, clear tone for space clearing, transition signaling, and upper-field activation.",
       healingBenefits: JSON.stringify(["energetic-clearing","coherence","focus","integration","meditation-support","intuitive-support"]),
       sessionRole: JSON.stringify(["opener","closer","accent","halo-layer","integrator"]),
