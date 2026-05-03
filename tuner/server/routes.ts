@@ -2,6 +2,47 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { seedDatabase } from "./seed";
+import nodemailer from "nodemailer";
+
+const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL ?? "markus@jointidea.com";
+const SMTP_HOST = process.env.SMTP_HOST ?? "";
+const SMTP_PORT = parseInt(process.env.SMTP_PORT ?? "587");
+const SMTP_USER = process.env.SMTP_USER ?? "";
+const SMTP_PASS = process.env.SMTP_PASS ?? "";
+
+async function sendIntakeNotification(q: any) {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) return; // skip if not configured
+  try {
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST, port: SMTP_PORT, secure: SMTP_PORT === 465,
+      auth: { user: SMTP_USER, pass: SMTP_PASS },
+    });
+    const flags = (() => { try { return JSON.parse(q.contraindicationFlags ?? "[]"); } catch { return []; } })();
+    const flagLine = flags.length > 0 ? `⚠️ Flags: ${flags.join(", ")}` : "✅ No contraindication flags";
+    await transporter.sendMail({
+      from: `"CommonUnity Tuner" <${SMTP_USER}>`,
+      to: NOTIFY_EMAIL,
+      subject: `New intake: ${q.clientName ?? "Client"} — ${q.recommendedProtocolId ?? "protocol pending"}`,
+      text: [
+        `New remote intake received.`,
+        ``,
+        `Name: ${q.clientName ?? "—"}`,
+        `Date: ${q.sessionDate ?? "—"}`,
+        `Dominant quality: ${q.dominantDosha ?? "—"}`,
+        `Dominant center: ${q.dominantCenter ?? "—"}`,
+        `Recommended protocol: ${q.recommendedProtocolId ?? "—"}`,
+        `Comfort tier: ${q.recommendedComfortTier ?? "—"}`,
+        flagLine,
+        ``,
+        `Intention: ${q.intentionText ?? "not provided"}`,
+        ``,
+        `View in Tuner: https://ideal-trust-production-7782.up.railway.app/#/clients`,
+      ].join("\n"),
+    });
+  } catch (err) {
+    console.warn("Email notification failed:", err);
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Seed on startup
@@ -65,6 +106,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ─── QUESTIONNAIRE ────────────────────────────────────────────────────────────
+  app.get("/api/questionnaires", (_req, res) => {
+    res.json(storage.getAllQuestionnaires());
+  });
+
+  app.delete("/api/questionnaires/:id", (req, res) => {
+    storage.deleteQuestionnaire(Number(req.params.id));
+    res.json({ ok: true });
+  });
+
   app.get("/api/questionnaires/:id", (req, res) => {
     const item = storage.getQuestionnaireById(Number(req.params.id));
     if (!item) return res.status(404).json({ error: "Not found" });
@@ -133,7 +183,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       recommendedProtocolId: focusProtocol,
     };
 
-    res.json(storage.createQuestionnaire(data));
+    const saved = storage.createQuestionnaire(data);
+    // Fire-and-forget email for remote intake submissions
+    if (raw._source === "intake") {
+      sendIntakeNotification(saved);
+    }
+    res.json(saved);
   });
 
   // ─── SESSION LOGS ─────────────────────────────────────────────────────────────

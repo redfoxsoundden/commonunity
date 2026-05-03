@@ -40,9 +40,11 @@ export interface IStorage {
   createClient(data: InsertClientProfile): ClientProfile;
 
   // Questionnaire responses
+  getAllQuestionnaires(): QuestionnaireResponse[];
   getQuestionnairesByClient(clientId: number): QuestionnaireResponse[];
   getQuestionnaireById(id: number): QuestionnaireResponse | undefined;
   createQuestionnaire(data: InsertQuestionnaire): QuestionnaireResponse;
+  deleteQuestionnaire(id: number): void;
 
   // Protocol templates
   getAllProtocols(): ProtocolTemplate[];
@@ -116,6 +118,9 @@ export class DatabaseStorage implements IStorage {
     return db.insert(clientProfiles).values(data).returning().get() as ClientProfile;
   }
 
+  getAllQuestionnaires(): QuestionnaireResponse[] {
+    return db.select().from(questionnaireResponses).orderBy(desc(questionnaireResponses.id)).all();
+  }
   getQuestionnairesByClient(clientId: number): QuestionnaireResponse[] {
     return db.select().from(questionnaireResponses).where(eq(questionnaireResponses.clientId, clientId)).all();
   }
@@ -124,6 +129,9 @@ export class DatabaseStorage implements IStorage {
   }
   createQuestionnaire(data: InsertQuestionnaire): QuestionnaireResponse {
     return db.insert(questionnaireResponses).values(data).returning().get() as QuestionnaireResponse;
+  }
+  deleteQuestionnaire(id: number): void {
+    db.delete(questionnaireResponses).where(eq(questionnaireResponses.id, id)).run();
   }
 
   getAllProtocols(): ProtocolTemplate[] {

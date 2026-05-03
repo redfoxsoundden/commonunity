@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import {
   Music2, Brain, Activity, Leaf, Eye, ClipboardList,
   BookOpen, PlayCircle, PenLine, FlaskConical, Layers,
-  Info, BookMarked, ChevronLeft, ChevronRight, Menu, X
+  Info, BookMarked, ChevronLeft, ChevronRight, Menu, X, Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +26,8 @@ const NAV_GROUPS = [
   {
     label: "Session",
     items: [
-      { href: "/questionnaire", label: "Pre-Session Form", icon: ClipboardList },
+      { href: "/clients", label: "Client Profiles", icon: Users },
+      { href: "/questionnaire", label: "In-Person Form", icon: ClipboardList },
       { href: "/protocols", label: "Protocol Library", icon: BookOpen },
       { href: "/sessions", label: "Session Log", icon: PenLine },
     ]

@@ -1,0 +1,216 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { parseArr, DOSHA_LABELS } from "@/lib/utils";
+import {
+  AlertTriangle, CheckCircle, Trash2, ArrowRight,
+  Users, ClipboardList, Calendar
+} from "lucide-react";
+import type { QuestionnaireResponse } from "@shared/schema";
+import { useState } from "react";
+
+const DOSHA_COLORS: Record<string, string> = {
+  vata: "#a78bfa", pitta: "#f97316", kapha: "#34d399",
+};
+
+const SOURCE_LABELS: Record<string, { label: string; color: string }> = {
+  intake: { label: "Remote intake", color: "bg-sky-500/20 text-sky-300 border-sky-500/30" },
+  in_person: { label: "In-person", color: "bg-violet-500/20 text-violet-300 border-violet-500/30" },
+};
+
+export default function Clients() {
+  const qc = useQueryClient();
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+
+  const { data: profiles, isLoading } = useQuery<QuestionnaireResponse[]>({
+    queryKey: ["/api/questionnaires"],
+    queryFn: () => apiRequest("GET", "/api/questionnaires").then((r) => r.json()),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => apiRequest("DELETE", `/api/questionnaires/${id}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/questionnaires"] });
+      setConfirmDelete(null);
+    },
+  });
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+            <Users className="w-5 h-5 text-[var(--primary)]" />
+            Client Profiles
+          </h1>
+          <p className="text-sm text-[var(--muted)] mt-0.5">
+            All submitted intake forms — newest first. Click any entry to view the full session profile.
+          </p>
+        </div>
+        <Link href="/questionnaire">
+          <Button className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 shrink-0">
+            <ClipboardList className="w-4 h-4 mr-1.5" />
+            In-person form
+          </Button>
+        </Link>
+      </div>
+
+      {/* Remote intake link box */}
+      <div className="bg-[var(--card)] border border-white/10 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-[var(--muted)] uppercase tracking-wider mb-1">Remote intake link</p>
+          <p className="text-sm text-white font-mono truncate">
+            https://ideal-trust-production-7782.up.railway.app/intake
+          </p>
+          <p className="text-xs text-[var(--muted)] mt-1">
+            Share this with clients before their session. Submissions appear here automatically.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-white/20 text-[var(--muted)] shrink-0"
+          onClick={() => {
+            navigator.clipboard.writeText("https://ideal-trust-production-7782.up.railway.app/intake");
+          }}
+        >
+          Copy link
+        </Button>
+      </div>
+
+      {/* List */}
+      {isLoading ? (
+        <div className="space-y-3">
+          {[1,2,3].map(i => <Skeleton key={i} className="h-24" />)}
+        </div>
+      ) : !profiles || profiles.length === 0 ? (
+        <div className="bg-[var(--card)] border border-white/10 rounded-xl p-12 text-center space-y-3">
+          <ClipboardList className="w-10 h-10 text-[var(--muted)] mx-auto opacity-40" />
+          <p className="text-[var(--muted)] text-sm">No profiles yet.</p>
+          <p className="text-xs text-[var(--muted)] opacity-60">
+            Fill out an in-person form above, or share the remote intake link with a client.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {profiles.map((p) => {
+            const flags = parseArr(p.contraindicationFlags as unknown as string);
+            const doshaColor = DOSHA_COLORS[p.dominantDosha ?? ""] ?? "#6366f1";
+            const src = (p as any)._source as string | undefined;
+            const srcInfo = src ? SOURCE_LABELS[src] : null;
+
+            return (
+              <div
+                key={p.id}
+                className="bg-[var(--card)] border border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors"
+              >
+                <div className="flex items-start gap-4">
+                  {/* Left: main info */}
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-white truncate">
+                        {p.clientName ?? "Unnamed"}
+                      </span>
+                      {srcInfo && (
+                        <Badge className={`text-xs border ${srcInfo.color}`}>{srcInfo.label}</Badge>
+                      )}
+                      {flags.length > 0 ? (
+                        <span className="flex items-center gap-1 text-xs text-red-400">
+                          <AlertTriangle className="w-3 h-3" />
+                          {flags.length} flag{flags.length > 1 ? "s" : ""}
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-xs text-emerald-400">
+                          <CheckCircle className="w-3 h-3" />
+                          Clear
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-4 flex-wrap text-xs text-[var(--muted)]">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {p.sessionDate ?? "—"}
+                      </span>
+                      {p.dominantDosha && (
+                        <span className="flex items-center gap-1.5">
+                          <span
+                            className="w-2 h-2 rounded-full inline-block"
+                            style={{ background: doshaColor }}
+                          />
+                          <span style={{ color: doshaColor }} className="capitalize">
+                            {p.dominantDosha}
+                          </span>
+                        </span>
+                      )}
+                      {p.dominantCenter && (
+                        <span className="capitalize">{p.dominantCenter} center</span>
+                      )}
+                      {p.recommendedProtocolId && (
+                        <span className="font-mono text-[var(--primary)]">{p.recommendedProtocolId}</span>
+                      )}
+                    </div>
+
+                    {p.intentionText && (
+                      <p className="text-xs text-[var(--muted)] italic truncate">
+                        "{p.intentionText}"
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Right: actions */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Link href={`/questionnaire/result/${p.id}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-white/20 text-[var(--muted)] hover:text-white"
+                      >
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Button>
+                    </Link>
+
+                    {confirmDelete === p.id ? (
+                      <div className="flex items-center gap-1.5">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="text-xs px-2 h-7"
+                          onClick={() => deleteMutation.mutate(p.id)}
+                          disabled={deleteMutation.isPending}
+                        >
+                          Confirm
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs px-2 h-7 border-white/20 text-[var(--muted)]"
+                          onClick={() => setConfirmDelete(null)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-[var(--muted)] hover:text-red-400 hover:bg-red-500/10"
+                        onClick={() => setConfirmDelete(p.id)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

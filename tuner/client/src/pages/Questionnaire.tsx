@@ -133,7 +133,7 @@ export default function Questionnaire() {
       return res.json();
     },
     onSuccess: (result) => {
-      navigate(`/questionnaire/result/${result.id}`);
+      navigate(`/clients`);
     },
     onError: () => {
       toast({ title: "Submission error", description: "Please check your answers and try again.", variant: "destructive" });
@@ -154,10 +154,9 @@ export default function Questionnaire() {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-xl font-bold text-white">Pre-Session Questionnaire</h1>
+        <h1 className="text-xl font-bold text-white">In-Person Form</h1>
         <p className="text-sm text-[var(--muted)]">
-          Complete all 8 sections before your sound healing session. The system will generate a personalised
-          session profile, contraindication flags, and protocol recommendation.
+          Complete together with your client. The system generates a session profile, flags any contraindications, and recommends a protocol.
         </p>
       </div>
 
@@ -334,48 +333,47 @@ export default function Questionnaire() {
           </div>
         )}
 
-        {/* ── Section 5: Dosha Screen ── */}
+        {/* ── Section 5: How are you today? ── */}
         {section === 5 && (
           <div className="space-y-5">
             <p className="text-sm text-[var(--muted)]">
-              Select the option that most closely matches your current state (not your general nature).
-              Vāta = airy/variable, Pitta = fiery/intense, Kapha = earthy/stable.
+              Select the option that most closely matches your current state — not your general nature, just right now.
             </p>
             {[
               {
                 key: "doshaBody",
                 question: "How does your body feel today?",
                 options: [
-                  { value: "vata-like", label: "Light, dry, cold — restless or variable" },
-                  { value: "pitta-like", label: "Warm, sharp, intense — focused or inflamed" },
-                  { value: "kapha-like", label: "Heavy, slow, cool — steady or sluggish" },
+                  { value: "vata-like", label: "Light, restless, cold, or scattered" },
+                  { value: "pitta-like", label: "Warm, tense, sharp, or intense" },
+                  { value: "kapha-like", label: "Heavy, slow, cool, or sluggish" },
                 ],
               },
               {
                 key: "doshaMind",
                 question: "How is your mind right now?",
                 options: [
-                  { value: "vata-like", label: "Scattered, anxious, or moving quickly between thoughts" },
-                  { value: "pitta-like", label: "Sharp, critical, goal-oriented, or irritated" },
-                  { value: "kapha-like", label: "Slow, foggy, contented, or withdrawn" },
+                  { value: "vata-like", label: "Racing, anxious, or jumping between thoughts" },
+                  { value: "pitta-like", label: "Focused but pressured, critical, or irritated" },
+                  { value: "kapha-like", label: "Foggy, slow, withdrawn, or flat" },
                 ],
               },
               {
                 key: "doshaSleep",
-                question: "How was your sleep recently?",
+                question: "How has your sleep been lately?",
                 options: [
-                  { value: "vata-like", label: "Light, interrupted, or insufficient" },
-                  { value: "pitta-like", label: "Vivid dreams, wake in heat, or short but intense" },
-                  { value: "kapha-like", label: "Heavy, long, or difficult to wake from" },
+                  { value: "vata-like", label: "Light, interrupted, or not enough" },
+                  { value: "pitta-like", label: "Vivid dreams, waking hot, or short and intense" },
+                  { value: "kapha-like", label: "Heavy, long, or hard to wake from" },
                 ],
               },
               {
                 key: "doshaEnergy",
                 question: "How is your energy today?",
                 options: [
-                  { value: "vata-like", label: "Erratic — bursts then crashes" },
-                  { value: "pitta-like", label: "Driven — strong but pressured" },
-                  { value: "kapha-like", label: "Low — steady but hard to mobilise" },
+                  { value: "vata-like", label: "Erratic — bursts of energy then crashes" },
+                  { value: "pitta-like", label: "Driven but depleted — pushing hard" },
+                  { value: "kapha-like", label: "Low and hard to mobilise" },
                 ],
               },
             ].map(({ key, question, options }) => (
@@ -387,12 +385,11 @@ export default function Questionnaire() {
           </div>
         )}
 
-        {/* ── Section 6: Centers ── */}
+        {/* ── Section 6: Where you hold things ── */}
         {section === 6 && (
           <div className="space-y-5">
             <p className="text-sm text-[var(--muted)]">
-              The Centers model (Gurdjieff) identifies three primary intelligence centers: Physical (body),
-              Emotional (heart), and Intellectual (mind). Select what feels truest right now.
+              Three short questions about how you process experience. Select what feels truest right now.
             </p>
             {[
               {
@@ -406,16 +403,16 @@ export default function Questionnaire() {
               },
               {
                 key: "centerStress",
-                question: "Where do you hold stress in your body?",
+                question: "Where do you feel stress most in your body?",
                 options: [
-                  { value: "intellectual", label: "Head, eyes, jaw — mental tension" },
-                  { value: "emotional", label: "Chest, throat — emotional tightness" },
-                  { value: "physical", label: "Shoulders, belly, legs — physical holding" },
+                  { value: "intellectual", label: "Head, eyes, or jaw — mental tension" },
+                  { value: "emotional", label: "Chest or throat — emotional tightness" },
+                  { value: "physical", label: "Shoulders, belly, or legs — physical holding" },
                 ],
               },
               {
                 key: "centerNeglected",
-                question: "Which center feels most neglected in your life?",
+                question: "Which part of yourself feels most neglected right now?",
                 options: [
                   { value: "intellectual", label: "Mind — I don't give myself time to reflect" },
                   { value: "emotional", label: "Heart — I suppress or avoid feelings" },
