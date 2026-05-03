@@ -1172,3 +1172,17 @@ async def serve_studio():
         })
     return {"error": "Studio not found"}
 
+# ── Tuner redirect ───────────────────────────────────────────────────────────
+# Update TUNER_URL after Railway deployment is complete.
+# Set env var TUNER_URL on the root Railway service, or update the fallback below.
+import os as _os_env
+from fastapi.responses import RedirectResponse
+
+TUNER_URL = _os_env.getenv("TUNER_URL", "")
+
+@app.get("/tuner")
+async def redirect_to_tuner():
+    if TUNER_URL:
+        return RedirectResponse(url=TUNER_URL, status_code=302)
+    return {"message": "CommonUnity Tuner is not yet deployed. Set TUNER_URL env var on the root Railway service."}
+
