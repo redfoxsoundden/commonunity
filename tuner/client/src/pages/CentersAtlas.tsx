@@ -3,6 +3,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseArr } from "@/lib/utils";
 import type { Center } from "@shared/schema";
+import { setNexusContext } from "../components/NexusPanel";
 
 const CATEGORY_COLORS: Record<string, { border: string; bg: string; text: string }> = {
   "physical": { border: "#f97316", bg: "#f9731618", text: "#f97316" },
@@ -32,6 +33,11 @@ export default function CentersAtlas() {
       </div>
     );
   }
+
+  useEffect(() => {
+    setNexusContext("Centers Atlas (Gurdjieff)\nMoving, emotional, and intellectual centers — how center dominance shapes a client's session needs and instrument choices.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { setNexusContext } from "../components/NexusPanel";
 
 const SECTIONS = [
   {
@@ -242,6 +243,11 @@ const SECTIONS = [
 export default function PractitionerGuide() {
   const [active, setActive] = useState("overview");
   const activeSection = SECTIONS.find((s) => s.id === active)!;
+
+  useEffect(() => {
+    setNexusContext("Practitioner Guide\nSession design, client preparation, contraindication protocols, and ethical guidelines for sound healing practice.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">

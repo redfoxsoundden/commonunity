@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Plus, Trash2, ChevronRight } from "lucide-react";
 import type { SessionLog as SessionLogType, ProtocolTemplate } from "@shared/schema";
+import { setNexusContext } from "../components/NexusPanel";
 
 export default function SessionLog() {
   const { toast } = useToast();
@@ -61,6 +62,11 @@ export default function SessionLog() {
   });
 
   const set = (key: string, val: any) => setForm((f) => ({ ...f, [key]: val }));
+
+  useEffect(() => {
+    setNexusContext("Session Log\nRecord of past sessions — outcomes, instruments used, protocol deviations, and follow-up notes.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">

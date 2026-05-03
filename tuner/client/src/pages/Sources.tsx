@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { setNexusContext } from "../components/NexusPanel";
+
 export default function Sources() {
   const sources = [
     {
@@ -146,6 +149,11 @@ export default function Sources() {
       ],
     },
   ];
+
+  useEffect(() => {
+    setNexusContext("Sources & Licensing\nAttributions for McKusick Biofield Tuning, Cousto Cosmic Octave, Solfeggio lineage, and instrument manufacturers.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-8">

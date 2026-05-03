@@ -21,7 +21,7 @@ const API_BASE = "__PORT_5000__".startsWith("__") ? "" : "__PORT_5000__";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface NexusMessage {
-  role: "user" | "nexus";
+  role: "user" | "nexus" | "divider";
   text: string;
 }
 
@@ -63,10 +63,32 @@ export default function NexusPanel() {
   const convRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const streamingTextRef = useRef("");
+  const prevContextRef = useRef<string>("");
 
-  // Register global context setter
+  // Register global context setter — inserts a divider when context shifts
   useEffect(() => {
-    _setContext = setPageContext;
+    _setContext = (ctx: string) => {
+      setPageContext(ctx);
+      // Extract the first line as a short page label
+      const newLabel = ctx.split("\n")[0].trim();
+      const prevLabel = prevContextRef.current.split("\n")[0].trim();
+      // Only insert a divider if: there's already a conversation, and the
+      // page-level label actually changed (ignore sub-state changes on same page)
+      if (
+        newLabel &&
+        prevLabel &&
+        newLabel !== prevLabel &&
+        !newLabel.startsWith("Sound healing") // ignore reset-to-default
+      ) {
+        setHistory((h) => {
+          if (h.length === 0) return h;
+          // Don't stack dividers
+          if (h[h.length - 1]?.role === "divider") return h;
+          return [...h, { role: "divider", text: newLabel }];
+        });
+      }
+      prevContextRef.current = ctx;
+    };
     return () => { _setContext = null; };
   }, []);
 
@@ -350,34 +372,49 @@ export default function NexusPanel() {
               protocols, or clients.
             </div>
           )}
-          {history.map((msg, i) => (
-            <div
-              key={i}
-              className={cn("flex flex-col gap-1", msg.role === "user" ? "items-end" : "items-start")}
-            >
-              <span className="text-[10px] text-muted-foreground px-1">
-                {msg.role === "user" ? "You" : "Nexus"}
-              </span>
+          {history.map((msg, i) => {
+            // ── Divider: page-change marker ──────────────────────────────
+            if (msg.role === "divider") {
+              return (
+                <div key={i} className="flex items-center gap-2 py-1">
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-[9px] text-muted-foreground/60 font-medium px-1 shrink-0 max-w-[180px] truncate">
+                    {msg.text}
+                  </span>
+                  <div className="flex-1 h-px bg-border" />
+                </div>
+              );
+            }
+            // ── Normal message ───────────────────────────────────────────
+            return (
               <div
-                className={cn(
-                  "rounded-xl px-3.5 py-2.5 text-sm leading-relaxed max-w-[88%]",
-                  msg.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-accent text-foreground"
-                )}
+                key={i}
+                className={cn("flex flex-col gap-1", msg.role === "user" ? "items-end" : "items-start")}
               >
-                {msg.text || (
-                  streaming && i === history.length - 1 ? (
-                    <span className="inline-flex gap-1 items-center text-muted-foreground">
-                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:0ms]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:150ms]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:300ms]" />
-                    </span>
-                  ) : null
-                )}
+                <span className="text-[10px] text-muted-foreground px-1">
+                  {msg.role === "user" ? "You" : "Nexus"}
+                </span>
+                <div
+                  className={cn(
+                    "rounded-xl px-3.5 py-2.5 text-sm leading-relaxed max-w-[88%]",
+                    msg.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-accent text-foreground"
+                  )}
+                >
+                  {msg.text || (
+                    streaming && i === history.length - 1 ? (
+                      <span className="inline-flex gap-1 items-center text-muted-foreground">
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:0ms]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:150ms]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:300ms]" />
+                      </span>
+                    ) : null
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Input area */}

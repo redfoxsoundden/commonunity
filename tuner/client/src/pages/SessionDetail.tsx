@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link, useLocation } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { parseArr } from "@/lib/utils";
 import { ArrowLeft, Save, Trash2, Calendar } from "lucide-react";
 import type { SessionLog } from "@shared/schema";
+import { setNexusContext } from "../components/NexusPanel";
 
 export default function SessionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,17 @@ export default function SessionDetail() {
     queryFn: () => apiRequest("GET", `/api/sessions/${id}`).then((r) => r.json()),
     enabled: !!id,
   });
+
+  useEffect(() => {
+    if (session) {
+      setNexusContext(
+        `Session detail: ${session.clientName || "unnamed client"} — ${session.sessionDate}\n` +
+        (session.goalPresentingNeed ? `Goal: ${session.goalPresentingNeed.slice(0, 100)}\n` : "") +
+        (session.selectedProtocolId ? `Protocol: ${session.selectedProtocolId}` : "")
+      );
+    }
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, [session]);
 
   const updateMutation = useMutation({
     mutationFn: (data: Partial<SessionLog>) =>

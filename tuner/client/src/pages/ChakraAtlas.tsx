@@ -4,11 +4,17 @@ import { Brain, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseArr, CHAKRA_COLORS, formatHz, cn } from "@/lib/utils";
 import type { Chakra } from "@shared/schema";
+import { setNexusContext } from "../components/NexusPanel";
 
 export default function ChakraAtlas() {
   const { data: chakras = [], isLoading } = useQuery<Chakra[]>({
     queryKey: ["/api/chakras"],
   });
+
+  useEffect(() => {
+    setNexusContext("Chakra Atlas\nOverview of all 7 chakras plus extended centers — frequencies, bija mantras, mudras, forks, and placement guides.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
 
   const sorted = [...chakras].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 

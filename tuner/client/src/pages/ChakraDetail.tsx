@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { parseArr, parseObj, CHAKRA_COLORS, formatHz } from "@/lib/utils";
 import type { Chakra } from "@shared/schema";
 import ChladniCanvas from "../components/ChladniCanvas";
+import { setNexusContext } from "../components/NexusPanel";
 
 export default function ChakraDetail() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,20 @@ export default function ChakraDetail() {
       return res.json();
     },
   });
+
+  useEffect(() => {
+    if (chakra) {
+      const themes = parseArr(chakra.themes).slice(0, 3).join(", ");
+      setNexusContext(
+        `Viewing chakra: ${chakra.sanskrit} (${chakra.id})\n` +
+        `Element: ${chakra.element || "—"} | Bija: ${chakra.bijaMantraShort || "—"}\n` +
+        (chakra.frequencyCousto ? `Cousto: ${chakra.frequencyCousto} Hz` : "") +
+        (chakra.frequencySolfeggio ? ` | Solfeggio: ${chakra.frequencySolfeggio} Hz` : "") +
+        (themes ? `\nThemes: ${themes}` : "")
+      );
+    }
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, [chakra]);
 
   if (isLoading) return <div className="p-6"><Skeleton className="h-96"/></div>;
   if (!chakra) return <div className="p-6 text-muted-foreground">Chakra not found.</div>;

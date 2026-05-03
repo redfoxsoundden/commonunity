@@ -1,12 +1,19 @@
+import { useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import ChladniCanvas from "@/components/ChladniCanvas";
 import { formatHz } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
+import { setNexusContext } from "../components/NexusPanel";
 
 const OM_HZ = 136.10;
 
 export default function WhyOM() {
+  useEffect(() => {
+    setNexusContext("Why OM — 136.10 Hz\nThe Earth Year frequency, Cousto derivation, co-chanting practice with two heart forks at the sternum, and the ceremonial container.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
+
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-10">
       {/* Hero */}

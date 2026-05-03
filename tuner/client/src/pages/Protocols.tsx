@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { parseArr, CHAKRA_COLORS } from "@/lib/utils";
 import { Clock, Users, ChevronRight } from "lucide-react";
 import type { ProtocolTemplate } from "@shared/schema";
+import { setNexusContext } from "../components/NexusPanel";
 
 const CATEGORY_COLORS: Record<string, { border: string; bg: string; text: string }> = {
   grounding: { border: "#CC0000", bg: "#CC000018", text: "#f87171" },
@@ -38,6 +39,11 @@ export default function Protocols() {
       </div>
     );
   }
+
+  useEffect(() => {
+    setNexusContext("Protocol Library\nAll session protocols — grounding, clearing, heart-centering, chakra-specific, dosha-specific, and the OM ceremonial container.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">

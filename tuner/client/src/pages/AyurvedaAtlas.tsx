@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { parseArr, DOSHA_LABELS } from "@/lib/utils";
 import type { AyurvedaElement } from "@shared/schema";
+import { setNexusContext } from "../components/NexusPanel";
 
 const DOSHA_COLORS: Record<string, { border: string; bg: string; text: string }> = {
   vata: { border: "#a78bfa", bg: "#a78bfa18", text: "#a78bfa" },
@@ -51,6 +52,11 @@ export default function AyurvedaAtlas() {
       </div>
     );
   }
+
+  useEffect(() => {
+    setNexusContext("Ayurveda & Elements\nVata, Pitta, Kapha doshas — elemental correspondences, balancing forks, and dosha-specific session guidance.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Search, Filter, Music2, ChevronRight } from "lucide-react";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, parseArr, formatHz, TYPE_COLORS, TYPE_BG, CHAKRA_COLORS } from "@/lib/utils";
 import type { Instrument } from "@shared/schema";
+import { setNexusContext } from "../components/NexusPanel";
 
 const LINEAGE_OPTIONS = ["All", "Planetware", "Biofield Tuning", "Independent"];
 const TYPE_OPTIONS = ["All", "fork", "bowl", "bell"];
@@ -19,6 +20,12 @@ export default function Inventory() {
   const { data: instruments = [], isLoading } = useQuery<Instrument[]>({
     queryKey: ["/api/instruments"],
   });
+
+  // Nexus context — instrument inventory overview
+  useEffect(() => {
+    setNexusContext("Instrument Inventory\nFull collection of tuning forks, singing bowls, and bells — browse or search by type, lineage, or chakra.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
 
   const filtered = useMemo(() => {
     return instruments.filter(i => {
