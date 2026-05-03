@@ -40,12 +40,21 @@ export default function InstrumentDetail() {
 
       {/* Header */}
       <div className="flex items-start gap-6 mb-8">
-        <div
-          className="w-20 h-20 rounded-2xl flex items-center justify-center text-lg font-bold frequency-display flex-shrink-0"
-          style={{ background: bg, color, border: `2px solid ${color}30` }}
-        >
-          {Math.round(instrument.frequency)}
-        </div>
+        {instrument.imageFilename ? (
+          <img
+            src={`/assets/images/${instrument.imageFilename}`}
+            alt={instrument.name}
+            className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
+            style={{ border: `2px solid ${color}30` }}
+          />
+        ) : (
+          <div
+            className="w-20 h-20 rounded-2xl flex items-center justify-center text-lg font-bold frequency-display flex-shrink-0"
+            style={{ background: bg, color, border: `2px solid ${color}30` }}
+          >
+            {Math.round(instrument.frequency)}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-mono text-muted-foreground">{instrument.id}</span>
@@ -234,7 +243,7 @@ function AudioPlayer({ filename, color }: { filename: string; color: string }) {
         <Volume2 size={14} className="text-primary"/>
         <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Audio Preview</span>
       </div>
-      <audio ref={audioRef} src={`/assets/${filename}`} preload="none"/>
+      <audio ref={audioRef} src={`/assets/audio/${filename}`} preload="none"/>
       <button
         onClick={toggle}
         data-testid="button-audio-play"
