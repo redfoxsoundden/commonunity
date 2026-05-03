@@ -564,13 +564,333 @@ export async function seedDatabase() {
   }
 
   // ─── SEED BIOFIELD ZONES ────────────────────────────────────────────────────
+  // Full system drawn from Biofield Anatomy maps (McKusick / Biofield Tuning):
+  // Energetic Imbalances map + Trigger Points / Pain Areas map
   const biofieldData = [
-    { id: "BF-ROOT-LEFT", label: "Left Root Field", location: "Left side, base chakra zone", fieldSide: "left", themes: JSON.stringify(["Maternal grounding","Safety from mother lineage","Financial support from feminine side"]), suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SLIDER","TF-PW-ROOT"]), techniqueLocate: "Comb at arm's length, left side, from foot level to hip level", techniqueListen: "Listen for tonal heaviness or stagnation", techniqueTreat: "Slow combing inward; add TF-BT-SLIDER for body anchoring", techniqueIntegrate: "TF-PW-ROOT at sacrum", techniqueClose: "Smooth field outward; grounding breath", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning / McKusick" },
-    { id: "BF-ROOT-RIGHT", label: "Right Root Field", location: "Right side, base chakra zone", fieldSide: "right", themes: JSON.stringify(["Paternal grounding","Safety from father lineage","Financial support from masculine side"]), suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SLIDER","TF-PW-ROOT"]), techniqueLocate: "Comb right side, foot to hip level", techniqueListen: "Note tonal density shifts", techniqueTreat: "Inward combing; body anchor at sacrum if ready", techniqueIntegrate: "TF-PW-ROOT body contact", techniqueClose: "Smooth field, grounding breath", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
-    { id: "BF-SACRAL-LEFT", label: "Left Sacral Field", location: "Left side at sacral level", fieldSide: "left", themes: JSON.stringify(["Grief/anger re: lack of maternal support","Receiving money/pleasure","Intimacy issues from feminine lineage"]), suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SOL-417","TF-PW-SACRAL"]), techniqueLocate: "Arm's length, left hip level", techniqueListen: "Tonal changes in rhythmic/creative zones", techniqueTreat: "Slow comb inward; 417 for pattern dissolution", techniqueIntegrate: "TF-PW-SACRAL if body contact appropriate", techniqueClose: "Smooth and seal; nourishing breath", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
-    { id: "BF-HEART-FRONT", label: "Heart Field (Front)", location: "Front chest at heart level", fieldSide: "front", themes: JSON.stringify(["Giving love","Open-heartedness","Grief and loss of love","Self-compassion blocks"]), suggestedForks: JSON.stringify(["TF-PW-HEART","TF-BT-SOL-528","BOWL-528"]), techniqueLocate: "30–60 cm in front of chest", techniqueListen: "Heavy or hollow tone may indicate grief held here", techniqueTreat: "Gentle inward comb; 528 for love-frequency restoration", techniqueIntegrate: "TF-PW-HEART at sternum", techniqueClose: "Hands to heart; three OMs", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
-    { id: "BF-SOLAR-FRONT", label: "Solar Plexus Field (Front)", location: "Front body, upper abdomen level", fieldSide: "front", themes: JSON.stringify(["Willpower blocks","Authority wounds","Shame and self-worth","Power dynamics"]), suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-PW-SOLAR","TF-BT-SOL-528"]), techniqueLocate: "30 cm in front of solar plexus", techniqueListen: "Tight, brittle tone often indicates stored tension", techniqueTreat: "Slow inward comb; pause at distortions", techniqueIntegrate: "TF-PW-SOLAR body contact if welcome", techniqueClose: "Smooth outward; Ujjayi breath", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
-    { id: "BF-CROWN-ABOVE", label: "Crown / Sun Star Field", location: "Above the head", fieldSide: "front", themes: JSON.stringify(["Higher self connection","Worrying about the future","Spiritual disconnection","Crown opening"]), suggestedForks: JSON.stringify(["TF-PW-CROWN","TF-BT-FIB-144U","BELL-771"]), techniqueLocate: "30–90 cm above crown", techniqueListen: "Light, airy resonance in clear field; dense/muddy in blocked field", techniqueTreat: "Gentle sweeping; BELL-771 to open; TF-PW-CROWN to tune", techniqueIntegrate: "Silence and breath", techniqueClose: "Three OMs; seal with silence", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
+
+    // ── SPECIAL ZONES ────────────────────────────────────────────────────────
+    {
+      id: "BF-SUN-STAR",
+      label: "Sun Star",
+      location: "Above the crown, top of the field",
+      fieldSide: "center",
+      themes: JSON.stringify(["Relationship with time and nature","Worrying about the future (left)","Thinking about the past (right)","Higher self connection","Spiritual disconnection"]),
+      suggestedForks: JSON.stringify(["TF-PW-CROWN","TF-BT-FIB-144U","BELL-771"]),
+      techniqueLocate: "Begin combing 30–90 cm above crown; note where tone shifts from clear to dense",
+      techniqueListen: "Clear field sounds light and resonant; imbalance presents as tonal muddiness or drag",
+      techniqueTreat: "Gentle sweeping inward; BELL-771 to open; TF-PW-CROWN to fine-tune",
+      techniqueIntegrate: "Silence and deep breath",
+      techniqueClose: "Three OMs; seal with silence",
+      sourceAttribution: "Biofield Anatomy Map — Energetic Imbalances ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-EARTH-STAR",
+      label: "Earth Star",
+      location: "Below the feet, bottom of the field",
+      fieldSide: "center",
+      themes: JSON.stringify(["Next steps and where we are headed (right)","Mired/stuck/wanting to move away from stressor (left)","Stuck in toxic situation","Uncertainty about next steps","Physical grounding and embodiment"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SLIDER","TF-OTTO-128","TF-BT-SCHU-54"]),
+      techniqueLocate: "Comb 30–90 cm below feet; note density, heaviness, or drag",
+      techniqueListen: "Heavy sluggish tone = stuck forward momentum; hollow = disconnected from ground",
+      techniqueTreat: "Slow inward comb drawing energy up into the body; TF-BT-SLIDER along legs",
+      techniqueIntegrate: "TF-OTTO-128 at soles of feet if comfortable",
+      techniqueClose: "Grounding breath; feet pressed into floor",
+      sourceAttribution: "Biofield Anatomy Map — Energetic Imbalances ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-ANCESTRAL-RIGHT",
+      label: "Ancestral River (Paternal)",
+      location: "Right side vertical channel — runs alongside the body",
+      fieldSide: "right",
+      themes: JSON.stringify(["Paternal lineage patterns","Relationship with father","Masculine ancestral inheritance","Past-oriented consciousness"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SOL-417","TF-BT-SLIDER"]),
+      techniqueLocate: "Comb the vertical channel 30–60 cm to the right of the body from head to foot",
+      techniqueListen: "Notice tonal discontinuities that may correspond to life-stage zones",
+      techniqueTreat: "Slow vertical combing; pause at disruptions; 417 for pattern dissolution",
+      techniqueIntegrate: "Draw energy inward to corresponding chakra zones",
+      techniqueClose: "Smooth field; grounding breath",
+      sourceAttribution: "Biofield Anatomy Map — Energetic Imbalances ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-ANCESTRAL-LEFT",
+      label: "Ancestral River (Maternal)",
+      location: "Left side vertical channel — runs alongside the body",
+      fieldSide: "left",
+      themes: JSON.stringify(["Maternal lineage patterns","Relationship with mother","Feminine ancestral inheritance","Future-oriented consciousness"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SOL-417","TF-BT-SLIDER"]),
+      techniqueLocate: "Comb vertical channel 30–60 cm to the left of the body from head to foot",
+      techniqueListen: "Note tonal texture changes; left side often holds future-fear patterns",
+      techniqueTreat: "Slow vertical combing; 417 for held emotional patterns",
+      techniqueIntegrate: "Draw toward corresponding chakra on central channel",
+      techniqueClose: "Smooth field; nourishing breath",
+      sourceAttribution: "Biofield Anatomy Map — Energetic Imbalances ©2026 Biofield Tuning"
+    },
+
+    // ── ROOT LEVEL ────────────────────────────────────────────────────────────
+    {
+      id: "BF-ROOT-LEFT",
+      label: "Root Field — Left (Feminine)",
+      location: "Left side, base chakra zone, foot to hip level",
+      fieldSide: "left",
+      themes: JSON.stringify(["Mired/stuck/wanting to move away from stressor","Challenges with attachment and letting go","Sadness/anger over lack of support from mother","Receiving money and security from feminine side"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SLIDER","TF-PW-ROOT"]),
+      techniqueLocate: "Comb at arm's length, left side, from foot level up to hip level",
+      techniqueListen: "Listen for tonal heaviness, stagnation, or drag",
+      techniqueTreat: "Slow combing inward; TF-BT-SLIDER for body anchoring",
+      techniqueIntegrate: "TF-PW-ROOT at sacrum",
+      techniqueClose: "Smooth field outward; grounding breath",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-ROOT-RIGHT",
+      label: "Root Field — Right (Masculine)",
+      location: "Right side, base chakra zone, foot to hip level",
+      fieldSide: "right",
+      themes: JSON.stringify(["Next steps and where we are headed","Challenges moving forward / confusion / obstacles","Sadness/anger over lack of support from father","Blocked moving forward / uncertainty about next steps"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SLIDER","TF-PW-ROOT"]),
+      techniqueLocate: "Comb right side, foot to hip level",
+      techniqueListen: "Note tonal density shifts; drag indicates resistance to forward motion",
+      techniqueTreat: "Inward combing; body anchor at sacrum if ready",
+      techniqueIntegrate: "TF-PW-ROOT body contact",
+      techniqueClose: "Smooth field; grounding breath",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+
+    // ── SACRAL LEVEL ──────────────────────────────────────────────────────────
+    {
+      id: "BF-SACRAL-LEFT",
+      label: "Sacral Field — Left (Feminine)",
+      location: "Left side, sacral/hip level",
+      fieldSide: "left",
+      themes: JSON.stringify(["Frustration and disappointment","Things we want to be doing/being/having — unmet needs","Sadness/anger over lack of support from mother","Receiving money, pleasure, intimacy (back)","Habitually held back"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SOL-417","TF-PW-SACRAL"]),
+      techniqueLocate: "Arm's length, left hip level",
+      techniqueListen: "Tonal changes in rhythmic/creative zones",
+      techniqueTreat: "Slow comb inward; 417 for pattern dissolution",
+      techniqueIntegrate: "TF-PW-SACRAL if body contact appropriate",
+      techniqueClose: "Smooth and seal; nourishing breath",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-SACRAL-RIGHT",
+      label: "Sacral Field — Right (Masculine)",
+      location: "Right side, sacral/hip level",
+      fieldSide: "right",
+      themes: JSON.stringify(["Busy-ness, overdoing, overthinking","Guilt, shame and low self-worth","Sadness/anger over lack of support from father","Overdoing/overthinking (trigger)","Frustrated non-doing"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SOL-417","TF-PW-SACRAL"]),
+      techniqueLocate: "Comb right side at hip level",
+      techniqueListen: "May feel busy/dense — overthinking pattern",
+      techniqueTreat: "Slow comb inward; pause at distortions; 417 to dissolve guilt/shame patterns",
+      techniqueIntegrate: "TF-PW-SACRAL at lower abdomen if welcome",
+      techniqueClose: "Smooth field; release breath",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+
+    // ── SOLAR PLEXUS LEVEL ────────────────────────────────────────────────────
+    {
+      id: "BF-SOLAR-LEFT",
+      label: "Solar Plexus Field — Left (Feminine)",
+      location: "Left side, solar plexus level",
+      fieldSide: "left",
+      themes: JSON.stringify(["Relationship with one's mother — powerlessness","Sadness/grief/loss/depression","Defending against negative energy","Self-esteem and goal setting"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-PW-SOLAR","TF-BT-SOL-528"]),
+      techniqueLocate: "Left side at upper abdomen level",
+      techniqueListen: "Hollow or collapsed tone may indicate powerlessness pattern",
+      techniqueTreat: "Gentle inward comb; 528 for self-worth restoration",
+      techniqueIntegrate: "TF-PW-SOLAR at solar plexus if welcome",
+      techniqueClose: "Smooth outward; Ujjayi breath",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-SOLAR-RIGHT",
+      label: "Solar Plexus Field — Right (Masculine)",
+      location: "Right side, solar plexus level",
+      fieldSide: "right",
+      themes: JSON.stringify(["Relationship with one's father — anger","Saying yes when we mean no / caretaking / accommodating","Resentful from over-accommodating","Holding back aggressive action"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-PW-SOLAR","TF-BT-SOL-417"]),
+      techniqueLocate: "Right side at upper abdomen / solar level",
+      techniqueListen: "Dense or tight tone; anger and accommodation patterns",
+      techniqueTreat: "Slow inward comb; pause at density; 417 for anger pattern release",
+      techniqueIntegrate: "TF-PW-SOLAR body contact if welcome",
+      techniqueClose: "Smooth outward; empowering breath",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-SOLAR-FRONT",
+      label: "Solar Plexus Field — Front",
+      location: "Front body, upper abdomen level, 30–60 cm out",
+      fieldSide: "front",
+      themes: JSON.stringify(["Willpower blocks","Self-esteem and achievement","Goal setting","Support from ourselves and others (back)","Authority wounds"]),
+      suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-PW-SOLAR","TF-BT-SOL-528"]),
+      techniqueLocate: "30 cm in front of solar plexus",
+      techniqueListen: "Tight, brittle tone often indicates stored tension",
+      techniqueTreat: "Slow inward comb; pause at distortions",
+      techniqueIntegrate: "TF-PW-SOLAR body contact if welcome",
+      techniqueClose: "Smooth outward; Ujjayi breath",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+
+    // ── HEART LEVEL ───────────────────────────────────────────────────────────
+    {
+      id: "BF-HEART-LEFT",
+      label: "Heart Field — Left (Feminine)",
+      location: "Left side, heart level",
+      fieldSide: "left",
+      themes: JSON.stringify(["Sadness, grief, loss, depression","That which we do not say or express","Unexpressed sadness","Love we receive from others (back)"]),
+      suggestedForks: JSON.stringify(["TF-PW-HEART","TF-BT-SOL-528","BOWL-528"]),
+      techniqueLocate: "Left side at chest level, arm's length out",
+      techniqueListen: "Hollow or heavy tone — grief often held here",
+      techniqueTreat: "Gentle inward comb; 528 for heart field restoration",
+      techniqueIntegrate: "TF-PW-HEART at sternum",
+      techniqueClose: "Hand to heart; slow exhale",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-HEART-RIGHT",
+      label: "Heart Field — Right (Masculine)",
+      location: "Right side, heart level",
+      fieldSide: "right",
+      themes: JSON.stringify(["Speaking but not being heard","That which we want to express but cannot","Not being heard","Giving love (front)"]),
+      suggestedForks: JSON.stringify(["TF-PW-HEART","TF-BT-SOL-528","TF-PW-THROAT"]),
+      techniqueLocate: "Right side at chest level",
+      techniqueListen: "Compressed tone often indicates held expression",
+      techniqueTreat: "Slow inward comb; 528 for softening; TF-PW-THROAT if expression theme is primary",
+      techniqueIntegrate: "TF-PW-HEART at sternum",
+      techniqueClose: "Three OMs",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-HEART-FRONT",
+      label: "Heart Field — Front",
+      location: "Front chest, 30–60 cm out",
+      fieldSide: "front",
+      themes: JSON.stringify(["Giving and receiving love","Open-heartedness","Grief and loss","Self-compassion blocks"]),
+      suggestedForks: JSON.stringify(["TF-PW-HEART","TF-BT-SOL-528","BOWL-528"]),
+      techniqueLocate: "30–60 cm in front of chest",
+      techniqueListen: "Heavy or hollow tone may indicate grief held here",
+      techniqueTreat: "Gentle inward comb; 528 for love-frequency restoration",
+      techniqueIntegrate: "TF-PW-HEART at sternum",
+      techniqueClose: "Hands to heart; three OMs",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-HEART-BACK",
+      label: "Heart Field — Back",
+      location: "Behind the body at heart level",
+      fieldSide: "back",
+      themes: JSON.stringify(["Love we receive from others","Receiving support and care","Back of the heart — what we carry from others"]),
+      suggestedForks: JSON.stringify(["TF-PW-HEART","TF-BT-SOL-528","BOWL-528"]),
+      techniqueLocate: "Behind body between shoulder blades, 30 cm out",
+      techniqueListen: "Dense tone may indicate unprocessed received grief",
+      techniqueTreat: "Slow comb inward toward spine; 528 ambient",
+      techniqueIntegrate: "TF-PW-HEART between shoulder blades",
+      techniqueClose: "Breath into back body",
+      sourceAttribution: "Biofield Anatomy Map — Trigger Points ©2026 Biofield Tuning"
+    },
+
+    // ── THROAT LEVEL ──────────────────────────────────────────────────────────
+    {
+      id: "BF-THROAT-LEFT",
+      label: "Throat Field — Left (Feminine)",
+      location: "Left side, throat/jaw level",
+      fieldSide: "left",
+      themes: JSON.stringify(["That which we do not say or express","Worrying about the future","Things unspoken","Sadness not expressed"]),
+      suggestedForks: JSON.stringify(["TF-PW-THROAT","TF-BT-SOL-528","TF-BT-222"]),
+      techniqueLocate: "Left side, jaw and shoulder level",
+      techniqueListen: "Tight or choked tone — unexpressed words",
+      techniqueTreat: "Gentle comb inward; TF-PW-THROAT for activation",
+      techniqueIntegrate: "TF-PW-THROAT in field above throat",
+      techniqueClose: "Humming or gentle vocalization if client is comfortable",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-THROAT-RIGHT",
+      label: "Throat Field — Right (Masculine)",
+      location: "Right side, throat/jaw level",
+      fieldSide: "right",
+      themes: JSON.stringify(["Speaking but not being heard","Thinking about the past","Not being heard","Resentful from over-accommodating"]),
+      suggestedForks: JSON.stringify(["TF-PW-THROAT","TF-BT-SOL-528","TF-BT-222"]),
+      techniqueLocate: "Right side, jaw and shoulder level",
+      techniqueListen: "Dense or compressed — held frustration about not being heard",
+      techniqueTreat: "Slow inward comb; 528 for softening",
+      techniqueIntegrate: "TF-PW-THROAT field work at jaw/throat",
+      techniqueClose: "Three toning breaths",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-THROAT-BACK",
+      label: "Throat Field — Back",
+      location: "Behind the body at throat/cervical level",
+      fieldSide: "back",
+      themes: JSON.stringify(["Artistic inspiration","Channeling","Things in the back of the throat — unspoken expression"]),
+      suggestedForks: JSON.stringify(["TF-PW-THROAT","TF-BT-222","TF-BT-FIB-144U"]),
+      techniqueLocate: "Base of skull / C7 area, 20–40 cm out",
+      techniqueListen: "Note tonal quality — back throat holds inspiration and channeling themes",
+      techniqueTreat: "Gentle comb inward; TF-BT-222 for inspiration frequency",
+      techniqueIntegrate: "TF-PW-THROAT field behind neck",
+      techniqueClose: "Deep breath into back of throat",
+      sourceAttribution: "Biofield Anatomy Map — Trigger Points ©2026 Biofield Tuning"
+    },
+
+    // ── THIRD EYE LEVEL ───────────────────────────────────────────────────────
+    {
+      id: "BF-3RD-EYE-LEFT",
+      label: "Third Eye Field — Left (Feminine)",
+      location: "Left side, temple and forehead level",
+      fieldSide: "left",
+      themes: JSON.stringify(["Worrying about the future","Future related overwhelm","Mental processes and intuition"]),
+      suggestedForks: JSON.stringify(["TF-PW-3RD","TF-BT-FIB-144U","TF-BT-222"]),
+      techniqueLocate: "Left side at forehead/temple level, arm's length out",
+      techniqueListen: "Rapid flickering tone often signals future-anxiety patterns",
+      techniqueTreat: "Slow gentle comb inward; TF-PW-3RD in field",
+      techniqueIntegrate: "TF-PW-3RD held in field above forehead — never direct skull contact",
+      techniqueClose: "Silence and stillness",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-3RD-EYE-RIGHT",
+      label: "Third Eye Field — Right (Masculine)",
+      location: "Right side, temple and forehead level",
+      fieldSide: "right",
+      themes: JSON.stringify(["Thinking about the past","Past related regret / remorse","Mental processes and intuition"]),
+      suggestedForks: JSON.stringify(["TF-PW-3RD","TF-BT-FIB-144U","TF-BT-222"]),
+      techniqueLocate: "Right side at forehead/temple level",
+      techniqueListen: "Dense heavy tone may indicate rumination on past",
+      techniqueTreat: "Gentle comb inward; TF-PW-3RD to clear",
+      techniqueIntegrate: "TF-PW-3RD in field — no skull contact",
+      techniqueClose: "Silence",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
+    {
+      id: "BF-3RD-EYE-BACK",
+      label: "Third Eye Field — Back",
+      location: "Behind the head at occiput level",
+      fieldSide: "back",
+      themes: JSON.stringify(["Things in the back of our minds","Subconscious processing","Visionary perception"]),
+      suggestedForks: JSON.stringify(["TF-PW-3RD","TF-BT-FIB-144U","TF-BT-222"]),
+      techniqueLocate: "Occiput / base of skull, 20–40 cm out",
+      techniqueListen: "What is held in the subconscious — things not yet in conscious awareness",
+      techniqueTreat: "TF-PW-3RD or TF-BT-FIB-144U in field behind head",
+      techniqueIntegrate: "Hold in field; allow integration",
+      techniqueClose: "Breath and stillness",
+      sourceAttribution: "Biofield Anatomy Map — Trigger Points ©2026 Biofield Tuning"
+    },
+
+    // ── CROWN / SUN STAR ──────────────────────────────────────────────────────
+    {
+      id: "BF-CROWN-ABOVE",
+      label: "Crown / Sun Star Field",
+      location: "Above the head, 30–90 cm",
+      fieldSide: "center",
+      themes: JSON.stringify(["Relationship with time and nature","Worrying about the future (left side)","Thinking about the past (right side)","Spiritual connection and disconnection","Crown opening"]),
+      suggestedForks: JSON.stringify(["TF-PW-CROWN","TF-BT-FIB-144U","BELL-771"]),
+      techniqueLocate: "30–90 cm above crown",
+      techniqueListen: "Light, airy resonance in clear field; dense/muddy in blocked field",
+      techniqueTreat: "Gentle sweeping; BELL-771 to open; TF-PW-CROWN to tune",
+      techniqueIntegrate: "Silence and breath",
+      techniqueClose: "Three OMs; seal with silence",
+      sourceAttribution: "Biofield Anatomy Map ©2026 Biofield Tuning"
+    },
   ];
 
   for (const bz of biofieldData) {
