@@ -15,6 +15,9 @@ import { X, Send, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 
+// Must use the same API_BASE as queryClient so Railway proxy rewrites work
+const API_BASE = "__PORT_5000__".startsWith("__") ? "" : "__PORT_5000__";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface NexusMessage {
@@ -109,7 +112,7 @@ export default function NexusPanel() {
     setHistory((h) => [...h, { role: "nexus", text: "" }]);
 
     try {
-      const res = await fetch("/api/nexus/chat", {
+      const res = await fetch(`${API_BASE}/api/nexus/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -167,12 +170,16 @@ export default function NexusPanel() {
       };
 
       await read();
-    } catch {
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      const isApiKey = errMsg.includes("503") || errMsg.includes("ANTHROPIC_API_KEY");
       setHistory((h) => {
         const updated = [...h];
         updated[updated.length - 1] = {
           role: "nexus",
-          text: "Something interrupted the connection. Try again when you are ready.",
+          text: isApiKey
+            ? "Nexus is not yet connected — the ANTHROPIC_API_KEY environment variable needs to be set on Railway."
+            : `Connection error: ${errMsg}`,
         };
         return updated;
       });
@@ -194,7 +201,7 @@ export default function NexusPanel() {
           .join("\n");
         const compressionPrompt = `Based on this conversation, write a 3–5 sentence compressed profile of the practitioner: what instruments they use, their experience level, any preferences or patterns you notice, and any clinical or personal context that would help you in future sessions. Be specific, not generic. Return plain text only.\n\nConversation:\n${transcript.slice(0, 3000)}`;
 
-        const res = await fetch("/api/nexus/chat", {
+        const res = await fetch(`${API_BASE}/api/nexus/chat`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
