@@ -288,3 +288,13 @@ export const soundscapes = sqliteTable("soundscapes", {
 export const insertSoundscapeSchema = createInsertSchema(soundscapes).omit({ id: true });
 export type InsertSoundscape = z.infer<typeof insertSoundscapeSchema>;
 export type Soundscape = typeof soundscapes.$inferSelect;
+
+// ─── Nexus Memory ─────────────────────────────────────────────────────────────
+// Global single-row memory for the Nexus AI — keyed by a fixed key "default"
+// for beta. At scale, swap in practitioner_id.
+export const nexusMemory = sqliteTable("nexus_memory", {
+  key: text("key").primaryKey(),        // always "default" in beta
+  memory: text("memory").notNull().default(""),  // compressed practitioner profile
+  updatedAt: text("updated_at").notNull(),
+});
+export type NexusMemory = typeof nexusMemory.$inferSelect;

@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { parseArr, parseObj, formatHz, TYPE_COLORS, TYPE_BG, CHAKRA_COLORS, cn } from "@/lib/utils";
 import type { Instrument } from "@shared/schema";
 import ChladniCanvas from "../components/ChladniCanvas";
+import { setNexusContext } from "../components/NexusPanel";
 
 export default function InstrumentDetail() {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +19,23 @@ export default function InstrumentDetail() {
       return res.json();
     },
   });
+
+  // Provide Nexus with contextual awareness of this instrument
+  useEffect(() => {
+    if (instrument) {
+      const notes = parseArr(instrument.notes).slice(0, 3).join("; ");
+      setNexusContext(
+        `Viewing instrument: ${instrument.name}\n` +
+        `Type: ${instrument.type} | Frequency: ${formatHz(instrument.primaryHz)}` +
+        (instrument.solfeggio ? ` (Solfeggio: ${instrument.solfeggio} Hz)` : "") +
+        (instrument.planetaryNote ? ` | Cousto: ${instrument.planetaryNote}` : "") +
+        (instrument.chakraId ? ` | Chakra: ${instrument.chakraId}` : "") +
+        (instrument.masterExplainer ? `\nDescription: ${instrument.masterExplainer.slice(0, 200)}` : "") +
+        (notes ? `\nKey notes: ${notes}` : "")
+      );
+    }
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, [instrument]);
 
   if (isLoading) return <div className="p-6"><Skeleton className="h-80"/></div>;
   if (!instrument) return <div className="p-6 text-muted-foreground">Instrument not found.</div>;

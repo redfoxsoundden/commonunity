@@ -217,4 +217,11 @@ export function runMigrations() {
     created_at TEXT NOT NULL,
     rendered_export_file TEXT
   )`);
+
+  // Nexus AI memory — single-row global store for beta
+  db.run(sql`CREATE TABLE IF NOT EXISTS nexus_memory (
+    key TEXT PRIMARY KEY,
+    memory TEXT NOT NULL DEFAULT '',
+    updated_at TEXT NOT NULL
+  )`);
 }

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { setNexusContext } from "../components/NexusPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -132,6 +133,26 @@ export default function Composer() {
     queryKey: ["/api/soundscapes"],
     queryFn: () => apiRequest("GET", "/api/soundscapes").then((r) => r.json()),
   });
+
+  // Keep Nexus aware of the current soundscape composition
+  useEffect(() => {
+    if (tracks.length === 0) {
+      setNexusContext("Soundscape Composer — no tracks loaded yet");
+    } else {
+      const trackList = tracks
+        .map((t) => `${t.label} (${t.frequency.toFixed(2)} Hz)`)
+        .join(", ");
+      const freqs = tracks.map((t) => t.frequency);
+      const minHz = Math.min(...freqs).toFixed(2);
+      const maxHz = Math.max(...freqs).toFixed(2);
+      setNexusContext(
+        `Soundscape Composer\n` +
+        `${tracks.length} active track${tracks.length > 1 ? "s" : ""}: ${trackList}\n` +
+        `Frequency range: ${minHz}–${maxHz} Hz`
+      );
+    }
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, [tracks]);
 
   const saveMutation = useMutation({
     mutationFn: () =>

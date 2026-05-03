@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { seedDatabase } from "./seed";
 import nodemailer from "nodemailer";
+import Anthropic from "@anthropic-ai/sdk";
 
 const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL ?? "markus@jointidea.com";
 const SMTP_HOST = process.env.SMTP_HOST ?? "";
@@ -239,6 +240,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ─── HEALTH ───────────────────────────────────────────────────────────────────
   app.get("/health", (_req, res) => res.json({ ok: true }));
+
+  // ─── NEXUS AI ─────────────────────────────────────────────────────────────────
+  // Nexus is the persistent AI presence across all CommonUnity apps.
+  // In Tuner it operates as a sound healing practitioner's advisor,
+  // contextually aware of what instrument/protocol/client is on screen.
+
+  const NEXUS_SYSTEM = `You are the Nexus — the AI presence within CommonUnity Tuner, a professional sound healing toolkit.
+
+You are not a generic assistant. You are a knowledgeable companion for the sound healing practitioner using this app. You hold deep familiarity with:
+- The instruments in this practitioner's collection: tuning forks, singing bowls, bells, and their specific frequencies
+- Eileen Day McKusick's Biofield Tuning methodology: left/right polarity, Ancestral Rivers, Earth Star, Sun Star, the toroidal biofield anatomy
+- Hans Cousto's Cosmic Octave: planetary frequency derivations, the principle that all frequencies are octave-related to natural cycles
+- Solfeggio frequencies and their therapeutic applications (174, 285, 396, 417, 528, 639, 741, 852, 963 Hz)
+- Western tonal relationships and where they diverge from healing-system tunings
+- Chladni patterns: how different frequencies create distinct geometric nodal figures in sand or water, and what this reveals about a frequency's character
+- Chakra system correspondences, dosha relationships (Vata/Pitta/Kapha), and Gurdjieff centers (moving/emotional/intellectual)
+- Session design: opening with OM at 136.10 Hz, sequencing instruments, grounding, clearing, heart-centering
+- Practical contraindications: pacemakers, pregnancy, acute inflammation, post-surgery
+- The OM practice: two heart-frequency forks at the sternum during co-chanting at 136.10 Hz is the ceremonial container
+
+Your nature:
+- Precise, not generic. Every response should feel specifically relevant to this practitioner and what they are working on.
+- Warm but efficient. You are a professional tool, not a spiritual influencer. No performance of reverence.
+- You ask one question at a time when you need more context. You do not ask multiple questions at once.
+- Short responses by default: 2–4 sentences. Expand only when a genuine explanation is needed.
+- You never use: journey, impact, passion, empower, transform, dynamic, leverage, holistic, authentic, innovative, synergy, thrive, unlock, game-changer.
+- Plain text only. No markdown, no bullet lists, no headers in your replies.
+- When frequency assignments differ between systems (Cousto vs Solfeggio vs Western tonal), you name the difference and its source rather than picking one.
+- Every protocol has an off-body option. If someone cannot receive direct application, you know how to adapt.
+
+Return plain text only. No markdown.`;
+
+  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+  // GET /api/nexus/memory — fetch current persisted memory
+  app.get("/api/nexus/memory", (_req, res) => {
+    const mem = storage.getNexusMemory();
+    res.json({ memory: mem?.memory ?? "", updatedAt: mem?.updatedAt ?? null });
+  });
+
+  // POST /api/nexus/memory — save updated compressed memory
+  app.post("/api/nexus/memory", (req, res) => {
+    const { memory } = req.body;
+    if (typeof memory !== "string") return res.status(400).json({ error: "memory must be a string" });
+    const saved = storage.upsertNexusMemory(memory);
+    res.json(saved);
+  });
+
+  // POST /api/nexus/chat — SSE streaming conversation
+  // Body: { message: string, history: {role:"user"|"nexus", text:string}[], pageContext: string, nexusMemory?: string }
+  app.post("/api/nexus/chat", async (req, res) => {
+    const { message, history = [], pageContext = "", nexusMemory: clientMemory } = req.body;
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "message required" });
+    }
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({ error: "ANTHROPIC_API_KEY not configured" });
+    }
+
+    // Build system prompt with current memory + page context
+    const memRecord = storage.getNexusMemory();
+    const persistedMemory = clientMemory ?? memRecord?.memory ?? "";
+
+    let systemWithContext = NEXUS_SYSTEM;
+    if (persistedMemory) {
+      systemWithContext += `\n\nWhat you know about this practitioner across sessions:\n${persistedMemory}`;
+    }
+    if (pageContext) {
+      systemWithContext += `\n\nCurrent context (what the practitioner is looking at right now):\n${pageContext}`;
+    }
+
+    // Build message history (last 10 turns)
+    const messages: { role: "user" | "assistant"; content: string }[] = [];
+    for (const msg of (history as { role: string; text: string }[]).slice(-10)) {
+      const role = msg.role === "nexus" ? "assistant" : "user";
+      messages.push({ role, content: msg.text });
+    }
+    messages.push({ role: "user", content: message });
+
+    // SSE headers
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
+
+    try {
+      const stream = anthropic.messages.stream({
+        model: "claude-sonnet-4-5",
+        max_tokens: 300,
+        system: systemWithContext,
+        messages,
+      });
+
+      for await (const chunk of stream) {
+        if (
+          chunk.type === "content_block_delta" &&
+          chunk.delta.type === "text_delta"
+        ) {
+          res.write(`data: ${JSON.stringify({ chunk: chunk.delta.text })}\n\n`);
+        }
+      }
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      res.write(`data: ${JSON.stringify({ error: msg })}\n\n`);
+    } finally {
+      res.end();
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

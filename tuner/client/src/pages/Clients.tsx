@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import { setNexusContext } from "../components/NexusPanel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,7 +12,6 @@ import {
   Users, ClipboardList, Calendar
 } from "lucide-react";
 import type { QuestionnaireResponse } from "@shared/schema";
-import { useState } from "react";
 
 const DOSHA_COLORS: Record<string, string> = {
   vata: "#a78bfa", pitta: "#f97316", kapha: "#34d399",
@@ -37,6 +38,12 @@ export default function Clients() {
       setConfirmDelete(null);
     },
   });
+
+  useEffect(() => {
+    const count = profiles?.length ?? 0;
+    setNexusContext(`Client Profiles page\n${count} client questionnaire${count !== 1 ? "s" : ""} on file`);
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, [profiles]);
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">

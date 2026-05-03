@@ -2,12 +2,14 @@ import { db } from "./db";
 import {
   instruments, chakras, biofieldZones, ayurvedaElements, centers,
   clientProfiles, questionnaireResponses, protocolTemplates, sessionLogs, soundscapes,
+  nexusMemory,
   type Instrument, type Chakra, type BiofieldZone, type AyurvedaElement, type Center,
   type ClientProfile, type InsertClientProfile,
   type QuestionnaireResponse, type InsertQuestionnaire,
   type ProtocolTemplate,
   type SessionLog, type InsertSessionLog,
   type Soundscape, type InsertSoundscape,
+  type NexusMemory,
 } from "../shared/schema";
 import { eq, desc } from "drizzle-orm";
 
@@ -174,6 +176,25 @@ export class DatabaseStorage implements IStorage {
   }
   deleteSoundscape(id: number): void {
     db.delete(soundscapes).where(eq(soundscapes.id, id)).run();
+  }
+
+  // ─── Nexus Memory ──────────────────────────────────────────────────────────
+  getNexusMemory(): NexusMemory | undefined {
+    return db.select().from(nexusMemory).where(eq(nexusMemory.key, "default")).get();
+  }
+  upsertNexusMemory(memory: string): NexusMemory {
+    const now = new Date().toISOString();
+    const existing = this.getNexusMemory();
+    if (existing) {
+      return db.update(nexusMemory)
+        .set({ memory, updatedAt: now })
+        .where(eq(nexusMemory.key, "default"))
+        .returning().get() as NexusMemory;
+    } else {
+      return db.insert(nexusMemory)
+        .values({ key: "default", memory, updatedAt: now })
+        .returning().get() as NexusMemory;
+    }
   }
 }
 

@@ -6,6 +6,7 @@ import {
   Info, BookMarked, ChevronLeft, ChevronRight, Menu, X, Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import NexusPanel from "./NexusPanel";
 
 const NAV_GROUPS = [
   {
@@ -167,6 +168,9 @@ export default function Layout({ children }: LayoutProps) {
           {children}
         </main>
       </div>
+
+      {/* Nexus AI — persistent across all pages */}
+      <NexusPanel />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import { useEffect } from "react";
+import { setNexusContext } from "../components/NexusPanel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +46,19 @@ export default function ProtocolDetail() {
     queryFn: () => apiRequest("GET", `/api/protocols/${id}`).then((r) => r.json()),
     enabled: !!id,
   });
+
+  useEffect(() => {
+    if (proto) {
+      const phases = parseArr(proto.phases);
+      setNexusContext(
+        `Viewing protocol: ${proto.name}\n` +
+        `Goal: ${proto.primaryGoal || "general healing"} | Duration: ${proto.durationMinutes || "?"} min | Comfort tier: ${proto.comfortTier ?? 1}\n` +
+        (proto.description ? `Description: ${proto.description.slice(0, 200)}\n` : "") +
+        `Phases: ${phases.length} phases in this protocol`
+      );
+    }
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, [proto]);
 
   if (isLoading) {
     return (
