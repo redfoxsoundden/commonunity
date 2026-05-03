@@ -1,0 +1,820 @@
+import { db } from "./db";
+import {
+  instruments, chakras, biofieldZones, ayurvedaElements, centers, protocolTemplates
+} from "../shared/schema";
+
+export async function seedDatabase() {
+  // Check if already seeded
+  const existing = db.select().from(instruments).all();
+  if (existing.length > 0) return;
+
+  // ─── SEED INSTRUMENTS ──────────────────────────────────────────────────────
+  const instrumentData = [
+    // PLANETWARE CHAKRA L WEIGHTED SET
+    {
+      id: "TF-PW-ROOT", name: "Planetware Root", type: "fork", weighting: "weighted",
+      frequency: 194.18, lineage: "Planetware", imageFilename: "TF-PW-ROOT_main.png",
+      audioFilename: "TF-PW-ROOT_audio.wav",
+      masterExplainer: "Earth Day frequency fork for root chakra activation — dynamic, vitalizing, and grounding.",
+      healingBenefits: JSON.stringify(["grounding","nervous-system-support","circulation-support","energetic-clearing","relaxation"]),
+      sessionRole: JSON.stringify(["opener","body-anchor","stabilizer"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","recent-surgery-caution","fracture-bone-weakness-caution","avoid-over-open-wound","avoid-over-acute-inflammation"]),
+      contraNote: "Avoid direct placement over compromised tissue.",
+      notes: JSON.stringify(["Use at base of session for grounding and root activation.","Place at sacrum or soles of feet for body contact.","Tonifying; good for depleted, ungrounded states.","Cousto: Earth Day (synodic) — orange-red, G note."]),
+      toneName: "Earth Day (synodic)", colorHex: "#E8632A", colorName: "orange-red", colorWavelength: "610-625 nm",
+      chakraId: "CH-ROOT", elementalAssociation: "earth",
+      doshaTags: JSON.stringify(["vata-pacifying","kapha-pacifying"]),
+      sourceReference: "Cousto, The Cosmic Octave Tuning Forks, Planetware 2009 (CC BY-NC-ND 4.0)"
+    },
+    {
+      id: "TF-PW-SACRAL", name: "Planetware Sacral", type: "fork", weighting: "weighted",
+      frequency: 210.42, lineage: "Planetware", imageFilename: "TF-PW-SACRAL_main.png",
+      audioFilename: "TF-PW-SACRAL_audio.wav",
+      masterExplainer: "Synodic Moon frequency for sacral chakra — supports creative flow, emotional balance, and glandular regulation.",
+      healingBenefits: JSON.stringify(["emotional-clearing","circulation-support","lymphatic-support","relaxation","integration"]),
+      sessionRole: JSON.stringify(["body-anchor","bridge-tone","integrator"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","recent-surgery-caution","avoid-over-acute-inflammation"]),
+      contraNote: "Use with care during menstruation or reproductive health conditions.",
+      notes: JSON.stringify(["Good mid-session for emotional or creative work.","Place at lower abdomen or sacrum for direct contact.","Cousto: Synodic Moon — orange, G# note — stimulates creative and erotic energy.","Supports lymphatic and glandular function."]),
+      toneName: "Synodic Moon", colorHex: "#FF8C00", colorName: "orange", colorWavelength: "590-610 nm",
+      chakraId: "CH-SACRAL", elementalAssociation: "water",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+      sourceReference: "Cousto, The Cosmic Octave Tuning Forks, Planetware 2009"
+    },
+    {
+      id: "TF-PW-SOLAR", name: "Planetware Solar Plexus", type: "fork", weighting: "weighted",
+      frequency: 126.22, lineage: "Planetware", imageFilename: "TF-PW-SOLAR_main.png",
+      audioFilename: "TF-PW-SOLAR_audio.wav",
+      masterExplainer: "Sun Tone frequency for solar plexus — centering, clarifying, with a transcendental quality.",
+      healingBenefits: JSON.stringify(["focus","coherence","emotional-clearing","energetic-clearing","meditation-support"]),
+      sessionRole: JSON.stringify(["body-anchor","fine-tuner","bridge-tone"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","recent-surgery-caution"]),
+      contraNote: "Avoid prolonged use over acute abdominal inflammation.",
+      notes: JSON.stringify(["Use for centering and will-clarification work.","Place at solar plexus (upper abdomen) or hold above field.","Cousto: Sun Tone — green/yellow-green, B note — magical centering quality.","Pairs with 136.1 for solar-heart bridge."]),
+      toneName: "Sun Tone", colorHex: "#9ACD32", colorName: "yellow-green", colorWavelength: "560-570 nm",
+      chakraId: "CH-SOLAR", elementalAssociation: "fire",
+      doshaTags: JSON.stringify(["pitta-pacifying","kapha-pacifying"]),
+      sourceReference: "Cousto, The Cosmic Octave Tuning Forks, Planetware 2009"
+    },
+    {
+      id: "TF-PW-HEART", name: "Planetware Heart (OM)", type: "fork", weighting: "weighted",
+      frequency: 136.10, lineage: "Planetware", imageFilename: "TF-PW-HEART_main.png",
+      audioFilename: "TF-PW-HEART_audio.wav",
+      masterExplainer: "Earth Year / OM frequency — the central heart tone used in opener/closer ceremonies. Relaxing, soothing, deeply balancing.",
+      healingBenefits: JSON.stringify(["heart-opening","coherence","relaxation","nervous-system-support","vagal-tone-support","meditation-support","integration"]),
+      sessionRole: JSON.stringify(["opener","closer","body-anchor","integrator","stabilizer"]),
+      contraindications: JSON.stringify(["pacemaker-caution","implanted-device-caution","pregnancy-caution","recent-surgery-caution","avoid-over-heart-device"]),
+      contraNote: "Do not place directly over pacemaker or cardiac devices.",
+      notes: JSON.stringify(["Primary fork for opener and closer ceremonies — place at sternum.","Use with TF-OM-136W for co-chanting entanglement practice.","Pairs with any fork for grounding into coherence.","Cousto: Earth Year (OM) — turquoise/blue-green, C# note — sedative, deeply balancing."]),
+      toneName: "Earth Year (OM)", colorHex: "#00CED1", colorName: "turquoise", colorWavelength: "490-510 nm",
+      chakraId: "CH-HEART", elementalAssociation: "air",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying","kapha-pacifying"]),
+      sourceReference: "Cousto, The Cosmic Octave Tuning Forks, Planetware 2009"
+    },
+    {
+      id: "TF-PW-THROAT", name: "Planetware Throat", type: "fork", weighting: "weighted",
+      frequency: 141.27, lineage: "Planetware", imageFilename: "TF-PW-THROAT_main.png",
+      audioFilename: "TF-PW-THROAT_audio.wav",
+      masterExplainer: "Mercury frequency for throat chakra — supports communication, expression, and the intellectual-communicative principle.",
+      healingBenefits: JSON.stringify(["expression-support","focus","coherence","energetic-clearing","meditation-support"]),
+      sessionRole: JSON.stringify(["body-anchor","fine-tuner","bridge-tone"]),
+      contraindications: JSON.stringify(["pacemaker-caution","implanted-device-caution","pregnancy-caution","recent-surgery-caution"]),
+      contraNote: "Gentle application over throat; avoid pressure on carotid area.",
+      notes: JSON.stringify(["Use for expression blocks, communication themes, creative voice.","Place near throat or upper chest — avoid direct carotid pressure.","Cousto: Mercury — blue-green, C# — communicative-intellectual principle.","Pairs with TF-PW-HEART for heart-throat coherence."]),
+      toneName: "Mercury", colorHex: "#007B83", colorName: "blue-green", colorWavelength: "485-500 nm",
+      chakraId: "CH-THROAT", elementalAssociation: "space",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+      sourceReference: "Cousto, The Cosmic Octave Tuning Forks, Planetware 2009"
+    },
+    {
+      id: "TF-PW-3RD", name: "Planetware Third Eye", type: "fork", weighting: "weighted",
+      frequency: 221.23, lineage: "Planetware", imageFilename: "TF-PW-3RD_main.png",
+      audioFilename: "TF-PW-3RD_audio.wav",
+      masterExplainer: "Venus frequency for third eye — aspiration toward higher love, harmony, and intuitive clarity.",
+      healingBenefits: JSON.stringify(["intuitive-support","focus","coherence","meditation-support","emotional-clearing"]),
+      sessionRole: JSON.stringify(["fine-tuner","halo-layer","bridge-tone","accent"]),
+      contraindications: JSON.stringify(["pacemaker-caution","implanted-device-caution","pregnancy-caution","epilepsy-seizure-caution"]),
+      contraNote: "Use gently around the head; avoid strong activation with seizure history.",
+      notes: JSON.stringify(["Use for intuition work, visualization, and third-eye themes.","Hold in field above or beside the head — rarely direct contact.","Cousto: Venus — yellow-orange, A note — higher love energy and harmonic aspiration.","Good late-session for integration and visionary states."]),
+      toneName: "Venus", colorHex: "#FFA500", colorName: "yellow-orange", colorWavelength: "570-590 nm",
+      chakraId: "CH-THIRD-EYE", elementalAssociation: "space",
+      doshaTags: JSON.stringify(["pitta-pacifying","vata-pacifying"]),
+      sourceReference: "Cousto, The Cosmic Octave Tuning Forks, Planetware 2009"
+    },
+    {
+      id: "TF-PW-CROWN", name: "Planetware Crown", type: "fork", weighting: "weighted",
+      frequency: 172.06, lineage: "Planetware", imageFilename: "TF-PW-CROWN_main.png",
+      audioFilename: "TF-PW-CROWN_audio.wav",
+      masterExplainer: "Platonic Year frequency for crown chakra — cheerfulness, clarity of spirit, cosmic unity consciousness. Antidepressive.",
+      healingBenefits: JSON.stringify(["coherence","meditation-support","integration","emotional-clearing","sleep-support","intuitive-support"]),
+      sessionRole: JSON.stringify(["halo-layer","closer","integrator","accent"]),
+      contraindications: JSON.stringify(["pacemaker-caution","implanted-device-caution","pregnancy-caution","epilepsy-seizure-caution"]),
+      contraNote: "Handle above the head in the field; minimize strong direct cranial contact.",
+      notes: JSON.stringify(["Best used at session close for integration and transcendence work.","Work in the field above the crown — minimal direct contact.","Cousto: Platonic Year — purple/violet, F note — cosmic unity, antidepressive.","Pairs with TF-PW-3RD for full upper-chakra closing sweep."]),
+      toneName: "Platonic Year", colorHex: "#8B00FF", colorName: "purple", colorWavelength: "380-420 nm",
+      chakraId: "CH-CROWN", elementalAssociation: "space",
+      doshaTags: JSON.stringify(["vata-pacifying"]),
+      sourceReference: "Cousto, The Cosmic Octave Tuning Forks, Planetware 2009"
+    },
+    // INDEPENDENT WEIGHTED
+    {
+      id: "TF-OTTO-128", name: "Otto 128", type: "fork", weighting: "weighted",
+      frequency: 128, lineage: "Independent / classic bodywork fork", imageFilename: "TF-OTTO-128_main.png",
+      audioFilename: "TF-OTTO-128_audio.wav",
+      masterExplainer: "Weighted body fork used to settle the system through deep vibration, ease tension, and stimulate the parasympathetic response.",
+      healingBenefits: JSON.stringify(["grounding","relaxation","tension-relief","pain-support","nervous-system-support","circulation-support","bone-tissue-support","vagal-tone-support"]),
+      sessionRole: JSON.stringify(["opener","body-anchor","stabilizer","spot-treatment"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","metal-implant-caution","recent-surgery-caution","fracture-bone-weakness-caution","avoid-over-open-wound","avoid-over-acute-inflammation","avoid-over-blood-clot"]),
+      contraNote: "Avoid direct stem placement over implants, fresh injuries, or inflamed tissue.",
+      notes: JSON.stringify(["Use on bony landmarks: sternum, sacrum, joints, sides of spine.","Strong opener for grounding-focused sessions.","Pairs well with 136.1 for grounding into coherence.","Activate by tapping firmly on knee or palm; stem makes contact with body."]),
+      chakraId: "CH-ROOT",
+      doshaTags: JSON.stringify(["vata-pacifying","kapha-pacifying"]),
+    },
+    {
+      id: "TF-OM-136W", name: "OM 136.1 Weighted", type: "fork", weighting: "weighted",
+      frequency: 136.10, lineage: "Independent / OM fork", imageFilename: "TF-OM-136W_main.png",
+      audioFilename: "TF-OM-136W_audio.wav",
+      masterExplainer: "Weighted aluminum OM fork at the Earth Year frequency — practitioner's personal fork for the opener/closer co-chanting ceremony.",
+      healingBenefits: JSON.stringify(["heart-opening","coherence","relaxation","nervous-system-support","vagal-tone-support","meditation-support","integration"]),
+      sessionRole: JSON.stringify(["opener","closer","body-anchor","stabilizer","integrator"]),
+      contraindications: JSON.stringify(["pacemaker-caution","implanted-device-caution","pregnancy-caution","avoid-over-heart-device"]),
+      contraNote: "Do not place over cardiac devices.",
+      notes: JSON.stringify(["Practitioner's own fork for opener and closer ceremonies at sternum.","Pairs with TF-PW-HEART (client's fork) for co-chanting entanglement practice.","Weighted aluminum body gives strong vibration transfer at sternum.","Both forks at 136.1 create resonant entrainment between practitioner and client."]),
+      toneName: "Earth Year (OM)", colorHex: "#00CED1", colorName: "turquoise",
+      chakraId: "CH-HEART", elementalAssociation: "air",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying","kapha-pacifying"]),
+    },
+    // BIOFIELD TUNING KIT
+    {
+      id: "TF-BT-SLIDER", name: "Sonic Slider", type: "fork", weighting: "weighted",
+      frequency: 93.96, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SLIDER_main.png",
+      audioFilename: "TF-BT-SLIDER_audio.wav",
+      masterExplainer: "Weighted Schumann-based body fork used to settle the system and bring coherent earth-pulse vibration into body and field.",
+      healingBenefits: JSON.stringify(["grounding","nervous-system-support","relaxation","fascia-release","circulation-support","lymphatic-support","pain-support","energetic-clearing"]),
+      sessionRole: JSON.stringify(["opener","body-anchor","stabilizer","bridge-tone","integrator"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","recent-surgery-caution","fracture-bone-weakness-caution","avoid-over-open-wound","avoid-over-acute-inflammation","avoid-over-blood-clot"]),
+      contraNote: "Use caution with direct body application over sensitive, inflamed, or medically compromised areas.",
+      notes: JSON.stringify(["Use early in session for regulation, grounding, and coherence.","Good before more specific body or field tuning.","Glide along body or apply to points; long handle supports both.","Pairs well with 136.1 (TF-OM-136W / TF-PW-HEART) for grounding into coherence."]),
+      toneName: "Schumann × 12", elementalAssociation: "earth",
+      doshaTags: JSON.stringify(["vata-pacifying","kapha-pacifying"]),
+      sourceReference: "McKusick, Tuning the Human Biofield; Biofield Tuning Kit"
+    },
+    {
+      id: "TF-BT-SCHU-62", name: "Schumann 62 Hz", type: "fork", weighting: "weighted",
+      frequency: 62.64, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SCHU-62_main.png",
+      audioFilename: "TF-BT-SCHU-62_audio.wav",
+      masterExplainer: "Deep Schumann resonance fork (×8) — profound grounding, field stabilization, and subconscious access.",
+      healingBenefits: JSON.stringify(["grounding","relaxation","nervous-system-support","meditation-support","sleep-support","energetic-clearing"]),
+      sessionRole: JSON.stringify(["opener","body-anchor","stabilizer","bridge-tone"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","recent-surgery-caution","avoid-over-acute-inflammation"]),
+      contraNote: "Very low frequency — use with care on hyperacute clients.",
+      notes: JSON.stringify(["Deepest Schumann fork in the kit — use for profound grounding work.","Good early in session for very ungrounded or high-anxiety clients.","Pairs with TF-BT-SLIDER for layered Schumann field.",  "Lower frequency may be felt as strongly physical vibration."]),
+      toneName: "Schumann × 8", elementalAssociation: "earth",
+      doshaTags: JSON.stringify(["vata-pacifying"]),
+      sourceReference: "McKusick, Biofield Tuning Kit"
+    },
+    {
+      id: "TF-BT-SCHU-54", name: "Schumann 54 Hz", type: "fork", weighting: "weighted",
+      frequency: 54.81, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SCHU-54_main.png",
+      audioFilename: "TF-BT-SCHU-54_audio.wav",
+      masterExplainer: "Sub-bass Schumann fork (×7) — deepest grounding in the kit; access to ancestral and foundational field layers.",
+      healingBenefits: JSON.stringify(["grounding","relaxation","nervous-system-support","meditation-support","sleep-support"]),
+      sessionRole: JSON.stringify(["body-anchor","stabilizer","opener"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","recent-surgery-caution"]),
+      contraNote: "Extremely low — use gently on sensitive clients.",
+      notes: JSON.stringify(["Deepest fork in the Schumann sequence — pair with 62 Hz for full low-field work.","Best for ancestral lineage work, deep earthing, and held trauma.","Works well at sacrum or feet for maximum earth-pulse contact.",  "Less commonly used than 62 or Slider — reserve for specific deep-grounding sessions."]),
+      toneName: "Schumann × 7", elementalAssociation: "earth",
+      doshaTags: JSON.stringify(["vata-pacifying"]),
+    },
+    {
+      id: "TF-BT-FIB-144W", name: "Fibonacci 144 Weighted", type: "fork", weighting: "weighted",
+      frequency: 144, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-144W_main.png",
+      audioFilename: "TF-BT-FIB-144W_audio.wav",
+      masterExplainer: "Weighted Fibonacci body fork — applies sacred-geometry resonance to the physical body for structural and energetic coherence.",
+      healingBenefits: JSON.stringify(["coherence","integration","nervous-system-support","relaxation","bone-tissue-support","energetic-clearing"]),
+      sessionRole: JSON.stringify(["body-anchor","fine-tuner","bridge-tone","integrator"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","metal-implant-caution","recent-surgery-caution","avoid-over-acute-inflammation"]),
+      contraNote: "Avoid over implants; stem contact brings strong structural vibration.",
+      notes: JSON.stringify(["Use on structural landmarks — spine, sternum, joints — for Fibonacci coherence.","Weighted version for body contact; pairs with unweighted 144 for body+field layering.","Fibonacci series supports phi-ratio resonance through the physical system.","Good mid-session structural bridge between grounding and field work."]),
+      toneName: "Fibonacci 144", elementalAssociation: "air",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+      sourceReference: "McKusick, Biofield Tuning Kit"
+    },
+    {
+      id: "TF-BT-FIB-89", name: "Fibonacci 89 Hz", type: "fork", weighting: "weighted",
+      frequency: 89, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-89_main.png",
+      audioFilename: "TF-BT-FIB-89_audio.wav",
+      masterExplainer: "Lower Fibonacci body fork — deep phi-ratio resonance for root and sacral zones, structural release, and nervous system bridging.",
+      healingBenefits: JSON.stringify(["grounding","coherence","nervous-system-support","integration","fascia-release","relaxation"]),
+      sessionRole: JSON.stringify(["body-anchor","bridge-tone","stabilizer"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","metal-implant-caution","recent-surgery-caution"]),
+      notes: JSON.stringify(["Use with 144 weighted for Fibonacci pair work on the body.","Good for root-sacral structural work and nervous system bridging.","Fibonacci 89 and 144 form a coherent phi-ratio interval — work together.",  "Pairs with Schumann forks for deep grounding + structural coherence."]),
+      toneName: "Fibonacci 89", elementalAssociation: "earth",
+      doshaTags: JSON.stringify(["vata-pacifying"]),
+    },
+    {
+      id: "TF-BT-FIB-144U", name: "Fibonacci 144 Unweighted", type: "fork", weighting: "unweighted",
+      frequency: 144, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-144U_main.png",
+      audioFilename: "TF-BT-FIB-144U_audio.wav",
+      masterExplainer: "Unweighted Fibonacci field fork — extends phi-ratio resonance into the biofield for scanning and spatial coherence work.",
+      healingBenefits: JSON.stringify(["coherence","energetic-clearing","integration","nervous-system-support","intuitive-support"]),
+      sessionRole: JSON.stringify(["field-scanner","fine-tuner","halo-layer","harmonic-support"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","tinnitus-caution","sound-sensitivity-caution"]),
+      notes: JSON.stringify(["Field fork — hold at distance and sweep; no body contact.","Pairs with TF-BT-FIB-144W for body+field Fibonacci layering.","Use for biofield coherence scanning and spatial clearing.","Listen for tonal changes as fork moves through field distortions."]),
+      toneName: "Fibonacci 144", elementalAssociation: "air",
+    },
+    {
+      id: "TF-BT-SOL-174", name: "Solfeggio 174 Hz", type: "fork", weighting: "unweighted",
+      frequency: 174, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-174_main.png",
+      audioFilename: "TF-BT-SOL-174_audio.wav",
+      masterExplainer: "The 'workhorse' of Biofield Tuning — primary unweighted field fork for full-field scanning, distortion detection, and energy combing.",
+      healingBenefits: JSON.stringify(["energetic-clearing","pain-support","nervous-system-support","relaxation","grounding","fascia-release"]),
+      sessionRole: JSON.stringify(["field-scanner","distortion-locator","opener","body-anchor","integrator"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","tinnitus-caution","sound-sensitivity-caution"]),
+      notes: JSON.stringify(["Primary scanning fork — use to comb the field from feet to head.","Listen for tonal and density changes indicating distortions.","Move from periphery inward; let the fork lead to stuck areas.","McKusick describes as the foundational Biofield Tuning workhorse."]),
+      toneName: "Solfeggio 174 Hz", elementalAssociation: "earth",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+      sourceReference: "McKusick, Tuning the Human Biofield (Sounds True)"
+    },
+    {
+      id: "TF-BT-SOL-417", name: "Solfeggio 417 Hz", type: "fork", weighting: "unweighted",
+      frequency: 417, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-417_main.png",
+      audioFilename: "TF-BT-SOL-417_audio.wav",
+      masterExplainer: "Solfeggio 'facilitating change' fork — used after 174 to refine resolved zones and dissolve stuck patterns.",
+      healingBenefits: JSON.stringify(["energetic-clearing","emotional-clearing","integration","coherence","focus"]),
+      sessionRole: JSON.stringify(["fine-tuner","integrator","bridge-tone","accent"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","tinnitus-caution","sound-sensitivity-caution"]),
+      notes: JSON.stringify(["Use after 174 to refine and integrate cleared zones.","Higher frequency for more subtle field work and change facilitation.","Good for emotional clearing and facilitating shift in stuck patterns.","Solfeggio: 417 Hz — undoing situations and facilitating change."]),
+      toneName: "Solfeggio 417 Hz",
+      doshaTags: JSON.stringify(["pitta-pacifying"]),
+      sourceReference: "McKusick, Tuning the Human Biofield"
+    },
+    {
+      id: "TF-BT-SOL-528", name: "Solfeggio 528 Hz", type: "fork", weighting: "unweighted",
+      frequency: 528, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-528_main.png",
+      audioFilename: "TF-BT-SOL-528_audio.wav",
+      masterExplainer: "The 'Love / Miracle / Repair' Solfeggio frequency — coherence, DNA resonance, and heart-field activation.",
+      healingBenefits: JSON.stringify(["heart-opening","coherence","integration","emotional-clearing","meditation-support","sleep-support"]),
+      sessionRole: JSON.stringify(["fine-tuner","integrator","halo-layer","closer","accent"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","tinnitus-caution","sound-sensitivity-caution"]),
+      notes: JSON.stringify(["Use for heart-opening, love-frequency, and coherence work.","Good in closing phases and integration moments.","Solfeggio: 528 Hz — DNA repair/transformation, love frequency.","Matches BOWL-528 — pair for layered coherence effect."]),
+      toneName: "Solfeggio 528 Hz",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+    },
+    {
+      id: "TF-BT-222", name: "BT 222 Hz", type: "fork", weighting: "unweighted",
+      frequency: 222, lineage: "Biofield Tuning", imageFilename: "TF-BT-222_main.png",
+      audioFilename: "TF-BT-222_audio.wav",
+      masterExplainer: "Unweighted Biofield Tuning field fork at 222 Hz — fine upper-field work, throat and third-eye zone resonance.",
+      healingBenefits: JSON.stringify(["expression-support","intuitive-support","focus","coherence","energetic-clearing"]),
+      sessionRole: JSON.stringify(["fine-tuner","field-scanner","halo-layer","accent"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","tinnitus-caution","epilepsy-seizure-caution"]),
+      notes: JSON.stringify(["Upper-field work for throat and third-eye zones.","Good for expression and intuitive clearing work.","Close in frequency to TF-PW-3RD (221.23 Hz) — creates near-unison harmonic pair.","Use in field rather than direct body contact."]),
+      doshaTags: JSON.stringify(["pitta-pacifying","vata-pacifying"]),
+    },
+    // SINGING BOWLS
+    {
+      id: "BOWL-111", name: "Singing Bowl 111 Hz", type: "bowl", weighting: "n/a",
+      frequency: 111, lineage: "Independent", imageFilename: "BOWL-111_main.png",
+      audioFilename: "BOWL-111_audio.wav",
+      masterExplainer: "Deep 111 Hz bowl — sacred geometry frequency associated with neural coherence, theta-state access, and cellular regeneration.",
+      healingBenefits: JSON.stringify(["nervous-system-support","meditation-support","sleep-support","relaxation","coherence","integration"]),
+      sessionRole: JSON.stringify(["opener","body-anchor","spatial-wash","closer"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","metal-implant-caution","epilepsy-seizure-caution","sound-sensitivity-caution","tinnitus-caution"]),
+      contraNote: "Do not place directly on or near metal implants. Avoid for seizure history.",
+      notes: JSON.stringify(["111 Hz: theta-brainwave entrainment, neural coherence, sacred geometry frequency.","Use early or as ambient wash for full-session containment.","Good for deep meditation states and cellular coherence work.","Research suggests 111 Hz may stimulate right-brain activity and neural coherence."]),
+      chakraId: "CH-ROOT", elementalAssociation: "earth",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+    },
+    {
+      id: "BOWL-272", name: "Singing Bowl 272 Hz", type: "bowl", weighting: "n/a",
+      frequency: 272, frequencyHarmonic: 771, lineage: "Independent", imageFilename: "BOWL-272_main.png",
+      audioFilename: "BOWL-272_audio.wav",
+      masterExplainer: "Mid-range bowl at 272 Hz with 771 Hz harmonic — solar plexus / throat zone bridge, clarity and expression support.",
+      healingBenefits: JSON.stringify(["focus","expression-support","coherence","emotional-clearing","integration","relaxation"]),
+      sessionRole: JSON.stringify(["body-anchor","bridge-tone","spatial-wash","harmonic-support"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","metal-implant-caution","tinnitus-caution"]),
+      notes: JSON.stringify(["Dominant 272 Hz bridges solar plexus and throat zones.","771 Hz harmonic adds crown/bell overtone — good for full-spectrum layering.","Harmonically related to BELL-771 — use together for 3rd overtone coherence.","Good mid-session spatial wash or anchor beneath finer fork work."]),
+      doshaTags: JSON.stringify(["pitta-pacifying","kapha-pacifying"]),
+    },
+    {
+      id: "BOWL-385", name: "Singing Bowl 385 Hz", type: "bowl", weighting: "n/a",
+      frequency: 385.5, frequencyHarmonic: 1087, lineage: "Independent", imageFilename: "BOWL-385_main.png",
+      audioFilename: "BOWL-385_audio.wav",
+      masterExplainer: "Heart-to-throat range bowl — warmth, expression, and opening themes in the mid-upper frequency range.",
+      healingBenefits: JSON.stringify(["heart-opening","expression-support","coherence","emotional-clearing","relaxation","meditation-support"]),
+      sessionRole: JSON.stringify(["bridge-tone","spatial-wash","harmonic-support","integrator"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","tinnitus-caution","sound-sensitivity-caution"]),
+      notes: JSON.stringify(["Sits between heart (136/256) and throat (141/288) frequency zones.","Use for heart-throat bridge work and expression opening.","Warm mid-range tone — good for sustained ambient support during fork work.","1087 Hz harmonic adds upper overtone brightness."]),
+      chakraId: "CH-THROAT",
+      doshaTags: JSON.stringify(["pitta-pacifying","vata-pacifying"]),
+    },
+    {
+      id: "BOWL-429", name: "Singing Bowl 429 Hz", type: "bowl", weighting: "n/a",
+      frequency: 429, frequencyHarmonic: 1176, lineage: "Independent", imageFilename: "BOWL-429_main.png",
+      audioFilename: "BOWL-429_audio.wav",
+      masterExplainer: "Upper mid-range bowl in the throat-third eye zone — clarity, communication, and refined intuitive support.",
+      healingBenefits: JSON.stringify(["expression-support","intuitive-support","focus","coherence","emotional-clearing"]),
+      sessionRole: JSON.stringify(["bridge-tone","fine-tuner","spatial-wash","harmonic-support"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","tinnitus-caution"]),
+      notes: JSON.stringify(["Near Solfeggio 432 Hz — use for classical 432 tuning affinity sessions.","Good in the upper throat and third-eye zone during spatial work.","Pairs with BOWL-528 for a warm 4-6 chakra zone wash.","1176 Hz harmonic adds subtle upper-field shimmer."]),
+      doshaTags: JSON.stringify(["pitta-pacifying","vata-pacifying"]),
+    },
+    {
+      id: "BOWL-528", name: "Singing Bowl 528 Hz", type: "bowl", weighting: "n/a",
+      frequency: 528, lineage: "Independent", imageFilename: "BOWL-528_main.png",
+      audioFilename: "BOWL-528_audio.wav",
+      masterExplainer: "Love / Miracle bowl at 528 Hz — heart coherence, DNA resonance, deep restoration and transformation.",
+      healingBenefits: JSON.stringify(["heart-opening","coherence","integration","emotional-clearing","meditation-support","sleep-support","energetic-clearing"]),
+      sessionRole: JSON.stringify(["bridge-tone","spatial-wash","closer","integrator","halo-layer"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","implanted-device-caution","tinnitus-caution","sound-sensitivity-caution"]),
+      notes: JSON.stringify(["Use for heart-coherence and love-frequency work.","Matches TF-BT-SOL-528 fork — pair for layered Solfeggio 528 effect.","Best in closing or integration phases; strong transformative quality.","528 Hz: repair, love, transformation — widely cited across Solfeggio tradition."]),
+      chakraId: "CH-HEART", elementalAssociation: "air",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+    },
+    // BELL
+    {
+      id: "BELL-771", name: "Tibetan Bell 771 Hz", type: "bell", weighting: "n/a",
+      frequency: 771, lineage: "Independent", imageFilename: "BELL-771_main.png",
+      audioFilename: "BELL-771_audio.wav",
+      masterExplainer: "High-frequency Tibetan bell — sharp, clear tone for space clearing, transition signaling, and upper-field activation.",
+      healingBenefits: JSON.stringify(["energetic-clearing","coherence","focus","integration","meditation-support","intuitive-support"]),
+      sessionRole: JSON.stringify(["opener","closer","accent","halo-layer","integrator"]),
+      contraindications: JSON.stringify(["pregnancy-caution","pacemaker-caution","tinnitus-caution","sound-sensitivity-caution","epilepsy-seizure-caution"]),
+      contraNote: "Sharp attack — use gently near tinnitus-sensitive clients.",
+      notes: JSON.stringify(["Use to open and close session space with clear, penetrating tone.","Harmonically related to BOWL-272 (771 Hz harmonic) — rich overtone pair.","Good for transitions between protocol phases.","Not for sustained play — use as accent and ceremony marker."]),
+      chakraId: "CH-CROWN", elementalAssociation: "space",
+      doshaTags: JSON.stringify(["pitta-pacifying"]),
+    },
+  ];
+
+  for (const instr of instrumentData) {
+    db.insert(instruments).values(instr as any).run();
+  }
+
+  // ─── SEED CHAKRAS ──────────────────────────────────────────────────────────
+  const chakraData = [
+    {
+      id: "CH-ROOT", sanskrit: "Mūlādhāra", sanskritMeaning: "Root support / foundation",
+      locationPhysical: "Base of spine, perineum", locationSpinal: "Coccygeal plexus",
+      element: "Earth", fingerCorrespondence: "Ring finger (Anamika)",
+      colorTraditional: "Red", colorHex: "#CC0000", colorCoustoWavelength: "194.18 Hz / 610-625 nm orange-red",
+      bijaMantraShort: "LAM", bijaMantraLong: "LLAAAMMM",
+      vowelSound: "UH (as in cup)",
+      affirmationEnglish: "I am safe. I am grounded. I belong.",
+      devata: "Ganesha / Brahma", devataMantra: "Om Gam Ganapataye Namaha",
+      yantraGeometry: "Square", petalCount: 4,
+      themes: JSON.stringify(["Safety","Survival","Grounding","Belonging","Physical foundation","Ancestral roots","Basic needs"]),
+      imbalanceSigns: JSON.stringify({ excess: "Sluggishness, hoarding, rigid, fearful of change", deficiency: "Anxiety, scattered, ungrounded, instability" }),
+      physicalCorrelates: JSON.stringify(["Adrenal glands","Spine","Legs","Feet","Bones","Large intestine","Immune system"]),
+      asanas: JSON.stringify(["Tadasana","Virabhadrasana I","Malasana","Balasana","Dandasana"]),
+      pranayamaPrimary: "Bhramari (humming bee)",
+      pranayamaGentler: "Natural breath with extended exhale",
+      mudra: "Prithvi Mudra (ring fingertip to thumb tip)",
+      mudraAlt: "Bhu Mudra (touch ground with index and middle fingers)",
+      bandha: "Mula Bandha",
+      frequencyCousto: 194.18, frequencySolfeggio: 396, frequencyWestern: "G3 (196 Hz)",
+      frequencyBowl: 194, frequencyPractitioner: 194.18,
+      recommendedForks: JSON.stringify(["TF-PW-ROOT","TF-OTTO-128","TF-BT-SLIDER","TF-BT-SCHU-62"]),
+      placementGuide: JSON.stringify({ front: "Lower abdomen / pubic bone area", back: "Sacrum / coccyx", lateral: "Hip creases", field: "0.3–1m below feet (Earth Star)", surrogate: "Therapist's own feet or sacrum" }),
+      layeringPattern: JSON.stringify(["Start with body-contact fork (TF-BT-SLIDER or TF-OTTO-128)","Add field scanning with TF-BT-SOL-174","Close with TF-PW-ROOT for chakra-specific activation"]),
+      comfortTierGuidance: "Tiers 1–3 preferred; direct body contact fine from Tier 2+",
+      practitionerObservations: "The root is often the starting place. Clients who arrive scattered, anxious, or disconnected from the body respond well to slow Schumann grounding before any specific chakra work.",
+      sourceReferences: JSON.stringify(["Judith, Wheels of Life","Judith, Eastern Body Western Mind","Cousto, The Cosmic Octave"]),
+      sortOrder: 1
+    },
+    {
+      id: "CH-SACRAL", sanskrit: "Svādhiṣṭhāna", sanskritMeaning: "One's own dwelling place",
+      locationPhysical: "Lower abdomen, 4–7 cm below navel", locationSpinal: "Sacral plexus L1-L5",
+      element: "Water", fingerCorrespondence: "Little finger (Kanistha)",
+      colorTraditional: "Orange", colorHex: "#FF8C00", colorCoustoWavelength: "210.42 Hz / 590-610 nm orange",
+      bijaMantraShort: "VAM", bijaMantraLong: "VAAAMMM",
+      vowelSound: "OO (as in you)",
+      affirmationEnglish: "I feel. I create. I flow with life.",
+      devata: "Varuna / Vishnu", devataMantra: "Om Namo Narayanaya",
+      yantraGeometry: "Circle / Crescent moon", petalCount: 6,
+      themes: JSON.stringify(["Creativity","Pleasure","Sexuality","Desire","Flow","Emotional intelligence","Intimacy","Procreation"]),
+      imbalanceSigns: JSON.stringify({ excess: "Addictions, emotional overwhelm, sexual compulsion, codependency", deficiency: "Emotional numbness, creative block, fear of pleasure, rigidity" }),
+      physicalCorrelates: JSON.stringify(["Reproductive organs","Kidneys","Bladder","Hips","Lower back","Lymphatic system"]),
+      asanas: JSON.stringify(["Baddha Konasana","Upavistha Konasana","Pigeon Pose","Hip circles","Yin hip openers"]),
+      pranayamaPrimary: "Chandra Bhedana (left-nostril, lunar)",
+      pranayamaGentler: "Nadi Shodhana with emphasis on left side",
+      mudra: "Varuna Mudra (little fingertip to thumb tip)",
+      mudraAlt: "Shakti Mudra",
+      bandha: "none direct (soft Mula Bandha with exhale)",
+      frequencyCousto: 210.42, frequencySolfeggio: 417, frequencyWestern: "A3 (220 Hz)",
+      frequencyBowl: 210, frequencyPractitioner: 210.42,
+      recommendedForks: JSON.stringify(["TF-PW-SACRAL","TF-BT-SLIDER","TF-BT-SOL-417"]),
+      placementGuide: JSON.stringify({ front: "Lower abdomen, 4–7 cm below navel", back: "Sacral dimples / lower sacrum", lateral: "Hip crests", field: "0.5m from sides at hip level", surrogate: "Practitioner's hip / lower abdomen" }),
+      layeringPattern: JSON.stringify(["Begin with grounding (root) then move to sacral","TF-BT-SLIDER along lower back and hips","TF-PW-SACRAL direct placement for chakra activation","TF-BT-SOL-417 for field clearing of emotional patterns"]),
+      comfortTierGuidance: "Tier 2+ for body contact; Tier 1 field-only absolutely fine and often preferred",
+      practitionerObservations: "Many emotional patterns — especially around creativity and relationships — show up in the sacral field. Clients often need explicit permission to receive here. Field-only approach is gentle and often more effective than body contact.",
+      sourceReferences: JSON.stringify(["Judith, Eastern Body Western Mind","Cousto, The Cosmic Octave"]),
+      sortOrder: 2
+    },
+    {
+      id: "CH-SOLAR", sanskrit: "Maṇipūra", sanskritMeaning: "City of gems / lustrous jewel",
+      locationPhysical: "Upper abdomen, solar plexus, navel region", locationSpinal: "T6-T10",
+      element: "Fire", fingerCorrespondence: "Thumb (Angustha)",
+      colorTraditional: "Yellow", colorHex: "#FFD700", colorCoustoWavelength: "126.22 Hz / 560-570 nm yellow-green",
+      bijaMantraShort: "RAM", bijaMantraLong: "RAAAMMM",
+      vowelSound: "OH (as in open)",
+      affirmationEnglish: "I act. I choose. I am powerful.",
+      devata: "Rudra (Shiva) / Agni", devataMantra: "Om Namah Shivaya",
+      yantraGeometry: "Downward-pointing triangle / 10-petalled lotus", petalCount: 10,
+      themes: JSON.stringify(["Personal power","Will","Confidence","Identity","Action","Transformation","Discipline","Self-esteem"]),
+      imbalanceSigns: JSON.stringify({ excess: "Control issues, aggression, arrogance, domination", deficiency: "Low self-esteem, passivity, shame, victim mentality" }),
+      physicalCorrelates: JSON.stringify(["Digestive system","Liver","Pancreas","Adrenals","Middle spine","Metabolism"]),
+      asanas: JSON.stringify(["Navasana","Warrior III","Ardha Navasana","Twists","Core sequences"]),
+      pranayamaPrimary: "Kapalabhati (skull-shining breath)",
+      pranayamaGentler: "Ujjayi with core engagement",
+      mudra: "Agni Mudra (fold ring finger, thumb presses it)",
+      mudraAlt: "Surya Mudra (ring finger to base of thumb)",
+      bandha: "Uddiyana Bandha",
+      frequencyCousto: 126.22, frequencySolfeggio: 528, frequencyWestern: "B2 (123.5 Hz)",
+      frequencyBowl: 126, frequencyPractitioner: 126.22,
+      recommendedForks: JSON.stringify(["TF-PW-SOLAR","TF-BT-SOL-528","TF-BT-FIB-144W"]),
+      placementGuide: JSON.stringify({ front: "Solar plexus — upper abdomen between navel and sternum", back: "T7-T10 region, mid-back", lateral: "Sides of ribcage", field: "30–60 cm above solar plexus area", surrogate: "Practitioner's solar plexus" }),
+      layeringPattern: JSON.stringify(["Grounding first to prevent solar plexus overstimulation","TF-PW-SOLAR at solar plexus for direct activation","TF-BT-SOL-528 field work for transformation themes","TF-BT-FIB-144W for structural coherence if tension held in core"]),
+      comfortTierGuidance: "Tier 2+ preferred; solar plexus is sensitive — establish trust before direct body contact",
+      practitionerObservations: "The solar plexus often holds tension from authority wounds and identity suppression. Approach gently — this area can release powerfully. Field work first is usually more sustainable than direct contact.",
+      sourceReferences: JSON.stringify(["Judith, Eastern Body Western Mind","Cousto, The Cosmic Octave"]),
+      sortOrder: 3
+    },
+    {
+      id: "CH-HEART", sanskrit: "Anāhata", sanskritMeaning: "Unstruck / unhurt sound",
+      locationPhysical: "Center of chest, cardiac plexus", locationSpinal: "T3-T5",
+      element: "Air", fingerCorrespondence: "Index finger (Tarjani)",
+      colorTraditional: "Green", colorHex: "#228B22", colorCoustoWavelength: "136.10 Hz / 490-510 nm turquoise-green",
+      bijaMantraShort: "YAM", bijaMantraLong: "YAAAMMM",
+      vowelSound: "AY (as in say)",
+      affirmationEnglish: "I love. I am love. I give and receive freely.",
+      devata: "Vayu / Ishana", devataMantra: "Om Klim Krishnaya Namaha",
+      yantraGeometry: "Six-pointed star (two intersecting triangles)", petalCount: 12,
+      themes: JSON.stringify(["Love","Compassion","Connection","Grief","Forgiveness","Balance","Relationships","Self-love"]),
+      imbalanceSigns: JSON.stringify({ excess: "Codependency, martyrdom, possessiveness, over-giving", deficiency: "Isolation, grief, coldness, fear of intimacy, loneliness" }),
+      physicalCorrelates: JSON.stringify(["Heart","Lungs","Thymus","Arms","Hands","Upper back","Circulatory system"]),
+      asanas: JSON.stringify(["Ustrasana","Bhujangasana","Matsyasana","Anahatasana","Shoulder openers"]),
+      pranayamaPrimary: "Anulom Vilom / Nadi Shodhana",
+      pranayamaGentler: "4-count inhale / 4-count exhale with hands on heart",
+      mudra: "Hridaya Mudra (index inward to thumb, middle/ring to thumb)",
+      mudraAlt: "Anjali Mudra",
+      bandha: "None specific",
+      frequencyCousto: 136.10, frequencySolfeggio: 639, frequencyWestern: "C#4 (138.6 Hz)",
+      frequencyBowl: 528, frequencyPractitioner: 136.10,
+      recommendedForks: JSON.stringify(["TF-PW-HEART","TF-OM-136W","TF-BT-SOL-528","BOWL-528"]),
+      placementGuide: JSON.stringify({ front: "Center of sternum", back: "Between shoulder blades T3-T5", lateral: "Sides of chest at heart level", field: "30–60 cm from chest in front", surrogate: "Practitioner's own sternum (for opener/closer)" }),
+      layeringPattern: JSON.stringify(["Opener: TF-PW-HEART + TF-OM-136W at sternum (co-chanting)","BOWL-528 ambient wash if available","TF-BT-SOL-528 for love-frequency field work","Closer: repeat TF-PW-HEART + TF-OM-136W at sternum"]),
+      comfortTierGuidance: "Sternum contact accessible in all tiers; surrogate approach fine in all tiers. The heart-sternum placement is the default and most powerful.",
+      practitionerObservations: "This is the ceremonial center of every session via the opener/closer. The 136.1 Hz OM fork at the sternum creates coherent resonance between practitioner and client. It is always present.",
+      sourceReferences: JSON.stringify(["Judith, Eastern Body Western Mind","Cousto, The Cosmic Octave","Mandukya Upanishad"]),
+      sortOrder: 4
+    },
+    {
+      id: "CH-THROAT", sanskrit: "Viśuddha", sanskritMeaning: "Especially pure / purification",
+      locationPhysical: "Throat, neck, jaw", locationSpinal: "C3-C7",
+      element: "Space (Akasha)", fingerCorrespondence: "Thumb (alternative system) / all fingers",
+      colorTraditional: "Blue", colorHex: "#1E90FF", colorCoustoWavelength: "141.27 Hz / 450-495 nm blue",
+      bijaMantraShort: "HAM", bijaMantraLong: "HAAAMMM",
+      vowelSound: "EYE (as in I)",
+      affirmationEnglish: "I speak my truth. I am heard. I express clearly.",
+      devata: "Akasha / Sadashiva", devataMantra: "Om Namah Shivaya (throat vibration)",
+      yantraGeometry: "Circle with downward triangle", petalCount: 16,
+      themes: JSON.stringify(["Expression","Truth","Communication","Creativity through voice","Listening","Integrity","Timing"]),
+      imbalanceSigns: JSON.stringify({ excess: "Over-talking, inability to listen, dominating conversations, gossiping", deficiency: "Fear of speaking, voice loss, swallowing truth, chronic sore throat" }),
+      physicalCorrelates: JSON.stringify(["Thyroid","Parathyroid","Throat","Neck","Jaw","Ears","Shoulders"]),
+      asanas: JSON.stringify(["Sarvangasana (shoulder stand)","Halasana","Fish pose","Neck rolls","Jalandhara Bandha"]),
+      pranayamaPrimary: "Ujjayi (ocean breath / victorious breath)",
+      pranayamaGentler: "Humming exhale (gentle Bhramari variant)",
+      mudra: "Akasha Mudra (middle fingertip to thumb tip)",
+      mudraAlt: "Granthita Mudra (interlaced fingers at throat)",
+      bandha: "Jalandhara Bandha",
+      frequencyCousto: 141.27, frequencySolfeggio: 741, frequencyWestern: "C#/Db4 (138.6–146.8 Hz range)",
+      frequencyBowl: 385.5, frequencyPractitioner: 141.27,
+      recommendedForks: JSON.stringify(["TF-PW-THROAT","TF-BT-222","BOWL-385","TF-BT-SOL-417"]),
+      placementGuide: JSON.stringify({ front: "Sternum / upper chest; avoid direct larynx", back: "Base of skull / C7", lateral: "Jaw and behind ears", field: "30–50 cm in front of face/throat area", surrogate: "Practitioner's throat area" }),
+      layeringPattern: JSON.stringify(["Begin with heart work (Anāhata) to open pathway to throat","TF-PW-THROAT gentle contact at upper sternum (not larynx)","BOWL-385 ambient spatial wash","TF-BT-222 fine field work around throat and jaw area"]),
+      comfortTierGuidance: "Tiers 2–5 for body contact; Tier 1 field or surrogate. Avoid contact on larynx in all tiers.",
+      practitionerObservations: "The throat holds suppressed expression. Many clients carry stories they have never voiced here. Gentle, patient approach. The Ujjayi instruction — 'breathe as if fogging a mirror' — often opens this area more than direct placement.",
+      sourceReferences: JSON.stringify(["Judith, Wheels of Life","Cousto, The Cosmic Octave"]),
+      sortOrder: 5
+    },
+    {
+      id: "CH-THIRD-EYE", sanskrit: "Ājñā", sanskritMeaning: "Command / perceive / beyond wisdom",
+      locationPhysical: "Center of forehead, between eyebrows", locationSpinal: "Brain / medulla oblongata",
+      element: "Light / Space", fingerCorrespondence: "Index finger",
+      colorTraditional: "Indigo", colorHex: "#4B0082", colorCoustoWavelength: "221.23 Hz / 420-450 nm indigo",
+      bijaMantraShort: "OM", bijaMantraLong: "AUMMM",
+      vowelSound: "AY (nasal quality)",
+      affirmationEnglish: "I see. I know. I trust my vision.",
+      devata: "Shiva-Shakti / Hakini", devataMantra: "Om Namah Shivaya (subtle)",
+      yantraGeometry: "Two-petalled lotus (Ida and Pingala)", petalCount: 2,
+      themes: JSON.stringify(["Intuition","Insight","Vision","Wisdom","Perception","Third-eye opening","Clairvoyance","Pattern recognition"]),
+      imbalanceSigns: JSON.stringify({ excess: "Headaches, delusion, inability to focus, spiritual bypassing", deficiency: "Inability to visualize, poor intuition, denial, closed-mindedness" }),
+      physicalCorrelates: JSON.stringify(["Pineal gland","Pituitary gland","Eyes","Sinuses","Brain hemispheres"]),
+      asanas: JSON.stringify(["Balasana","Garudasana","Forward folds with forehead contact","Trataka (candle gazing)"]),
+      pranayamaPrimary: "Nadi Shodhana (alternate nostril)",
+      pranayamaGentler: "Sama Vritti (equal breathing 4:4:4:4)",
+      mudra: "Gyana Mudra (index to thumb, open palm)",
+      mudraAlt: "Shambhavi Mudra (gaze toward third eye)",
+      bandha: "None direct",
+      frequencyCousto: 221.23, frequencySolfeggio: 852, frequencyWestern: "A4 (220 Hz)",
+      frequencyBowl: 429, frequencyPractitioner: 221.23,
+      recommendedForks: JSON.stringify(["TF-PW-3RD","TF-BT-222","BOWL-429","TF-BT-SOL-417"]),
+      placementGuide: JSON.stringify({ front: "Hold in field above forehead — never direct contact on skull", back: "Occiput / base of skull", lateral: "Temples (very gentle)", field: "30–60 cm above and in front of forehead", surrogate: "Practitioner's own third eye area" }),
+      layeringPattern: JSON.stringify(["Never begin at third eye — open lower chakras first","TF-PW-3RD held in field above forehead","BOWL-429 ambient wash for expanded field effect","TF-BT-222 for fine clearing around forehead and temples"]),
+      comfortTierGuidance: "Field-only for Tiers 1–3; very gentle physical proximity for 4–5 only. The third eye responds to presence, not pressure.",
+      practitionerObservations: "The third eye is accessed through stillness, not force. Many practitioners over-activate this area too quickly. Trust that working lower chakras fully opens the path naturally.",
+      sourceReferences: JSON.stringify(["Judith, Wheels of Life","Cousto, The Cosmic Octave"]),
+      sortOrder: 6
+    },
+    {
+      id: "CH-CROWN", sanskrit: "Sahasrāra", sanskritMeaning: "Thousand-petalled / thousandfold",
+      locationPhysical: "Top of head, cerebral cortex", locationSpinal: "Cerebral cortex / pineal",
+      element: "Thought / Pure consciousness", fingerCorrespondence: "None — beyond physical elements",
+      colorTraditional: "Violet / White", colorHex: "#9400D3", colorCoustoWavelength: "172.06 Hz / 380-420 nm violet",
+      bijaMantraShort: "AH (silence / OM)", bijaMantraLong: "Silence or AUMMM into silence",
+      vowelSound: "EE (high, subtle)",
+      affirmationEnglish: "I know. I understand. I am one.",
+      devata: "Shiva (pure consciousness) / Brahman", devataMantra: "Om (the root sound itself)",
+      yantraGeometry: "Thousand-petalled lotus", petalCount: 1000,
+      themes: JSON.stringify(["Unity consciousness","Spiritual connection","Transcendence","Devotion","Understanding","Cosmic awareness","Liberation (Moksha)"]),
+      imbalanceSigns: JSON.stringify({ excess: "Spiritual addiction, disconnection from earth, dissociation", deficiency: "Spiritual disconnection, closed-mindedness, materialism, nihilism" }),
+      physicalCorrelates: JSON.stringify(["Cerebral cortex","Pineal gland","Central nervous system","Skin"]),
+      asanas: JSON.stringify(["Sirsasana (supported)","Savasana","Meditation postures","Yoga Nidra"]),
+      pranayamaPrimary: "Meditation breath (natural, witnessing)",
+      pranayamaGentler: "Extended exhale with inner silence",
+      mudra: "Brahma Mudra (all four finger tips to thumbs, fists joined)",
+      mudraAlt: "Hands at heart in Anjali, eyes closed toward crown",
+      bandha: "None — this is released",
+      frequencyCousto: 172.06, frequencySolfeggio: 963, frequencyWestern: "F3 (174.6 Hz)",
+      frequencyBowl: 111, frequencyPractitioner: 172.06,
+      recommendedForks: JSON.stringify(["TF-PW-CROWN","BOWL-111","BELL-771","TF-BT-FIB-144U"]),
+      placementGuide: JSON.stringify({ front: "Field above crown — no body contact here", back: "Field behind and above the head", lateral: "Field at ear level and above", field: "30–90 cm above crown", surrogate: "Practitioner holds in own crown field" }),
+      layeringPattern: JSON.stringify(["Always the last chakra in any ascending sequence","BELL-771 to open the crown space (ceremony)","TF-PW-CROWN held in field above crown","BOWL-111 ambient wash for theta containment","Close with the Universal Closer — return to heart (TF-PW-HEART)"]),
+      comfortTierGuidance: "Field work only in Tiers 1–4; very gentle crown touch possible in Tier 5 with explicit consent. The crown is approached through stillness and breath.",
+      practitionerObservations: "The crown rarely needs direct activation. When the lower six chakras are clear and coherent, the crown opens naturally. Trust the sequence. Less is more here.",
+      sourceReferences: JSON.stringify(["Judith, Wheels of Life","Cousto, The Cosmic Octave","Mandukya Upanishad"]),
+      sortOrder: 7
+    },
+  ];
+
+  for (const ch of chakraData) {
+    db.insert(chakras).values(ch as any).run();
+  }
+
+  // ─── SEED BIOFIELD ZONES ────────────────────────────────────────────────────
+  const biofieldData = [
+    { id: "BF-ROOT-LEFT", label: "Left Root Field", location: "Left side, base chakra zone", fieldSide: "left", themes: JSON.stringify(["Maternal grounding","Safety from mother lineage","Financial support from feminine side"]), suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SLIDER","TF-PW-ROOT"]), techniqueLocate: "Comb at arm's length, left side, from foot level to hip level", techniqueListen: "Listen for tonal heaviness or stagnation", techniqueTreat: "Slow combing inward; add TF-BT-SLIDER for body anchoring", techniqueIntegrate: "TF-PW-ROOT at sacrum", techniqueClose: "Smooth field outward; grounding breath", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning / McKusick" },
+    { id: "BF-ROOT-RIGHT", label: "Right Root Field", location: "Right side, base chakra zone", fieldSide: "right", themes: JSON.stringify(["Paternal grounding","Safety from father lineage","Financial support from masculine side"]), suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SLIDER","TF-PW-ROOT"]), techniqueLocate: "Comb right side, foot to hip level", techniqueListen: "Note tonal density shifts", techniqueTreat: "Inward combing; body anchor at sacrum if ready", techniqueIntegrate: "TF-PW-ROOT body contact", techniqueClose: "Smooth field, grounding breath", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
+    { id: "BF-SACRAL-LEFT", label: "Left Sacral Field", location: "Left side at sacral level", fieldSide: "left", themes: JSON.stringify(["Grief/anger re: lack of maternal support","Receiving money/pleasure","Intimacy issues from feminine lineage"]), suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-BT-SOL-417","TF-PW-SACRAL"]), techniqueLocate: "Arm's length, left hip level", techniqueListen: "Tonal changes in rhythmic/creative zones", techniqueTreat: "Slow comb inward; 417 for pattern dissolution", techniqueIntegrate: "TF-PW-SACRAL if body contact appropriate", techniqueClose: "Smooth and seal; nourishing breath", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
+    { id: "BF-HEART-FRONT", label: "Heart Field (Front)", location: "Front chest at heart level", fieldSide: "front", themes: JSON.stringify(["Giving love","Open-heartedness","Grief and loss of love","Self-compassion blocks"]), suggestedForks: JSON.stringify(["TF-PW-HEART","TF-BT-SOL-528","BOWL-528"]), techniqueLocate: "30–60 cm in front of chest", techniqueListen: "Heavy or hollow tone may indicate grief held here", techniqueTreat: "Gentle inward comb; 528 for love-frequency restoration", techniqueIntegrate: "TF-PW-HEART at sternum", techniqueClose: "Hands to heart; three OMs", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
+    { id: "BF-SOLAR-FRONT", label: "Solar Plexus Field (Front)", location: "Front body, upper abdomen level", fieldSide: "front", themes: JSON.stringify(["Willpower blocks","Authority wounds","Shame and self-worth","Power dynamics"]), suggestedForks: JSON.stringify(["TF-BT-SOL-174","TF-PW-SOLAR","TF-BT-SOL-528"]), techniqueLocate: "30 cm in front of solar plexus", techniqueListen: "Tight, brittle tone often indicates stored tension", techniqueTreat: "Slow inward comb; pause at distortions", techniqueIntegrate: "TF-PW-SOLAR body contact if welcome", techniqueClose: "Smooth outward; Ujjayi breath", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
+    { id: "BF-CROWN-ABOVE", label: "Crown / Sun Star Field", location: "Above the head", fieldSide: "front", themes: JSON.stringify(["Higher self connection","Worrying about the future","Spiritual disconnection","Crown opening"]), suggestedForks: JSON.stringify(["TF-PW-CROWN","TF-BT-FIB-144U","BELL-771"]), techniqueLocate: "30–90 cm above crown", techniqueListen: "Light, airy resonance in clear field; dense/muddy in blocked field", techniqueTreat: "Gentle sweeping; BELL-771 to open; TF-PW-CROWN to tune", techniqueIntegrate: "Silence and breath", techniqueClose: "Three OMs; seal with silence", sourceAttribution: "Biofield Anatomy Map ©Biofield Tuning" },
+  ];
+
+  for (const bz of biofieldData) {
+    db.insert(biofieldZones).values(bz as any).run();
+  }
+
+  // ─── SEED AYURVEDA / ELEMENTS ───────────────────────────────────────────────
+  const ayurvedaData = [
+    { id: "AY-EARTH", name: "Earth", type: "element", sanskrit: "Prithvi", qualities: JSON.stringify(["Heavy","Stable","Dense","Hard","Solid"]), fingerCorrespondence: "Ring finger", chakraLink: "CH-ROOT", doshaPrimary: "Kapha", season: "Winter/Spring", taste: "Sweet", bodyType: "Structural, bones, flesh", balancingForks: JSON.stringify(["TF-BT-SLIDER","TF-OTTO-128","TF-PW-ROOT","TF-BT-SCHU-62"]), imbalanceSigns: "Heaviness, sluggishness, attachment, weight gain, congestion", practices: JSON.stringify(["Grounding yoga","Walking barefoot","Sunlight","Stimulating exercise"]), colorHex: "#8B4513", description: "Prithvi — the earth element provides structure, stability, and form. It is the foundation of all material existence. In the body it manifests as solid tissues: bones, muscles, nails, hair, teeth, and skin." },
+    { id: "AY-WATER", name: "Water", type: "element", sanskrit: "Apas / Jal", qualities: JSON.stringify(["Fluid","Cold","Soft","Smooth","Oily"]), fingerCorrespondence: "Little finger", chakraLink: "CH-SACRAL", doshaPrimary: "Kapha/Pitta", season: "Winter", taste: "Sweet", bodyType: "Fluids: plasma, blood, lymph, mucus", balancingForks: JSON.stringify(["TF-PW-SACRAL","TF-BT-SOL-417","TF-BT-FIB-89"]), imbalanceSigns: "Fluid retention, congestion, excess mucus, or conversely dryness and dehydration", practices: JSON.stringify(["Swimming","Hip openers","Emotional release work","Hydration"]), colorHex: "#1E90FF", description: "Apas — the water element governs flow, cohesion, and emotional fluidity. It is the binding principle of matter and the carrier of life force through the body's fluid systems." },
+    { id: "AY-FIRE", name: "Fire", type: "element", sanskrit: "Agni / Tejas", qualities: JSON.stringify(["Hot","Sharp","Light","Spreading","Transforming"]), fingerCorrespondence: "Thumb", chakraLink: "CH-SOLAR", doshaPrimary: "Pitta", season: "Summer", taste: "Pungent/Sour", bodyType: "Digestion, metabolism, vision", balancingForks: JSON.stringify(["TF-PW-SOLAR","TF-BT-FIB-144W","TF-BT-SOL-528"]), imbalanceSigns: "Inflammation, acid, irritability, perfectionism, burnout, or low digestion", practices: JSON.stringify(["Cooling pranayama (Sitali)","Moonlight","Cooling foods","Pitta-pacifying yoga"]), colorHex: "#FF6600", description: "Agni — the fire element drives transformation, digestion, and clarity of perception. It is the metabolic force that converts experience into understanding and food into energy." },
+    { id: "AY-AIR", name: "Air", type: "element", sanskrit: "Vayu", qualities: JSON.stringify(["Light","Mobile","Dry","Rough","Subtle","Cold"]), fingerCorrespondence: "Index finger", chakraLink: "CH-HEART", doshaPrimary: "Vata", season: "Autumn", taste: "Astringent", bodyType: "Movement, nervous system, breath", balancingForks: JSON.stringify(["TF-PW-HEART","TF-OM-136W","TF-BT-SLIDER","TF-BT-SOL-174"]), imbalanceSigns: "Anxiety, scattered mind, insomnia, dry skin, inconsistency, fear", practices: JSON.stringify(["Grounding yoga","Warm sesame oil self-massage","Regular schedule","Nadi Shodhana"]), colorHex: "#87CEEB", description: "Vayu — the air element governs all movement in the body and mind: breath, circulation, nerve impulse, and the movement of thoughts. Vata dosha is primarily composed of air." },
+    { id: "AY-SPACE", name: "Space (Ether)", type: "element", sanskrit: "Ākāsha", qualities: JSON.stringify(["Expansive","Light","Clear","Subtle","Pervasive"]), fingerCorrespondence: "Middle finger", chakraLink: "CH-THROAT", doshaPrimary: "Vata", season: "All seasons", taste: "None / all", bodyType: "Cavities: throat, chest, sinuses, cranium", balancingForks: JSON.stringify(["TF-PW-THROAT","TF-PW-3RD","TF-PW-CROWN","BELL-771"]), imbalanceSigns: "Disconnection, emptiness, void-feeling, or conversely inability to find stillness", practices: JSON.stringify(["Mantra","Meditation","Silence","Pranayama","Sound healing"]), colorHex: "#E6E6FA", description: "Ākāsha — the space element is the most subtle of the five. It provides the container for all other elements to exist. It is the medium through which sound travels and the domain of the chakras above the throat." },
+    { id: "AY-VATA", name: "Vata", type: "dosha", sanskrit: "Vāta", qualities: JSON.stringify(["Air+Space","Light","Mobile","Dry","Cold","Rough","Subtle"]), imbalanceSigns: "Anxiety, insomnia, dry skin, constipation, scattered thoughts, fear, pain", balancingForks: JSON.stringify(["TF-BT-SLIDER","TF-OTTO-128","TF-PW-HEART","TF-BT-SCHU-62","BOWL-111"]), practices: JSON.stringify(["Grounding routine","Warm oil massage (Abhyanga)","Nadi Shodhana","Restorative yoga","Warm nourishing food"]), colorHex: "#A8D8EA", description: "Vata is the dosha of movement — composed of air and space. When balanced, Vata brings creativity, enthusiasm, and adaptability. When imbalanced, it manifests as anxiety, instability, and physical depletion." },
+    { id: "AY-PITTA", name: "Pitta", type: "dosha", sanskrit: "Pitta", qualities: JSON.stringify(["Fire+Water","Hot","Sharp","Light","Oily","Liquid","Spreading"]), imbalanceSigns: "Inflammation, irritability, perfectionism, acid reflux, skin rashes, burnout", balancingForks: JSON.stringify(["TF-PW-HEART","TF-BT-SOL-417","TF-PW-CROWN","BOWL-528"]), practices: JSON.stringify(["Cooling yoga (moon salutations)","Sitali pranayama","Moonlight walks","Sheetali cooling breath","Avoiding midday sun"]), colorHex: "#FFB347", description: "Pitta is the dosha of transformation — composed of fire and water. When balanced, Pitta brings clarity, focus, and drive. When imbalanced, it manifests as criticism, heat disorders, and inflammation." },
+    { id: "AY-KAPHA", name: "Kapha", type: "dosha", sanskrit: "Kapha", qualities: JSON.stringify(["Earth+Water","Heavy","Slow","Cool","Oily","Dense","Stable"]), imbalanceSigns: "Lethargy, weight gain, congestion, depression, attachment, resistance to change", balancingForks: JSON.stringify(["TF-PW-SOLAR","TF-PW-ROOT","TF-BT-SOL-528","BELL-771"]), practices: JSON.stringify(["Vigorous morning yoga","Kapalabhati pranayama","Dry brushing","Stimulating activities","Lighter meals"]), colorHex: "#90EE90", description: "Kapha is the dosha of structure — composed of earth and water. When balanced, Kapha brings stability, loyalty, and nurturing. When imbalanced, it manifests as stagnation, heaviness, and resistance to change." },
+  ];
+
+  for (const ae of ayurvedaData) {
+    db.insert(ayurvedaElements).values(ae as any).run();
+  }
+
+  // ─── SEED CENTERS (GURDJIEFF) ───────────────────────────────────────────────
+  const centersData = [
+    { id: "CTR-MOVING", name: "Moving Center", category: "physical", manNumber: "1", description: "The moving center manages physical habits, automatic actions, and bodily intelligence. Man Number 1 operates primarily from instinct and movement.", characteristics: JSON.stringify(["Learns by doing","Bodily intelligence dominant","Quick to physically act","Trusts direct sensory experience"]), dominantBehaviors: JSON.stringify(["Makes decisions through feeling in the body","Trusts gut instinct before thinking","Excellent at physical tasks and craftsmanship","May neglect emotional or intellectual input"]), suggestedForks: JSON.stringify(["TF-OTTO-128","TF-BT-SLIDER","TF-BT-SCHU-62","TF-PW-ROOT"]), practitionerNotes: "Moving-centered clients often need body-contact work first. They respond quickly to weighted forks on bony landmarks and benefit from physical sensation as an access point to deeper work.", questionnaireResponses: JSON.stringify(["physical","physical","physical","physical"]) },
+    { id: "CTR-EMOTIONAL", name: "Emotional Center", category: "emotional", manNumber: "2", description: "The emotional center processes feeling, relationship, and meaning. Man Number 2 operates primarily from emotional intelligence.", characteristics: JSON.stringify(["Decisions through feeling","Learns through relationship","Empathic and relational","Strongly affected by atmosphere and tone"]), dominantBehaviors: JSON.stringify(["Trusts heart above logic","May struggle with analytical detachment","Rich inner life and emotional vocabulary","Connections matter above efficiency"]), suggestedForks: JSON.stringify(["TF-PW-HEART","TF-OM-136W","TF-BT-SOL-528","BOWL-528"]), practitionerNotes: "Emotionally-centered clients need attunement and safety before opening. The OM ceremony is especially powerful — they feel the co-resonance. Vocal and mantra layers (Tiers 4–5) are particularly meaningful.", questionnaireResponses: JSON.stringify(["emotional","emotional","emotional","emotional"]) },
+    { id: "CTR-INTELLECTUAL", name: "Intellectual Center", category: "intellectual", manNumber: "3", description: "The intellectual center processes ideas, systems, and understanding. Man Number 3 operates primarily from conceptual intelligence.", characteristics: JSON.stringify(["Learns through understanding","Needs to comprehend before trusting","Analytical and systems-oriented","Can over-think and detach from body"]), dominantBehaviors: JSON.stringify(["Makes decisions by reasoning through","May intellectualize rather than feel","Values explanation and evidence","Strong at abstract pattern recognition"]), suggestedForks: JSON.stringify(["TF-PW-CROWN","TF-PW-3RD","TF-BT-FIB-144U","TF-BT-222"]), practitionerNotes: "Intellectual-centered clients benefit from explanation and context — give them the 'why' of each step. Field work (non-contact) is often a good entry point. Over time, body contact work helps ground an over-active intellectual center.", questionnaireResponses: JSON.stringify(["intellectual","intellectual","intellectual","intellectual"]) },
+    { id: "CTR-HIGHER-EMOTIONAL", name: "Higher Emotional Center", category: "emotional", manNumber: "higher", description: "The higher emotional center is the domain of love, compassion, and direct spiritual feeling — accessible through developed emotional intelligence and inner work.", characteristics: JSON.stringify(["Non-dual awareness","Unconditional compassion","Access through silence and surrender","Activated through heart-field practices"]), dominantBehaviors: JSON.stringify(["Transcends personal emotion into universal feeling","Perceives others' states without reactivity","Natural empathy without co-dependence","Presence as the primary gift"]), suggestedForks: JSON.stringify(["TF-PW-HEART","TF-OM-136W","BOWL-528","TF-BT-SOL-528"]), practitionerNotes: "The higher emotional center is not cultivated directly — it opens as a result of inner clearing. The OM opener/closer ceremony at 136.1 Hz is a direct activator of higher emotional resonance.", questionnaireResponses: JSON.stringify([]) },
+    { id: "CTR-HIGHER-INTELLECTUAL", name: "Higher Intellectual Center", category: "intellectual", manNumber: "higher", description: "The higher intellectual center is the domain of objective understanding, conscience, and direct knowing — accessible through integrated development.", characteristics: JSON.stringify(["Perceives essence over appearance","Non-conceptual knowing","Conscience rather than social morality","Pattern perception across all systems"]), dominantBehaviors: JSON.stringify(["Sees clearly without agenda","Understands context without judgment","Wisdom that comes from lived clarity","Rare — not stabilized through willpower alone"]), suggestedForks: JSON.stringify(["TF-PW-CROWN","TF-PW-3RD","BELL-771","BOWL-111"]), practitionerNotes: "The higher intellectual center is approached through surrender and silence — not through effort. Closing phases of sessions and the Triple Shanti ceremony create conditions for its activation.", questionnaireResponses: JSON.stringify([]) },
+  ];
+
+  for (const c of centersData) {
+    db.insert(centers).values(c as any).run();
+  }
+
+  // ─── SEED PROTOCOL TEMPLATES ────────────────────────────────────────────────
+  const protocolData = [
+    {
+      id: "PROTO-GROUNDING",
+      name: "Grounding & Nervous System Calm",
+      goal: "Deep grounding, nervous system regulation, anxiety relief",
+      description: "A full-body grounding protocol using Schumann and Earth Day frequencies to settle the nervous system and establish physical-field coherence.",
+      goalTags: JSON.stringify(["grounding","nervous-system-support","relaxation","anxiety-relief"]),
+      doshaTags: JSON.stringify(["vata-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-ROOT","CH-SACRAL"]),
+      comfortTierMin: 1, comfortTierMax: 5,
+      phases: JSON.stringify([
+        { phase: 1, name: "Body Landing", duration: 8, instruments: ["TF-OTTO-128","TF-BT-SLIDER"], placement: "Sternum then sacrum (Otto); gliding along spine and sacrum (Slider)", notes: "Slow, deliberate. Let client arrive. No rushing.", breath: "Natural breath, invite extended exhale", mudra: null, mantra: null },
+        { phase: 2, name: "Field Grounding", duration: 10, instruments: ["TF-BT-SOL-174","TF-BT-SCHU-62"], placement: "Field scanning from feet upward; 62 Hz at lower body", notes: "Listen for density in root/sacral field. Work with distortions gently.", breath: "4-count exhale", mudra: "Prithvi Mudra (ring to thumb)", mantra: null },
+        { phase: 3, name: "Earth Frequency Anchor", duration: 7, instruments: ["TF-PW-ROOT","TF-BT-SLIDER"], placement: "TF-PW-ROOT at sacrum; Slider gliding legs", notes: "Earth Day frequency brings vitality to root zone. Pair with Prithvi Mudra.", breath: "Bhramari (humming bee) for Tier 3+", mudra: "Prithvi Mudra", mantra: "LAM (Tier 4+)" },
+        { phase: 4, name: "Integration", duration: 5, instruments: ["TF-PW-HEART"], placement: "Sternum", notes: "Bridge to heart for coherent integration. Silent presence.", breath: "Natural", mudra: "Hridaya Mudra", mantra: null }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 45, sortOrder: 1
+    },
+    {
+      id: "PROTO-SLEEP",
+      name: "Sleep Support",
+      goal: "Preparing the nervous system for deep, restorative sleep",
+      description: "A deeply calming protocol for sleep disorders, insomnia, and nervous system dysregulation that affects sleep quality.",
+      goalTags: JSON.stringify(["sleep-support","relaxation","nervous-system-support","grounding"]),
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-ROOT","CH-CROWN"]),
+      comfortTierMin: 1, comfortTierMax: 3,
+      phases: JSON.stringify([
+        { phase: 1, name: "Settling", duration: 10, instruments: ["TF-OTTO-128","TF-BT-SLIDER","TF-BT-SCHU-62"], placement: "Sacrum (Otto); slow spinal glide (Slider); lower body field (62 Hz)", notes: "Very slow, minimal speech. Let client drop in.", breath: "Extended exhale 4:6", mudra: "Prithvi Mudra", mantra: null },
+        { phase: 2, name: "Deep Coherence", duration: 12, instruments: ["BOWL-111","TF-PW-HEART"], placement: "BOWL-111 ambient; TF-PW-HEART at sternum", notes: "111 Hz theta-state wash. Silence between strikes.", breath: "Natural", mudra: "Hridaya Mudra", mantra: null },
+        { phase: 3, name: "Crown Quieting", duration: 8, instruments: ["TF-PW-CROWN","TF-BT-FIB-144U"], placement: "Field above crown; Fibonacci sweep of upper field", notes: "Quiet, slow, minimal movement. Create container for sleep.", breath: "Natural, witnessing", mudra: null, mantra: null }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 45, sortOrder: 2
+    },
+    {
+      id: "PROTO-HEART",
+      name: "Heart Opening / Emotional Access",
+      goal: "Heart chakra opening, emotional access, grief work, love-frequency restoration",
+      description: "A heart-centered protocol using OM and love frequencies to open the cardiac field and support emotional processing.",
+      goalTags: JSON.stringify(["heart-opening","emotional-clearing","coherence","integration"]),
+      doshaTags: JSON.stringify(["pitta-pacifying","vata-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-HEART","CH-SACRAL"]),
+      comfortTierMin: 2, comfortTierMax: 5,
+      phases: JSON.stringify([
+        { phase: 1, name: "Root to Heart Pathway", duration: 8, instruments: ["TF-BT-SLIDER","TF-PW-ROOT"], placement: "Grounding first — sacrum and lower spine", notes: "Heart work needs grounding to stay embodied. Do not skip.", breath: "Natural", mudra: "Prithvi Mudra", mantra: null },
+        { phase: 2, name: "Heart Field Opening", duration: 12, instruments: ["TF-PW-HEART","BOWL-528","TF-BT-SOL-528"], placement: "TF-PW-HEART at sternum; BOWL-528 ambient; TF-BT-SOL-528 in heart field", notes: "OM tone + 528 Hz creates powerful heart coherence field.", breath: "Anulom Vilom or equal breathing", mudra: "Hridaya Mudra", mantra: "YAM (Tier 4+)" },
+        { phase: 3, name: "Emotional Integration", duration: 10, instruments: ["TF-BT-SOL-528","TF-PW-HEART"], placement: "Field scanning chest and upper body; gentle sternum contact", notes: "Hold space for emotional release. No urgency. Silence is the medicine.", breath: "Free breath — allow sighs and sounds (Tier 3+)", mudra: "Anjali Mudra", mantra: null },
+        { phase: 4, name: "Re-grounding", duration: 5, instruments: ["TF-OTTO-128","TF-BT-SLIDER"], placement: "Sacrum (Otto); legs and feet (Slider)", notes: "Heart work opens — re-ground before closing to prevent spaciness.", breath: "Extended exhale", mudra: null, mantra: null }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 50, sortOrder: 3
+    },
+    {
+      id: "PROTO-CLEARING",
+      name: "Energetic Clearing",
+      goal: "Full-field clearing, stagnant energy, post-conflict recovery",
+      description: "Biofield Tuning-style comprehensive field scan and distortion clearing protocol.",
+      goalTags: JSON.stringify(["energetic-clearing","emotional-clearing","grounding","integration"]),
+      doshaTags: JSON.stringify(["pitta-pacifying","kapha-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-ROOT","CH-SACRAL","CH-SOLAR","CH-HEART"]),
+      comfortTierMin: 1, comfortTierMax: 5,
+      phases: JSON.stringify([
+        { phase: 1, name: "Field Assessment", duration: 10, instruments: ["TF-BT-SOL-174"], placement: "Full field scan, feet to head, both sides", notes: "Primary workhorse fork. Listen carefully. Note distortions, density, hollow zones.", breath: "Client breathes naturally", mudra: null, mantra: null },
+        { phase: 2, name: "Left Field Clearing", duration: 10, instruments: ["TF-BT-SOL-174","TF-BT-SOL-417"], placement: "Left side field — comb inward from periphery", notes: "Left: feminine/maternal lineage. 417 for pattern dissolution.", breath: "Extended exhale with left clearing", mudra: null, mantra: null },
+        { phase: 3, name: "Right Field Clearing", duration: 10, instruments: ["TF-BT-SOL-174","TF-BT-SOL-417"], placement: "Right side field — comb inward from periphery", notes: "Right: masculine/paternal lineage.", breath: "Extended exhale with right clearing", mudra: null, mantra: null },
+        { phase: 4, name: "Body Anchoring", duration: 8, instruments: ["TF-BT-SLIDER","TF-OTTO-128"], placement: "Full body spine contact — sacrum to sternum", notes: "Ground cleared field back into body.", breath: "Natural", mudra: "Prithvi Mudra", mantra: null },
+        { phase: 5, name: "Coherence Sealing", duration: 7, instruments: ["TF-BT-FIB-144U","TF-PW-HEART"], placement: "Field above and around entire body; TF-PW-HEART sternum", notes: "Fibonacci field coherence seal. Heart anchor for integration.", breath: "Natural", mudra: "Hridaya Mudra", mantra: "YAM (Tier 4+)" }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 60, sortOrder: 4
+    },
+    {
+      id: "PROTO-FOCUS",
+      name: "Focus & Mental Clarity",
+      goal: "Mental clarity, concentration, intellectual center activation",
+      description: "Upper-chakra protocol for clarity, focus, and intellectual center alignment.",
+      goalTags: JSON.stringify(["focus","coherence","intuitive-support","meditation-support"]),
+      doshaTags: JSON.stringify(["kapha-pacifying","vata-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-SOLAR","CH-THROAT","CH-THIRD-EYE"]),
+      comfortTierMin: 2, comfortTierMax: 5,
+      phases: JSON.stringify([
+        { phase: 1, name: "Grounding Base", duration: 7, instruments: ["TF-OTTO-128","TF-BT-SLIDER"], placement: "Sacrum and spine — ground before ascending", notes: "Intellectual center work without grounding can increase dissociation.", breath: "Natural", mudra: "Prithvi Mudra", mantra: null },
+        { phase: 2, name: "Solar Plexus Activation", duration: 8, instruments: ["TF-PW-SOLAR","TF-BT-FIB-144W"], placement: "Solar plexus contact (TF-PW-SOLAR); spinal contact (144W)", notes: "Sun Tone brings centering and clarity of purpose.", breath: "Kapalabhati 20 rounds (Tier 3+)", mudra: "Agni Mudra", mantra: "RAM (Tier 4+)" },
+        { phase: 3, name: "Throat & Third Eye", duration: 10, instruments: ["TF-PW-THROAT","TF-BT-222","TF-PW-3RD"], placement: "TF-PW-THROAT upper chest; TF-BT-222 field; TF-PW-3RD held above forehead", notes: "Expression pathway to vision. Let clarity emerge.", breath: "Ujjayi", mudra: "Gyana Mudra", mantra: "HAM + OM (Tier 4+)" },
+        { phase: 4, name: "Integration Silence", duration: 5, instruments: [], placement: "No forks — hold field with silent presence", notes: "Clarity comes in stillness. Trust the pause.", breath: "Sama Vritti (4:4:4:4)", mudra: "Gyana Mudra", mantra: null }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 45, sortOrder: 5
+    },
+    {
+      id: "PROTO-PAIN",
+      name: "Pain Relief & Body Settling",
+      goal: "Physical pain support, tension release, body comfort",
+      description: "Targeted protocol for physical pain, tension, and body-level discomfort using weighted forks and nervous system support.",
+      goalTags: JSON.stringify(["pain-support","tension-relief","nervous-system-support","relaxation","fascia-release"]),
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-ROOT","CH-SACRAL"]),
+      comfortTierMin: 1, comfortTierMax: 4,
+      phases: JSON.stringify([
+        { phase: 1, name: "Nervous System Safety", duration: 10, instruments: ["TF-OTTO-128","TF-BT-SLIDER"], placement: "Bony landmarks away from pain site; spine and sacrum", notes: "Never work directly on acute pain site. Establish safety first.", breath: "Extended exhale 4:6", mudra: null, mantra: null },
+        { phase: 2, name: "Field Pain Work", duration: 12, instruments: ["TF-BT-SOL-174","TF-BT-SOL-417"], placement: "Field around pain zone (not on it); 174 to scan, 417 to dissolve", notes: "Pain often has emotional correlates — 417 supports pattern clearing.", breath: "Breath directed to pain site with extended exhale", mudra: null, mantra: null },
+        { phase: 3, name: "Structural Coherence", duration: 8, instruments: ["TF-BT-FIB-144W","TF-BT-FIB-89"], placement: "Fibonacci pair on structural landmarks near (not on) pain site", notes: "Phi-ratio resonance for structural tissue coherence.", breath: "Natural", mudra: null, mantra: null },
+        { phase: 4, name: "Grounding & Close", duration: 5, instruments: ["TF-OTTO-128","TF-PW-HEART"], placement: "Sacrum; sternum", notes: "Anchor the system before closing.", breath: "Natural", mudra: "Prithvi Mudra", mantra: null }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 50, sortOrder: 6
+    },
+    {
+      id: "PROTO-MEDITATION",
+      name: "Meditation Deepening",
+      goal: "Deepen meditation practice, access theta/delta states, spiritual connection",
+      description: "A protocol for experienced meditators seeking deeper states through sound entrainment.",
+      goalTags: JSON.stringify(["meditation-support","coherence","integration","intuitive-support","sleep-support"]),
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-HEART","CH-THIRD-EYE","CH-CROWN"]),
+      comfortTierMin: 3, comfortTierMax: 5,
+      phases: JSON.stringify([
+        { phase: 1, name: "Entrainment", duration: 12, instruments: ["BOWL-111","TF-BT-SCHU-62"], placement: "BOWL-111 ambient; 62 Hz in field", notes: "111 Hz theta wave entrainment. Allow natural drop-in.", breath: "Natural, slowing naturally", mudra: "Gyana Mudra", mantra: null },
+        { phase: 2, name: "Heart-Third Eye Axis", duration: 12, instruments: ["TF-PW-HEART","TF-PW-3RD"], placement: "TF-PW-HEART at sternum; TF-PW-3RD in field above forehead", notes: "The heart-mind axis — feeling meets vision.", breath: "Nadi Shodhana (Tier 3+)", mudra: "Hridaya Mudra transitioning to Gyana Mudra", mantra: "OM in silence (Tier 4+)" },
+        { phase: 3, name: "Crown Field", duration: 10, instruments: ["TF-PW-CROWN","BELL-771","TF-BT-FIB-144U"], placement: "Crown field above; Bell for transition; Fibonacci sweep", notes: "Stillness and silence. Minimal practitioner movement.", breath: "Witnessing breath", mudra: "Brahma Mudra", mantra: "AH (Tier 5)" },
+        { phase: 4, name: "Deep Rest", duration: 6, instruments: ["BOWL-111"], placement: "Ambient — let resonance decay naturally", notes: "Do not rush. Hold space in silence.", breath: "Natural", mudra: null, mantra: null }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 55, sortOrder: 7
+    },
+    {
+      id: "PROTO-VATA",
+      name: "Vata Pacification",
+      goal: "Calm and ground Vata dosha excess — anxiety, scatter, depletion",
+      description: "Ayurvedically-informed grounding protocol specifically designed for Vata-dominant or Vata-excess presentations.",
+      goalTags: JSON.stringify(["grounding","nervous-system-support","relaxation","sleep-support"]),
+      doshaTags: JSON.stringify(["vata-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-ROOT","CH-SACRAL","CH-HEART"]),
+      comfortTierMin: 1, comfortTierMax: 4,
+      phases: JSON.stringify([
+        { phase: 1, name: "Earth Anchoring", duration: 12, instruments: ["TF-OTTO-128","TF-BT-SCHU-62","TF-BT-SLIDER"], placement: "Heavy contact at sacrum (Otto); field at lower body (62 Hz); slow spine glide (Slider)", notes: "Slow, warm, repetitive movement. Vata needs sustained gentle input.", breath: "Extended exhale 4:6:0", mudra: "Prithvi Mudra", mantra: null },
+        { phase: 2, name: "Water Element Support", duration: 10, instruments: ["TF-PW-SACRAL","BOWL-111"], placement: "TF-PW-SACRAL at lower abdomen; BOWL-111 ambient", notes: "Moon frequency for Vata: introduces smoothness, flow, nourishment.", breath: "Chandra Bhedana (left nostril)", mudra: "Varuna Mudra", mantra: "VAM (Tier 4+)" },
+        { phase: 3, name: "Heart Coherence", duration: 8, instruments: ["TF-PW-HEART","TF-OM-136W"], placement: "Sternum — gentle, warm, steady", notes: "OM frequency offers the most nourishing, Vata-pacifying quality of any tone.", breath: "Natural with 4-count exhale", mudra: "Hridaya Mudra", mantra: "OM (all tiers as hum)" }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 45, sortOrder: 8
+    },
+    {
+      id: "PROTO-PITTA",
+      name: "Pitta Cooling",
+      goal: "Cool and calm Pitta dosha excess — heat, irritability, inflammation",
+      description: "Cooling, heart-centered protocol for Pitta-excess presentations — perfectionism, burnout, inflammation, heat.",
+      goalTags: JSON.stringify(["relaxation","emotional-clearing","heart-opening","nervous-system-support"]),
+      doshaTags: JSON.stringify(["pitta-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-HEART","CH-SOLAR","CH-CROWN"]),
+      comfortTierMin: 1, comfortTierMax: 4,
+      phases: JSON.stringify([
+        { phase: 1, name: "Cooling Entry", duration: 8, instruments: ["TF-BT-SOL-174","TF-BT-SCHU-54"], placement: "Field work only initially — keep body contact minimal until trust established", notes: "Pitta types may resist letting go of control. Field approach is less activating.", breath: "Natural with long cooling exhale", mudra: null, mantra: null },
+        { phase: 2, name: "Heart Softening", duration: 12, instruments: ["TF-PW-HEART","BOWL-528","TF-BT-SOL-528"], placement: "Sternum; ambient bowl; 528 field", notes: "528 Hz love frequency directly addresses Pitta's tendency toward hardening and judgment.", breath: "Anulom Vilom 4 rounds", mudra: "Hridaya Mudra", mantra: "YAM (Tier 4+)" },
+        { phase: 3, name: "Crown Release", duration: 10, instruments: ["TF-PW-CROWN","TF-BT-FIB-144U"], placement: "Crown field; Fibonacci upper-field sweep", notes: "Cooling, spacious quality of Platonic Year frequency helps release Pitta's grip.", breath: "Long exhale into surrender", mudra: "Brahma Mudra", mantra: null }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 45, sortOrder: 9
+    },
+    {
+      id: "PROTO-KAPHA",
+      name: "Kapha Activation",
+      goal: "Stimulate and uplift Kapha dosha — stagnation, depression, lethargy",
+      description: "Activating, uplifting protocol for Kapha-excess presentations — heaviness, stagnation, emotional flat-lining.",
+      goalTags: JSON.stringify(["energetic-clearing","focus","coherence","integration"]),
+      doshaTags: JSON.stringify(["kapha-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-SOLAR","CH-THROAT","CH-ROOT"]),
+      comfortTierMin: 2, comfortTierMax: 5,
+      phases: JSON.stringify([
+        { phase: 1, name: "Earth Stimulation", duration: 8, instruments: ["TF-PW-ROOT","TF-OTTO-128"], placement: "Sacrum and feet — wake up the base", notes: "Kapha needs stimulation, not sedation. Use more vigorous tapping.", breath: "Kapalabhati 20 rounds (Tier 3+)", mudra: "Prithvi Mudra inverted", mantra: "LAM (Tier 4+)" },
+        { phase: 2, name: "Fire Activation", duration: 10, instruments: ["TF-PW-SOLAR","TF-BT-FIB-144W","BELL-771"], placement: "Solar plexus (PW-SOLAR); spine (144W); Bell for activation moments", notes: "Sun Tone and Fibonacci wake the solar plexus. Bell creates punctuation and presence.", breath: "Ujjayi with core engagement", mudra: "Agni Mudra", mantra: "RAM (Tier 4+)" },
+        { phase: 3, name: "Expression Opening", duration: 8, instruments: ["TF-PW-THROAT","TF-BT-222"], placement: "Upper chest and throat field", notes: "Kapha often holds unexpressed emotion in throat. Gentle activation here.", breath: "Humming exhale", mudra: "Akasha Mudra", mantra: "HAM (Tier 4+)" }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 40, sortOrder: 10
+    },
+    {
+      id: "PROTO-QUICK-GROUND",
+      name: "Quick Grounding (20 min)",
+      goal: "Short session grounding for time-limited situations",
+      description: "An abbreviated 20-minute grounding protocol for when time is limited.",
+      goalTags: JSON.stringify(["grounding","nervous-system-support","relaxation"]),
+      doshaTags: JSON.stringify(["vata-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-ROOT"]),
+      comfortTierMin: 1, comfortTierMax: 3,
+      phases: JSON.stringify([
+        { phase: 1, name: "Body Landing", duration: 7, instruments: ["TF-OTTO-128","TF-BT-SLIDER"], placement: "Sacrum then spine", notes: "Rapid but thorough body grounding.", breath: "Extended exhale", mudra: null, mantra: null },
+        { phase: 2, name: "Field Coherence", duration: 8, instruments: ["TF-BT-SOL-174","TF-PW-ROOT"], placement: "Quick field scan then ROOT at sacrum", notes: "Brief but effective. Trust the frequency.", breath: "Natural", mudra: "Prithvi Mudra", mantra: null }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 20, sortOrder: 11
+    },
+    {
+      id: "PROTO-FULL-ASCENDING",
+      name: "Full Ascending (All 7 Chakras)",
+      goal: "Complete chakra clearing, ascending root-to-crown sequence",
+      description: "A comprehensive full-sequence protocol moving root to crown. For experienced clients or longer sessions (75–90 min).",
+      goalTags: JSON.stringify(["grounding","energetic-clearing","coherence","integration","meditation-support"]),
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying","kapha-pacifying"]),
+      chakraFocus: JSON.stringify(["CH-ROOT","CH-SACRAL","CH-SOLAR","CH-HEART","CH-THROAT","CH-THIRD-EYE","CH-CROWN"]),
+      comfortTierMin: 2, comfortTierMax: 5,
+      phases: JSON.stringify([
+        { phase: 1, name: "Root Grounding", duration: 10, instruments: ["TF-OTTO-128","TF-BT-SLIDER","TF-PW-ROOT"], placement: "Sacrum, spine base, feet field", notes: "Foundation for everything. Do not rush.", breath: "Bhramari", mudra: "Prithvi Mudra", mantra: "LAM" },
+        { phase: 2, name: "Sacral Opening", duration: 8, instruments: ["TF-PW-SACRAL","TF-BT-SOL-417"], placement: "Lower abdomen; sacral field", notes: "Creative and emotional water element.", breath: "Chandra Bhedana", mudra: "Varuna Mudra", mantra: "VAM" },
+        { phase: 3, name: "Solar Activation", duration: 8, instruments: ["TF-PW-SOLAR","TF-BT-FIB-144W"], placement: "Solar plexus; spine", notes: "Personal power and will.", breath: "Kapalabhati 20", mudra: "Agni Mudra", mantra: "RAM" },
+        { phase: 4, name: "Heart Opening", duration: 10, instruments: ["TF-PW-HEART","BOWL-528"], placement: "Sternum; ambient bowl", notes: "Central pause. The heart is the crossing point.", breath: "Anulom Vilom", mudra: "Hridaya Mudra", mantra: "YAM" },
+        { phase: 5, name: "Throat Expression", duration: 8, instruments: ["TF-PW-THROAT","TF-BT-222"], placement: "Upper chest; throat field", notes: "Expression opens the path upward.", breath: "Ujjayi", mudra: "Akasha Mudra", mantra: "HAM" },
+        { phase: 6, name: "Third Eye Vision", duration: 8, instruments: ["TF-PW-3RD","BOWL-429"], placement: "Third eye field; ambient bowl", notes: "Vision and intuition. Work in field only.", breath: "Nadi Shodhana", mudra: "Gyana Mudra", mantra: "OM" },
+        { phase: 7, name: "Crown Transcendence", duration: 8, instruments: ["TF-PW-CROWN","BELL-771","BOWL-111"], placement: "Crown field; Bell opening; Bowl ambient", notes: "Cosmic unity. Silence is the final teacher.", breath: "Witnessing", mudra: "Brahma Mudra", mantra: "AH / Silence" }
+      ]),
+      universalOpener: 1, universalCloser: 1, estimatedDuration: 90, sortOrder: 12
+    },
+  ];
+
+  for (const pt of protocolData) {
+    db.insert(protocolTemplates).values(pt as any).run();
+  }
+
+  console.log("✅ CommonUnity Tuner: database seeded successfully");
+}

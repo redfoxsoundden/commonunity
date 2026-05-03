@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   COMMONUNITY TUNER — Design System
+   Exact token match to CommonUnity Compass / Studio
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* CommonUnity Theme A (dark blue) exact tokens */
+    --background: 220 28% 8%;
+    --foreground: 213 31% 95%;
+
+    --card: 222 24% 10%;
+    --card-foreground: 213 31% 95%;
+
+    --popover: 222 24% 10%;
+    --popover-foreground: 213 31% 95%;
+
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 19% 16%;
+    --secondary-foreground: 213 31% 95%;
+
+    --muted: 215 19% 16%;
+    --muted-foreground: 215 16% 57%;
+
+    --accent: 217 19% 18%;
+    --accent-foreground: 213 31% 95%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 24% 16%;
+    --input: 216 20% 10%;
+    --ring: 239 84% 67%;
+
+    --radius: 0.5rem;
+
+    /* Chart / chakra colors */
+    --chart-1: 239 84% 67%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 338 82% 62%;
+    --chart-5: 261 80% 75%;
+
+    /* CommonUnity 4-point colors */
+    --work: 38 93% 50%;
+    --lens: 239 84% 67%;
+    --field: 160 84% 39%;
+    --call: 338 82% 62%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  html { scroll-behavior: smooth; }
+}
+
+/* ─── CHAKRA COLOR SYSTEM ─────────────────────────────────── */
+:root {
+  --chakra-root:      #CC0000;
+  --chakra-sacral:    #FF8C00;
+  --chakra-solar:     #FFD700;
+  --chakra-heart:     #228B22;
+  --chakra-throat:    #1E90FF;
+  --chakra-third-eye: #4B0082;
+  --chakra-crown:     #9400D3;
+  --chakra-om:        #00CED1;
+}
+
+/* ─── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+/* ─── TUNER SPECIFIC ─────────────────────────────────────── */
+.om-symbol {
+  font-family: 'Noto Serif Devanagari', Georgia, serif;
+  line-height: 1;
+}
+
+.frequency-display {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.chakra-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  background: hsl(var(--secondary));
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+/* ─── SIDEBAR NAV ACTIVE STATE ───────────────────────────── */
+.nav-item-active {
+  background: hsl(var(--accent));
+  color: hsl(var(--foreground));
+}
+
+/* ─── WAVEFORM CONTAINER ─────────────────────────────────── */
+.waveform-container wave {
+  overflow: hidden !important;
+}
+
+/* ─── CHLADNI CANVAS ─────────────────────────────────────── */
+.chladni-canvas {
+  border-radius: var(--radius);
+  background: #050a14;
+}
+
+/* ─── INSTRUMENT CARD ────────────────────────────────────── */
+.instrument-card {
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.instrument-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+/* ─── SPECTRUM ANALYZER ──────────────────────────────────── */
+#audiomotion-container canvas {
+  border-radius: var(--radius);
+}
+
+/* ─── PROTOCOL PHASE ─────────────────────────────────────── */
+.phase-connector {
+  width: 2px;
+  background: linear-gradient(to bottom, hsl(var(--border)), transparent);
+  margin: 0 auto;
+}
+
+/* ─── QUESTIONNAIRE ──────────────────────────────────────── */
+.q-section-header {
+  @apply flex items-center gap-3 mb-4;
+}
+.q-section-number {
+  @apply w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold;
+  background: hsl(var(--primary) / 0.2);
+  color: hsl(var(--primary));
+  border: 1px solid hsl(var(--primary) / 0.3);
+  flex-shrink: 0;
+}

@@ -1,0 +1,407 @@
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import { useToast } from "@/hooks/use-toast";
+import { MultiChladniCanvas } from "@/components/ChladniCanvas";
+import { parseArr, CHAKRA_COLORS, formatHz } from "@/lib/utils";
+import { Plus, Trash2, Save, Play, Square, Volume2 } from "lucide-react";
+import type { Instrument, Soundscape } from "@shared/schema";
+
+interface Track {
+  instrumentId: string;
+  frequency: number;
+  gain: number; // 0-100
+  label: string;
+  chakraId?: string;
+  color: string;
+}
+
+const TRACK_COLORS = [
+  "#6366f1", "#14b8a6", "#f59e0b", "#ec4899",
+  "#10b981", "#f97316", "#8b5cf6", "#06b6d4",
+];
+
+function TrackRow({
+  track,
+  index,
+  instruments,
+  onUpdate,
+  onRemove,
+}: {
+  track: Track;
+  index: number;
+  instruments: Instrument[];
+  onUpdate: (t: Partial<Track>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div
+      className="bg-[var(--card)] border border-white/10 rounded-xl p-4 space-y-3"
+      data-testid={`track-row-${index}`}
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: track.color }} />
+        <div className="flex-1 min-w-0">
+          <select
+            value={track.instrumentId}
+            onChange={(e) => {
+              const inst = instruments.find((i) => i.id === e.target.value);
+              if (inst) {
+                onUpdate({
+                  instrumentId: inst.id,
+                  frequency: inst.frequency,
+                  label: inst.name,
+                  chakraId: inst.chakraId ?? undefined,
+                });
+              }
+            }}
+            className="w-full bg-[var(--bg)] border border-white/20 rounded-lg px-3 py-2 text-sm text-white"
+            data-testid={`select-track-instrument-${index}`}
+          >
+            <option value="">— Select instrument —</option>
+            {instruments.map((inst) => (
+              <option key={inst.id} value={inst.id}>
+                {inst.name} ({formatHz(inst.frequency)})
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          onClick={onRemove}
+          className="p-1.5 text-[var(--muted)] hover:text-red-400 transition-colors rounded"
+          data-testid={`button-remove-track-${index}`}
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label className="text-xs text-[var(--muted)] flex items-center gap-2">
+            <Volume2 className="w-3 h-3" />
+            Volume: {track.gain}%
+          </Label>
+          <Slider
+            value={[track.gain]}
+            onValueChange={([v]) => onUpdate({ gain: v })}
+            min={0}
+            max={100}
+            step={5}
+            className="w-full"
+            data-testid={`slider-track-gain-${index}`}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-xs text-[var(--muted)]">
+            Frequency: {track.frequency > 0 ? formatHz(track.frequency) : "—"}
+          </Label>
+          {track.chakraId && (
+            <div className="flex items-center gap-2 mt-1">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ background: CHAKRA_COLORS[track.chakraId] ?? "#6366f1" }} />
+              <span className="text-xs text-[var(--muted)]">{track.chakraId?.replace("CH-", "")}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function Composer() {
+  const { toast } = useToast();
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [soundscapeName, setSoundscapeName] = useState("");
+  const [soundscapeNotes, setSoundscapeNotes] = useState("");
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const oscillatorsRef = useRef<{ osc: OscillatorNode; gain: GainNode }[]>([]);
+
+  const { data: instruments = [] } = useQuery<Instrument[]>({
+    queryKey: ["/api/instruments"],
+    queryFn: () => apiRequest("GET", "/api/instruments").then((r) => r.json()),
+  });
+
+  const { data: soundscapes = [] } = useQuery<Soundscape[]>({
+    queryKey: ["/api/soundscapes"],
+    queryFn: () => apiRequest("GET", "/api/soundscapes").then((r) => r.json()),
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: () =>
+      apiRequest("POST", "/api/soundscapes", {
+        name: soundscapeName || "Untitled Soundscape",
+        notes: soundscapeNotes,
+        tracks: JSON.stringify(tracks),
+        instrumentIds: JSON.stringify(tracks.map((t) => t.instrumentId).filter(Boolean)),
+      }).then((r) => r.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/soundscapes"] });
+      toast({ title: "Soundscape saved" });
+      setSoundscapeName("");
+      setSoundscapeNotes("");
+    },
+  });
+
+  const loadSoundscape = (sc: Soundscape) => {
+    const loaded = parseArr(sc.tracks as unknown as string);
+    if (loaded.length > 0) {
+      try {
+        setTracks(JSON.parse(sc.tracks as unknown as string));
+        toast({ title: `Loaded: ${sc.name}` });
+      } catch {
+        toast({ title: "Could not load soundscape", variant: "destructive" });
+      }
+    }
+  };
+
+  const stopAudio = useCallback(() => {
+    oscillatorsRef.current.forEach(({ osc, gain }) => {
+      try {
+        gain.gain.setTargetAtTime(0, audioCtxRef.current!.currentTime, 0.05);
+        osc.stop(audioCtxRef.current!.currentTime + 0.1);
+      } catch {}
+    });
+    oscillatorsRef.current = [];
+    setIsPlaying(false);
+  }, []);
+
+  const startAudio = useCallback(() => {
+    if (isPlaying) { stopAudio(); return; }
+    if (tracks.length === 0 || tracks.every((t) => t.frequency === 0)) {
+      toast({ title: "Add at least one instrument track to preview", variant: "destructive" });
+      return;
+    }
+
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioContext();
+    } else if (audioCtxRef.current.state === "suspended") {
+      audioCtxRef.current.resume();
+    }
+
+    const ctx = audioCtxRef.current;
+
+    oscillatorsRef.current = tracks
+      .filter((t) => t.frequency > 0 && t.gain > 0)
+      .map((t) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = t.frequency;
+        gain.gain.value = (t.gain / 100) * 0.3; // keep output gentle
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        return { osc, gain };
+      });
+
+    setIsPlaying(true);
+    toast({ title: "Preview playing — click Stop to end" });
+  }, [tracks, isPlaying, stopAudio, toast]);
+
+  useEffect(() => {
+    return () => {
+      if (isPlaying) stopAudio();
+    };
+  }, []);
+
+  const addTrack = () => {
+    const color = TRACK_COLORS[tracks.length % TRACK_COLORS.length];
+    setTracks((ts) => [
+      ...ts,
+      { instrumentId: "", frequency: 0, gain: 70, label: "", chakraId: undefined, color },
+    ]);
+  };
+
+  const updateTrack = (idx: number, update: Partial<Track>) => {
+    setTracks((ts) => ts.map((t, i) => (i === idx ? { ...t, ...update } : t)));
+  };
+
+  const removeTrack = (idx: number) => {
+    setTracks((ts) => ts.filter((_, i) => i !== idx));
+  };
+
+  const activeTracks = tracks.filter((t) => t.frequency > 0);
+
+  return (
+    <div className="p-6 max-w-5xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-xl font-bold text-white">Soundscape Composer</h1>
+        <p className="text-sm text-[var(--muted)]">
+          Layer multiple instruments into a custom soundscape. Each track generates a live Chladni
+          pattern and browser tone preview. Save compositions to the session library.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* ── Left: Tracks ── */}
+        <div className="lg:col-span-3 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wider">Tracks ({tracks.length})</h2>
+            <Button size="sm" variant="outline" onClick={addTrack} className="border-white/20 text-[var(--muted)]" data-testid="button-add-track">
+              <Plus className="w-4 h-4 mr-1" />
+              Add Track
+            </Button>
+          </div>
+
+          {tracks.length === 0 ? (
+            <div className="bg-[var(--card)] border border-white/10 rounded-xl p-10 text-center">
+              <p className="text-sm text-[var(--muted)]">No tracks yet. Add an instrument to build your soundscape.</p>
+              <Button onClick={addTrack} variant="outline" className="mt-4 border-white/20 text-[var(--muted)]">
+                <Plus className="w-4 h-4 mr-1" />
+                Add First Track
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {tracks.map((track, i) => (
+                <TrackRow
+                  key={i}
+                  track={track}
+                  index={i}
+                  instruments={instruments}
+                  onUpdate={(u) => updateTrack(i, u)}
+                  onRemove={() => removeTrack(i)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Playback */}
+          <div className="flex gap-3 pt-2">
+            <Button
+              onClick={isPlaying ? stopAudio : startAudio}
+              className={isPlaying ? "bg-red-500/20 border border-red-500/40 text-red-300 hover:bg-red-500/30" : "bg-[var(--primary)] hover:bg-[var(--primary)]/90"}
+              data-testid="button-toggle-playback"
+            >
+              {isPlaying ? (
+                <><Square className="w-4 h-4 mr-1.5" /> Stop Preview</>
+              ) : (
+                <><Play className="w-4 h-4 mr-1.5" /> Preview Tones</>
+              )}
+            </Button>
+          </div>
+
+          {/* Save soundscape */}
+          <div className="bg-[var(--card)] border border-white/10 rounded-xl p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-white">Save Soundscape</h3>
+            <div className="space-y-2">
+              <Label className="text-[var(--muted)]">Name</Label>
+              <Input
+                value={soundscapeName}
+                onChange={(e) => setSoundscapeName(e.target.value)}
+                placeholder="My morning grounding practice…"
+                className="bg-[var(--bg)] border-white/20"
+                data-testid="input-soundscape-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[var(--muted)]">Notes (optional)</Label>
+              <Textarea
+                value={soundscapeNotes}
+                onChange={(e) => setSoundscapeNotes(e.target.value)}
+                placeholder="Protocol context, client notes…"
+                className="bg-[var(--bg)] border-white/20 min-h-[60px]"
+                data-testid="textarea-soundscape-notes"
+              />
+            </div>
+            <Button
+              onClick={() => saveMutation.mutate()}
+              disabled={saveMutation.isPending || tracks.length === 0}
+              data-testid="button-save-soundscape"
+            >
+              <Save className="w-4 h-4 mr-1.5" />
+              {saveMutation.isPending ? "Saving…" : "Save Soundscape"}
+            </Button>
+          </div>
+        </div>
+
+        {/* ── Right: Visualization ── */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Multi-Chladni */}
+          <div className="bg-[var(--card)] border border-white/10 rounded-xl overflow-hidden">
+            <div className="p-3 border-b border-white/5">
+              <p className="text-xs text-[var(--muted)] uppercase tracking-wider">Chladni Patterns</p>
+            </div>
+            <div className="p-4">
+              {activeTracks.length > 0 ? (
+                <MultiChladniCanvas
+                  tracks={activeTracks.map((t) => ({
+                    frequency: t.frequency,
+                    color: t.color,
+                    volume: t.gain / 100,
+                  }))}
+                  size={280}
+                />
+              ) : (
+                <div className="w-full aspect-square flex items-center justify-center text-[var(--muted)] text-sm border border-white/10 rounded-lg">
+                  Add tracks to see Chladni patterns
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Frequency summary */}
+          {activeTracks.length > 0 && (
+            <div className="bg-[var(--card)] border border-white/10 rounded-xl p-4 space-y-3">
+              <p className="text-xs text-[var(--muted)] uppercase tracking-wider">Active Frequencies</p>
+              <div className="space-y-2">
+                {activeTracks.map((t, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: t.color }} />
+                    <span className="text-sm text-white flex-1 truncate">{t.label || t.instrumentId}</span>
+                    <span className="text-xs font-mono text-[var(--muted)]">{formatHz(t.frequency)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* OM special note */}
+          <div className="bg-teal-900/20 border border-teal-500/30 rounded-xl p-4">
+            <p className="text-xs text-teal-200">
+              <span className="font-semibold">OM tip:</span> Begin every composition with{" "}
+              TF-PW-HEART (136.10 Hz) to establish the ceremonial container before layering
+              additional frequencies.
+            </p>
+          </div>
+
+          {/* Saved soundscapes */}
+          {soundscapes.length > 0 && (
+            <div className="bg-[var(--card)] border border-white/10 rounded-xl p-4 space-y-3">
+              <p className="text-xs text-[var(--muted)] uppercase tracking-wider">Saved Soundscapes</p>
+              <div className="space-y-2">
+                {soundscapes.slice(0, 5).map((sc) => (
+                  <button
+                    key={sc.id}
+                    onClick={() => loadSoundscape(sc)}
+                    className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 rounded-lg px-3 py-2 text-sm text-left transition-colors"
+                    data-testid={`button-load-soundscape-${sc.id}`}
+                  >
+                    <span className="text-white truncate">{sc.name}</span>
+                    <span className="text-xs text-[var(--muted)] ml-2 shrink-0">Load</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Disclaimer */}
+      <div className="bg-[var(--card)] border border-white/10 rounded-xl p-4">
+        <p className="text-xs text-[var(--muted)]">
+          Browser tone preview uses the Web Audio API with sine oscillators. Full audio files from the
+          instrument recordings are served from the asset library. The Chladni visualisation is a
+          mathematical approximation based on the classical vibrating plate equation — not a direct
+          simulation of physical sand patterns.
+        </p>
+      </div>
+    </div>
+  );
+}
