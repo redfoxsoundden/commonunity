@@ -144,13 +144,22 @@ function InstrumentCard({ instrument: i }: { instrument: Instrument }) {
         {/* Top row */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2">
-            {/* Frequency circle */}
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold frequency-display"
-              style={{ background: bg, color, border: `1.5px solid ${color}40` }}
-            >
-              {i.frequency < 200 ? Math.round(i.frequency) : Math.round(i.frequency)}
-            </div>
+            {/* Instrument photo or frequency circle fallback */}
+            {i.imageFilename ? (
+              <img
+                src={`/assets/images/${i.imageFilename}`}
+                alt={i.name}
+                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                style={{ border: `1.5px solid ${color}40` }}
+              />
+            ) : (
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold frequency-display"
+                style={{ background: bg, color, border: `1.5px solid ${color}40` }}
+              >
+                {Math.round(i.frequency)}
+              </div>
+            )}
             <div>
               <div className="text-xs text-muted-foreground font-mono">{i.id}</div>
               <div className="text-sm font-semibold text-foreground leading-tight">{i.name}</div>
