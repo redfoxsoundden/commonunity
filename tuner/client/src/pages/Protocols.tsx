@@ -30,6 +30,11 @@ export default function Protocols() {
     queryFn: () => apiRequest("GET", "/api/protocols").then((r) => r.json()),
   });
 
+  useEffect(() => {
+    setNexusContext("Protocol Library\nAll session protocols — grounding, clearing, heart-centering, chakra-specific, dosha-specific, and the OM ceremonial container.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
+
   if (isLoading) {
     return (
       <div className="p-6 space-y-4">
@@ -40,11 +45,6 @@ export default function Protocols() {
       </div>
     );
   }
-
-  useEffect(() => {
-    setNexusContext("Protocol Library\nAll session protocols — grounding, clearing, heart-centering, chakra-specific, dosha-specific, and the OM ceremonial container.");
-    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
-  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">

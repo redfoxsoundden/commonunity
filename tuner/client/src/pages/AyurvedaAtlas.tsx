@@ -43,6 +43,11 @@ export default function AyurvedaAtlas() {
   const doshaElements = elements.filter((e) => e.type === "dosha");
   const elementEls = elements.filter((e) => e.type === "element");
 
+  useEffect(() => {
+    setNexusContext("Ayurveda & Elements\nVata, Pitta, Kapha doshas — elemental correspondences, balancing forks, and dosha-specific session guidance.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
+
   if (isLoading) {
     return (
       <div className="p-6 space-y-4">
@@ -53,11 +58,6 @@ export default function AyurvedaAtlas() {
       </div>
     );
   }
-
-  useEffect(() => {
-    setNexusContext("Ayurveda & Elements\nVata, Pitta, Kapha doshas — elemental correspondences, balancing forks, and dosha-specific session guidance.");
-    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
-  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">

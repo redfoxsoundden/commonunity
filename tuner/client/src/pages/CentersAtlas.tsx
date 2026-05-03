@@ -24,6 +24,11 @@ export default function CentersAtlas() {
     queryFn: () => apiRequest("GET", "/api/centers").then((r) => r.json()),
   });
 
+  useEffect(() => {
+    setNexusContext("Centers Atlas (Gurdjieff)\nMoving, emotional, and intellectual centers — how center dominance shapes a client's session needs and instrument choices.");
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, []);
+
   if (isLoading) {
     return (
       <div className="p-6 space-y-4">
@@ -34,11 +39,6 @@ export default function CentersAtlas() {
       </div>
     );
   }
-
-  useEffect(() => {
-    setNexusContext("Centers Atlas (Gurdjieff)\nMoving, emotional, and intellectual centers — how center dominance shapes a client's session needs and instrument choices.");
-    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
-  }, []);
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">
