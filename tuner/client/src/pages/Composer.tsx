@@ -19,6 +19,7 @@ interface Track {
   label: string;
   chakraId?: string;
   color: string;
+  audioFilename?: string;
 }
 
 const TRACK_COLORS = [
@@ -57,6 +58,7 @@ function TrackRow({
                   frequency: inst.frequency,
                   label: inst.name,
                   chakraId: inst.chakraId ?? undefined,
+                  audioFilename: inst.audioFilename ?? undefined,
                 });
               }
             }}
@@ -119,7 +121,7 @@ export default function Composer() {
   const [soundscapeName, setSoundscapeName] = useState("");
   const [soundscapeNotes, setSoundscapeNotes] = useState("");
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const oscillatorsRef = useRef<{ osc: OscillatorNode; gain: GainNode }[]>([]);
+  const playbackNodesRef = useRef<{ source: AudioBufferSourceNode | OscillatorNode; gain: GainNode }[]>([]);
 
   const { data: instruments = [] } = useQuery<Instrument[]>({
     queryKey: ["/api/instruments"],
@@ -160,19 +162,20 @@ export default function Composer() {
   };
 
   const stopAudio = useCallback(() => {
-    oscillatorsRef.current.forEach(({ osc, gain }) => {
+    playbackNodesRef.current.forEach(({ source, gain }) => {
       try {
-        gain.gain.setTargetAtTime(0, audioCtxRef.current!.currentTime, 0.05);
-        osc.stop(audioCtxRef.current!.currentTime + 0.1);
+        gain.gain.setTargetAtTime(0, audioCtxRef.current!.currentTime, 0.1);
+        source.stop(audioCtxRef.current!.currentTime + 0.2);
       } catch {}
     });
-    oscillatorsRef.current = [];
+    playbackNodesRef.current = [];
     setIsPlaying(false);
   }, []);
 
-  const startAudio = useCallback(() => {
+  const startAudio = useCallback(async () => {
     if (isPlaying) { stopAudio(); return; }
-    if (tracks.length === 0 || tracks.every((t) => t.frequency === 0)) {
+    const activeTracks = tracks.filter((t) => t.frequency > 0 && t.gain > 0);
+    if (activeTracks.length === 0) {
       toast({ title: "Add at least one instrument track to preview", variant: "destructive" });
       return;
     }
@@ -180,27 +183,55 @@ export default function Composer() {
     if (!audioCtxRef.current) {
       audioCtxRef.current = new AudioContext();
     } else if (audioCtxRef.current.state === "suspended") {
-      audioCtxRef.current.resume();
+      await audioCtxRef.current.resume();
     }
 
     const ctx = audioCtxRef.current;
+    const nodes: { source: AudioBufferSourceNode | OscillatorNode; gain: GainNode }[] = [];
 
-    oscillatorsRef.current = tracks
-      .filter((t) => t.frequency > 0 && t.gain > 0)
-      .map((t) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.value = t.frequency;
-        gain.gain.value = (t.gain / 100) * 0.3; // keep output gentle
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        return { osc, gain };
-      });
+    await Promise.all(
+      activeTracks.map(async (t) => {
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = (t.gain / 100) * 0.7;
+        gainNode.connect(ctx.destination);
 
+        if (t.audioFilename) {
+          try {
+            const response = await fetch(`/assets/audio/${t.audioFilename}`);
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+            const source = ctx.createBufferSource();
+            source.buffer = audioBuffer;
+            source.loop = true;
+            source.connect(gainNode);
+            source.start();
+            nodes.push({ source, gain: gainNode });
+          } catch {
+            // Fallback to sine oscillator if sample load fails
+            const osc = ctx.createOscillator();
+            osc.type = "sine";
+            osc.frequency.value = t.frequency;
+            gainNode.gain.value = (t.gain / 100) * 0.3;
+            osc.connect(gainNode);
+            osc.start();
+            nodes.push({ source: osc, gain: gainNode });
+          }
+        } else {
+          // No recording — sine oscillator fallback
+          const osc = ctx.createOscillator();
+          osc.type = "sine";
+          osc.frequency.value = t.frequency;
+          gainNode.gain.value = (t.gain / 100) * 0.3;
+          osc.connect(gainNode);
+          osc.start();
+          nodes.push({ source: osc, gain: gainNode });
+        }
+      })
+    );
+
+    playbackNodesRef.current = nodes;
     setIsPlaying(true);
-    toast({ title: "Preview playing — click Stop to end" });
+    toast({ title: "Playing your recordings — click Stop to end" });
   }, [tracks, isPlaying, stopAudio, toast]);
 
   useEffect(() => {
@@ -282,7 +313,7 @@ export default function Composer() {
               {isPlaying ? (
                 <><Square className="w-4 h-4 mr-1.5" /> Stop Preview</>
               ) : (
-                <><Play className="w-4 h-4 mr-1.5" /> Preview Tones</>
+                <><Play className="w-4 h-4 mr-1.5" /> Preview Recordings</>
               )}
             </Button>
           </div>
@@ -396,8 +427,8 @@ export default function Composer() {
       {/* Disclaimer */}
       <div className="bg-[var(--card)] border border-white/10 rounded-xl p-4">
         <p className="text-xs text-[var(--muted)]">
-          Browser tone preview uses the Web Audio API with sine oscillators. Full audio files from the
-          instrument recordings are served from the asset library. The Chladni visualisation is a
+          Preview plays your actual instrument recordings, looped and mixed in the browser via the Web Audio API.
+          Each track's volume slider controls its mix level. The Chladni visualisation is a
           mathematical approximation based on the classical vibrating plate equation — not a direct
           simulation of physical sand patterns.
         </p>
