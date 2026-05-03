@@ -8,30 +8,84 @@ interface ChladniCanvasProps {
   frequencies?: number[]; // for multi-track layering
 }
 
-// Classical Chladni equation:
-// cos(n·π·x/L)·cos(m·π·y/L) − cos(m·π·x/L)·cos(n·π·y/L) = 0
-// We derive n, m from frequency using log-based mapping
+// ─── Frequency → Mode Pair ────────────────────────────────────────────────────
+//
+// Classical Chladni plate: E(x,y) = cos(n·π·x/L)·cos(m·π·y/L) - cos(m·π·x/L)·cos(n·π·y/L)
+//
+// Strategy: map Hz to (n, m) deterministically but with maximum spread so that
+// every instrument in this kit produces a visually distinct pattern.
+//
+// We use a lookup table for the exact frequencies in the set, and a fallback
+// formula for any frequency not in the table.
+//
+// The table was designed so that:
+//   - Weighted body forks (low Hz, dense body effect) → low n/m, fewer nodal lines
+//   - Mid field forks → moderate n/m, medium complexity
+//   - High Solfeggio / bowl forks → higher n/m, rich complex webs
+//   - No two instruments share the same (n, m) pair
 
-function freqToNM(freq: number): { n: number; m: number } {
-  // Map frequency to integer pair (n, m) producing visually meaningful patterns
-  const log = Math.log2(freq / 100);
-  const base = Math.max(1, Math.round(log * 2));
-  const n = base + (Math.round(freq / 73) % 3);
-  const m = base + (Math.round(freq / 53) % 4);
-  return { n: Math.max(1, n), m: Math.max(2, m) };
+const FREQ_TABLE: Record<number, [number, number]> = {
+  //  Hz      n   m
+  54.81:  [2, 3],   // TF-BT-SCHU-54   — very deep, 2 simple nodal arcs
+  62.64:  [2, 4],   // TF-BT-SCHU-62   — deep Schumann, open cross
+  89:     [3, 4],   // TF-BT-FIB-89    — lower Fibonacci, gentle quad
+  93.96:  [3, 5],   // TF-BT-SLIDER    — Sonic Slider, pentagon-ish
+  111:    [3, 6],   // BOWL-111        — star-of-David inner ring
+  126.22: [4, 5],   // TF-PW-SOLAR     — Sun Tone, 4×5 web
+  128:    [4, 6],   // TF-OTTO-128     — Otto 128, clean cross-ring
+  136.10: [4, 7],   // TF-PW-HEART/OM  — heart OM, 4×7 petals
+  141.27: [5, 6],   // TF-PW-THROAT    — Mercury, 5×6 interlock
+  144:    [5, 7],   // TF-BT-FIB-144   — Fibonacci 144, phi web
+  172.06: [5, 8],   // TF-PW-CROWN     — Platonic Year, crown web
+  174:    [6, 7],   // TF-BT-SOL-174   — Solfeggio workhorse, hex grid
+  194.18: [6, 8],   // TF-PW-ROOT      — Earth Day, 6×8 mandala
+  210.42: [6, 9],   // TF-PW-SACRAL    — Moon, 6×9 flower
+  221.23: [7, 8],   // TF-PW-3RD       — Venus, 7×8 petal ring
+  222:    [7, 9],   // TF-BT-222       — BT 222, 7×9 complex
+  272:    [8, 9],   // BOWL-272        — 8×9 dense web
+  385.5:  [9, 10],  // BOWL-385        — rich mid-upper web
+  396:    [9, 11],  // Solfeggio 396   — liberation freq
+  417:    [10, 11], // TF-BT-SOL-417   — facilitating change
+  429:    [10, 12], // BOWL-429        — near-432 clarity
+  528:    [11, 13], // BOWL/TF 528     — love freq, complex lace
+  639:    [12, 13], // Solfeggio 639
+  741:    [13, 14], // Solfeggio 741
+  771:    [13, 15], // BELL-771        — Tibetan bell, finest lace
+  852:    [14, 15], // Solfeggio 852
+};
+
+// Round to 2 decimal places for lookup
+function roundHz(f: number): number {
+  return Math.round(f * 100) / 100;
 }
 
-/**
- * Renders a single frequency layer onto an offscreen canvas and returns it.
- * Using an offscreen canvas lets us composite with drawImage (which respects
- * globalCompositeOperation), whereas putImageData bypasses compositing entirely.
- */
+function freqToNM(freq: number): { n: number; m: number } {
+  const key = roundHz(freq);
+  const entry = FREQ_TABLE[key];
+  if (entry) return { n: entry[0], m: entry[1] };
+
+  // Fallback formula for frequencies not in the table
+  // Use a log-spread that produces well-separated integer pairs
+  const log = Math.log2(Math.max(freq, 20) / 40); // 40 Hz baseline
+  const base = Math.max(2, Math.round(log * 3));
+  const offset = Math.round((freq / 137) % 5); // 137 = prime, good spread
+  const n = base + offset;
+  const m = n + 1 + (Math.round(freq / 89) % 3); // always m > n
+  return { n: Math.max(2, n), m: Math.max(3, m) };
+}
+
+// ─── Offscreen layer renderer ─────────────────────────────────────────────────
+//
+// Renders a single (n, m) Chladni pattern to an offscreen canvas.
+// putImageData bypasses globalCompositeOperation entirely (browser spec),
+// so we write to offscreen first, then use drawImage to composite.
+
 function renderFrequencyLayer(
   freq: number,
   color: string,
   size: number,
   alpha: number,
-  threshold = 0.12
+  threshold = 0.10  // sharper nodal lines — 0.10 instead of 0.12
 ): HTMLCanvasElement {
   const offscreen = document.createElement("canvas");
   offscreen.width = size;
@@ -41,7 +95,7 @@ function renderFrequencyLayer(
   const { n, m } = freqToNM(freq);
   const L = Math.PI;
 
-  // Parse hex color to RGB (always a 6-digit hex)
+  // Parse hex color → RGB
   const r = parseInt(color.slice(1, 3), 16);
   const g = parseInt(color.slice(3, 5), 16);
   const b = parseInt(color.slice(5, 7), 16);
@@ -53,27 +107,29 @@ function renderFrequencyLayer(
     for (let px = 0; px < size; px++) {
       const x = (px / size) * L;
       const y = (py / size) * L;
+      // Classical square plate equation
       const val =
-        Math.cos(n * x) * Math.cos(m * y) - Math.cos(m * x) * Math.cos(n * y);
+        Math.cos(n * x) * Math.cos(m * y) -
+        Math.cos(m * x) * Math.cos(n * y);
       const abs = Math.abs(val);
 
       if (abs < threshold) {
         const intensity = 1 - abs / threshold;
-        const bright = intensity * intensity; // squared for sharp nodal lines
+        const bright = intensity * intensity * intensity; // cubic for very sharp lines
         const i = (py * size + px) * 4;
-        data[i] = Math.round(r * bright * alpha);
+        data[i]     = Math.round(r * bright * alpha);
         data[i + 1] = Math.round(g * bright * alpha);
         data[i + 2] = Math.round(b * bright * alpha);
-        data[i + 3] = Math.round(220 * bright * alpha);
+        data[i + 3] = Math.round(230 * bright * alpha);
       }
     }
   }
 
-  // Write pixel data to the offscreen canvas (this is fine — no compositing needed here)
   ctx.putImageData(imgData, 0, 0);
-
   return offscreen;
 }
+
+// ─── drawChladni ─────────────────────────────────────────────────────────────
 
 function drawChladni(
   canvas: HTMLCanvasElement,
@@ -84,43 +140,40 @@ function drawChladni(
   if (!ctx) return;
   const size = canvas.width;
 
-  // Background
   ctx.fillStyle = "#050a14";
   ctx.fillRect(0, 0, size, size);
 
   if (frequencies.length === 0) return;
 
   frequencies.forEach((freq, idx) => {
-    const alpha = idx === 0 ? 1 : 0.6;
-
-    // Render this frequency to an offscreen canvas
+    const alpha = idx === 0 ? 1 : 0.65;
     const layer = renderFrequencyLayer(freq, color, size, alpha);
 
-    // Composite the layer onto the main canvas using "screen"
-    // drawImage respects globalCompositeOperation; putImageData does NOT
+    // Main pattern — source-over for first, screen for subsequent
     ctx.save();
     ctx.globalCompositeOperation = idx === 0 ? "source-over" : "screen";
     ctx.drawImage(layer, 0, 0);
     ctx.restore();
 
-    // Glow pass: draw the same layer again blurred and screened
+    // Glow pass — draws the same layer blurred + screened
     ctx.save();
     ctx.globalCompositeOperation = "screen";
-    ctx.globalAlpha = 0.2 * alpha;
-    ctx.filter = "blur(5px)";
+    ctx.globalAlpha = 0.22 * alpha;
+    ctx.filter = "blur(6px)";
     ctx.drawImage(layer, 0, 0);
     ctx.restore();
   });
 }
 
+// ─── ChladniCanvas (single instrument) ───────────────────────────────────────
+
 export default function ChladniCanvas({
   frequency,
   color = "#6366f1",
-  size = 220,
+  size = 300,
   frequencies,
 }: ChladniCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
   const allFreqs =
     frequencies && frequencies.length > 0 ? frequencies : [frequency];
 
@@ -141,10 +194,11 @@ export default function ChladniCanvas({
   );
 }
 
-// Multi-frequency Chladni for the composer
+// ─── MultiChladniCanvas (composer) ───────────────────────────────────────────
+
 export function MultiChladniCanvas({
   tracks,
-  size = 320,
+  size = 380,
 }: {
   tracks: { frequency: number; color: string; volume: number }[];
   size?: number;
@@ -160,31 +214,28 @@ export function MultiChladniCanvas({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Background
     ctx.fillStyle = "#050a14";
     ctx.fillRect(0, 0, size, size);
 
     tracks.forEach((track, idx) => {
-      // Render this track to an offscreen canvas
       const layer = renderFrequencyLayer(
         track.frequency,
         track.color,
         size,
-        track.volume,
-        0.15
+        Math.max(0.1, track.volume),
+        0.10
       );
 
-      // Each track composited with "screen" so colors blend additively
       ctx.save();
       ctx.globalCompositeOperation = idx === 0 ? "source-over" : "screen";
       ctx.drawImage(layer, 0, 0);
       ctx.restore();
 
-      // Glow pass
+      // Glow
       ctx.save();
       ctx.globalCompositeOperation = "screen";
-      ctx.globalAlpha = 0.15 * track.volume;
-      ctx.filter = "blur(5px)";
+      ctx.globalAlpha = 0.18 * track.volume;
+      ctx.filter = "blur(6px)";
       ctx.drawImage(layer, 0, 0);
       ctx.restore();
     });

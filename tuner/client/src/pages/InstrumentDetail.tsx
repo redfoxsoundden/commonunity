@@ -90,7 +90,7 @@ export default function InstrumentDetail() {
             <ChladniCanvas
               frequency={instrument.frequency}
               color={chakraColor}
-              size={220}
+              size={300}
             />
             <p className="text-xs text-muted-foreground mt-2 text-center">
               Standing wave pattern at {formatHz(instrument.frequency)}

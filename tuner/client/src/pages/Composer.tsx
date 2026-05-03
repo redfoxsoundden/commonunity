@@ -367,7 +367,7 @@ export default function Composer() {
                     color: t.color,
                     volume: t.gain / 100,
                   }))}
-                  size={280}
+                  size={380}
                 />
               ) : (
                 <div className="w-full aspect-square flex items-center justify-center text-[var(--muted)] text-sm border border-white/10 rounded-lg">
