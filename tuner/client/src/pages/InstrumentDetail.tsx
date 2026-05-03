@@ -26,7 +26,7 @@ export default function InstrumentDetail() {
       const notes = parseArr(instrument.notes).slice(0, 3).join("; ");
       setNexusContext(
         `Viewing instrument: ${instrument.name}\n` +
-        `Type: ${instrument.type} | Frequency: ${formatHz(instrument.primaryHz)}` +
+        `Type: ${instrument.type} | Frequency: ${formatHz(instrument.frequency)}` +
         (instrument.solfeggio ? ` (Solfeggio: ${instrument.solfeggio} Hz)` : "") +
         (instrument.planetaryNote ? ` | Cousto: ${instrument.planetaryNote}` : "") +
         (instrument.chakraId ? ` | Chakra: ${instrument.chakraId}` : "") +
