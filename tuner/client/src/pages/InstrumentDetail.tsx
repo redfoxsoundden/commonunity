@@ -41,12 +41,16 @@ export default function InstrumentDetail() {
       {/* Header */}
       <div className="flex items-start gap-6 mb-8">
         {instrument.imageFilename ? (
-          <img
-            src={`/assets/images/${instrument.imageFilename}`}
-            alt={instrument.name}
-            className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
-            style={{ border: `2px solid ${color}30` }}
-          />
+          <div
+            className="w-20 h-20 rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center"
+            style={{ background: "#0b1120", border: `2px solid ${color}30` }}
+          >
+            <img
+              src={`/assets/images/${instrument.imageFilename}`}
+              alt={instrument.name}
+              className="w-full h-full object-contain p-1"
+            />
+          </div>
         ) : (
           <div
             className="w-20 h-20 rounded-2xl flex items-center justify-center text-lg font-bold frequency-display flex-shrink-0"

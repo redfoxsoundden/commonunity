@@ -146,12 +146,16 @@ function InstrumentCard({ instrument: i }: { instrument: Instrument }) {
           <div className="flex items-center gap-2">
             {/* Instrument photo or frequency circle fallback */}
             {i.imageFilename ? (
-              <img
-                src={`/assets/images/${i.imageFilename}`}
-                alt={i.name}
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                style={{ border: `1.5px solid ${color}40` }}
-              />
+              <div
+                className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden flex items-center justify-center"
+                style={{ background: "#0b1120", border: `1.5px solid ${color}40` }}
+              >
+                <img
+                  src={`/assets/images/${i.imageFilename}`}
+                  alt={i.name}
+                  className="w-full h-full object-contain p-0.5"
+                />
+              </div>
             ) : (
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold frequency-display"
