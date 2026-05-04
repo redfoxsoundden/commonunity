@@ -28,7 +28,8 @@ export function runMigrations() {
     center_affinity_tags TEXT,
     elemental_association TEXT,
     source_reference TEXT,
-    chakra_id TEXT
+    chakra_id TEXT,
+    closest_chakra_alignment INTEGER DEFAULT 0
   )`);
 
   db.run(sql`CREATE TABLE IF NOT EXISTS chakras (

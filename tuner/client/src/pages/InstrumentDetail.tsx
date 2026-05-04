@@ -208,8 +208,16 @@ export default function InstrumentDetail() {
               <div className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/30 transition-colors group">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full" style={{background: chakraColor}}/>
-                  <span className="text-sm font-medium">Associated Chakra: {instrument.chakraId}</span>
-                  <ArrowLeft size={12} className="ml-auto rotate-180 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"/>
+                  <div className="flex items-center gap-2 flex-1">
+                    <span className="text-sm font-medium">Associated Chakra: {instrument.chakraId}</span>
+                    {instrument.closestChakraAlignment && (
+                      <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded"
+                        style={{background: `${chakraColor}18`, color: chakraColor, border: `1px solid ${chakraColor}40`}}>
+                        closest alignment
+                      </span>
+                    )}
+                  </div>
+                  <ArrowLeft size={12} className="rotate-180 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"/>
                 </div>
               </div>
             </Link>

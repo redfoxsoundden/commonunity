@@ -147,7 +147,8 @@ export async function seedDatabase() {
     // BIOFIELD TUNING KIT
     {
       id: "TF-BT-SLIDER", name: "Sonic Slider", type: "fork", weighting: "weighted",
-      frequency: 93.96, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SLIDER_main.png",
+      frequency: 93.96, lineage: "Biofield Tuning – Schumann series",
+      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SLIDER_main.png",
       audioFilename: "TF-BT-SLIDER.mp3",
       masterExplainer: "The Sonic Slider is McKusick's signature body-contact fork and the most versatile weighted fork in the Biofield Tuning kit. At 93.96 Hz — the 12th harmonic of the Schumann resonance (7.83 Hz × 12) — it carries the Earth's own electromagnetic pulse frequency into the physical body. The extended handle design allows it to be used in two distinct modes: point contact on bony landmarks (like the Otto 128), and gliding — drawn slowly along the spine, legs, or arms while the body remains still, creating a moving wave of vibration through the fascia and connective tissue. This gliding action is almost unique in therapeutic tuning fork work and produces profound fascial release and systemic settling. It is one of the most reliable parasympathetic activators in the entire kit.",
       healingBenefits: JSON.stringify(["grounding","nervous-system-support","relaxation","fascia-release","circulation-support","lymphatic-support","pain-support","energetic-clearing"]),
@@ -161,7 +162,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-SCHU-62", name: "Schumann 62 Hz", type: "fork", weighting: "weighted",
-      frequency: 62.64, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SCHU-62_main.png",
+      frequency: 62.64, lineage: "Biofield Tuning – Schumann series",
+      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SCHU-62_main.png",
       audioFilename: "TF-BT-SCHU-62.mp3",
       masterExplainer: "62.64 Hz — the 8th harmonic of the Schumann resonance. Where the Sonic Slider (93.96 Hz, ×12) is versatile and body-friendly, this fork operates at a lower, more profoundly earthward register. At this frequency, the vibration is felt more as a deep structural tremor than a tone — clients sometimes struggle to hear it clearly but feel it very physically, particularly at the sacrum, feet, and lower spine. Its primary domain is the root and Earth Star zone: the deepest layers of embodied grounding, subconscious field stabilization, and the pre-personal. Useful specifically for very scattered, anxious, or trauma-activated clients where higher-frequency forks would feel stimulating rather than settling. The open cross-like 2×4 Chladni pattern reflects its simplicity: this fork does not complicate things — it anchors.",
       healingBenefits: JSON.stringify(["grounding","relaxation","nervous-system-support","meditation-support","sleep-support","energetic-clearing"]),
@@ -175,7 +177,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-SCHU-54", name: "Schumann 54 Hz", type: "fork", weighting: "weighted",
-      frequency: 54.81, lineage: "Biofield Tuning – Schumann series", imageFilename: "TF-BT-SCHU-54_main.png",
+      frequency: 54.81, lineage: "Biofield Tuning – Schumann series",
+      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SCHU-54_main.png",
       audioFilename: "TF-BT-SCHU-54.mp3",
       masterExplainer: "54.81 Hz — the 7th harmonic of the Schumann resonance and the deepest body-contact fork in the entire kit. At this frequency, the vibration is below the auditory threshold for many environments — it is experienced primarily as a slow, subsonic tremor through dense tissue and bone. This is the ancestral register: the pre-verbal, pre-personal, the substrate layers of the biofield where inherited patterns and deep somatic holding exist. McKusick uses this fork specifically for work at the Ancestral Rivers (the field zones below the feet extending from each side — paternal right, maternal left) and for clients presenting with patterns that feel older than their own biography. It is not a common or frequently used fork — it is reserved for specific moments when the session calls for the deepest possible earthward reach.",
       healingBenefits: JSON.stringify(["grounding","relaxation","nervous-system-support","meditation-support","sleep-support"]),
@@ -188,7 +191,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-FIB-144W", name: "Fibonacci 144 Weighted", type: "fork", weighting: "weighted",
-      frequency: 144, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-144W_main.png",
+      frequency: 144, lineage: "Biofield Tuning – Fibonacci series",
+      chakraId: "CH-THROAT", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-144W_main.png",
       audioFilename: "TF-BT-FIB-144W.mp3",
       masterExplainer: "144 Hz — a Fibonacci number and part of the most mathematically beautiful sequence in nature: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144… Each number is the sum of the two before it, and the ratio of any two adjacent terms converges toward the golden ratio φ (1.618…). This ratio governs the spiraling architecture of shells, galaxies, plant growth, and — crucially — the proportional geometry of the human body. The Fibonacci forks translate this phi-ratio resonance into vibration. The weighted version applies this directly to the physical structure: bone, fascia, and connective tissue respond to it with a release and reordering quality that is distinct from the more straightforward settling of the Schumann forks. Use it as a mid-session structural bridge — after grounding is established, before field work begins — to help the physical body organize itself around its own inherent geometry.",
       healingBenefits: JSON.stringify(["coherence","integration","nervous-system-support","relaxation","bone-tissue-support","energetic-clearing"]),
@@ -202,7 +206,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-FIB-89", name: "Fibonacci 89 Hz", type: "fork", weighting: "weighted",
-      frequency: 89, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-89_main.png",
+      frequency: 89, lineage: "Biofield Tuning – Fibonacci series",
+      chakraId: "CH-SACRAL", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-89_main.png",
       audioFilename: "TF-BT-FIB-89.mp3",
       masterExplainer: "89 Hz — the predecessor Fibonacci number to 144 Hz. Where 144 Hz operates in the upper structural register (spine, sternum, joints of the upper body), 89 Hz belongs to the lower body: the sacrum, hips, femurs, and lower spine. Together, 89 and 144 form the phi-ratio interval (89:144 ≈ 1:1.618), meaning the frequency relationship between them is the golden ratio itself — the most coherence-generating interval in the Fibonacci sequence. This makes the two-fork pair — one at sacrum, one at sternum, or one at each hip — uniquely powerful for creating a whole-body phi-ratio resonance field. Physiologically, 89 Hz is in the deep-bass body register: felt as substantial vibration, settling quickly into the nervous system, with an earthward quality that connects it naturally to the Schumann family.",
       healingBenefits: JSON.stringify(["grounding","coherence","nervous-system-support","integration","fascia-release","relaxation"]),
@@ -214,7 +219,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-FIB-144U", name: "Fibonacci 144 Unweighted", type: "fork", weighting: "unweighted",
-      frequency: 144, lineage: "Biofield Tuning – Fibonacci series", imageFilename: "TF-BT-FIB-144U_main.png",
+      frequency: 144, lineage: "Biofield Tuning – Fibonacci series",
+      chakraId: "CH-THROAT", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-144U_main.png",
       audioFilename: "TF-BT-FIB-144U.mp3",
       masterExplainer: "The unweighted version of the 144 Hz Fibonacci fork — its field counterpart. While the weighted version delivers phi-ratio resonance into the physical structure, the unweighted version extends the same resonance into the biofield as an audible ringing tone that can be swept, held, and moved through space. Unweighted forks are the primary instrument for biofield scanning in McKusick's method: the practitioner moves the ringing fork through the field and listens for changes in the tone quality that indicate distortions (dense = charge, hollow = depletion, static = stuck pattern). The Fibonacci frequency adds a specific organizing quality to this scanning — it seems to support the field in returning to its own inherent geometric order rather than simply clearing distortions. Used in the closing phase to 'seal' the field after clearing, it acts as a coherence net cast over the entire session space.",
       healingBenefits: JSON.stringify(["coherence","energetic-clearing","integration","nervous-system-support","intuitive-support"]),
@@ -225,7 +231,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-SOL-174", name: "Solfeggio 174 Hz", type: "fork", weighting: "unweighted",
-      frequency: 174, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-174_main.png",
+      frequency: 174, lineage: "Biofield Tuning – Solfeggio series",
+      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-174_main.png",
       audioFilename: "TF-BT-SOL-174.mp3",
       masterExplainer: "174 Hz — the workhorse of McKusick's Biofield Tuning method and the single most important fork in the kit for diagnostic and clearing work. This is the primary field-scanning instrument: activated and held at various distances from the body, it becomes a tonal probe of the biofield's condition. McKusick discovered that the tone quality changes measurably in zones of energetic distortion — a practitioner trained to listen for these changes can map the field with remarkable specificity. The Solfeggio system assigns 174 Hz to the foundational level of the frequency ladder — it is the ground tone from which the higher Solfeggio tones ascend. Clinically, it carries an analgesic quality (pain reduction through field-level clearing) and a general settling effect that makes it safe and effective as an opener regardless of presenting issue. No other single fork in this kit does more work in more sessions.",
       healingBenefits: JSON.stringify(["energetic-clearing","pain-support","nervous-system-support","relaxation","grounding","fascia-release"]),
@@ -238,7 +245,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-SOL-417", name: "Solfeggio 417 Hz", type: "fork", weighting: "unweighted",
-      frequency: 417, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-417_main.png",
+      frequency: 417, lineage: "Biofield Tuning – Solfeggio series",
+      chakraId: "CH-SACRAL", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-417_main.png",
       audioFilename: "TF-BT-SOL-417.mp3",
       masterExplainer: "417 Hz — the Solfeggio 'facilitating change' frequency, traditionally described as the tone of undoing, dissolution of stuck situations, and clearing of limiting patterns. In the context of Biofield Tuning, 417 Hz serves a secondary role after 174 Hz has located and begun clearing a distortion: where 174 Hz finds and marks the stuck zone, 417 Hz dissolves it. The higher frequency vibrates the distortion apart more completely, especially useful for entrenched emotional patterns, long-held belief structures, and places in the field that have responded to 174 Hz but not fully resolved. It is less a scanning fork and more a refinement tool — precise, targeted, and used with intentional care rather than as a broad sweep. The 10×11 Chladni mode is one of the more complex patterns in the set, reflecting its role at a more refined level of field work.",
       healingBenefits: JSON.stringify(["energetic-clearing","emotional-clearing","integration","coherence","focus"]),
@@ -251,7 +259,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-SOL-528", name: "Solfeggio 528 Hz", type: "fork", weighting: "unweighted",
-      frequency: 528, lineage: "Biofield Tuning – Solfeggio series", imageFilename: "TF-BT-SOL-528_main.png",
+      frequency: 528, lineage: "Biofield Tuning – Solfeggio series",
+      chakraId: "CH-HEART", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-528_main.png",
       audioFilename: "TF-BT-SOL-528.mp3",
       masterExplainer: "528 Hz — the most widely recognized and discussed frequency in contemporary sound healing, assigned in the Solfeggio tradition to 'Mi' (Mira gestorum — 'miracle'). The claims around this frequency are considerable: Dr. Len Horowitz's work describes it as the 'Love frequency' with DNA repair and transformation properties; cymatics research has shown it produces particularly ordered and symmetrical patterns in water. In therapeutic practice, the most reliable and consistent quality observed is a coherence-generating effect at the heart field: this frequency seems to invite emotional opening, softening of defensive holding, and access to love as a physical felt-sense rather than a concept. It pairs with BOWL-528 (same frequency, much more resonant body) to create one of the most powerful heart-coherence combinations in the kit. The 11×13 Chladni mode — intricate lacework — reflects the fine, coherence-organizing quality of this frequency.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","integration","emotional-clearing","meditation-support","sleep-support"]),
@@ -263,7 +272,8 @@ export async function seedDatabase() {
     },
     {
       id: "TF-BT-222", name: "BT 222 Hz", type: "fork", weighting: "unweighted",
-      frequency: 222, lineage: "Biofield Tuning", imageFilename: "TF-BT-222_main.png",
+      frequency: 222, lineage: "Biofield Tuning",
+      chakraId: "CH-THIRD-EYE", closestChakraAlignment: true, imageFilename: "TF-BT-222_main.png",
       audioFilename: "TF-BT-222.mp3",
       masterExplainer: "222 Hz — a Biofield Tuning kit fork that occupies a unique position in the frequency map: it is almost exactly 1 Hz above the Planetware Third Eye fork (TF-PW-3RD at 221.23 Hz). This near-unison relationship creates one of the most therapeutically interesting interval pairings in the kit: when both forks are activated together, they produce a slow beating pulse at approximately 0.77 Hz — the infra-slow oscillation range associated with deep meditative and restorative states. Both forks together create an interference pattern that many practitioners experience as one of the most profoundly stilling combinations available. Used independently, 222 Hz focuses on the upper field — throat, jaw, temples, and third-eye zone — with a quality that supports the integration of expression and vision, the bridge between what one sees inwardly and what one is able to speak outwardly.",
       healingBenefits: JSON.stringify(["expression-support","intuitive-support","focus","coherence","energetic-clearing"]),

@@ -30,6 +30,7 @@ export const instruments = sqliteTable("instruments", {
   elementalAssociation: text("elemental_association"),
   sourceReference: text("source_reference"),
   chakraId: text("chakra_id"), // FK reference
+  closestChakraAlignment: integer("closest_chakra_alignment", { mode: "boolean" }), // true = closest match, not definitive
 });
 
 export const insertInstrumentSchema = createInsertSchema(instruments);

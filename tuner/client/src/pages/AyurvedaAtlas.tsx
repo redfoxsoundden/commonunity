@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Leaf } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
