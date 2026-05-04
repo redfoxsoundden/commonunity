@@ -82,7 +82,7 @@ export default function Layout({ children }: LayoutProps) {
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 py-5 border-b border-border flex-shrink-0">
           <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
-            <svg viewBox="0 0 32 32" className="w-7 h-7" fill="none">
+            <svg viewBox="0 0 32 32" className="w-7 h-7 om-logo-glow" fill="none">
               {/* OM symbol simplified as SVG */}
               <circle cx="16" cy="16" r="15" stroke="hsl(239,84%,67%)" strokeWidth="1.5" fill="none" opacity="0.3"/>
               <text x="16" y="22" textAnchor="middle" fontSize="18" fill="hsl(239,84%,67%)" fontFamily="serif" className="om-symbol">ॐ</text>

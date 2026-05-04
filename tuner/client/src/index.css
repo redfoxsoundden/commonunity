@@ -10,10 +10,10 @@
 @layer base {
   :root {
     /* CommonUnity Theme A (dark blue) exact tokens */
-    --background: 220 28% 8%;
-    --foreground: 213 31% 95%;
+    --background: 222 35% 9%;
+    --foreground: 213 31% 97%;
 
-    --card: 222 24% 10%;
+    --card: 224 28% 11%;
     --card-foreground: 213 31% 95%;
 
     --popover: 222 24% 10%;
@@ -34,7 +34,7 @@
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 217 24% 16%;
+    --border: 217 28% 19%;
     --input: 216 20% 10%;
     --ring: 239 84% 67%;
 
@@ -76,6 +76,35 @@
   --chakra-third-eye: #4B0082;
   --chakra-crown:     #9400D3;
   --chakra-om:        #00CED1;
+}
+
+/* ─── GLOW SYSTEM ────────────────────────────────────────── */
+:root {
+  /* Background radial — lifts the center like a light source */
+  --bg-glow: radial-gradient(ellipse at 50% 30%, hsl(239 60% 14%) 0%, hsl(222 35% 9%) 60%);
+
+  /* Card glows — per accent color */
+  --glow-primary:  rgba(99, 102, 241, 0.18);
+  --glow-teal:     rgba(0, 206, 209, 0.18);
+  --glow-amber:    rgba(245, 158, 11, 0.15);
+  --glow-rose:     rgba(244, 63, 94, 0.15);
+  --glow-green:    rgba(16, 185, 129, 0.15);
+
+  /* Chakra card glows */
+  --glow-root:       rgba(204, 0, 0, 0.20);
+  --glow-sacral:     rgba(255, 140, 0, 0.20);
+  --glow-solar:      rgba(255, 215, 0, 0.18);
+  --glow-heart:      rgba(34, 139, 34, 0.20);
+  --glow-throat:     rgba(30, 144, 255, 0.20);
+  --glow-third-eye:  rgba(75, 0, 130, 0.25);
+  --glow-crown:      rgba(148, 0, 211, 0.22);
+  --glow-om:         rgba(0, 206, 209, 0.28);
+}
+
+/* Apply bg radial gradient to body */
+body {
+  background-image: var(--bg-glow) !important;
+  background-attachment: fixed !important;
 }
 
 /* ─── SCROLLBAR ───────────────────────────────────────────── */
@@ -126,6 +155,30 @@
   color: hsl(var(--foreground));
 }
 
+/* ─── SIDEBAR OM LOGO GLOW ───────────────────────────────── */
+.om-logo-glow {
+  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+  animation: om-breathe 5s ease-in-out infinite;
+}
+@keyframes om-breathe {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.4)); }
+  50%       { filter: drop-shadow(0 0 16px rgba(0, 206, 209, 0.65)); }
+}
+
+/* ─── FLOATING GLOW CARDS (generic) ─────────────────────── */
+.glow-card {
+  box-shadow: 0 0 0 1px hsl(var(--border)),
+              0 4px 24px rgba(0,0,0,0.35),
+              0 0 20px var(--glow-primary);
+  transition: box-shadow 250ms ease, transform 200ms ease;
+}
+.glow-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3),
+              0 8px 32px rgba(0,0,0,0.45),
+              0 0 32px var(--glow-teal);
+}
+
 /* ─── WAVEFORM CONTAINER ─────────────────────────────────── */
 .waveform-container wave {
   overflow: hidden !important;
@@ -140,11 +193,26 @@
 /* ─── INSTRUMENT CARD ────────────────────────────────────── */
 .instrument-card {
   transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 0 1px hsl(var(--border)), 0 4px 16px rgba(0,0,0,0.3);
 }
 .instrument-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3),
+              0 8px 32px rgba(0,0,0,0.4),
+              0 0 24px var(--glow-primary);
 }
+
+/* ─── CARD AMBIENT GLOW ──────────────────────────────────── */
+/* Applied via className on chakra/atlas cards */
+.card-glow-root       { box-shadow: 0 0 20px var(--glow-root),   0 1px 0 hsl(var(--border)); }
+.card-glow-sacral     { box-shadow: 0 0 20px var(--glow-sacral), 0 1px 0 hsl(var(--border)); }
+.card-glow-solar      { box-shadow: 0 0 20px var(--glow-solar),  0 1px 0 hsl(var(--border)); }
+.card-glow-heart      { box-shadow: 0 0 20px var(--glow-heart),  0 1px 0 hsl(var(--border)); }
+.card-glow-throat     { box-shadow: 0 0 20px var(--glow-throat), 0 1px 0 hsl(var(--border)); }
+.card-glow-third-eye  { box-shadow: 0 0 20px var(--glow-third-eye), 0 1px 0 hsl(var(--border)); }
+.card-glow-crown      { box-shadow: 0 0 20px var(--glow-crown),  0 1px 0 hsl(var(--border)); }
+.card-glow-om         { box-shadow: 0 0 28px var(--glow-om),     0 1px 0 hsl(var(--border)); }
+.card-glow-primary    { box-shadow: 0 0 20px var(--glow-primary), 0 1px 0 hsl(var(--border)); }
 
 /* ─── SPECTRUM ANALYZER ──────────────────────────────────── */
 #audiomotion-container canvas {

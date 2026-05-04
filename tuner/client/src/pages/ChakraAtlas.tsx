@@ -52,7 +52,10 @@ function ChakraRow({ chakra: c }: { chakra: Chakra }) {
 
   return (
     <Link href={`/chakras/${c.id}`} data-testid={`card-chakra-${c.id}`}>
-      <div className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/30 transition-all group flex gap-4 items-start">
+      <div
+        className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-primary/30 transition-all group flex gap-4 items-start"
+        style={{ boxShadow: `0 0 20px ${color}28, 0 1px 0 hsl(var(--border))` }}
+      >
         {/* Color swatch */}
         <div
           className="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-white text-xs font-bold"
