@@ -1177,6 +1177,19 @@ async def serve_studio():
         })
     return {"error": "Studio not found"}
 
+# CommonUnity public homepage (served at /home for now; intended for the
+# commonunity.io apex once Compass moves to compass.commonunity.io).
+@app.get("/home")
+async def serve_homepage():
+    home = pathlib.Path(__file__).parent / "homepage.html"
+    if home.exists():
+        return FileResponse(home, headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        })
+    return {"error": "Homepage not found"}
+
 # ── Tuner redirect ───────────────────────────────────────────────────────────
 # Update TUNER_URL after Railway deployment is complete.
 # Set env var TUNER_URL on the root Railway service, or update the fallback below.

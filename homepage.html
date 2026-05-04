@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonUnity — Instruments for Inner Precision</title>
+<meta name="description" content="A suite of instruments for practitioners of better living. Compass orients. Studio creates. Tuner calibrates. Anchored in Gene Keys, Human Design, Biofield Tuning, and the keynote frequencies.">
+<meta name="theme-color" content="#0b1120">
+<meta property="og:title" content="CommonUnity — Instruments for Inner Precision">
+<meta property="og:description" content="Compass orients. Studio creates. Tuner calibrates. One coherent suite for practitioners of better living.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://commonunity.io/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --base: #0b1120;
+    --base-2: #0f172a;
+    --base-3: #131c34;
+    --teal: #2A6B8C;
+    --teal-soft: #3a8aae;
+    --forest: #5C7A3E;
+    --gold: #B8872E;
+    --gold-soft: #d4a04a;
+    --terracotta: #C8622A;
+    --cream: #FAF8F4;
+    --cream-dim: rgba(250, 248, 244, 0.72);
+    --cream-faint: rgba(250, 248, 244, 0.45);
+    --line: rgba(250, 248, 244, 0.10);
+    --line-strong: rgba(250, 248, 244, 0.18);
+    --max: 1180px;
+    --pad: clamp(20px, 4vw, 48px);
+    --radius: 6px;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --font-display: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--base);
+    color: var(--cream);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* Subtle ambient gradient — sacred-geometry feel without ornament overload */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 50% at 12% 10%, rgba(42,107,140,0.18), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 88% 8%, rgba(184,135,46,0.12), transparent 60%),
+      radial-gradient(ellipse 70% 60% at 50% 110%, rgba(92,122,62,0.14), transparent 60%);
+    z-index: 0;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--gold-soft);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  /* ─────────── Layout ─────────── */
+  .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding-left: var(--pad); padding-right: var(--pad); position: relative; z-index: 1; }
+
+  /* ─────────── Header ─────────── */
+  header.site {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(11, 17, 32, 0.72);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    gap: 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: 0.01em; }
+  .brand svg { width: 32px; height: 32px; flex-shrink: 0; }
+  .brand-name { font-family: var(--font-display); font-size: 22px; font-weight: 500; letter-spacing: 0.02em; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a {
+    font-size: 14px;
+    color: var(--cream-dim);
+    transition: color .18s ease;
+    font-weight: 500;
+  }
+  .nav-links a:hover { color: var(--cream); }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+  }
+
+  /* ─────────── Hero ─────────── */
+  .hero {
+    padding-top: clamp(70px, 12vh, 140px);
+    padding-bottom: clamp(70px, 12vh, 130px);
+    text-align: center;
+    position: relative;
+  }
+  .hero .mark {
+    width: clamp(110px, 18vw, 160px);
+    height: clamp(110px, 18vw, 160px);
+    margin: 0 auto 32px;
+    display: block;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(40px, 7vw, 78px);
+    line-height: 1.04;
+    letter-spacing: -0.01em;
+    margin: 0 0 20px;
+    color: var(--cream);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold-soft);
+    font-weight: 400;
+  }
+  .hero .lede {
+    font-size: clamp(17px, 2vw, 21px);
+    color: var(--cream-dim);
+    max-width: 640px;
+    margin: 0 auto 36px;
+    line-height: 1.55;
+  }
+  .hero .opening {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+    margin-bottom: 28px;
+    padding: 8px 18px;
+    border: 1px solid var(--line-strong);
+    border-radius: 99px;
+  }
+  .hero .opening .om {
+    font-family: var(--font-display);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--gold-soft);
+    font-size: 16px;
+  }
+  .cta-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 26px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: var(--radius);
+    transition: all .2s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--base);
+    border-color: var(--gold);
+  }
+  .btn-primary:hover { background: var(--gold-soft); border-color: var(--gold-soft); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--cream);
+    border-color: var(--line-strong);
+  }
+  .btn-ghost:hover { border-color: var(--cream-dim); background: rgba(250,248,244,0.04); }
+  .btn .arrow { font-size: 16px; line-height: 1; transition: transform .2s ease; }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  /* ─────────── Section base ─────────── */
+  section { padding-top: clamp(72px, 10vh, 120px); padding-bottom: clamp(72px, 10vh, 120px); position: relative; }
+  .section-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(30px, 4.6vw, 48px);
+    line-height: 1.12;
+    letter-spacing: -0.005em;
+    margin: 0 0 18px;
+  }
+  .section-title em { font-style: italic; color: var(--gold-soft); font-weight: 400; }
+  .section-lede {
+    font-size: clamp(16px, 1.6vw, 18px);
+    color: var(--cream-dim);
+    max-width: 640px;
+    line-height: 1.6;
+  }
+  .section-head { max-width: 760px; margin-bottom: 56px; }
+
+  /* ─────────── Three Instruments ─────────── */
+  .instruments {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  @media (max-width: 920px) { .instruments { grid-template-columns: 1fr; } }
+  .instrument {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 32px 28px;
+    background: linear-gradient(180deg, rgba(250,248,244,0.025), rgba(250,248,244,0.008));
+    transition: all .25s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .instrument::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 50% 50% at 50% 0%, var(--accent-color, transparent) 0%, transparent 70%);
+    opacity: 0.10;
+    transition: opacity .25s ease;
+  }
+  .instrument:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+  .instrument:hover::after { opacity: 0.18; }
+  .instrument .glyph {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 22px;
+  }
+  .instrument h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 28px;
+    margin: 0 0 6px;
+    letter-spacing: -0.005em;
+  }
+  .instrument .role {
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+    margin-bottom: 14px;
+  }
+  .instrument p {
+    color: var(--cream-dim);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 20px;
+    flex-grow: 1;
+  }
+  .instrument .features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 22px;
+    font-size: 13px;
+    color: var(--cream-faint);
+  }
+  .instrument .features li {
+    padding: 4px 0;
+    border-top: 1px dashed var(--line);
+  }
+  .instrument .features li:first-child { border-top: 1px solid var(--line); padding-top: 10px; }
+  .instrument .visit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--accent-color);
+    font-weight: 500;
+  }
+  .instrument .visit::after { content: "→"; transition: transform .2s ease; }
+  .instrument:hover .visit::after { transform: translateX(4px); }
+  .instrument.compass { --accent-color: var(--teal-soft); }
+  .instrument.studio { --accent-color: var(--gold-soft); }
+  .instrument.tuner { --accent-color: var(--terracotta); }
+
+  /* ─────────── Synthesis ─────────── */
+  .synthesis {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .synthesis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 80px);
+    align-items: center;
+  }
+  @media (max-width: 860px) { .synthesis-grid { grid-template-columns: 1fr; } }
+  .synthesis-figure {
+    aspect-ratio: 1 / 1;
+    max-width: 480px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .synthesis ul.lineages {
+    list-style: none;
+    padding: 0;
+    margin: 28px 0 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 22px;
+  }
+  @media (max-width: 520px) { .synthesis ul.lineages { grid-template-columns: 1fr; } }
+  .synthesis ul.lineages li {
+    font-size: 14px;
+    color: var(--cream-dim);
+    padding-left: 18px;
+    position: relative;
+  }
+  .synthesis ul.lineages li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 9px;
+    width: 8px; height: 8px;
+    border: 1px solid var(--gold-soft);
+    transform: rotate(45deg);
+  }
+
+  /* ─────────── Key ─────────── */
+  .key {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 5vw, 70px);
+    align-items: start;
+  }
+  .key > * { min-width: 0; max-width: 100%; }
+  @media (max-width: 860px) { .key { grid-template-columns: 1fr; } }
+  .synthesis-grid > * { min-width: 0; }
+  .instruments > * { min-width: 0; }
+  .key-card {
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    padding: 30px;
+    background: linear-gradient(180deg, rgba(42,107,140,0.06), rgba(11,17,32,0.4));
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--cream-dim);
+    overflow-x: auto;
+    max-width: 100%;
+    margin: 0;
+    white-space: pre;
+  }
+  @media (max-width: 360px) {
+    .key-card { padding: 20px 18px; font-size: 11.5px; }
+  }
+  .key-card .k { color: var(--teal-soft); }
+  .key-card .s { color: var(--gold-soft); }
+  .key-card .n { color: var(--terracotta); }
+  .key-features {
+    list-style: none;
+    padding: 0;
+    margin: 28px 0 0;
+  }
+  .key-features li {
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    align-items: baseline;
+  }
+  .key-features li:last-child { border-bottom: 1px solid var(--line); }
+  .key-features .k-label {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold-soft);
+    font-size: 17px;
+    min-width: 110px;
+  }
+  .key-features .k-text { color: var(--cream-dim); font-size: 15px; line-height: 1.5; }
+
+  /* ─────────── Practitioners ─────────── */
+  .practitioners-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-top: 40px;
+  }
+  @media (max-width: 860px) { .practitioners-grid { grid-template-columns: 1fr; } }
+  .pcard {
+    border-left: 2px solid var(--gold);
+    padding: 6px 0 6px 22px;
+  }
+  .pcard h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--cream);
+    letter-spacing: 0.005em;
+  }
+  .pcard p {
+    margin: 0;
+    color: var(--cream-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .pcard.teal { border-color: var(--teal-soft); }
+  .pcard.forest { border-color: var(--forest); }
+  .pcard.terracotta { border-color: var(--terracotta); }
+
+  /* ─────────── Pull-quote ─────────── */
+  .pull {
+    text-align: center;
+    padding: 70px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .pull blockquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(22px, 3vw, 32px);
+    line-height: 1.4;
+    color: var(--cream);
+    margin: 0 auto;
+    max-width: 760px;
+  }
+  .pull cite {
+    display: block;
+    margin-top: 18px;
+    font-style: normal;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+  }
+
+  /* ─────────── Connect ─────────── */
+  .connect {
+    text-align: center;
+    padding-top: clamp(72px, 10vh, 110px);
+    padding-bottom: clamp(72px, 10vh, 110px);
+  }
+  .connect .closing {
+    display: inline-block;
+    margin-top: 36px;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold-soft);
+    font-size: 22px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─────────── Footer ─────────── */
+  footer.site {
+    border-top: 1px solid var(--line);
+    padding: 48px 0 56px;
+    color: var(--cream-faint);
+    font-size: 13px;
+  }
+  .foot {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 32px;
+  }
+  @media (max-width: 720px) { .foot { grid-template-columns: 1fr 1fr; gap: 28px 20px; } }
+  @media (max-width: 380px) { .foot { grid-template-columns: 1fr; } }
+  .foot h5 {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  .foot a { display: block; padding: 4px 0; color: var(--cream-faint); transition: color .15s; }
+  .foot a:hover { color: var(--cream); }
+  .foot .colophon { color: var(--cream-faint); line-height: 1.7; max-width: 320px; }
+  .foot-meta {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: var(--cream-faint);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ─────────── Reveal animation ─────────── */
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal.in { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────── Inline SVG defs for repeated marks ─────────── -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- The CommonUnity mark: four-pointed star inside a circle, with a centered point.
+         Reads as: four compass points + the still center. Sacred geometry, not ornament. -->
+    <symbol id="logo-mark" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.45"/>
+      <circle cx="50" cy="50" r="34" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.25"/>
+      <!-- four-pointed star (compass) -->
+      <path d="M50 8 L54 46 L92 50 L54 54 L50 92 L46 54 L8 50 L46 46 Z"
+            fill="currentColor" opacity="0.9"/>
+      <!-- inner gold point -->
+      <circle cx="50" cy="50" r="3.2" fill="#d4a04a"/>
+    </symbol>
+
+    <!-- Compass glyph: cross with a single point -->
+    <symbol id="g-compass" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+      <path d="M24 4 L26 22 L44 24 L26 26 L24 44 L22 26 L4 24 L22 22 Z" fill="currentColor"/>
+      <circle cx="24" cy="24" r="2" fill="#0b1120"/>
+    </symbol>
+
+    <!-- Studio glyph: vesica + waveform suggestion -->
+    <symbol id="g-studio" viewBox="0 0 48 48">
+      <circle cx="18" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="1"/>
+      <circle cx="30" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="1"/>
+      <path d="M14 24 Q18 16, 24 24 T34 24" fill="none" stroke="currentColor" stroke-width="1.4"/>
+    </symbol>
+
+    <!-- Tuner glyph: tuning fork -->
+    <symbol id="g-tuner" viewBox="0 0 48 48">
+      <path d="M18 6 L18 22 Q18 28 24 28 Q30 28 30 22 L30 6"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M24 28 L24 42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="24" cy="42" r="2" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ─────────── Header ─────────── -->
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="/" aria-label="CommonUnity home">
+      <svg style="color:var(--cream)" aria-hidden="true"><use href="#logo-mark"/></svg>
+      <span class="brand-name">CommonUnity</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#instruments">Instruments</a>
+      <a href="#synthesis">Synthesis</a>
+      <a href="#key">The Key</a>
+      <a href="#practitioners">Practitioners</a>
+      <a href="#connect">Connect</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ─────────── Hero ─────────── -->
+<section class="hero">
+  <div class="wrap">
+    <svg class="mark" style="color:var(--cream)" aria-hidden="true"><use href="#logo-mark"/></svg>
+    <div class="opening">
+      <span>Open</span>
+      <span class="om">Oṁ</span>
+      <span>· 136.10 Hz</span>
+    </div>
+    <h1>Instruments for <em>inner precision.</em></h1>
+    <p class="lede">
+      A coherent suite for practitioners of better living. Three instruments that orient,
+      create, and calibrate — anchored in the Gene Keys, Human Design, Biofield Tuning,
+      and the keynote frequencies that have organised consciousness for thousands of years.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#instruments">
+        Meet the Instruments <span class="arrow">→</span>
+      </a>
+      <a class="btn btn-ghost" href="https://ideal-trust-production-7782.up.railway.app/" target="_blank" rel="noopener">
+        Open Compass
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── Three Instruments ─────────── -->
+<section id="instruments">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Three Instruments · One Suite</div>
+      <h2 class="section-title">One body of work, played in three <em>registers.</em></h2>
+      <p class="section-lede">
+        Each instrument stands alone. Together they form a single arc — the same person,
+        the same field, the same frequencies, examined through three different apertures.
+      </p>
+    </div>
+
+    <div class="instruments">
+      <article class="instrument compass reveal">
+        <svg class="glyph" style="color:var(--teal-soft)" aria-hidden="true"><use href="#g-compass"/></svg>
+        <div class="role">Orient</div>
+        <h3>Compass</h3>
+        <p>
+          Map the four points of your living identity — Work, Lens, Field, Call —
+          against your Gene Keys and Human Design profile. The conversation that
+          finds what is already there.
+        </p>
+        <ul class="features">
+          <li>Four-point compass · Universal laws</li>
+          <li>Gene Keys + Human Design profile</li>
+          <li>Nexus AI · CommonUnityKey export</li>
+        </ul>
+        <a class="visit" href="https://ideal-trust-production-7782.up.railway.app/" target="_blank" rel="noopener">
+          compass.commonunity.io
+        </a>
+      </article>
+
+      <article class="instrument studio reveal">
+        <svg class="glyph" style="color:var(--gold-soft)" aria-hidden="true"><use href="#g-studio"/></svg>
+        <div class="role">Create</div>
+        <h3>Studio</h3>
+        <p>
+          A creative workspace held by sound and the long view. Four rooms,
+          four laws, one Nexus that remembers across sessions. For the work
+          that finds you when no one is watching.
+        </p>
+        <ul class="features">
+          <li>Four-room creative workspace</li>
+          <li>Sound-anchored sessions · 528 Hz</li>
+          <li>Continuous Nexus presence</li>
+        </ul>
+        <a class="visit" href="https://ideal-trust-production-7782.up.railway.app/studio" target="_blank" rel="noopener">
+          studio.commonunity.io
+        </a>
+      </article>
+
+      <article class="instrument tuner reveal">
+        <svg class="glyph" style="color:var(--terracotta)" aria-hidden="true"><use href="#g-tuner"/></svg>
+        <div class="role">Calibrate</div>
+        <h3>Tuner</h3>
+        <p>
+          A practitioner's bench for sound, biofield, and frequency work.
+          Twenty-five instruments, a Synthesis Engine, atlas chains, and a
+          protocol generator that respects modesty by default.
+        </p>
+        <ul class="features">
+          <li>25 instruments · Synthesis Engine v2</li>
+          <li>Chakra &amp; Biofield Atlas · Composer</li>
+          <li>Protocol generator · Practitioner guide</li>
+        </ul>
+        <a class="visit" href="https://ideal-trust-production-7782.up.railway.app/tuner" target="_blank" rel="noopener">
+          tuner.commonunity.io
+        </a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── Synthesis Engine ─────────── -->
+<section id="synthesis" class="synthesis">
+  <div class="wrap">
+    <div class="synthesis-grid">
+      <div class="reveal">
+        <div class="section-eyebrow">The Synthesis Engine</div>
+        <h2 class="section-title">Many lineages. One <em>tuned chord.</em></h2>
+        <p class="section-lede">
+          The Synthesis Engine is the bridge that lets sound, body, breath, and
+          archetype speak to each other without collapsing into one another.
+          Each lineage is honoured — credited in plain language, never blended
+          into a beige spirituality. OM is the centerpiece. Two heart-frequency
+          forks at the sternum open and close every protocol.
+        </p>
+        <ul class="lineages">
+          <li>Cousto · Planetary Frequencies</li>
+          <li>Solfeggio Tradition</li>
+          <li>Western Tonal Theory</li>
+          <li>Biofield Tuning · Eileen McKusick</li>
+          <li>Gurdjieff · Octaves &amp; Intervals</li>
+          <li>Patanjali · The Eight Limbs</li>
+          <li>Gene Keys · Richard Rudd</li>
+          <li>Human Design · Ra Uru Hu</li>
+        </ul>
+      </div>
+
+      <!-- Right-side figure: layered concentric rings (lineages) converging on OM -->
+      <div class="reveal" aria-hidden="true">
+        <svg class="synthesis-figure" viewBox="0 0 400 400">
+          <defs>
+            <radialGradient id="om-glow" cx="50%" cy="50%" r="40%">
+              <stop offset="0%" stop-color="#d4a04a" stop-opacity="0.85"/>
+              <stop offset="50%" stop-color="#B8872E" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#0b1120" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <!-- concentric rings: 8 lineages -->
+          <g fill="none" stroke="#FAF8F4" stroke-opacity="0.10">
+            <circle cx="200" cy="200" r="180"/>
+            <circle cx="200" cy="200" r="158"/>
+            <circle cx="200" cy="200" r="136"/>
+            <circle cx="200" cy="200" r="114"/>
+            <circle cx="200" cy="200" r="92"/>
+            <circle cx="200" cy="200" r="70"/>
+          </g>
+          <!-- 12 spokes -->
+          <g stroke="#FAF8F4" stroke-opacity="0.08" stroke-width="0.6">
+            <line x1="200" y1="20" x2="200" y2="380"/>
+            <line x1="20" y1="200" x2="380" y2="200"/>
+            <line x1="73" y1="73" x2="327" y2="327"/>
+            <line x1="327" y1="73" x2="73" y2="327"/>
+            <line x1="110" y1="32" x2="290" y2="368"/>
+            <line x1="290" y1="32" x2="110" y2="368"/>
+          </g>
+          <!-- fork pair at sternum (centerline) -->
+          <g stroke="#2A6B8C" stroke-width="1.5" fill="none" opacity="0.7">
+            <path d="M170 130 L170 170 Q170 180 180 180 L180 200"/>
+            <path d="M230 130 L230 170 Q230 180 220 180 L220 200"/>
+          </g>
+          <!-- om center -->
+          <circle cx="200" cy="200" r="60" fill="url(#om-glow)"/>
+          <text x="200" y="212" text-anchor="middle"
+                font-family="Cormorant Garamond, serif"
+                font-style="italic" font-size="42"
+                fill="#FAF8F4" opacity="0.95">Oṁ</text>
+          <text x="200" y="240" text-anchor="middle"
+                font-family="Plus Jakarta Sans, sans-serif"
+                font-size="9" letter-spacing="3"
+                fill="#d4a04a" opacity="0.85">136.10 Hz</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── CommonUnity Key ─────────── -->
+<section id="key">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">The CommonUnity Key</div>
+      <h2 class="section-title">Your data, in a portable <em>JSON file.</em></h2>
+      <p class="section-lede">
+        A single signed file you carry between instruments and across sessions.
+        Compass writes to it. Studio reads from it. Tuner calibrates against it.
+        It is yours — store it locally, export it, hand it to a practitioner you trust.
+      </p>
+    </div>
+
+    <div class="key">
+      <div class="reveal">
+        <pre class="key-card" aria-label="Example CommonUnity Key"><span class="k">{</span>
+  <span class="s">"schema"</span>: <span class="n">"commonunity-key/1.0"</span>,
+  <span class="s">"profile"</span>: <span class="k">{</span>
+    <span class="s">"work"</span>:  <span class="k">{</span> <span class="s">"gate"</span>: <span class="n">22</span>, <span class="s">"line"</span>: <span class="n">4</span> <span class="k">}</span>,
+    <span class="s">"lens"</span>:  <span class="k">{</span> <span class="s">"gate"</span>: <span class="n">47</span>, <span class="s">"line"</span>: <span class="n">2</span> <span class="k">}</span>,
+    <span class="s">"field"</span>: <span class="k">{</span> <span class="s">"gate"</span>: <span class="n">11</span>, <span class="s">"line"</span>: <span class="n">5</span> <span class="k">}</span>,
+    <span class="s">"call"</span>:  <span class="k">{</span> <span class="s">"gate"</span>: <span class="n">36</span>, <span class="s">"line"</span>: <span class="n">3</span> <span class="k">}</span>
+  <span class="k">}</span>,
+  <span class="s">"keynote"</span>: <span class="k">{</span> <span class="s">"hz"</span>: <span class="n">136.10</span>, <span class="s">"name"</span>: <span class="n">"OM"</span> <span class="k">}</span>,
+  <span class="s">"sessions"</span>: <span class="k">[</span> <span class="n">…</span> <span class="k">]</span>,
+  <span class="s">"owned_by"</span>: <span class="n">"you"</span>
+<span class="k">}</span></pre>
+      </div>
+      <div class="reveal">
+        <ul class="key-features">
+          <li>
+            <span class="k-label">Portable</span>
+            <span class="k-text">Plain JSON. Email it, sync it, archive it. No vendor lock-in.</span>
+          </li>
+          <li>
+            <span class="k-label">Coherent</span>
+            <span class="k-text">One schema across Compass, Studio, and Tuner. The same person, recognised everywhere.</span>
+          </li>
+          <li>
+            <span class="k-label">Decentralised</span>
+            <span class="k-text">Lives on your device by default. The cloud is a copy, not the original.</span>
+          </li>
+          <li>
+            <span class="k-label">Modest</span>
+            <span class="k-text">Off-body and surrogate alternatives are first-class. Every protocol respects this.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── Pull-quote ─────────── -->
+<section class="pull">
+  <div class="wrap reveal">
+    <blockquote>
+      “Reuse, don't rebuild. Honour multiple lineages transparently.
+      Default to modesty. The tools serve the person — never the other way around.”
+    </blockquote>
+    <cite>Working Principles · CommonUnity</cite>
+  </div>
+</section>
+
+<!-- ─────────── For Practitioners ─────────── -->
+<section id="practitioners">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">For Practitioners of Better Living</div>
+      <h2 class="section-title">Built for the people who hold the <em>room.</em></h2>
+      <p class="section-lede">
+        CommonUnity is for facilitators, sound practitioners, energy workers, yoga
+        teachers, designers, and the quiet professionals who are tired of choosing
+        between depth and rigour. These instruments hold both.
+      </p>
+    </div>
+
+    <div class="practitioners-grid">
+      <div class="pcard teal reveal">
+        <h4>Sound &amp; Biofield Practitioners</h4>
+        <p>
+          A bench that respects your training. Forks, bowls, and frequency
+          chains organised against the body — with off-body and surrogate
+          protocols treated as first-class, not as an afterthought.
+        </p>
+      </div>
+      <div class="pcard reveal">
+        <h4>Facilitators &amp; Coaches</h4>
+        <p>
+          A structured conversation around the four compass points. The
+          Nexus holds the long view across sessions, so you can hold the
+          person in front of you.
+        </p>
+      </div>
+      <div class="pcard forest reveal">
+        <h4>Yoga &amp; Movement Teachers</h4>
+        <p>
+          The eight limbs of Patanjali, the chakra system, and the keynote
+          frequencies — kept distinct, kept attributed, kept usable in the
+          shape of your actual practice.
+        </p>
+      </div>
+      <div class="pcard terracotta reveal">
+        <h4>Designers &amp; Builders</h4>
+        <p>
+          Open schema. Honest typography. Tools you can hand to a senior
+          practitioner without apology, and that a beginner can still meet.
+        </p>
+      </div>
+      <div class="pcard reveal">
+        <h4>Researchers</h4>
+        <p>
+          The Atlas chains and Synthesis Engine are documented and
+          attributed at every step. No black box. No proprietary mysticism.
+        </p>
+      </div>
+      <div class="pcard teal reveal">
+        <h4>Long-Term Companions</h4>
+        <p>
+          Your CommonUnity Key accumulates with you. The instruments
+          remember — but the data is yours, in a file you can read.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── Connect ─────────── -->
+<section id="connect" class="connect">
+  <div class="wrap reveal">
+    <div class="section-eyebrow">Connect</div>
+    <h2 class="section-title">Begin where you <em>are.</em></h2>
+    <p class="section-lede" style="margin-left:auto;margin-right:auto;">
+      The instruments are live. Open Compass to orient, Studio to create, or
+      Tuner to calibrate. If you are bringing this to a practice, write —
+      we honour serious enquiry.
+    </p>
+    <div class="cta-row" style="margin-top:36px;">
+      <a class="btn btn-primary" href="https://ideal-trust-production-7782.up.railway.app/" target="_blank" rel="noopener">
+        Open Compass <span class="arrow">→</span>
+      </a>
+      <a class="btn btn-ghost" href="https://ideal-trust-production-7782.up.railway.app/studio" target="_blank" rel="noopener">
+        Enter Studio
+      </a>
+      <a class="btn btn-ghost" href="https://ideal-trust-production-7782.up.railway.app/tuner" target="_blank" rel="noopener">
+        Open Tuner
+      </a>
+    </div>
+    <div class="closing">Close · Oṁ</div>
+  </div>
+</section>
+
+<!-- ─────────── Footer ─────────── -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <div class="brand" style="margin-bottom:14px;">
+          <svg style="color:var(--cream)" aria-hidden="true"><use href="#logo-mark"/></svg>
+          <span class="brand-name">CommonUnity</span>
+        </div>
+        <p class="colophon">
+          A suite of instruments for practitioners of better living.
+          Anchored in OM (136.10 Hz). Built on open schemas and
+          attributed lineages. Your data stays yours.
+        </p>
+      </div>
+      <div>
+        <h5>Instruments</h5>
+        <a href="https://ideal-trust-production-7782.up.railway.app/" target="_blank" rel="noopener">Compass</a>
+        <a href="https://ideal-trust-production-7782.up.railway.app/studio" target="_blank" rel="noopener">Studio</a>
+        <a href="https://ideal-trust-production-7782.up.railway.app/tuner" target="_blank" rel="noopener">Tuner</a>
+      </div>
+      <div>
+        <h5>The Suite</h5>
+        <a href="#synthesis">Synthesis Engine</a>
+        <a href="#key">CommonUnity Key</a>
+        <a href="#practitioners">Practitioners</a>
+      </div>
+      <div>
+        <h5>Lineages</h5>
+        <a href="https://genekeys.com" target="_blank" rel="noopener">Gene Keys</a>
+        <a href="https://www.jovianarchive.com" target="_blank" rel="noopener">Human Design</a>
+        <a href="https://biofieldtuning.com" target="_blank" rel="noopener">Biofield Tuning</a>
+      </div>
+    </div>
+    <div class="foot-meta">
+      <span>© CommonUnity · HearthVS</span>
+      <span>commonunity.io · 136.10 Hz</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Lightweight reveal-on-scroll. Respects prefers-reduced-motion (CSS handles fallback).
+  (function () {
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+  })();
+</script>
+
+</body>
+</html>
