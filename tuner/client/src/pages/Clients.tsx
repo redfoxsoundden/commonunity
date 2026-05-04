@@ -14,7 +14,7 @@ import {
 import type { QuestionnaireResponse } from "@shared/schema";
 
 const DOSHA_COLORS: Record<string, string> = {
-  vata: "#a78bfa", pitta: "#f97316", kapha: "#34d399",
+  vata: "#a78bfa", pitta: "#f97316", kapha: "#34d399", balanced: "#6ee7b7",
 };
 
 const SOURCE_LABELS: Record<string, { label: string; color: string }> = {

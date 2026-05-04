@@ -137,7 +137,7 @@ export default function Questionnaire() {
       return res.json();
     },
     onSuccess: (result) => {
-      navigate(`/clients`);
+      navigate(`/questionnaire/result/${result.id}`);
     },
     onError: () => {
       toast({ title: "Submission error", description: "Please check your answers and try again.", variant: "destructive" });
