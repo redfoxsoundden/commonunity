@@ -154,6 +154,10 @@ export const clientProfiles = sqliteTable("client_profiles", {
   age: integer("age"),
   createdAt: text("created_at").notNull(),
   notes: text("notes"),
+  // Gene Keys Radiance sphere (optional)
+  birthDate: text("birth_date"),       // ISO "YYYY-MM-DD"
+  birthTime: text("birth_time"),       // "HH:MM" 24h, optional — improves line precision
+  birthPlace: text("birth_place"),     // free text, for reference
 });
 
 export const insertClientProfileSchema = createInsertSchema(clientProfiles).omit({ id: true });
@@ -211,6 +215,10 @@ export const questionnaireResponses = sqliteTable("questionnaire_responses", {
   otherNotes: text("other_notes"),
   // S8 consent
   consentGiven: integer("consent_given"),
+  // Gene Keys Radiance (optional)
+  birthDate: text("birth_date"),   // ISO "YYYY-MM-DD"
+  birthTime: text("birth_time"),   // "HH:MM" 24h, optional
+  birthPlace: text("birth_place"), // free text, for reference
   // Auto-outputs
   contraindicationFlags: text("contraindication_flags"), // JSON array
   dominantDosha: text("dominant_dosha"),

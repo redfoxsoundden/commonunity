@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { useParams, Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -7,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { COMFORT_TIERS, DOSHA_LABELS, CHAKRA_COLORS, parseArr } from "@/lib/utils";
 import { AlertTriangle, CheckCircle, ArrowRight, BookOpen } from "lucide-react";
 import type { QuestionnaireResponse } from "@shared/schema";
+import RadianceCard from "@/components/RadianceCard";
+import { setNexusContext } from "../components/NexusPanel";
+import type { RadianceProfile } from "@shared/genekeys";
 
 const DOSHA_COLORS: Record<string, string> = {
   vata: "#a78bfa",
@@ -34,6 +38,28 @@ export default function QuestionnaireResult() {
     queryFn: () => apiRequest("GET", `/api/questionnaires/${id}`).then((r) => r.json()),
     enabled: !!id,
   });
+
+  const birthDate = (result as any)?.birthDate as string | undefined;
+  const birthTime = (result as any)?.birthTime as string | undefined;
+
+  const { data: radianceProfile } = useQuery<RadianceProfile>({
+    queryKey: ["/api/radiance", birthDate, birthTime],
+    queryFn: () => apiRequest("POST", "/api/radiance", { birthDate, birthTime }).then(r => r.json()),
+    enabled: !!birthDate,
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (!result) return;
+    const lines = [
+      `Session Profile — ${result.clientName ?? "Client"} (${result.sessionDate ?? "today"})`,
+      `Dominant dosha: ${result.dominantDosha ?? "unknown"} | Center: ${result.dominantCenter ?? "unknown"}`,
+      `Protocol: ${result.recommendedProtocolId ?? "pending"} | Tier: ${result.recommendedComfortTier ?? "3"}`,
+      radianceProfile ? radianceProfile.nexusSummary : "Radiance sphere: birth data not provided.",
+    ];
+    setNexusContext(lines.join("\n"));
+    return () => setNexusContext("Sound healing practitioner tool — CommonUnity Tuner");
+  }, [result, radianceProfile]);
 
   if (isLoading) {
     return (
@@ -173,6 +199,12 @@ export default function QuestionnaireResult() {
           <p className="text-sm text-white leading-relaxed italic">"{result.intentionText}"</p>
         </div>
       )}
+
+      {/* Gene Keys Radiance Sphere */}
+      <RadianceCard
+        birthDate={(result as any).birthDate}
+        birthTime={(result as any).birthTime}
+      />
 
       {/* Actions */}
       <div className="flex gap-3">

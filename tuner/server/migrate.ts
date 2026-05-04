@@ -224,6 +224,28 @@ export function runMigrations() {
     db.run(sql`ALTER TABLE instruments ADD COLUMN closest_chakra_alignment INTEGER DEFAULT 0`);
   } catch (_) { /* column already exists */ }
 
+  // Gene Keys Radiance — birth data columns (migration for existing DBs)
+  try {
+    db.run(sql`ALTER TABLE client_profiles ADD COLUMN birth_date TEXT`);
+  } catch (_) { /* column already exists */ }
+  try {
+    db.run(sql`ALTER TABLE client_profiles ADD COLUMN birth_time TEXT`);
+  } catch (_) { /* column already exists */ }
+  try {
+    db.run(sql`ALTER TABLE client_profiles ADD COLUMN birth_place TEXT`);
+  } catch (_) { /* column already exists */ }
+
+  // Gene Keys Radiance — questionnaire response columns
+  try {
+    db.run(sql`ALTER TABLE questionnaire_responses ADD COLUMN birth_date TEXT`);
+  } catch (_) { /* column already exists */ }
+  try {
+    db.run(sql`ALTER TABLE questionnaire_responses ADD COLUMN birth_time TEXT`);
+  } catch (_) { /* column already exists */ }
+  try {
+    db.run(sql`ALTER TABLE questionnaire_responses ADD COLUMN birth_place TEXT`);
+  } catch (_) { /* column already exists */ }
+
   // Nexus AI memory — single-row global store for beta
   db.run(sql`CREATE TABLE IF NOT EXISTS nexus_memory (
     key TEXT PRIMARY KEY,

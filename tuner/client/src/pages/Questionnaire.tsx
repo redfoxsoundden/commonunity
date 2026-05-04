@@ -96,6 +96,9 @@ export default function Questionnaire() {
     sessionDate: new Date().toISOString().slice(0, 10),
     practitionerName: "",
     consentGiven: 0,
+    birthDate: "",
+    birthTime: "",
+    birthPlace: "",
     understandsLimits: 0,
     hasPacemaker: 0,
     hasEpilepsy: 0,
@@ -236,6 +239,42 @@ export default function Questionnaire() {
                   className="bg-[var(--bg)] border-white/20"
                   data-testid="input-practitionerName"
                 />
+              </div>
+            </div>
+
+            {/* Gene Keys Radiance — optional */}
+            <div className="space-y-3 pt-2 border-t border-white/5">
+              <div>
+                <Label className="text-[var(--muted)]">Date of birth <span className="text-white/30 font-normal">(optional — unlocks Gene Keys Radiance synthesis)</span></Label>
+                <Input
+                  type="date"
+                  value={form.birthDate}
+                  onChange={(e) => set("birthDate", e.target.value)}
+                  className="bg-[var(--bg)] border-white/20 mt-2"
+                  data-testid="input-birthDate"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-[var(--muted)]">Time of birth <span className="text-white/30 font-normal">(optional — improves accuracy)</span></Label>
+                  <Input
+                    type="time"
+                    value={form.birthTime}
+                    onChange={(e) => set("birthTime", e.target.value)}
+                    className="bg-[var(--bg)] border-white/20"
+                    data-testid="input-birthTime"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[var(--muted)]">Place of birth <span className="text-white/30 font-normal">(optional)</span></Label>
+                  <Input
+                    value={form.birthPlace}
+                    onChange={(e) => set("birthPlace", e.target.value)}
+                    placeholder="City, Country"
+                    className="bg-[var(--bg)] border-white/20"
+                    data-testid="input-birthPlace"
+                  />
+                </div>
               </div>
             </div>
           </div>

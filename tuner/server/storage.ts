@@ -41,6 +41,7 @@ export interface IStorage {
   getAllClients(): ClientProfile[];
   getClientById(id: number): ClientProfile | undefined;
   createClient(data: InsertClientProfile): ClientProfile;
+  updateClient(id: number, data: Partial<InsertClientProfile>): ClientProfile | undefined;
 
   // Questionnaire responses
   getAllQuestionnaires(): QuestionnaireResponse[];
@@ -123,6 +124,9 @@ export class DatabaseStorage implements IStorage {
   }
   createClient(data: InsertClientProfile): ClientProfile {
     return db.insert(clientProfiles).values(data).returning().get() as ClientProfile;
+  }
+  updateClient(id: number, data: Partial<InsertClientProfile>): ClientProfile | undefined {
+    return db.update(clientProfiles).set(data).where(eq(clientProfiles.id, id)).returning().get() as ClientProfile | undefined;
   }
 
   getAllQuestionnaires(): QuestionnaireResponse[] {

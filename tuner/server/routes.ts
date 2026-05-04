@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { calculateRadiance, synthesizeRadianceProfile } from "../shared/genekeys";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { seedDatabase } from "./seed";
@@ -114,6 +115,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/clients", (req, res) => {
     const data = { ...req.body, createdAt: new Date().toISOString() };
     res.json(storage.createClient(data));
+  });
+  app.patch("/api/clients/:id", (req, res) => {
+    const updated = storage.updateClient(Number(req.params.id), req.body);
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json(updated);
+  });
+  app.get("/api/clients/:id", (req, res) => {
+    const client = storage.getClientById(Number(req.params.id));
+    if (!client) return res.status(404).json({ error: "Not found" });
+    res.json(client);
+  });
+
+  // ─── GENE KEYS RADIANCE ───────────────────────────────────────────────────────
+  // Pure computation — no DB write. POST { birthDate, birthTime? }
+  app.post("/api/radiance", (req, res) => {
+    const { birthDate, birthTime } = req.body;
+    if (!birthDate) return res.status(400).json({ error: "birthDate required (YYYY-MM-DD)" });
+    try {
+      const activation = calculateRadiance(birthDate, birthTime);
+      const profile = synthesizeRadianceProfile(activation);
+      res.json(profile);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   });
 
   // ─── QUESTIONNAIRE ────────────────────────────────────────────────────────────
