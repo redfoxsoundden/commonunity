@@ -310,73 +310,134 @@ const LINE_INSTRUMENTS: Record<number, { add: string[] }> = {
 };
 
 // ─── Solar longitude → HD gate lookup ─────────────────────────────────────────
-// Each gate spans 5.625° of solar arc (360° / 64 gates)
-// The HD wheel begins at gate 41 at 0° Aries and proceeds in a specific sequence
-// This is the authentic IHDS gate wheel order
+// HD / Gene Keys gate wheel — 64 gates mapped to ecliptic longitude.
+// Each gate spans 5.625° (360° / 64). Gate 25 starts at 0° Aries (tropical).
+// Source: Compass app (commonunity/index.html) — verified correct against
+// official Gene Keys profile (GK 29.4 for Nov 18, 1973).
 
-const GATE_WHEEL: number[] = [
-  41, 19, 13, 49, 30, 55, 37, 63, 22, 36, 25, 17, 21, 51, 42, 3,
-  27, 24, 2,  23, 8,  20, 16, 35, 45, 12, 15, 52, 39, 53, 62, 56,
-  31, 33, 7,  4,  29, 59, 40, 64, 47, 6,  46, 18, 48, 57, 32, 50,
-  28, 44, 1,  43, 14, 34, 9,  5,  26, 11, 10, 58, 38, 54, 61, 60,
+const HD_GATE_WHEEL: Array<{ gate: number; start: number }> = [
+  {gate:25, start:0.000},   {gate:17, start:3.875},   {gate:21, start:9.500},
+  {gate:51, start:15.125},  {gate:42, start:20.750},  {gate:3,  start:26.375},
+  {gate:27, start:32.000},  {gate:24, start:37.625},  {gate:2,  start:43.250},
+  {gate:23, start:48.875},  {gate:8,  start:54.500},  {gate:20, start:60.125},
+  {gate:16, start:65.750},  {gate:35, start:71.375},  {gate:45, start:77.000},
+  {gate:12, start:82.625},  {gate:15, start:88.250},  {gate:52, start:93.875},
+  {gate:39, start:99.500},  {gate:53, start:105.125}, {gate:62, start:110.750},
+  {gate:56, start:116.375}, {gate:31, start:122.000}, {gate:33, start:127.625},
+  {gate:7,  start:133.250}, {gate:4,  start:138.875}, {gate:29, start:144.500},
+  {gate:59, start:150.125}, {gate:40, start:155.750}, {gate:64, start:161.375},
+  {gate:47, start:167.000}, {gate:6,  start:172.625}, {gate:46, start:178.250},
+  {gate:18, start:183.875}, {gate:48, start:189.500}, {gate:57, start:195.125},
+  {gate:32, start:200.750}, {gate:50, start:206.375}, {gate:28, start:212.000},
+  {gate:44, start:217.625}, {gate:1,  start:223.250}, {gate:43, start:228.875},
+  {gate:14, start:234.500}, {gate:34, start:240.125}, {gate:9,  start:245.750},
+  {gate:5,  start:251.375}, {gate:26, start:257.000}, {gate:11, start:262.625},
+  {gate:10, start:268.250}, {gate:58, start:273.875}, {gate:38, start:279.500},
+  {gate:54, start:285.125}, {gate:61, start:290.750}, {gate:60, start:296.375},
+  {gate:41, start:302.000}, {gate:19, start:307.625}, {gate:13, start:313.250},
+  {gate:49, start:318.875}, {gate:30, start:324.500}, {gate:55, start:330.125},
+  {gate:37, start:335.750}, {gate:63, start:341.375}, {gate:22, start:347.000},
+  {gate:36, start:352.625},
 ];
 
-// Solar longitude of the Sun for a given date (approximate, accurate to ~0.5°)
-function getSolarLongitude(date: Date): number {
-  // Days since J2000.0 (2000-01-01 12:00 TT)
-  const J2000 = Date.UTC(2000, 0, 1, 12, 0, 0);
-  const n = (date.getTime() - J2000) / 86400000;
-
-  // Mean longitude of the Sun (degrees)
-  const L = (280.460 + 0.9856474 * n) % 360;
-  // Mean anomaly (degrees)
-  const g = ((357.528 + 0.9856003 * n) % 360) * (Math.PI / 180);
-  // Ecliptic longitude
-  const lambda = (L + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) % 360;
-  return lambda < 0 ? lambda + 360 : lambda;
+/**
+ * Calculate Julian Day Number from a UTC Date.
+ * Meeus, "Astronomical Algorithms" Ch. 7.
+ */
+function dateToJD(date: Date): number {
+  let year  = date.getUTCFullYear();
+  let month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  const hourFrac = (date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600) / 24;
+  if (month <= 2) { year -= 1; month += 12; }
+  const A = Math.floor(year / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (year + 4716))
+       + Math.floor(30.6001 * (month + 1))
+       + day + hourFrac + B - 1524.5;
 }
 
-// Convert solar longitude to HD gate + line
+/**
+ * Apparent solar ecliptic longitude (tropical degrees) for a Julian Day.
+ * Meeus Ch. 25/27. Accurate to ~0.01 degrees.
+ */
+function jdToSolarLongitude(jd: number): number {
+  const T = (jd - 2451545.0) / 36525.0;
+
+  let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  L0 = ((L0 % 360) + 360) % 360;
+
+  let M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  M = ((M % 360) + 360) % 360;
+  const Mrad = M * Math.PI / 180;
+
+  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mrad)
+          + (0.019993 - 0.000101 * T) * Math.sin(2 * Mrad)
+          + 0.000289 * Math.sin(3 * Mrad);
+
+  const sunTrueLon = L0 + C;
+
+  let omega = 125.04452 - 1934.136261 * T;
+  omega = ((omega % 360) + 360) % 360;
+  const apparent = sunTrueLon - 0.00569 - 0.00478 * Math.sin(omega * Math.PI / 180);
+
+  return ((apparent % 360) + 360) % 360;
+}
+
+/**
+ * Map an ecliptic longitude to a HD gate + line.
+ * Walk the wheel from the end to find the matching segment.
+ */
 function longitudeToGateLine(lon: number): { gate: number; line: number } {
-  // Normalise: HD wheel starts at gate 41 at 0° Aries (0° ecliptic)
-  const gateIndex = Math.floor(lon / 5.625) % 64;
-  const gate = GATE_WHEEL[gateIndex];
-  const degWithinGate = lon % 5.625;
-  const line = Math.min(6, Math.floor(degWithinGate / 0.9375) + 1);
-  return { gate, line };
+  const norm = ((lon % 360) + 360) % 360;
+  for (let i = HD_GATE_WHEEL.length - 1; i >= 0; i--) {
+    if (norm >= HD_GATE_WHEEL[i].start) {
+      const posInGate = norm - HD_GATE_WHEEL[i].start;
+      const line = Math.min(Math.floor(posInGate / 0.9375) + 1, 6);
+      return { gate: HD_GATE_WHEEL[i].gate, line };
+    }
+  }
+  // Fallback: wraps into gate 25 (start-of-wheel zone)
+  return { gate: 25, line: 1 };
 }
 
 // ─── Main calculation ──────────────────────────────────────────────────────────
 
 /**
- * Calculate the Radiance Gene Key activation from a birth date.
- * The Radiance sphere = unconscious Sun = Sun position 88° before birth.
+ * Calculate Gene Key activations from a birth date/time.
+ *
+ * Uses the Compass / Meeus method (verified correct):
+ *   Life's Work = natal Sun longitude
+ *   Radiance    = natal Sun longitude − 88° (subtract 88 degrees of arc)
+ *   Evolution   = natal Sun longitude + 180° (Earth)
+ *   Purpose     = Radiance longitude + 180°
  *
  * @param birthDateStr  ISO date string "YYYY-MM-DD"
- * @param birthTimeStr  Optional "HH:MM" (24h) — improves line accuracy
+ * @param birthTimeStr  Optional "HH:MM" (24h UTC) — improves line accuracy
  */
 export function calculateRadiance(
   birthDateStr: string,
   birthTimeStr?: string | null
 ): RadianceActivation {
   const [y, m, d] = birthDateStr.split("-").map(Number);
-  let hours = 12; // default to noon when time unknown
+  let hr = 12; // default to noon when time unknown
+  let mn = 0;
   if (birthTimeStr) {
     const parts = birthTimeStr.split(":");
-    hours = parseInt(parts[0]) + (parseInt(parts[1] ?? "0") / 60);
+    hr = parseInt(parts[0], 10);
+    mn = parseInt(parts[1] ?? "0", 10);
   }
   const precise = !!birthTimeStr;
 
-  // Birth moment in UTC (approximate — birthPlace timezone not factored,
-  // introduces ±1 line error near boundaries for far-from-UTC timezones)
-  const birthMs = Date.UTC(y, m - 1, d, hours, 0, 0);
+  const birthUTC = new Date(Date.UTC(y, m - 1, d, hr, mn, 0));
 
-  // Radiance = 88 solar degrees before birth ≈ 88 days (Earth moves ~1°/day)
-  const RADIANCE_OFFSET_MS = 88 * 24 * 60 * 60 * 1000;
-  const radianceDate = new Date(birthMs - RADIANCE_OFFSET_MS);
+  // Natal Sun longitude (Life's Work)
+  const jdBirth = dateToJD(birthUTC);
+  const csLon   = jdToSolarLongitude(jdBirth);
 
-  const lon = getSolarLongitude(radianceDate);
-  const { gate, line } = longitudeToGateLine(lon);
+  // Radiance = natal Sun lon − 88° (subtract 88 degrees of arc, NOT 88 days)
+  const radianceLon = ((csLon - 88) + 360) % 360;
+  const { gate, line } = longitudeToGateLine(radianceLon);
 
   return { gate, line, precise };
 }
