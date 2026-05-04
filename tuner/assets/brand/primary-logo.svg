@@ -16,6 +16,6 @@
         text-rendering="geometricPrecision">
     <tspan fill="#FAF8F4" fill-opacity="0.96">C</tspan><tspan fill="#d4a04a" filter="url(#om-glow)">OM</tspan><tspan fill="#FAF8F4" fill-opacity="0.96">MONUNITY</tspan>
   </text>
-  <path d="M 94 38 Q 124 26 154 38" fill="none" stroke="#d4a04a" stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
+  <path d="M 94 38 Q 124 50 154 38" fill="none" stroke="#d4a04a" stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
   <path d="M 124 14 L 128 19 L 124 24 L 120 19 Z" fill="#d4a04a" opacity="0.95"/>
 </svg>
