@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="32" height="32" role="img" aria-label="CommonUnity">
+  <title>CommonUnity</title>
+  <!-- Compact OM mark optimised for 16–32px display.
+       Background tile keeps the mark legible inside browser tab chrome. -->
+  <rect width="200" height="200" rx="36" fill="#0b1120"/>
+
+  <!-- Single resonance ring (others would muddy at small sizes) -->
+  <circle cx="100" cy="100" r="78" fill="none" stroke="#2A6B8C" stroke-width="3" opacity="0.55"/>
+
+  <!-- OM form (slightly thicker strokes for small-size legibility) -->
+  <!-- A — lower bowl -->
+  <path d="M 74 116 A 26 19 0 0 0 126 116"
+        fill="none" stroke="#C8962E" stroke-width="6" stroke-linecap="round"/>
+  <!-- Uprights -->
+  <line x1="74"  y1="116" x2="74"  y2="95" stroke="#C8962E" stroke-width="6" stroke-linecap="round"/>
+  <line x1="126" y1="116" x2="126" y2="95" stroke="#C8962E" stroke-width="6" stroke-linecap="round"/>
+  <!-- U — upper arch -->
+  <path d="M 74 95 A 26 20 0 0 1 126 95"
+        fill="none" stroke="#C8962E" stroke-width="6" stroke-linecap="round"/>
+  <!-- M — hook -->
+  <path d="M 126 95 C 143 95, 148 80, 136 74"
+        fill="none" stroke="#C8622A" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 136 74 A 5.5 5.5 0 1 0 130.8 65"
+        fill="none" stroke="#C8622A" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Bar -->
+  <line x1="82" y1="59" x2="124" y2="59" stroke="#FAF8F4" stroke-width="3.5" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Bindu -->
+  <circle cx="103" cy="50" r="5" fill="#C8962E"/>
+</svg>

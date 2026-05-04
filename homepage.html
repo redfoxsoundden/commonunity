@@ -10,7 +10,8 @@
 <meta property="og:description" content="Compass orients. Studio creates. Tuner calibrates. One coherent suite for practitioners of better living.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://commonunity.io/">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="mask-icon" href="/assets/brand/mono-mark.svg" color="#B8872E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -93,8 +94,21 @@
     gap: 24px;
   }
   .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: 0.01em; }
-  .brand svg { width: 32px; height: 32px; flex-shrink: 0; }
+  .brand svg { width: 36px; height: 36px; flex-shrink: 0; }
   .brand-name { font-family: var(--font-display); font-size: 22px; font-weight: 500; letter-spacing: 0.02em; }
+  /* OM as identity centerpiece — the hidden 'om' inside CommonUnity surfaced
+     typographically. Echoes the bindu/bar relationship in the mark via a
+     fine gold underline applied only beneath the two characters. */
+  .brand-name .om {
+    color: var(--gold-soft);
+    font-weight: 700;
+    font-style: normal;
+    font-variant-ligatures: none;
+    text-decoration: underline;
+    text-decoration-color: rgba(212, 160, 74, 0.55);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
   .nav-links { display: flex; gap: 28px; align-items: center; }
   .nav-links a {
     font-size: 14px;
@@ -525,16 +539,101 @@
 <!-- ─────────── Inline SVG defs for repeated marks ─────────── -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <!-- The CommonUnity mark: four-pointed star inside a circle, with a centered point.
-         Reads as: four compass points + the still center. Sacred geometry, not ornament. -->
-    <symbol id="logo-mark" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.45"/>
-      <circle cx="50" cy="50" r="34" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.25"/>
-      <!-- four-pointed star (compass) -->
-      <path d="M50 8 L54 46 L92 50 L54 54 L50 92 L46 54 L8 50 L46 46 Z"
-            fill="currentColor" opacity="0.9"/>
-      <!-- inner gold point -->
-      <circle cx="50" cy="50" r="3.2" fill="#d4a04a"/>
+    <!-- CommonUnity mark — monochrome (currentColor).
+         The OM resonance chamber: A bowl + uprights + U arch + M hook,
+         crowned by chandrabindu (bar + bindu). Concentric rings carry the
+         resonance reading. Used in nav and footer where it sits inline with
+         the wordmark. Designed to read as a precision instrument diagram
+         even when its OM lineage is not recognised. -->
+    <symbol id="logo-mark" viewBox="0 0 200 200">
+      <!-- Outer precision rings -->
+      <circle cx="100" cy="100" r="92"   fill="none" stroke="currentColor" stroke-width="1.0" opacity="0.42"/>
+      <!-- Resonance rings -->
+      <circle cx="100" cy="100" r="74" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.32"/>
+      <circle cx="100" cy="100" r="56" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
+      <!-- Twelve graduation ticks -->
+      <g stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.50">
+        <line x1="192" y1="100" x2="184" y2="100"/>
+        <line x1="8" y1="100" x2="16" y2="100"/>
+        <line x1="179.4" y1="150" x2="172.5" y2="138.1"/>
+        <line x1="20.6" y1="50" x2="27.5" y2="61.9"/>
+        <line x1="146" y1="167.1" x2="140.2" y2="156.7"/>
+        <line x1="54" y1="32.9" x2="59.8" y2="43.3"/>
+        <line x1="100" y1="192" x2="100" y2="184"/>
+        <line x1="100" y1="8" x2="100" y2="16"/>
+        <line x1="54" y1="167.1" x2="59.8" y2="156.7"/>
+        <line x1="146" y1="32.9" x2="140.2" y2="43.3"/>
+        <line x1="20.6" y1="150" x2="27.5" y2="138.1"/>
+        <line x1="179.4" y1="50" x2="172.5" y2="61.9"/>
+      </g>
+      <!-- OM form: A bowl, uprights, U arch, M hook + closed loop -->
+      <path d="M 74 116 A 26 19 0 0 0 126 116" fill="none" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
+      <line x1="74"  y1="116" x2="74"  y2="95" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
+      <line x1="126" y1="116" x2="126" y2="95" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
+      <path d="M 74 95 A 26 20 0 0 1 126 95" fill="none" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
+      <path d="M 126 95 C 143 95, 148 80, 136 74" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" opacity="0.85"/>
+      <path d="M 136 74 A 5.5 5.5 0 1 0 130.8 65" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity="0.80"/>
+      <!-- Chandrabindu: bar + bindu -->
+      <line x1="82" y1="59" x2="124" y2="59" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.70"/>
+      <circle cx="103" cy="50" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.78"/>
+      <circle cx="103" cy="50" r="2.4" fill="currentColor" opacity="0.96"/>
+    </symbol>
+
+    <!-- CommonUnity hero mark — full-colour OM resonance chamber.
+         Used at the top of the hero section so the OM identity reads
+         immediately. Independent of the mono mark's currentColor wiring;
+         this version carries the brand palette directly. -->
+    <symbol id="logo-om" viewBox="0 0 200 200">
+      <!-- Outer precision ring -->
+      <circle cx="100" cy="100" r="92" fill="none" stroke="#2A6B8C" stroke-width="0.9" opacity="0.40"/>
+      <circle cx="100" cy="100" r="89.8" fill="none" stroke="#2A6B8C" stroke-width="0.35" opacity="0.18"/>
+      <!-- Twelve graduation ticks -->
+      <g stroke="#2A6B8C" stroke-width="0.9" stroke-linecap="round" opacity="0.55">
+        <line x1="192" y1="100" x2="184" y2="100"/>
+        <line x1="8" y1="100" x2="16" y2="100"/>
+        <line x1="179.4" y1="150" x2="172.5" y2="138.1"/>
+        <line x1="20.6" y1="50" x2="27.5" y2="61.9"/>
+        <line x1="146" y1="167.1" x2="140.2" y2="156.7"/>
+        <line x1="54" y1="32.9" x2="59.8" y2="43.3"/>
+        <line x1="100" y1="192" x2="100" y2="184"/>
+        <line x1="100" y1="8" x2="100" y2="16"/>
+        <line x1="54" y1="167.1" x2="59.8" y2="156.7"/>
+        <line x1="146" y1="32.9" x2="140.2" y2="43.3"/>
+        <line x1="20.6" y1="150" x2="27.5" y2="138.1"/>
+        <line x1="179.4" y1="50" x2="172.5" y2="61.9"/>
+      </g>
+      <!-- Seed of life substrate -->
+      <g fill="none" stroke="#5C7A3E" stroke-width="0.6" opacity="0.20">
+        <circle cx="100" cy="100" r="28"/>
+        <circle cx="128" cy="100" r="28"/>
+        <circle cx="114" cy="124.25" r="28"/>
+        <circle cx="86"  cy="124.25" r="28"/>
+        <circle cx="72"  cy="100"    r="28"/>
+        <circle cx="86"  cy="75.75"  r="28"/>
+        <circle cx="114" cy="75.75"  r="28"/>
+      </g>
+      <!-- Resonance rings: teal / gold / forest -->
+      <circle cx="100" cy="100" r="74" fill="none" stroke="#2A6B8C" stroke-width="0.7" opacity="0.36"/>
+      <circle cx="100" cy="100" r="56" fill="none" stroke="#B8872E" stroke-width="0.7" opacity="0.50"/>
+      <circle cx="100" cy="100" r="38" fill="none" stroke="#5C7A3E" stroke-width="0.6" opacity="0.35"/>
+      <!-- OM form -->
+      <path d="M 74 116 A 26 19 0 0 0 126 116" fill="none" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
+      <line x1="74"  y1="116" x2="74"  y2="95" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
+      <line x1="126" y1="116" x2="126" y2="95" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
+      <path d="M 74 95 A 26 20 0 0 1 126 95" fill="none" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
+      <path d="M 126 95 C 143 95, 148 80, 136 74" fill="none" stroke="#C8622A" stroke-width="2.0" stroke-linecap="round" opacity="0.92"/>
+      <path d="M 136 74 A 5.5 5.5 0 1 0 130.8 65" fill="none" stroke="#C8622A" stroke-width="1.8" stroke-linecap="round" opacity="0.88"/>
+      <!-- Chandrabindu -->
+      <line x1="82" y1="59" x2="124" y2="59" stroke="#FAF8F4" stroke-width="1.4" stroke-linecap="round" opacity="0.68"/>
+      <circle cx="103" cy="50" r="4.5" fill="none" stroke="#B8872E" stroke-width="1.5" opacity="0.85"/>
+      <circle cx="103" cy="50" r="2.2" fill="#B8872E" opacity="0.97"/>
+      <!-- Crosshair stubs -->
+      <g stroke="#FAF8F4" stroke-width="0.65" stroke-linecap="round" opacity="0.18">
+        <line x1="100" y1="20" x2="100" y2="38"/>
+        <line x1="100" y1="162" x2="100" y2="178"/>
+        <line x1="22" y1="100" x2="40" y2="100"/>
+        <line x1="160" y1="100" x2="178" y2="100"/>
+      </g>
     </symbol>
 
     <!-- Compass glyph: cross with a single point -->
@@ -566,7 +665,7 @@
   <div class="wrap nav">
     <a class="brand" href="/" aria-label="CommonUnity home">
       <svg style="color:var(--cream)" aria-hidden="true"><use href="#logo-mark"/></svg>
-      <span class="brand-name">CommonUnity</span>
+      <span class="brand-name">C<span class="om">om</span>monUnity</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
       <a href="#instruments">Instruments</a>
@@ -581,7 +680,7 @@
 <!-- ─────────── Hero ─────────── -->
 <section class="hero">
   <div class="wrap">
-    <svg class="mark" style="color:var(--cream)" aria-hidden="true"><use href="#logo-mark"/></svg>
+    <svg class="mark" aria-hidden="true"><use href="#logo-om"/></svg>
     <div class="opening">
       <span>Open</span>
       <span class="om">Oṁ</span>
@@ -910,7 +1009,7 @@
       <div>
         <div class="brand" style="margin-bottom:14px;">
           <svg style="color:var(--cream)" aria-hidden="true"><use href="#logo-mark"/></svg>
-          <span class="brand-name">CommonUnity</span>
+          <span class="brand-name">C<span class="om">om</span>monUnity</span>
         </div>
         <p class="colophon">
           A suite of instruments for practitioners of better living.

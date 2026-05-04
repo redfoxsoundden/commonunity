@@ -844,6 +844,11 @@ async def serve_favicon():
         return FileResponse(fav, media_type="image/svg+xml")
     return {"error": "Not found"}
 
+# CommonUnity brand assets (mark, mono-mark, primary-logo, brand favicon).
+_brand_dir = pathlib.Path(__file__).parent / "assets" / "brand"
+if _brand_dir.exists():
+    app.mount("/assets/brand", StaticFiles(directory=_brand_dir), name="brand")
+
 
 # ── Rose AI endpoints ─────────────────────────────────────────────────────────
 
