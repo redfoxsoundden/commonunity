@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { COMFORT_TIERS, DOSHA_LABELS, CHAKRA_COLORS, parseArr } from "@/lib/utils";
-import { AlertTriangle, CheckCircle, ArrowRight, BookOpen, Trash2, User, Calendar, Clock, MapPin, Mail, Stethoscope } from "lucide-react";
+import { AlertTriangle, CheckCircle, ArrowRight, BookOpen, Trash2, User, Calendar, Clock, MapPin, Mail, Stethoscope, Download } from "lucide-react";
 import type { QuestionnaireResponse } from "@shared/schema";
 import RadianceCard from "@/components/RadianceCard";
 import { setNexusContext } from "../components/NexusPanel";
@@ -38,6 +38,23 @@ export default function QuestionnaireResult() {
   const { toast } = useToast();
   const qc = useQueryClient();
   const [confirmDelete, setConfirmDelete] = useState(false);
+
+  // Save this profile as a local JSON file — same pattern as Compass / Studio
+  function saveProfileJSON() {
+    if (!result) return;
+    const payload = { ...result, _tunerExport: true, _exportedAt: new Date().toISOString() };
+    const name = (result.clientName ?? "profile").toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
+    const date = new Date().toISOString().slice(0, 10);
+    const filename = `${name}-tuner-${date}.json`;
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: `Saved: ${filename}` });
+  }
 
   const { data: result, isLoading } = useQuery<QuestionnaireResponse>({
     queryKey: ["/api/questionnaires", id],
@@ -343,7 +360,16 @@ export default function QuestionnaireResult() {
       />
 
       {/* Actions */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-wrap">
+        <Button
+          variant="outline"
+          className="border-white/20 text-[var(--muted)]"
+          onClick={saveProfileJSON}
+          data-testid="button-save-json"
+        >
+          <Download className="w-3.5 h-3.5 mr-1.5" />
+          Save JSON
+        </Button>
         <Link href="/clients">
           <Button variant="outline" className="border-white/20 text-[var(--muted)]" data-testid="button-all-profiles">
             All Profiles

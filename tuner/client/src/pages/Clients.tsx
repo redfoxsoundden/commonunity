@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { setNexusContext } from "../components/NexusPanel";
@@ -9,9 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { parseArr, DOSHA_LABELS } from "@/lib/utils";
 import {
   AlertTriangle, CheckCircle, Trash2, ArrowRight,
-  Users, ClipboardList, Calendar
+  Users, ClipboardList, Calendar, Upload
 } from "lucide-react";
 import type { QuestionnaireResponse } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 const DOSHA_COLORS: Record<string, string> = {
   vata: "#a78bfa", pitta: "#f97316", kapha: "#34d399", balanced: "#6ee7b7",
@@ -39,6 +40,35 @@ export default function Clients() {
     },
   });
 
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load a profile from a JSON file previously exported from this app
+  function handleLoadJSON(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (!data._tunerExport) {
+          toast({ title: "Not a Tuner profile file", variant: "destructive" });
+          return;
+        }
+        // Strip internal export metadata + id so it imports as a new record
+        const { _tunerExport, _exportedAt, id, ...payload } = data;
+        await apiRequest("POST", "/api/questionnaires", payload);
+        qc.invalidateQueries({ queryKey: ["/api/questionnaires"] });
+        toast({ title: `Loaded: ${data.clientName ?? "profile"}` });
+      } catch {
+        toast({ title: "Error loading file — invalid JSON", variant: "destructive" });
+      }
+    };
+    reader.readAsText(file);
+    // Reset so same file can be re-loaded
+    e.target.value = "";
+  }
+
   useEffect(() => {
     const count = profiles?.length ?? 0;
     setNexusContext(`Client Profiles page\n${count} client questionnaire${count !== 1 ? "s" : ""} on file`);
@@ -58,12 +88,31 @@ export default function Clients() {
             All submitted intake forms — newest first. Click any entry to view the full session profile.
           </p>
         </div>
-        <Link href="/questionnaire">
-          <Button className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 shrink-0">
-            <ClipboardList className="w-4 h-4 mr-1.5" />
-            In-person form
+        <div className="flex items-center gap-2 shrink-0">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleLoadJSON}
+            data-testid="input-load-json"
+          />
+          <Button
+            variant="outline"
+            className="border-white/20 text-[var(--muted)]"
+            onClick={() => fileInputRef.current?.click()}
+            data-testid="button-load-json"
+          >
+            <Upload className="w-4 h-4 mr-1.5" />
+            Load JSON
           </Button>
-        </Link>
+          <Link href="/questionnaire">
+            <Button className="bg-[var(--primary)] hover:bg-[var(--primary)]/90">
+              <ClipboardList className="w-4 h-4 mr-1.5" />
+              In-person form
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Remote intake link box */}
