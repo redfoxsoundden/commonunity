@@ -230,4 +230,30 @@ export function runMigrations() {
     memory TEXT NOT NULL DEFAULT '',
     updated_at TEXT NOT NULL
   )`);
+  db.run(sql`CREATE TABLE IF NOT EXISTS koshas (
+    id TEXT PRIMARY KEY,
+    layer_number INTEGER NOT NULL,
+    sanskrit_name TEXT NOT NULL,
+    english_name TEXT NOT NULL,
+    theosophical_name TEXT,
+    brennan_level TEXT,
+    gene_key_seal TEXT,
+    gene_key_siddhi TEXT,
+    gene_key_shadow TEXT,
+    gene_key_gift TEXT,
+    domain TEXT NOT NULL,
+    governing_principle TEXT,
+    vibrational_quality TEXT,
+    frequency_range TEXT,
+    biofield_position TEXT,
+    chakra_id TEXT,
+    sound_healing_interaction TEXT,
+    primary_instruments TEXT NOT NULL,
+    secondary_instruments TEXT,
+    application_mode TEXT NOT NULL,
+    color_hex TEXT,
+    is_extended_kosha INTEGER DEFAULT 0,
+    sort_order INTEGER NOT NULL
+  )`);
+
 }

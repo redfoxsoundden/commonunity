@@ -87,6 +87,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(storage.getAllCenters());
   });
 
+  // ─── KOSHAS ─────────────────────────────────────────────────────────────────
+  app.get("/api/koshas", (_req, res) => {
+    res.json(storage.getAllKoshas());
+  });
+  app.get("/api/koshas/:id", (req, res) => {
+    const item = storage.getKoshaById(req.params.id);
+    if (!item) return res.status(404).json({ error: "Not found" });
+    res.json(item);
+  });
+
   // ─── PROTOCOLS ───────────────────────────────────────────────────────────────
   app.get("/api/protocols", (_req, res) => {
     res.json(storage.getAllProtocols());

@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import {
   Music2, Brain, Activity, Leaf, Eye, ClipboardList,
   BookOpen, PlayCircle, PenLine, FlaskConical, Layers,
-  Info, BookMarked, ChevronLeft, ChevronRight, Menu, X, Users
+  Info, BookMarked, ChevronLeft, ChevronRight, Menu, X, Users, Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import NexusPanel from "./NexusPanel";
@@ -22,6 +22,8 @@ const NAV_GROUPS = [
       { href: "/biofield", label: "Biofield Atlas", icon: Activity },
       { href: "/ayurveda", label: "Ayurveda & Elements", icon: Leaf },
       { href: "/centers", label: "Centers (Gurdjieff)", icon: Eye },
+      { href: "/koshas", label: "Koshas (7 Sheaths)", icon: Layers },
+      { href: "/subtle-bodies", label: "Subtle Bodies", icon: Sparkles },
     ]
   },
   {

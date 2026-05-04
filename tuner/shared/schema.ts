@@ -299,3 +299,34 @@ export const nexusMemory = sqliteTable("nexus_memory", {
   updatedAt: text("updated_at").notNull(),
 });
 export type NexusMemory = typeof nexusMemory.$inferSelect;
+
+// ─── Koshas (7 Sheaths) ───────────────────────────────────────────────────────
+export const koshas = sqliteTable("koshas", {
+  id: text("id").primaryKey(),              // e.g. KO-1-ANNAMAYA
+  layerNumber: integer("layer_number").notNull(), // 1–7
+  sanskritName: text("sanskrit_name").notNull(),  // e.g. Annamaya Kosha
+  englishName: text("english_name").notNull(),    // e.g. Physical / Food Body
+  theosophicalName: text("theosophical_name"),    // e.g. Physical/Etheric Body
+  brennanLevel: text("brennan_level"),            // e.g. Etheric Body (Level 1)
+  geneKeySeal: text("gene_key_seal"),             // e.g. First Seal — Divine Will (GK 40)
+  geneKeySiddhi: text("gene_key_siddhi"),         // e.g. GK 40 — Divine Will
+  geneKeyShadow: text("gene_key_shadow"),         // e.g. Exhaustion
+  geneKeyGift: text("gene_key_gift"),             // e.g. Resolve
+  domain: text("domain").notNull(),               // what this body governs
+  governingPrinciple: text("governing_principle"), // Sanskrit principle
+  vibrationalQuality: text("vibrational_quality"),
+  frequencyRange: text("frequency_range"),        // e.g. "0–20 Hz"
+  biofieldPosition: text("biofield_position"),    // e.g. "0–2 inches from body"
+  chakraId: text("chakra_id"),                    // FK to chakras
+  soundHealingInteraction: text("sound_healing_interaction"), // how sound affects it
+  primaryInstruments: text("primary_instruments").notNull(), // JSON array of instrument IDs
+  secondaryInstruments: text("secondary_instruments"),       // JSON array of instrument IDs
+  applicationMode: text("application_mode").notNull(),       // how to apply instruments
+  colorHex: text("color_hex"),                    // visual color for this layer
+  isExtendedKosha: integer("is_extended_kosha", { mode: "boolean" }), // true for layers 6+7
+  sortOrder: integer("sort_order").notNull(),
+});
+
+export const insertKoshaSchema = createInsertSchema(koshas);
+export type InsertKosha = z.infer<typeof insertKoshaSchema>;
+export type Kosha = typeof koshas.$inferSelect;

@@ -11,6 +11,8 @@ import ChakraDetail from "./pages/ChakraDetail";
 import BiofieldAtlas from "./pages/BiofieldAtlas";
 import AyurvedaAtlas from "./pages/AyurvedaAtlas";
 import CentersAtlas from "./pages/CentersAtlas";
+import KoshasAtlas from "./pages/KoshasAtlas";
+import SubtleBodiesAtlas from "./pages/SubtleBodiesAtlas";
 import Questionnaire from "./pages/Questionnaire";
 import QuestionnaireResult from "./pages/QuestionnaireResult";
 import Clients from "./pages/Clients";
@@ -42,6 +44,8 @@ export default function App() {
             <Route path="/biofield" component={BiofieldAtlas} />
             <Route path="/ayurveda" component={AyurvedaAtlas} />
             <Route path="/centers" component={CentersAtlas} />
+            <Route path="/koshas" component={KoshasAtlas} />
+            <Route path="/subtle-bodies" component={SubtleBodiesAtlas} />
             <Route path="/questionnaire" component={Questionnaire} />
             <Route path="/questionnaire/result/:id" component={QuestionnaireResult} />
             <Route path="/clients" component={Clients} />

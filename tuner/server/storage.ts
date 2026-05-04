@@ -2,7 +2,7 @@ import { db } from "./db";
 import {
   instruments, chakras, biofieldZones, ayurvedaElements, centers,
   clientProfiles, questionnaireResponses, protocolTemplates, sessionLogs, soundscapes,
-  nexusMemory,
+  nexusMemory, koshas,
   type Instrument, type Chakra, type BiofieldZone, type AyurvedaElement, type Center,
   type ClientProfile, type InsertClientProfile,
   type QuestionnaireResponse, type InsertQuestionnaire,
@@ -10,6 +10,7 @@ import {
   type SessionLog, type InsertSessionLog,
   type Soundscape, type InsertSoundscape,
   type NexusMemory,
+  type Kosha,
 } from "../shared/schema";
 import { eq, desc } from "drizzle-orm";
 
@@ -66,6 +67,10 @@ export interface IStorage {
   createSoundscape(data: InsertSoundscape): Soundscape;
   updateSoundscape(id: number, data: Partial<InsertSoundscape>): Soundscape | undefined;
   deleteSoundscape(id: number): void;
+
+  // Koshas
+  getAllKoshas(): Kosha[];
+  getKoshaById(id: string): Kosha | undefined;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -176,6 +181,14 @@ export class DatabaseStorage implements IStorage {
   }
   deleteSoundscape(id: number): void {
     db.delete(soundscapes).where(eq(soundscapes.id, id)).run();
+  }
+
+  // ─── Koshas ──────────────────────────────────────────────────
+  getAllKoshas(): Kosha[] {
+    return db.select().from(koshas).orderBy(koshas.sortOrder).all();
+  }
+  getKoshaById(id: string): Kosha | undefined {
+    return db.select().from(koshas).where(eq(koshas.id, id)).get();
   }
 
   // ─── Nexus Memory ──────────────────────────────────────────────────────────
