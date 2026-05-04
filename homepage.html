@@ -381,6 +381,193 @@
   .instrument.studio { --accent-color: var(--gold-soft); }
   .instrument.tuner { --accent-color: var(--terracotta); }
 
+  /* ─────────── Nexus ─────────── */
+  .nexus-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 80px);
+    align-items: start;
+  }
+  @media (max-width: 920px) { .nexus-grid { grid-template-columns: 1fr; } }
+  .nexus-grid > * { min-width: 0; }
+  .nexus-prose .pull-line {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--cream);
+    font-size: clamp(20px, 2.4vw, 26px);
+    line-height: 1.4;
+    margin: 0 0 24px;
+    padding-left: 18px;
+    border-left: 2px solid var(--forest);
+  }
+  .nexus-prose p {
+    color: var(--cream-dim);
+    font-size: clamp(16px, 1.6vw, 18px);
+    line-height: 1.65;
+    margin: 0 0 18px;
+  }
+  .nexus-prose .nexus-coda {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold-soft);
+    font-size: clamp(18px, 2vw, 22px);
+    line-height: 1.45;
+    margin: 8px 0 24px;
+  }
+  details.nexus-details {
+    margin-top: 8px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 4px 0;
+  }
+  details.nexus-details > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--cream);
+    font-weight: 500;
+  }
+  details.nexus-details > summary::-webkit-details-marker { display: none; }
+  details.nexus-details > summary::after {
+    content: "+";
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1;
+    color: var(--forest);
+    transition: transform .25s ease;
+  }
+  details.nexus-details[open] > summary::after { content: "−"; }
+  details.nexus-details .nexus-detail-body {
+    padding: 4px 0 20px;
+    color: var(--cream-dim);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+  details.nexus-details .nexus-detail-body p { margin: 0 0 14px; }
+  details.nexus-details .nexus-detail-body p:last-child { margin-bottom: 0; }
+
+  /* Mockup */
+  .nexus-mockup {
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 22px;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(92,122,62,0.16), transparent 70%),
+      linear-gradient(180deg, rgba(250,248,244,0.025), rgba(11,17,32,0.5));
+    position: relative;
+    overflow: hidden;
+  }
+  .nexus-mockup::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(250,248,244,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(250,248,244,0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  .nexus-mockup-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .nexus-mockup-mark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nexus-mockup-mark svg { display: block; }
+  .nexus-mockup-title {
+    font-family: var(--font-mark);
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    font-size: 13px;
+    color: var(--cream);
+  }
+  .nexus-mockup-status {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--forest);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nexus-mockup-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #88b15c;
+    box-shadow: 0 0 10px rgba(136,177,92,0.85);
+  }
+  .nexus-signal {
+    position: relative;
+    z-index: 1;
+    margin: 18px 0 16px;
+    height: 56px;
+    width: 100%;
+  }
+  .nexus-cards {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 10px;
+  }
+  .nexus-card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 12px 14px;
+    background: rgba(11,17,32,0.6);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: baseline;
+  }
+  .nexus-card .nx-src {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+    font-weight: 600;
+    padding-top: 1px;
+  }
+  .nexus-card .nx-text {
+    color: var(--cream-dim);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .nexus-card.compass .nx-src { color: var(--teal-soft); }
+  .nexus-card.studio  .nx-src { color: var(--gold-soft); }
+  .nexus-card.tuner   .nx-src { color: var(--terracotta); }
+  .nexus-mockup-foot {
+    position: relative;
+    z-index: 1;
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+  }
+
   /* ─────────── Key ─────────── */
   .key {
     display: grid;
@@ -739,6 +926,7 @@
     <nav class="nav-links" aria-label="Primary">
       <a href="#practice">Practice</a>
       <a href="#core">Human core</a>
+      <a href="#nexus">Nexus</a>
       <a href="#tools">Tools</a>
       <a href="#key">The Key</a>
       <a href="#field">Enter the field</a>
@@ -918,6 +1106,132 @@
                 font-style="italic" font-size="42"
                 fill="#FAF8F4" opacity="0.96">Oṁ</text>
         </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── Nexus ─────────── -->
+<section id="nexus">
+  <div class="wrap">
+    <div class="nexus-grid">
+      <div class="reveal nexus-prose">
+        <div class="section-eyebrow">Nexus</div>
+        <h2 class="section-title">Intelligence in service of <em>practice.</em></h2>
+        <p class="pull-line">
+          Nexus is the synthesis layer of CommonUnity: a bridge between human
+          and AI intelligence that helps patterns become visible, context
+          become useful, and insight become practice.
+        </p>
+        <p class="nexus-coda">
+          It supports your evolution without outsourcing your wisdom.
+        </p>
+
+        <details class="nexus-details">
+          <summary>How Nexus works</summary>
+          <div class="nexus-detail-body">
+            <p>
+              Nexus listens across the CommonUnity ecosystem. With your
+              permission, it can draw from your Compass profile, Studio
+              reflections, Tuner protocols, and CommonUnity Key to help you
+              see relationships that might otherwise remain scattered.
+            </p>
+            <p>
+              It can reflect themes back to you, connect insights across
+              practices, remember context between sessions, and suggest
+              next steps. But it does not replace discernment, embodiment,
+              relationship, or lived experience.
+            </p>
+            <p>
+              Nexus is designed to strengthen the human core: attention,
+              intuition, responsibility, creativity, and conscious action.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Right: Nexus mockup. Synthesis layer preview. -->
+      <div class="reveal" aria-hidden="true">
+        <div class="nexus-mockup">
+          <div class="nexus-mockup-head">
+            <div class="nexus-mockup-mark">
+              <svg width="36" height="36" viewBox="0 0 48 48" aria-hidden="true">
+                <defs>
+                  <radialGradient id="nx-core" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#88b15c" stop-opacity="0.95"/>
+                    <stop offset="60%" stop-color="#5C7A3E" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#0b1120" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+                <!-- Outer hex frame -->
+                <polygon points="24,3 42,13 42,35 24,45 6,35 6,13"
+                         fill="none" stroke="#5C7A3E" stroke-opacity="0.55" stroke-width="1.2"/>
+                <!-- Inner field rings -->
+                <circle cx="24" cy="24" r="14" fill="none" stroke="#FAF8F4" stroke-opacity="0.10"/>
+                <circle cx="24" cy="24" r="10" fill="none" stroke="#FAF8F4" stroke-opacity="0.18"/>
+                <!-- Connector spokes -->
+                <g stroke="#FAF8F4" stroke-opacity="0.22" stroke-width="0.8">
+                  <line x1="24" y1="6" x2="24" y2="14"/>
+                  <line x1="24" y1="34" x2="24" y2="42"/>
+                  <line x1="6"  y1="24" x2="14" y2="24"/>
+                  <line x1="34" y1="24" x2="42" y2="24"/>
+                </g>
+                <!-- Tool node anchors (Compass, Studio, Tuner, Key) -->
+                <circle cx="24" cy="6"  r="1.6" fill="#3a8aae"/>
+                <circle cx="42" cy="24" r="1.6" fill="#d4a04a"/>
+                <circle cx="24" cy="42" r="1.6" fill="#C8622A"/>
+                <circle cx="6"  cy="24" r="1.6" fill="#B8872E"/>
+                <!-- Core -->
+                <circle cx="24" cy="24" r="6" fill="url(#nx-core)"/>
+                <circle cx="24" cy="24" r="2.2" fill="#FAF8F4" opacity="0.95"/>
+              </svg>
+              <div class="nexus-mockup-title">NEXUS</div>
+            </div>
+            <div class="nexus-mockup-status">Listening</div>
+          </div>
+
+          <svg class="nexus-signal" viewBox="0 0 320 56" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="nx-line" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%"  stop-color="#3a8aae" stop-opacity="0.0"/>
+                <stop offset="20%" stop-color="#3a8aae" stop-opacity="0.85"/>
+                <stop offset="50%" stop-color="#88b15c" stop-opacity="0.95"/>
+                <stop offset="80%" stop-color="#d4a04a" stop-opacity="0.85"/>
+                <stop offset="100%" stop-color="#C8622A" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 30 Q 40 6, 80 28 T 160 30 T 240 26 T 320 28"
+                  fill="none" stroke="url(#nx-line)" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M0 38 Q 40 22, 80 36 T 160 40 T 240 34 T 320 38"
+                  fill="none" stroke="#FAF8F4" stroke-opacity="0.18" stroke-width="0.9"/>
+            <g fill="#FAF8F4" fill-opacity="0.6">
+              <circle cx="56"  cy="22" r="1.6"/>
+              <circle cx="128" cy="30" r="1.6"/>
+              <circle cx="200" cy="26" r="1.6"/>
+              <circle cx="268" cy="30" r="1.6"/>
+            </g>
+          </svg>
+
+          <div class="nexus-cards">
+            <div class="nexus-card compass">
+              <span class="nx-src">Compass</span>
+              <span class="nx-text">A theme of <em>quiet authority</em> is recurring across your Work and Call points.</span>
+            </div>
+            <div class="nexus-card studio">
+              <span class="nx-src">Studio</span>
+              <span class="nx-text">Three reflections this month return to the same edge: <em>finishing what you begin.</em></span>
+            </div>
+            <div class="nexus-card tuner">
+              <span class="nx-src">Tuner</span>
+              <span class="nx-text">Protocols you ran most lean toward grounding sequences before sound work.</span>
+            </div>
+          </div>
+
+          <div class="nexus-mockup-foot">
+            <span>Synthesis layer · Preview</span>
+            <span>Owned by you</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
