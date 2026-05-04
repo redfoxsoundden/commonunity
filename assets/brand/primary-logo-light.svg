@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 132" width="700" height="132" role="img" aria-label="CommonUnity (light variant)">
+  <title>CommonUnity</title>
+  <rect width="700" height="132" fill="#FAF8F4"/>
+  <text x="350" y="108" text-anchor="middle"
+        font-family="Josefin Sans, Plus Jakarta Sans, system-ui, sans-serif"
+        font-weight="600" font-size="80" letter-spacing="6"
+        text-rendering="geometricPrecision">
+    <tspan fill="#1A1410">C</tspan><tspan fill="#1A35C8">OM</tspan><tspan fill="#1A1410">MONUNITY</tspan>
+  </text>
+  <path d="M 152 38 Q 180 26 208 38" fill="none" stroke="#1A35C8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M 180 14 L 184 19 L 180 24 L 176 19 Z" fill="#1A35C8"/>
+</svg>

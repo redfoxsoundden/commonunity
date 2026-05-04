@@ -14,7 +14,7 @@
 <link rel="mask-icon" href="/assets/brand/mono-mark.svg" color="#B8872E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Josefin+Sans:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --base: #0b1120;
@@ -36,6 +36,7 @@
     --radius: 6px;
     --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     --font-display: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+    --font-mark: 'Josefin Sans', 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
   * { box-sizing: border-box; }
@@ -92,18 +93,10 @@
     padding-bottom: 18px;
     gap: 24px;
   }
-  .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: 0.01em; }
-  .brand svg { width: 36px; height: 36px; flex-shrink: 0; }
-  .brand-name { font-family: var(--font-display); font-size: 22px; font-weight: 500; letter-spacing: 0.02em; }
-  .brand-name .om {
-    color: var(--gold-soft);
-    font-weight: 700;
-    font-style: normal;
-    font-variant-ligatures: none;
-    text-decoration: underline;
-    text-decoration-color: rgba(212, 160, 74, 0.55);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 4px;
+  .brand { display: flex; align-items: center; }
+  .brand svg.lockup { display: block; height: 28px; width: auto; }
+  @media (max-width: 480px) {
+    .brand svg.lockup { height: 24px; }
   }
   .nav-links { display: flex; gap: 26px; align-items: center; }
   .nav-links a {
@@ -124,11 +117,11 @@
     text-align: center;
     position: relative;
   }
-  .hero .mark {
-    width: clamp(110px, 18vw, 160px);
-    height: clamp(110px, 18vw, 160px);
-    margin: 0 auto 32px;
+  .hero .lockup-hero {
     display: block;
+    width: clamp(280px, 60vw, 560px);
+    height: auto;
+    margin: 0 auto 36px;
   }
   .hero h1 {
     font-family: var(--font-display);
@@ -587,98 +580,55 @@
 <!-- ─────────── Inline SVG defs for repeated marks ─────────── -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <!-- CommonUnity mark — monochrome (currentColor).
-         OM resonance chamber: bowl + uprights + U arch + M hook,
-         crowned by a crescent (chandra / Turiya) with bindu above.
-         The crescent opens upward; the bindu rests above its cup. -->
-    <symbol id="logo-mark" viewBox="0 0 200 200">
-      <!-- Outer precision rings -->
-      <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" stroke-width="1.0" opacity="0.42"/>
-      <circle cx="100" cy="100" r="74" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.32"/>
-      <circle cx="100" cy="100" r="56" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
-      <!-- Twelve graduation ticks -->
-      <g stroke="currentColor" stroke-width="1.1" stroke-linecap="round" opacity="0.50">
-        <line x1="192" y1="100" x2="184" y2="100"/>
-        <line x1="8" y1="100" x2="16" y2="100"/>
-        <line x1="179.4" y1="150" x2="172.5" y2="138.1"/>
-        <line x1="20.6" y1="50" x2="27.5" y2="61.9"/>
-        <line x1="146" y1="167.1" x2="140.2" y2="156.7"/>
-        <line x1="54" y1="32.9" x2="59.8" y2="43.3"/>
-        <line x1="100" y1="192" x2="100" y2="184"/>
-        <line x1="100" y1="8" x2="100" y2="16"/>
-        <line x1="54" y1="167.1" x2="59.8" y2="156.7"/>
-        <line x1="146" y1="32.9" x2="140.2" y2="43.3"/>
-        <line x1="20.6" y1="150" x2="27.5" y2="138.1"/>
-        <line x1="179.4" y1="50" x2="172.5" y2="61.9"/>
-      </g>
-      <!-- OM form: A bowl, uprights, U arch, M hook + closed loop -->
-      <path d="M 74 116 A 26 19 0 0 0 126 116" fill="none" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
-      <line x1="74"  y1="116" x2="74"  y2="95" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
-      <line x1="126" y1="116" x2="126" y2="95" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
-      <path d="M 74 95 A 26 20 0 0 1 126 95" fill="none" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
-      <path d="M 126 95 C 143 95, 148 80, 136 74" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" opacity="0.85"/>
-      <path d="M 136 74 A 5.5 5.5 0 1 0 130.8 65" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity="0.80"/>
-      <!-- Chandra / crescent: opens upward, sits above OM form -->
-      <path d="M 84 60 Q 100 72 116 60" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" opacity="0.78"/>
-      <!-- Bindu: above the crescent (Turiya, silence) -->
-      <circle cx="100" cy="50" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.78"/>
-      <circle cx="100" cy="50" r="2.4" fill="currentColor" opacity="0.96"/>
+    <!-- Typographic COMMONUNITY lockup.
+         OM is discovered inside the wordmark by highlighting letters 2–3 (O,M)
+         in gold with a subtle glow. A restrained crescent + bindu sit above
+         the OM letters — the chandra/bindu of Devanagari Oṁ, embedded in language. -->
+    <filter id="om-glow" x="-50%" y="-80%" width="200%" height="260%">
+      <feGaussianBlur stdDeviation="2.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Primary lockup: COMMONUNITY with OM highlighted, crescent + bindu above OM.
+         Strategy: a single <text> with three <tspan>s so the kerning and tracking are
+         identical across cream and gold runs. The crescent + bindu are positioned by
+         relative percentage above the OM letter pair.
+         Layout target: text-anchor middle at x=350; OM is the 2nd–3rd letter of 11.
+         For a centered string, OM's visual center sits left of the wordmark center —
+         we anchor the crescent based on measured layout below. -->
+    <symbol id="logo-lockup" viewBox="0 0 700 132">
+      <text x="350" y="108" text-anchor="middle"
+            font-family="Josefin Sans, Plus Jakarta Sans, system-ui, sans-serif"
+            font-weight="600" font-size="80" letter-spacing="6"
+            text-rendering="geometricPrecision">
+        <tspan fill="#FAF8F4" fill-opacity="0.96">C</tspan><tspan fill="#d4a04a" filter="url(#om-glow)">OM</tspan><tspan fill="#FAF8F4" fill-opacity="0.96">MONUNITY</tspan>
+      </text>
+      <!-- Crescent (chandra) + bindu above the OM letters.
+           For text-anchor=middle on COMMONUNITY at x=350 with 80px Josefin Sans 600 + 6 tracking,
+           total width is ~520px, so wordmark spans roughly x=90..610. The OM pair sits at
+           letters 2–3 (0-indexed 1,2), with center near x = 90 + (1.5/11)*520 ≈ 161.
+           We center the crescent above x=180 (slightly right to optically align with the M's
+           heavy stem balanced against the open O). -->
+      <path d="M 152 38 Q 180 26 208 38" fill="none" stroke="#d4a04a"
+            stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
+      <!-- bindu: small filled diamond above crescent -->
+      <path d="M 180 14 L 184 19 L 180 24 L 176 19 Z" fill="#d4a04a" opacity="0.95"/>
     </symbol>
 
-    <!-- CommonUnity hero mark — full-colour OM resonance chamber.
-         Crescent (chandra) sits above the OM form; bindu above the crescent. -->
-    <symbol id="logo-om" viewBox="0 0 200 200">
-      <!-- Outer precision ring -->
-      <circle cx="100" cy="100" r="92" fill="none" stroke="#2A6B8C" stroke-width="0.9" opacity="0.40"/>
-      <circle cx="100" cy="100" r="89.8" fill="none" stroke="#2A6B8C" stroke-width="0.35" opacity="0.18"/>
-      <!-- Twelve graduation ticks -->
-      <g stroke="#2A6B8C" stroke-width="0.9" stroke-linecap="round" opacity="0.55">
-        <line x1="192" y1="100" x2="184" y2="100"/>
-        <line x1="8" y1="100" x2="16" y2="100"/>
-        <line x1="179.4" y1="150" x2="172.5" y2="138.1"/>
-        <line x1="20.6" y1="50" x2="27.5" y2="61.9"/>
-        <line x1="146" y1="167.1" x2="140.2" y2="156.7"/>
-        <line x1="54" y1="32.9" x2="59.8" y2="43.3"/>
-        <line x1="100" y1="192" x2="100" y2="184"/>
-        <line x1="100" y1="8" x2="100" y2="16"/>
-        <line x1="54" y1="167.1" x2="59.8" y2="156.7"/>
-        <line x1="146" y1="32.9" x2="140.2" y2="43.3"/>
-        <line x1="20.6" y1="150" x2="27.5" y2="138.1"/>
-        <line x1="179.4" y1="50" x2="172.5" y2="61.9"/>
-      </g>
-      <!-- Seed of life substrate -->
-      <g fill="none" stroke="#5C7A3E" stroke-width="0.6" opacity="0.20">
-        <circle cx="100" cy="100" r="28"/>
-        <circle cx="128" cy="100" r="28"/>
-        <circle cx="114" cy="124.25" r="28"/>
-        <circle cx="86"  cy="124.25" r="28"/>
-        <circle cx="72"  cy="100"    r="28"/>
-        <circle cx="86"  cy="75.75"  r="28"/>
-        <circle cx="114" cy="75.75"  r="28"/>
-      </g>
-      <!-- Resonance rings: teal / gold / forest -->
-      <circle cx="100" cy="100" r="74" fill="none" stroke="#2A6B8C" stroke-width="0.7" opacity="0.36"/>
-      <circle cx="100" cy="100" r="56" fill="none" stroke="#B8872E" stroke-width="0.7" opacity="0.50"/>
-      <circle cx="100" cy="100" r="38" fill="none" stroke="#5C7A3E" stroke-width="0.6" opacity="0.35"/>
-      <!-- OM form -->
-      <path d="M 74 116 A 26 19 0 0 0 126 116" fill="none" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
-      <line x1="74"  y1="116" x2="74"  y2="95" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
-      <line x1="126" y1="116" x2="126" y2="95" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
-      <path d="M 74 95 A 26 20 0 0 1 126 95" fill="none" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
-      <path d="M 126 95 C 143 95, 148 80, 136 74" fill="none" stroke="#C8622A" stroke-width="2.0" stroke-linecap="round" opacity="0.92"/>
-      <path d="M 136 74 A 5.5 5.5 0 1 0 130.8 65" fill="none" stroke="#C8622A" stroke-width="1.8" stroke-linecap="round" opacity="0.88"/>
-      <!-- Chandra crescent above OM form -->
-      <path d="M 84 60 Q 100 72 116 60" fill="none" stroke="#FAF8F4" stroke-width="1.6" stroke-linecap="round" opacity="0.78"/>
-      <!-- Bindu above the crescent (Turiya / silence) -->
-      <circle cx="100" cy="50" r="4.5" fill="none" stroke="#B8872E" stroke-width="1.5" opacity="0.85"/>
-      <circle cx="100" cy="50" r="2.2" fill="#B8872E" opacity="0.97"/>
-      <!-- Crosshair stubs -->
-      <g stroke="#FAF8F4" stroke-width="0.65" stroke-linecap="round" opacity="0.18">
-        <line x1="100" y1="20" x2="100" y2="38"/>
-        <line x1="100" y1="162" x2="100" y2="178"/>
-        <line x1="22" y1="100" x2="40" y2="100"/>
-        <line x1="160" y1="100" x2="178" y2="100"/>
-      </g>
+    <!-- Compact OM mark: typographic OM in gold with crescent + bindu above.
+         Used only at very small sizes (favicon, app icon). The lockup is the primary mark. -->
+    <symbol id="logo-mark" viewBox="0 0 96 96">
+      <!-- crescent -->
+      <path d="M 28 28 Q 48 18 68 28" fill="none" stroke="#d4a04a" stroke-width="2.4" stroke-linecap="round" opacity="0.9"/>
+      <!-- bindu (diamond) -->
+      <path d="M 48 10 L 52 16 L 48 22 L 44 16 Z" fill="#d4a04a" opacity="0.95"/>
+      <!-- OM letters -->
+      <text x="48" y="78" text-anchor="middle"
+            font-family="Josefin Sans, Plus Jakarta Sans, system-ui, sans-serif"
+            font-weight="600" font-size="56" letter-spacing="2"
+            fill="#d4a04a">OM</text>
     </symbol>
 
     <!-- Compass glyph: cross with a single point -->
@@ -709,8 +659,7 @@
 <header class="site">
   <div class="wrap nav">
     <a class="brand" href="/" aria-label="CommonUnity home">
-      <svg style="color:var(--cream)" aria-hidden="true"><use href="#logo-mark"/></svg>
-      <span class="brand-name">C<span class="om">om</span>monUnity</span>
+      <svg class="lockup" viewBox="0 0 700 132" aria-hidden="true"><use href="#logo-lockup"/></svg>
     </a>
     <nav class="nav-links" aria-label="Primary">
       <a href="#practice">Practice</a>
@@ -725,7 +674,7 @@
 <!-- ─────────── Hero ─────────── -->
 <section class="hero">
   <div class="wrap">
-    <svg class="mark" aria-hidden="true"><use href="#logo-om"/></svg>
+    <svg class="lockup-hero" viewBox="0 0 700 132" aria-hidden="true"><use href="#logo-lockup"/></svg>
     <div class="opening">
       <span>Open</span>
       <span class="om">Oṁ</span>
@@ -1139,8 +1088,7 @@
     <div class="foot">
       <div>
         <div class="brand" style="margin-bottom:14px;">
-          <svg style="color:var(--cream)" aria-hidden="true"><use href="#logo-mark"/></svg>
-          <span class="brand-name">C<span class="om">om</span>monUnity</span>
+          <svg class="lockup" viewBox="0 0 700 132" aria-hidden="true" style="height:24px"><use href="#logo-lockup"/></svg>
         </div>
         <p class="colophon">
           A living field for unified living. Anchored in Oṁ (136.10 Hz).
