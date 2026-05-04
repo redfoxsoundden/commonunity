@@ -13,7 +13,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseArr } from "@/lib/utils";
-import { ArrowLeft, ZoomIn } from "lucide-react";
+import { ArrowLeft, ZoomIn, Activity } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import { cn } from "@/lib/utils";
 import type { BiofieldZone } from "@shared/schema";
 import { setNexusContext } from "../components/NexusPanel";
@@ -261,15 +262,13 @@ export default function BiofieldAtlas() {
   });
 
   return (
-    <div className="p-5 max-w-4xl mx-auto space-y-5">
+    <div className="p-6 max-w-4xl mx-auto space-y-5">
 
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-foreground">Biofield Atlas</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Tap any zone to explore its themes, technique, and suggested instruments.
-        </p>
-      </div>
+      <PageHeader
+        icon={<Activity size={20}/>}
+        title="Biofield Atlas"
+        description="Interactive McKusick biofield map. Tap any zone to explore its energetic themes, treatment technique, and suggested tuning forks. Based on Eileen Day McKusick's Biofield Anatomy."
+      />
 
       {/* Filter strip */}
       <div className="flex gap-2 flex-wrap">
