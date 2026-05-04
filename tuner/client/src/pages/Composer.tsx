@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import PageHeader from "@/components/PageHeader";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { setNexusContext } from "../components/NexusPanel";
@@ -283,11 +284,10 @@ export default function Composer() {
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl font-bold text-white">Soundscape Composer</h1>
-        <p className="text-sm text-[var(--muted)]">
-          Layer multiple instruments into a custom soundscape. Each track generates a live Chladni
-          pattern and browser tone preview. Save compositions to the session library.
-        </p>
+        <PageHeader
+          title="Soundscape Composer"
+          description="Layer multiple instruments into a custom soundscape. Each track generates a live Chladni pattern and browser tone preview. Save compositions to the session library."
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

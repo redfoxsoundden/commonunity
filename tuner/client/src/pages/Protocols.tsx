@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import PageHeader from "@/components/PageHeader";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -50,11 +51,10 @@ export default function Protocols() {
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl font-bold text-white">Protocol Library</h1>
-        <p className="text-sm text-[var(--muted)]">
-          12 practitioner-grade session templates. Every protocol includes the Universal OM Opener
-          (136.10 Hz) and Closer ceremony. Comfort tiers adapt each session for client readiness.
-        </p>
+        <PageHeader
+          title="Protocol Library"
+          description="12 practitioner-grade session templates. Every protocol includes the Universal OM Opener (136.10 Hz) and Closer ceremony. Comfort tiers adapt each session for client readiness."
+        />
       </div>
 
       {/* OM Ceremony banner */}

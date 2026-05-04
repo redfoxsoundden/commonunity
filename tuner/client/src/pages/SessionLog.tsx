@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import PageHeader from "@/components/PageHeader";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -73,7 +74,7 @@ export default function SessionLog() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Session Log</h1>
+          <PageHeader title="Session Log" description="Track all client sessions — notes, protocols used, and follow-up actions. Every session links back to the client profile and the protocol applied." />
           <p className="text-sm text-[var(--muted)] mt-0.5">{sessions.length} session{sessions.length !== 1 ? "s" : ""} recorded</p>
         </div>
         <Button onClick={() => setOpen(true)} data-testid="button-new-session">

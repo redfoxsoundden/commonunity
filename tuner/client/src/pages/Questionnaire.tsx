@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PageHeader from "@/components/PageHeader";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -154,10 +155,10 @@ export default function Questionnaire() {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-xl font-bold text-white">In-Person Form</h1>
-        <p className="text-sm text-[var(--muted)]">
-          Complete together with your client. The system generates a session profile, flags any contraindications, and recommends a protocol.
-        </p>
+        <PageHeader
+          title="In-Person Form"
+          description="Complete together with your client. The system generates a session profile, flags any contraindications, and recommends a protocol."
+        />
       </div>
 
       {/* Progress */}

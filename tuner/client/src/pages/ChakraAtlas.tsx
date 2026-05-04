@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Brain, ChevronRight } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parseArr, CHAKRA_COLORS, formatHz, cn } from "@/lib/utils";
 import type { Chakra } from "@shared/schema";
@@ -21,16 +22,11 @@ export default function ChakraAtlas() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Brain size={24} className="text-primary"/>
-          <h1 className="text-2xl font-bold">Chakra Atlas</h1>
-        </div>
-        <p className="text-muted-foreground text-sm">
-          Seven chakras with full sensory, frequency, practice, and instrument layering data.
-          Multi-system frequencies displayed with attribution.
-        </p>
-      </div>
+      <PageHeader
+        icon={<Brain size={20}/>}
+        title="Chakra Atlas"
+        description="Seven chakras with full sensory, frequency, practice, and instrument layering data. Multi-system frequencies displayed with attribution."
+      />
 
       {isLoading ? (
         <div className="space-y-3">

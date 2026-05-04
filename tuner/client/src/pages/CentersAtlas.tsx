@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import PageHeader from "@/components/PageHeader";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,12 +45,11 @@ export default function CentersAtlas() {
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl font-bold text-white">Centers Atlas</h1>
-        <p className="text-sm text-[var(--muted)]">
-          The Gurdjieff–Ouspensky Fourth Way tradition describes the human being as a multi-centered organism.
-          Each center operates at a distinct speed and quality of energy. Sound healing can address specific
-          centers to support balance and encourage presence.
-        </p>
+        <PageHeader
+          icon={<Eye size={20}/>}
+          title="Centers Atlas"
+          description="The Gurdjieff–Ouspensky Fourth Way tradition describes the human being as a multi-centered organism. Each center operates at a distinct speed and quality of energy. Sound healing can address specific centers to support balance and encourage presence."
+        />
       </div>
 
       {/* Lineage note */}

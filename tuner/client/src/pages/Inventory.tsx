@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import PageHeader from "@/components/PageHeader";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Search, Filter, Music2, ChevronRight } from "lucide-react";
@@ -46,16 +47,12 @@ export default function Inventory() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Music2 size={24} className="text-primary" />
-          <h1 className="text-2xl font-bold tracking-tight">Instrument Inventory</h1>
-          <Badge variant="outline" className="ml-auto">{instruments.length} instruments</Badge>
-        </div>
-        <p className="text-muted-foreground text-sm">
-          25 instruments — tuning forks, singing bowls, and bell — with full practitioner reference cards.
-        </p>
-      </div>
+      <PageHeader
+        icon={<Music2 size={20}/>}
+        title="Instrument Inventory"
+        description="25 instruments — tuning forks, singing bowls, and bell — with full practitioner reference cards."
+        actions={<Badge variant="outline">{instruments.length} instruments</Badge>}
+      />
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import PageHeader from "@/components/PageHeader";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import ChladniCanvas from "@/components/ChladniCanvas";
@@ -17,19 +18,11 @@ export default function WhyOM() {
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-10">
       {/* Hero */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-white">Why OM at 136.10 Hz?</h1>
-          <span className="text-sm font-mono bg-teal-500/20 text-teal-300 px-3 py-1 rounded-full">
-            {formatHz(OM_HZ)}
-          </span>
-        </div>
-        <p className="text-sm text-[var(--muted)] leading-relaxed">
-          The OM ceremony at 136.10 Hz is the ceremonial container of every CommonUnity sound healing session.
-          Understanding its origins — cosmological, physiological, and musical — deepens both the practitioner's
-          intention and the client's receptivity.
-        </p>
-      </div>
+      <PageHeader
+        title="Why OM at 136.10 Hz?"
+        description="The OM ceremony at 136.10 Hz is the ceremonial container of every CommonUnity sound healing session. Understanding its origins — cosmological, physiological, and musical — deepens both the practitioner's intention and the client's receptivity."
+        actions={<span className="text-sm font-mono bg-teal-500/20 text-teal-300 px-3 py-1 rounded-full">{formatHz(OM_HZ)}</span>}
+      />
 
       {/* Chladni pattern */}
       <div className="bg-[var(--card)] border border-teal-500/30 rounded-xl overflow-hidden">

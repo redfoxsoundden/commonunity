@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import PageHeader from "@/components/PageHeader";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -63,12 +64,11 @@ export default function AyurvedaAtlas() {
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-xl font-bold text-white">Āyurveda Atlas</h1>
-        <p className="text-sm text-[var(--muted)]">
-          Āyurvedic constitutional mapping for sound healing. Each dosha governs distinct physiological,
-          emotional, and elemental qualities. Instrument selection is guided by pacifying imbalanced doshas
-          while tonifying depleted ones.
-        </p>
+        <PageHeader
+          icon={<Leaf size={20}/>}
+          title="Āyurveda Atlas"
+          description="Āyurvedic constitutional mapping for sound healing. Each dosha governs distinct physiological, emotional, and elemental qualities. Instrument selection is guided by pacifying imbalanced doshas while tonifying depleted ones."
+        />
       </div>
 
       <Tabs defaultValue="doshas">
