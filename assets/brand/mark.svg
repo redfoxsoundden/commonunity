@@ -106,21 +106,21 @@
     fill="none" stroke="#C8622A" stroke-width="1.8" stroke-linecap="round" opacity="0.85"
   />
 
-  <!-- ── Chandrabindu region ──────────────────────────────────
-       The horizontal bar floats above the form.
-       Bindu (dot) sits above the bar, slightly right of center. -->
+  <!-- ── Chandra (crescent) + Bindu ───────────────────────────
+       Crescent moon sits above the OM form, opening upward —
+       a stronger nod to Turiya / silence than a straight bar.
+       Bindu rests above the crescent's cup. -->
 
-  <!-- Bar -->
-  <line
-    x1="82" y1="59"
-    x2="124" y2="59"
-    stroke="#FAF8F4" stroke-width="1.4" stroke-linecap="round" opacity="0.68"
+  <!-- Crescent: upward-opening cup, centred at x=100, mouth y=60, apex y=72 -->
+  <path
+    d="M 84 60 Q 100 72 116 60"
+    fill="none" stroke="#FAF8F4" stroke-width="1.6" stroke-linecap="round" opacity="0.72"
   />
 
   <!-- Bindu outer ring -->
-  <circle cx="103" cy="50" r="4.5" fill="none" stroke="#B8872E" stroke-width="1.5" opacity="0.82"/>
+  <circle cx="100" cy="50" r="4.5" fill="none" stroke="#B8872E" stroke-width="1.5" opacity="0.85"/>
   <!-- Bindu fill -->
-  <circle cx="103" cy="50" r="2.2"  fill="#B8872E" opacity="0.97"/>
+  <circle cx="100" cy="50" r="2.2"  fill="#B8872E" opacity="0.97"/>
 
   <!-- ── Axial crosshair stubs (precision overlay, outside form zone) -->
   <g stroke="#FAF8F4" stroke-width="0.65" stroke-linecap="round" opacity="0.18">

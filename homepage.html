@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CommonUnity — Instruments for Inner Precision</title>
-<meta name="description" content="A suite of instruments for practitioners of better living. Compass orients. Studio creates. Tuner calibrates. Anchored in Gene Keys, Human Design, Biofield Tuning, and the keynote frequencies.">
+<title>CommonUnity — Align the inner. Shape the outer.</title>
+<meta name="description" content="CommonUnity is a living field for unified living, rooted in timeless principles and brought into practice through self-knowledge, frequency, community, and conscious action.">
 <meta name="theme-color" content="#0b1120">
-<meta property="og:title" content="CommonUnity — Instruments for Inner Precision">
-<meta property="og:description" content="Compass orients. Studio creates. Tuner calibrates. One coherent suite for practitioners of better living.">
+<meta property="og:title" content="CommonUnity — Align the inner. Shape the outer.">
+<meta property="og:description" content="A living field for unified living. Rooted in timeless principles. Brought into practice through self-knowledge, frequency, community, and conscious action.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://commonunity.io/">
 <link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
@@ -52,7 +52,6 @@
     overflow-x: hidden;
   }
 
-  /* Subtle ambient gradient — sacred-geometry feel without ornament overload */
   body::before {
     content: "";
     position: fixed;
@@ -96,9 +95,6 @@
   .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: 0.01em; }
   .brand svg { width: 36px; height: 36px; flex-shrink: 0; }
   .brand-name { font-family: var(--font-display); font-size: 22px; font-weight: 500; letter-spacing: 0.02em; }
-  /* OM as identity centerpiece — the hidden 'om' inside CommonUnity surfaced
-     typographically. Echoes the bindu/bar relationship in the mark via a
-     fine gold underline applied only beneath the two characters. */
   .brand-name .om {
     color: var(--gold-soft);
     font-weight: 700;
@@ -109,7 +105,7 @@
     text-decoration-thickness: 1px;
     text-underline-offset: 4px;
   }
-  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links { display: flex; gap: 26px; align-items: center; }
   .nav-links a {
     font-size: 14px;
     color: var(--cream-dim);
@@ -117,7 +113,7 @@
     font-weight: 500;
   }
   .nav-links a:hover { color: var(--cream); }
-  @media (max-width: 720px) {
+  @media (max-width: 760px) {
     .nav-links { display: none; }
   }
 
@@ -140,7 +136,7 @@
     font-size: clamp(40px, 7vw, 78px);
     line-height: 1.04;
     letter-spacing: -0.01em;
-    margin: 0 0 20px;
+    margin: 0 0 22px;
     color: var(--cream);
   }
   .hero h1 em {
@@ -151,7 +147,7 @@
   .hero .lede {
     font-size: clamp(17px, 2vw, 21px);
     color: var(--cream-dim);
-    max-width: 640px;
+    max-width: 680px;
     margin: 0 auto 36px;
     line-height: 1.55;
   }
@@ -231,18 +227,113 @@
   .section-lede {
     font-size: clamp(16px, 1.6vw, 18px);
     color: var(--cream-dim);
-    max-width: 640px;
+    max-width: 660px;
     line-height: 1.6;
   }
   .section-head { max-width: 760px; margin-bottom: 56px; }
 
-  /* ─────────── Three Instruments ─────────── */
+  /* ─────────── Principles (Unity is a practice) ─────────── */
+  .principles {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .principles-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-top: 12px;
+  }
+  @media (max-width: 920px) { .principles-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .principles-grid { grid-template-columns: 1fr; } }
+  .principle {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 22px 20px;
+    background: linear-gradient(180deg, rgba(250,248,244,0.025), rgba(250,248,244,0.005));
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .principle:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+  .principle .num {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold-soft);
+    font-size: 15px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .principle h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 22px;
+    margin: 0 0 6px;
+    color: var(--cream);
+    letter-spacing: -0.005em;
+  }
+  .principle p {
+    margin: 0;
+    color: var(--cream-dim);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .principles-coda {
+    margin-top: 44px;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(18px, 2vw, 22px);
+    color: var(--cream);
+    max-width: 700px;
+    line-height: 1.5;
+  }
+
+  /* ─────────── Nexus / Human core ─────────── */
+  .core-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 80px);
+    align-items: start;
+  }
+  @media (max-width: 860px) { .core-grid { grid-template-columns: 1fr; } }
+  .core-grid > * { min-width: 0; }
+  .core-prose p {
+    color: var(--cream-dim);
+    font-size: clamp(16px, 1.6vw, 18px);
+    line-height: 1.65;
+    margin: 0 0 18px;
+  }
+  .core-prose p:last-child { margin-bottom: 0; }
+  .core-prose .pull-line {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--cream);
+    font-size: clamp(20px, 2.4vw, 26px);
+    line-height: 1.4;
+    margin: 0 0 24px;
+    padding-left: 18px;
+    border-left: 2px solid var(--gold);
+  }
+  .om-principle {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  /* ─────────── Tools within the field ─────────── */
+  .tools-eyebrow-line {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--cream-faint);
+    margin-top: 8px;
+    font-style: italic;
+    font-family: var(--font-display);
+  }
   .instruments {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 22px;
   }
   @media (max-width: 920px) { .instruments { grid-template-columns: 1fr; } }
+  .instruments > * { min-width: 0; }
   .instrument {
     border: 1px solid var(--line);
     border-radius: 8px;
@@ -318,48 +409,6 @@
   .instrument.studio { --accent-color: var(--gold-soft); }
   .instrument.tuner { --accent-color: var(--terracotta); }
 
-  /* ─────────── Synthesis ─────────── */
-  .synthesis {
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
-  }
-  .synthesis-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(40px, 6vw, 80px);
-    align-items: center;
-  }
-  @media (max-width: 860px) { .synthesis-grid { grid-template-columns: 1fr; } }
-  .synthesis-figure {
-    aspect-ratio: 1 / 1;
-    max-width: 480px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  .synthesis ul.lineages {
-    list-style: none;
-    padding: 0;
-    margin: 28px 0 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px 22px;
-  }
-  @media (max-width: 520px) { .synthesis ul.lineages { grid-template-columns: 1fr; } }
-  .synthesis ul.lineages li {
-    font-size: 14px;
-    color: var(--cream-dim);
-    padding-left: 18px;
-    position: relative;
-  }
-  .synthesis ul.lineages li::before {
-    content: "";
-    position: absolute;
-    left: 0; top: 9px;
-    width: 8px; height: 8px;
-    border: 1px solid var(--gold-soft);
-    transform: rotate(45deg);
-  }
-
   /* ─────────── Key ─────────── */
   .key {
     display: grid;
@@ -369,8 +418,6 @@
   }
   .key > * { min-width: 0; max-width: 100%; }
   @media (max-width: 860px) { .key { grid-template-columns: 1fr; } }
-  .synthesis-grid > * { min-width: 0; }
-  .instruments > * { min-width: 0; }
   .key-card {
     border: 1px solid var(--line-strong);
     border-radius: 8px;
@@ -477,6 +524,7 @@
     padding-top: clamp(72px, 10vh, 110px);
     padding-bottom: clamp(72px, 10vh, 110px);
   }
+  .connect .section-lede { margin-left: auto; margin-right: auto; }
   .connect .closing {
     display: inline-block;
     margin-top: 36px;
@@ -540,15 +588,12 @@
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <!-- CommonUnity mark — monochrome (currentColor).
-         The OM resonance chamber: A bowl + uprights + U arch + M hook,
-         crowned by chandrabindu (bar + bindu). Concentric rings carry the
-         resonance reading. Used in nav and footer where it sits inline with
-         the wordmark. Designed to read as a precision instrument diagram
-         even when its OM lineage is not recognised. -->
+         OM resonance chamber: bowl + uprights + U arch + M hook,
+         crowned by a crescent (chandra / Turiya) with bindu above.
+         The crescent opens upward; the bindu rests above its cup. -->
     <symbol id="logo-mark" viewBox="0 0 200 200">
       <!-- Outer precision rings -->
-      <circle cx="100" cy="100" r="92"   fill="none" stroke="currentColor" stroke-width="1.0" opacity="0.42"/>
-      <!-- Resonance rings -->
+      <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" stroke-width="1.0" opacity="0.42"/>
       <circle cx="100" cy="100" r="74" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.32"/>
       <circle cx="100" cy="100" r="56" fill="none" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
       <!-- Twelve graduation ticks -->
@@ -573,16 +618,15 @@
       <path d="M 74 95 A 26 20 0 0 1 126 95" fill="none" stroke="currentColor" stroke-width="3.0" stroke-linecap="round"/>
       <path d="M 126 95 C 143 95, 148 80, 136 74" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" opacity="0.85"/>
       <path d="M 136 74 A 5.5 5.5 0 1 0 130.8 65" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity="0.80"/>
-      <!-- Chandrabindu: bar + bindu -->
-      <line x1="82" y1="59" x2="124" y2="59" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.70"/>
-      <circle cx="103" cy="50" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.78"/>
-      <circle cx="103" cy="50" r="2.4" fill="currentColor" opacity="0.96"/>
+      <!-- Chandra / crescent: opens upward, sits above OM form -->
+      <path d="M 84 60 Q 100 72 116 60" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" opacity="0.78"/>
+      <!-- Bindu: above the crescent (Turiya, silence) -->
+      <circle cx="100" cy="50" r="4.5" fill="none" stroke="currentColor" stroke-width="1.6" opacity="0.78"/>
+      <circle cx="100" cy="50" r="2.4" fill="currentColor" opacity="0.96"/>
     </symbol>
 
     <!-- CommonUnity hero mark — full-colour OM resonance chamber.
-         Used at the top of the hero section so the OM identity reads
-         immediately. Independent of the mono mark's currentColor wiring;
-         this version carries the brand palette directly. -->
+         Crescent (chandra) sits above the OM form; bindu above the crescent. -->
     <symbol id="logo-om" viewBox="0 0 200 200">
       <!-- Outer precision ring -->
       <circle cx="100" cy="100" r="92" fill="none" stroke="#2A6B8C" stroke-width="0.9" opacity="0.40"/>
@@ -623,10 +667,11 @@
       <path d="M 74 95 A 26 20 0 0 1 126 95" fill="none" stroke="#B8872E" stroke-width="2.4" stroke-linecap="round" opacity="0.95"/>
       <path d="M 126 95 C 143 95, 148 80, 136 74" fill="none" stroke="#C8622A" stroke-width="2.0" stroke-linecap="round" opacity="0.92"/>
       <path d="M 136 74 A 5.5 5.5 0 1 0 130.8 65" fill="none" stroke="#C8622A" stroke-width="1.8" stroke-linecap="round" opacity="0.88"/>
-      <!-- Chandrabindu -->
-      <line x1="82" y1="59" x2="124" y2="59" stroke="#FAF8F4" stroke-width="1.4" stroke-linecap="round" opacity="0.68"/>
-      <circle cx="103" cy="50" r="4.5" fill="none" stroke="#B8872E" stroke-width="1.5" opacity="0.85"/>
-      <circle cx="103" cy="50" r="2.2" fill="#B8872E" opacity="0.97"/>
+      <!-- Chandra crescent above OM form -->
+      <path d="M 84 60 Q 100 72 116 60" fill="none" stroke="#FAF8F4" stroke-width="1.6" stroke-linecap="round" opacity="0.78"/>
+      <!-- Bindu above the crescent (Turiya / silence) -->
+      <circle cx="100" cy="50" r="4.5" fill="none" stroke="#B8872E" stroke-width="1.5" opacity="0.85"/>
+      <circle cx="100" cy="50" r="2.2" fill="#B8872E" opacity="0.97"/>
       <!-- Crosshair stubs -->
       <g stroke="#FAF8F4" stroke-width="0.65" stroke-linecap="round" opacity="0.18">
         <line x1="100" y1="20" x2="100" y2="38"/>
@@ -643,7 +688,7 @@
       <circle cx="24" cy="24" r="2" fill="#0b1120"/>
     </symbol>
 
-    <!-- Studio glyph: vesica + waveform suggestion -->
+    <!-- Studio glyph: vesica + waveform -->
     <symbol id="g-studio" viewBox="0 0 48 48">
       <circle cx="18" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="1"/>
       <circle cx="30" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="1"/>
@@ -668,11 +713,11 @@
       <span class="brand-name">C<span class="om">om</span>monUnity</span>
     </a>
     <nav class="nav-links" aria-label="Primary">
-      <a href="#instruments">Instruments</a>
-      <a href="#synthesis">Synthesis</a>
+      <a href="#practice">Practice</a>
+      <a href="#core">Human core</a>
+      <a href="#tools">Tools</a>
       <a href="#key">The Key</a>
-      <a href="#practitioners">Practitioners</a>
-      <a href="#connect">Connect</a>
+      <a href="#field">Enter the field</a>
     </nav>
   </div>
 </header>
@@ -686,33 +731,195 @@
       <span class="om">Oṁ</span>
       <span>· 136.10 Hz</span>
     </div>
-    <h1>Instruments for <em>inner precision.</em></h1>
+    <h1>Align the inner. Shape the <em>outer.</em></h1>
     <p class="lede">
-      A coherent suite for practitioners of better living. Three instruments that orient,
-      create, and calibrate — anchored in the Gene Keys, Human Design, Biofield Tuning,
-      and the keynote frequencies that have organised consciousness for thousands of years.
+      CommonUnity is a living field for unified living, rooted in timeless
+      principles and brought into practice through self-knowledge, frequency,
+      community, and conscious action.
     </p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="#instruments">
-        Meet the Instruments <span class="arrow">→</span>
+      <a class="btn btn-primary" href="#field">
+        Enter the field <span class="arrow">→</span>
       </a>
-      <a class="btn btn-ghost" href="https://ideal-trust-production-7782.up.railway.app/" target="_blank" rel="noopener">
-        Open Compass
+      <a class="btn btn-ghost" href="#tools">
+        Explore the tools
       </a>
     </div>
   </div>
 </section>
 
-<!-- ─────────── Three Instruments ─────────── -->
-<section id="instruments">
+<!-- ─────────── Unity is a practice (universal-language principles) ─────────── -->
+<section id="practice" class="principles">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="section-eyebrow">Three Instruments · One Suite</div>
-      <h2 class="section-title">One body of work, played in three <em>registers.</em></h2>
+      <div class="section-eyebrow">Unity is a practice</div>
+      <h2 class="section-title">Eight movements of <em>good living.</em></h2>
       <p class="section-lede">
-        Each instrument stands alone. Together they form a single arc — the same person,
-        the same field, the same frequencies, examined through three different apertures.
+        Universal principles, drawn from many lineages and shaped by lived
+        experience. Not steps to climb. Movements that fold into each other —
+        each one practiced quietly until the next becomes possible.
       </p>
+    </div>
+
+    <div class="principles-grid">
+      <div class="principle reveal">
+        <div class="num">i</div>
+        <h4>Relationship</h4>
+        <p>How we meet others, the world, and ourselves. The first ground.</p>
+      </div>
+      <div class="principle reveal">
+        <div class="num">ii</div>
+        <h4>Discipline</h4>
+        <p>The quiet daily yes. What we return to without needing to be seen.</p>
+      </div>
+      <div class="principle reveal">
+        <div class="num">iii</div>
+        <h4>Embodiment</h4>
+        <p>The body as the instrument. Posture, gesture, the felt sense of being here.</p>
+      </div>
+      <div class="principle reveal">
+        <div class="num">iv</div>
+        <h4>Breath</h4>
+        <p>The bridge between inner and outer. The rhythm beneath every action.</p>
+      </div>
+      <div class="principle reveal">
+        <div class="num">v</div>
+        <h4>Attention</h4>
+        <p>What we choose to give to. The currency of an examined life.</p>
+      </div>
+      <div class="principle reveal">
+        <div class="num">vi</div>
+        <h4>Focus</h4>
+        <p>Holding one thing long enough for it to open.</p>
+      </div>
+      <div class="principle reveal">
+        <div class="num">vii</div>
+        <h4>Meditation</h4>
+        <p>Sustained presence. The practice that does itself.</p>
+      </div>
+      <div class="principle reveal">
+        <div class="num">viii</div>
+        <h4>Unity</h4>
+        <p>The remembering that nothing was ever separate.</p>
+      </div>
+    </div>
+
+    <p class="principles-coda reveal">
+      CommonUnity cultivates these as core human skills — and uses the latest
+      technology in a way that strengthens, rather than substitutes for, the
+      human core.
+    </p>
+  </div>
+</section>
+
+<!-- ─────────── Technology that strengthens the human core ─────────── -->
+<section id="core">
+  <div class="wrap">
+    <div class="core-grid">
+      <div class="reveal core-prose">
+        <div class="section-eyebrow">The Human Core</div>
+        <h2 class="section-title">Technology that strengthens the <em>human core.</em></h2>
+        <p class="pull-line">
+          CommonUnity uses modern intelligence without asking you to outsource wisdom.
+        </p>
+        <p>
+          Nexus is the synthesis engine and intelligence layer inside the
+          ecosystem. It bridges human and AI intelligence, helping
+          practitioners reflect, connect patterns, remember context, and
+          translate insight into practice.
+        </p>
+        <p>
+          Guided by the Oṁ principle, Nexus begins from listening, moves
+          through resonance, and returns toward coherence. It is not a
+          replacement for attention, intuition, relationship, or lived
+          experience. It is technology designed to strengthen the human core.
+        </p>
+      </div>
+
+      <!-- Right: Oṁ at the centre, Nexus / Compass / Studio / Tuner orbiting as tools within the field -->
+      <div class="reveal" aria-hidden="true">
+        <svg class="om-principle" viewBox="0 0 400 400">
+          <defs>
+            <radialGradient id="om-glow" cx="50%" cy="50%" r="42%">
+              <stop offset="0%" stop-color="#d4a04a" stop-opacity="0.85"/>
+              <stop offset="55%" stop-color="#B8872E" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#0b1120" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Outer field boundary -->
+          <circle cx="200" cy="200" r="186" fill="none" stroke="#FAF8F4" stroke-opacity="0.10"/>
+          <circle cx="200" cy="200" r="160" fill="none" stroke="#FAF8F4" stroke-opacity="0.06"/>
+          <text x="200" y="34" text-anchor="middle"
+                font-family="Plus Jakarta Sans, sans-serif" font-size="10"
+                letter-spacing="3" fill="#d4a04a" opacity="0.78">THE LIVING FIELD</text>
+
+          <!-- Resonance rings -->
+          <g fill="none" stroke="#FAF8F4" stroke-opacity="0.10">
+            <circle cx="200" cy="200" r="120"/>
+            <circle cx="200" cy="200" r="92"/>
+          </g>
+
+          <!-- Tool nodes orbiting Oṁ: Compass (top), Studio (right), Tuner (left), Nexus (bottom) -->
+          <g font-family="Plus Jakarta Sans, sans-serif" font-size="11" letter-spacing="2" fill="#FAF8F4" opacity="0.85">
+            <g>
+              <circle cx="200" cy="80" r="6" fill="none" stroke="#3a8aae" stroke-width="1.4"/>
+              <circle cx="200" cy="80" r="2" fill="#3a8aae"/>
+              <text x="200" y="62" text-anchor="middle" fill="#3a8aae">COMPASS</text>
+            </g>
+            <g>
+              <circle cx="320" cy="200" r="6" fill="none" stroke="#d4a04a" stroke-width="1.4"/>
+              <circle cx="320" cy="200" r="2" fill="#d4a04a"/>
+              <text x="338" y="204" text-anchor="start" fill="#d4a04a">STUDIO</text>
+            </g>
+            <g>
+              <circle cx="80" cy="200" r="6" fill="none" stroke="#C8622A" stroke-width="1.4"/>
+              <circle cx="80" cy="200" r="2" fill="#C8622A"/>
+              <text x="62" y="204" text-anchor="end" fill="#C8622A">TUNER</text>
+            </g>
+            <g>
+              <circle cx="200" cy="320" r="6" fill="none" stroke="#5C7A3E" stroke-width="1.4"/>
+              <circle cx="200" cy="320" r="2" fill="#5C7A3E"/>
+              <text x="200" y="342" text-anchor="middle" fill="#5C7A3E">NEXUS</text>
+            </g>
+          </g>
+
+          <!-- Faint connectors from each tool to centre -->
+          <g stroke="#FAF8F4" stroke-opacity="0.10" stroke-width="0.7">
+            <line x1="200" y1="92" x2="200" y2="148"/>
+            <line x1="308" y1="200" x2="252" y2="200"/>
+            <line x1="92" y1="200" x2="148" y2="200"/>
+            <line x1="200" y1="308" x2="200" y2="252"/>
+          </g>
+
+          <!-- Centre: Oṁ -->
+          <circle cx="200" cy="200" r="60" fill="url(#om-glow)"/>
+          <text x="200" y="212" text-anchor="middle"
+                font-family="Cormorant Garamond, serif"
+                font-style="italic" font-size="42"
+                fill="#FAF8F4" opacity="0.96">Oṁ</text>
+          <text x="200" y="240" text-anchor="middle"
+                font-family="Plus Jakarta Sans, sans-serif"
+                font-size="9" letter-spacing="3"
+                fill="#d4a04a" opacity="0.85">SOURCE TONE · 136.10 Hz</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── Tools within the field ─────────── -->
+<section id="tools">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Tools within the field</div>
+      <h2 class="section-title">Three instruments. <em>One field.</em></h2>
+      <p class="section-lede">
+        Compass, Studio, and Tuner are not the identity — the field is.
+        They are practical apertures into the same body of work, each tuned
+        to a different register of practice.
+      </p>
+      <p class="tools-eyebrow-line">Instruments for inner precision.</p>
     </div>
 
     <div class="instruments">
@@ -728,7 +935,7 @@
         <ul class="features">
           <li>Four-point compass · Universal laws</li>
           <li>Gene Keys + Human Design profile</li>
-          <li>Nexus AI · CommonUnityKey export</li>
+          <li>Nexus presence · CommonUnity Key export</li>
         </ul>
         <a class="visit" href="https://ideal-trust-production-7782.up.railway.app/" target="_blank" rel="noopener">
           compass.commonunity.io
@@ -776,81 +983,6 @@
   </div>
 </section>
 
-<!-- ─────────── Synthesis Engine ─────────── -->
-<section id="synthesis" class="synthesis">
-  <div class="wrap">
-    <div class="synthesis-grid">
-      <div class="reveal">
-        <div class="section-eyebrow">The Synthesis Engine</div>
-        <h2 class="section-title">Many lineages. One <em>tuned chord.</em></h2>
-        <p class="section-lede">
-          The Synthesis Engine is the bridge that lets sound, body, breath, and
-          archetype speak to each other without collapsing into one another.
-          Each lineage is honoured — credited in plain language, never blended
-          into a beige spirituality. OM is the centerpiece. Two heart-frequency
-          forks at the sternum open and close every protocol.
-        </p>
-        <ul class="lineages">
-          <li>Cousto · Planetary Frequencies</li>
-          <li>Solfeggio Tradition</li>
-          <li>Western Tonal Theory</li>
-          <li>Biofield Tuning · Eileen McKusick</li>
-          <li>Gurdjieff · Octaves &amp; Intervals</li>
-          <li>Patanjali · The Eight Limbs</li>
-          <li>Gene Keys · Richard Rudd</li>
-          <li>Human Design · Ra Uru Hu</li>
-        </ul>
-      </div>
-
-      <!-- Right-side figure: layered concentric rings (lineages) converging on OM -->
-      <div class="reveal" aria-hidden="true">
-        <svg class="synthesis-figure" viewBox="0 0 400 400">
-          <defs>
-            <radialGradient id="om-glow" cx="50%" cy="50%" r="40%">
-              <stop offset="0%" stop-color="#d4a04a" stop-opacity="0.85"/>
-              <stop offset="50%" stop-color="#B8872E" stop-opacity="0.25"/>
-              <stop offset="100%" stop-color="#0b1120" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
-          <!-- concentric rings: 8 lineages -->
-          <g fill="none" stroke="#FAF8F4" stroke-opacity="0.10">
-            <circle cx="200" cy="200" r="180"/>
-            <circle cx="200" cy="200" r="158"/>
-            <circle cx="200" cy="200" r="136"/>
-            <circle cx="200" cy="200" r="114"/>
-            <circle cx="200" cy="200" r="92"/>
-            <circle cx="200" cy="200" r="70"/>
-          </g>
-          <!-- 12 spokes -->
-          <g stroke="#FAF8F4" stroke-opacity="0.08" stroke-width="0.6">
-            <line x1="200" y1="20" x2="200" y2="380"/>
-            <line x1="20" y1="200" x2="380" y2="200"/>
-            <line x1="73" y1="73" x2="327" y2="327"/>
-            <line x1="327" y1="73" x2="73" y2="327"/>
-            <line x1="110" y1="32" x2="290" y2="368"/>
-            <line x1="290" y1="32" x2="110" y2="368"/>
-          </g>
-          <!-- fork pair at sternum (centerline) -->
-          <g stroke="#2A6B8C" stroke-width="1.5" fill="none" opacity="0.7">
-            <path d="M170 130 L170 170 Q170 180 180 180 L180 200"/>
-            <path d="M230 130 L230 170 Q230 180 220 180 L220 200"/>
-          </g>
-          <!-- om center -->
-          <circle cx="200" cy="200" r="60" fill="url(#om-glow)"/>
-          <text x="200" y="212" text-anchor="middle"
-                font-family="Cormorant Garamond, serif"
-                font-style="italic" font-size="42"
-                fill="#FAF8F4" opacity="0.95">Oṁ</text>
-          <text x="200" y="240" text-anchor="middle"
-                font-family="Plus Jakarta Sans, sans-serif"
-                font-size="9" letter-spacing="3"
-                fill="#d4a04a" opacity="0.85">136.10 Hz</text>
-        </svg>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ─────────── CommonUnity Key ─────────── -->
 <section id="key">
   <div class="wrap">
@@ -858,7 +990,7 @@
       <div class="section-eyebrow">The CommonUnity Key</div>
       <h2 class="section-title">Your data, in a portable <em>JSON file.</em></h2>
       <p class="section-lede">
-        A single signed file you carry between instruments and across sessions.
+        A single signed file you carry between tools and across sessions.
         Compass writes to it. Studio reads from it. Tuner calibrates against it.
         It is yours — store it locally, export it, hand it to a practitioner you trust.
       </p>
@@ -907,10 +1039,9 @@
 <section class="pull">
   <div class="wrap reveal">
     <blockquote>
-      “Reuse, don't rebuild. Honour multiple lineages transparently.
-      Default to modesty. The tools serve the person — never the other way around.”
+      &ldquo;Begin from listening. Move through resonance. Return toward coherence.&rdquo;
     </blockquote>
-    <cite>Working Principles · CommonUnity</cite>
+    <cite>The Oṁ Principle · CommonUnity</cite>
   </div>
 </section>
 
@@ -918,12 +1049,12 @@
 <section id="practitioners">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="section-eyebrow">For Practitioners of Better Living</div>
+      <div class="section-eyebrow">For practitioners of better living</div>
       <h2 class="section-title">Built for the people who hold the <em>room.</em></h2>
       <p class="section-lede">
-        CommonUnity is for facilitators, sound practitioners, energy workers, yoga
-        teachers, designers, and the quiet professionals who are tired of choosing
-        between depth and rigour. These instruments hold both.
+        CommonUnity is for facilitators, sound practitioners, energy workers,
+        teachers, designers, and the quiet professionals who are tired of
+        choosing between depth and rigour. The field holds both.
       </p>
     </div>
 
@@ -939,17 +1070,17 @@
       <div class="pcard reveal">
         <h4>Facilitators &amp; Coaches</h4>
         <p>
-          A structured conversation around the four compass points. The
-          Nexus holds the long view across sessions, so you can hold the
-          person in front of you.
+          A structured conversation around the four compass points. Nexus
+          holds the long view across sessions, so you can hold the person
+          in front of you.
         </p>
       </div>
       <div class="pcard forest reveal">
-        <h4>Yoga &amp; Movement Teachers</h4>
+        <h4>Movement &amp; Embodiment Teachers</h4>
         <p>
-          The eight limbs of Patanjali, the chakra system, and the keynote
-          frequencies — kept distinct, kept attributed, kept usable in the
-          shape of your actual practice.
+          Universal principles of practice — relationship, breath, attention,
+          embodiment — kept distinct, kept attributed, kept usable in the
+          shape of your actual work.
         </p>
       </div>
       <div class="pcard terracotta reveal">
@@ -969,23 +1100,23 @@
       <div class="pcard teal reveal">
         <h4>Long-Term Companions</h4>
         <p>
-          Your CommonUnity Key accumulates with you. The instruments
-          remember — but the data is yours, in a file you can read.
+          Your CommonUnity Key accumulates with you. The tools remember —
+          but the data is yours, in a file you can read.
         </p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ─────────── Connect ─────────── -->
-<section id="connect" class="connect">
+<!-- ─────────── Enter the field ─────────── -->
+<section id="field" class="connect">
   <div class="wrap reveal">
-    <div class="section-eyebrow">Connect</div>
+    <div class="section-eyebrow">Enter the field</div>
     <h2 class="section-title">Begin where you <em>are.</em></h2>
-    <p class="section-lede" style="margin-left:auto;margin-right:auto;">
-      The instruments are live. Open Compass to orient, Studio to create, or
-      Tuner to calibrate. If you are bringing this to a practice, write —
-      we honour serious enquiry.
+    <p class="section-lede">
+      The field is open. Pick the tool that meets your moment — orient with
+      Compass, create in Studio, or calibrate at the Tuner bench. If you are
+      bringing this to a practice, write — we honour serious enquiry.
     </p>
     <div class="cta-row" style="margin-top:36px;">
       <a class="btn btn-primary" href="https://ideal-trust-production-7782.up.railway.app/" target="_blank" rel="noopener">
@@ -1012,22 +1143,22 @@
           <span class="brand-name">C<span class="om">om</span>monUnity</span>
         </div>
         <p class="colophon">
-          A suite of instruments for practitioners of better living.
-          Anchored in OM (136.10 Hz). Built on open schemas and
-          attributed lineages. Your data stays yours.
+          A living field for unified living. Anchored in Oṁ (136.10 Hz).
+          Built on universal principles, open schemas, and attributed lineages.
+          Your data stays yours.
         </p>
       </div>
       <div>
-        <h5>Instruments</h5>
+        <h5>Tools</h5>
         <a href="https://ideal-trust-production-7782.up.railway.app/" target="_blank" rel="noopener">Compass</a>
         <a href="https://ideal-trust-production-7782.up.railway.app/studio" target="_blank" rel="noopener">Studio</a>
         <a href="https://ideal-trust-production-7782.up.railway.app/tuner" target="_blank" rel="noopener">Tuner</a>
       </div>
       <div>
-        <h5>The Suite</h5>
-        <a href="#synthesis">Synthesis Engine</a>
+        <h5>The Field</h5>
+        <a href="#practice">Unity is a practice</a>
+        <a href="#core">Human core</a>
         <a href="#key">CommonUnity Key</a>
-        <a href="#practitioners">Practitioners</a>
       </div>
       <div>
         <h5>Lineages</h5>
@@ -1044,7 +1175,7 @@
 </footer>
 
 <script>
-  // Lightweight reveal-on-scroll. Respects prefers-reduced-motion (CSS handles fallback).
+  // Reveal-on-scroll. CSS handles reduced-motion fallback.
   (function () {
     if (!('IntersectionObserver' in window)) {
       document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
