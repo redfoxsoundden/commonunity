@@ -28,6 +28,41 @@ export interface RadianceActivation {
   precise: boolean;     // true if birth time was provided
 }
 
+/**
+ * Vertical axis of the chakra relative to the heart pivot.
+ * Derived from the consciousness framework (image.jpg / page 17):
+ *   above  = Higher Self / spiritual / field domain (Throat, Third Eye, Crown)
+ *   heart  = Equilibrium pivot — bridge between domains
+ *   below  = Lower Self / material / somatic domain (Root, Sacral, Solar Plexus)
+ */
+export type ChakraAxis = "above" | "heart" | "below";
+
+/**
+ * Entry vector: the natural direction of therapeutic entry for this line.
+ *   somatic-first = body opens the field (Lines 1–2)
+ *   bridge        = either direction valid; breath is the carrier (Line 3)
+ *   field-first   = frequency/intent/breath organise the field;
+ *                   body responds downstream (Lines 4–6)
+ */
+export type EntryVector = "somatic-first" | "bridge" | "field-first";
+
+/**
+ * Fork polarity: which class of fork is the primary clinical instrument.
+ *   weighted    = bone/tissue conduction — body as receiver
+ *   bridge      = weighted AND unweighted, both valid (Line 3 / Heart axis)
+ *   unweighted  = air conduction — field as receiver
+ */
+export type ForkPolarity = "weighted" | "bridge" | "unweighted";
+
+/**
+ * Vertical convergence between gate axis and line entry vector.
+ *   aligned      = both signals point same direction (above+field-first OR below+somatic-first)
+ *   heart-bridge = gate sits at heart axis — OM fork IS the session pivot
+ *   split        = gate and line point opposite directions; heart/OM bridges
+ *   neutral      = bridge line (Line 3) — no dominant direction
+ */
+export type VerticalConvergence = "aligned" | "heart-bridge" | "split" | "neutral";
+
 export interface RadianceProfile {
   activation: RadianceActivation;
 
@@ -47,6 +82,9 @@ export interface RadianceProfile {
   chakraFrequencyHz: number;
   chakraInstrumentId: string;
 
+  // Chakra vertical axis (above / heart / below)
+  chakraAxis: ChakraAxis;
+
   // Gate → Kosha (field layer)
   fieldKoshaLayer: number;
   fieldKoshaName: string;
@@ -57,6 +95,10 @@ export interface RadianceProfile {
   bodyLayer: string;
   bodyLayerDescription: string;
 
+  // Line → entry vector + fork polarity
+  entryVector: EntryVector;
+  forkPolarity: ForkPolarity;
+
   // Line → Kosha (somatic depth)
   somaticKoshaLayer: number;
   somaticKoshaName: string;
@@ -65,13 +107,15 @@ export interface RadianceProfile {
   fieldDepth: string;
   applicationMode: string;
 
-  // Convergence
-  koshasConverge: boolean;  // field + somatic kosha layers match
-  convergenceNote: string;
+  // Dual convergence
+  koshasConverge: boolean;           // field + somatic kosha layers match
+  verticalConvergence: VerticalConvergence;  // gate axis + line entry vector agree?
+  convergenceNote: string;           // human-readable clinical guidance
 
-  // Instrument shortlist (ids from inventory)
+  // Instrument shortlist (ids from inventory) — polarity-filtered
   primaryInstruments: string[];
   secondaryInstruments: string[];
+  omAnchor: boolean;                 // true when heart-bridge or split — OM fork is session pivot
 
   // Nexus-ready summary string
   nexusSummary: string;
@@ -153,23 +197,32 @@ const GATES: Record<number, {
 };
 
 // ─── HD Center → Chakra mapping ───────────────────────────────────────────────
-// HD has 9 centers; we map to the 7-chakra system + note where HD centers overlap
+// HD has 9 centers; we map to the 7-chakra system + note where HD centers overlap.
+// axis: vertical position relative to the heart pivot (consciousness framework, p.17)
+//   below = Lower Self / material / somatic domain
+//   heart = Equilibrium pivot — the balance axis; OM fork is the instrument here
+//   above = Higher Self / spiritual / field domain
 
 const CENTER_TO_CHAKRA: Record<string, {
   chakraId: string; chakraName: string; freqHz: number; instrumentId: string;
+  axis: ChakraAxis;
 }> = {
-  ROOT:   { chakraId: "CH-ROOT",      chakraName: "Mūlādhāra (Root)",       freqHz: 194.18, instrumentId: "TF-PW-ROOT" },
-  SACRAL: { chakraId: "CH-SACRAL",    chakraName: "Svādhiṣṭhāna (Sacral)",   freqHz: 210.42, instrumentId: "TF-PW-SACRAL" },
-  SOLAR:  { chakraId: "CH-SOLAR",     chakraName: "Maṇipūra (Solar Plexus)", freqHz: 126.22, instrumentId: "TF-PW-SOLAR" },
-  HEART:  { chakraId: "CH-HEART",     chakraName: "Anāhata (Heart)",         freqHz: 136.10, instrumentId: "TF-PW-HEART" },
-  // HD HEART/EGO center maps to heart chakra territory
-  SPLEEN: { chakraId: "CH-SACRAL",    chakraName: "Svādhiṣṭhāna / Spleen field", freqHz: 210.42, instrumentId: "TF-PW-SACRAL" },
-  // Spleen center sits in the lower body; closest is sacral/solar boundary — we use sacral
-  THROAT: { chakraId: "CH-THROAT",    chakraName: "Viśuddha (Throat)",       freqHz: 141.27, instrumentId: "TF-PW-THROAT" },
-  G:      { chakraId: "CH-HEART",     chakraName: "G-Center / Anāhata bridge",freqHz: 136.10, instrumentId: "TF-PW-HEART" },
-  // G-center (identity/love/direction) is the heart of HD — maps to Anāhata
-  AJNA:   { chakraId: "CH-THIRD-EYE", chakraName: "Ājñā (Third Eye)",        freqHz: 221.23, instrumentId: "TF-PW-3RD" },
-  CROWN:  { chakraId: "CH-CROWN",     chakraName: "Sahasrāra (Crown)",       freqHz: 172.06, instrumentId: "TF-PW-CROWN" },
+  // ── Lower Self / material / somatic domain ────────────────────────────────
+  ROOT:   { chakraId: "CH-ROOT",      chakraName: "Mūlādhāra (Root)",              freqHz: 194.18, instrumentId: "TF-PW-ROOT",   axis: "below" },
+  SACRAL: { chakraId: "CH-SACRAL",    chakraName: "Svādhiṣṭhāna (Sacral)",         freqHz: 210.42, instrumentId: "TF-PW-SACRAL", axis: "below" },
+  SOLAR:  { chakraId: "CH-SOLAR",     chakraName: "Maṇipūra (Solar Plexus)",        freqHz: 126.22, instrumentId: "TF-PW-SOLAR",  axis: "below" },
+  // Spleen center: lower body, sacral/solar boundary — somatic domain
+  SPLEEN: { chakraId: "CH-SACRAL",    chakraName: "Svādhiṣṭhāna / Spleen field",   freqHz: 210.42, instrumentId: "TF-PW-SACRAL", axis: "below" },
+
+  // ── Heart pivot — equilibrium axis ────────────────────────────────────────
+  // HD EGO/HEART and G-center both map here. OM fork (136.10 Hz) is the axis instrument.
+  HEART:  { chakraId: "CH-HEART",     chakraName: "Anāhata (Heart)",                freqHz: 136.10, instrumentId: "TF-PW-HEART",  axis: "heart" },
+  G:      { chakraId: "CH-HEART",     chakraName: "G-Center / Anāhata bridge",      freqHz: 136.10, instrumentId: "TF-PW-HEART",  axis: "heart" },
+
+  // ── Higher Self / spiritual / field domain ────────────────────────────────
+  THROAT: { chakraId: "CH-THROAT",    chakraName: "Viśuddha (Throat)",              freqHz: 141.27, instrumentId: "TF-PW-THROAT", axis: "above" },
+  AJNA:   { chakraId: "CH-THIRD-EYE", chakraName: "Ājñā (Third Eye)",              freqHz: 221.23, instrumentId: "TF-PW-3RD",   axis: "above" },
+  CROWN:  { chakraId: "CH-CROWN",     chakraName: "Sahasrāra (Crown)",              freqHz: 172.06, instrumentId: "TF-PW-CROWN",  axis: "above" },
 };
 
 // ─── Chakra → Kosha (field layer) mapping ─────────────────────────────────────
@@ -222,6 +275,8 @@ const LINE_DATA: Record<number, {
   fieldDepth: string;
   applicationMode: string;
   primaryInstrumentTypes: string[];   // descriptive types for shortlisting
+  entryVector: EntryVector;           // natural therapeutic entry direction
+  forkPolarity: ForkPolarity;         // weighted / bridge / unweighted
 }> = {
   1: {
     archetype: "Foundation",
@@ -232,6 +287,8 @@ const LINE_DATA: Record<number, {
     fieldDepth: "Body contact — 0 to 2 inches",
     applicationMode: "Weighted forks applied directly to bone landmarks: sacrum, sternum, mastoid process, long bones. Allow vibration to travel through the skeletal structure. Deep, slow, sustained contact — minimum 30 seconds per placement. The body needs to feel held before it opens.",
     primaryInstrumentTypes: ["weighted-bone-conduction"],
+    entryVector: "somatic-first",
+    forkPolarity: "weighted",
   },
   2: {
     archetype: "Hermit",
@@ -242,6 +299,8 @@ const LINE_DATA: Record<number, {
     fieldDepth: "Near field — 1 to 4 inches",
     applicationMode: "Weighted forks placed over organ areas (not on protruding bones) — solar plexus, liver/spleen region, lower abdomen. Light touch, allow the fork to rest rather than press. The organs respond to invitation, not force. Also effective in near-field (1–4 inches) hovering above the organ area.",
     primaryInstrumentTypes: ["weighted-soft-tissue"],
+    entryVector: "somatic-first",
+    forkPolarity: "weighted",
   },
   3: {
     archetype: "Martyr",
@@ -252,6 +311,8 @@ const LINE_DATA: Record<number, {
     fieldDepth: "Near-to-mid field — 2 to 8 inches",
     applicationMode: "Solfeggio and planetary forks near endocrine sites: thyroid/throat region (141.27 Hz), adrenal/kidney area (194.18 Hz), gonads/sacral region (210.42 Hz), pineal/crown area (172.06 Hz). Hold in the near field — 2 to 6 inches from body surface. The endocrine system responds to sustained tonal presence rather than movement.",
     primaryInstrumentTypes: ["solfeggio", "planetary-near-field"],
+    entryVector: "bridge",
+    forkPolarity: "bridge",
   },
   4: {
     archetype: "Opportunist",
@@ -262,6 +323,8 @@ const LINE_DATA: Record<number, {
     fieldDepth: "Mid field — 4 to 12 inches",
     applicationMode: "Unweighted forks in the air field — the nervous system responds primarily to air conduction and acoustic resonance rather than physical vibration. Sweep slowly through the mid-field around the head, spine, and solar plexus. Tuning fork pairs creating interval resonance are especially effective here. Allow pauses — the nervous system integrates in the silence between tones.",
     primaryInstrumentTypes: ["unweighted-field"],
+    entryVector: "field-first",
+    forkPolarity: "unweighted",
   },
   5: {
     archetype: "Heretic",
@@ -272,6 +335,8 @@ const LINE_DATA: Record<number, {
     fieldDepth: "Mid-to-far field — 6 to 24 inches",
     applicationMode: "Full-body sweeps and whole-field envelope work. Begin at the feet and sweep upward through the entire biofield. The circulatory layer responds to momentum and flow — keep the fork moving rather than holding. Finish by creating a complete torus envelope around the client from head to toe. Session tone: distributive, complete, whole-body.",
     primaryInstrumentTypes: ["unweighted-sweep", "field-envelope"],
+    entryVector: "field-first",
+    forkPolarity: "unweighted",
   },
   6: {
     archetype: "Role Model",
@@ -282,6 +347,8 @@ const LINE_DATA: Record<number, {
     fieldDepth: "Far field — 18 inches to 3+ feet",
     applicationMode: "Far-field and subtle body work. Fibonacci forks (144 Hz unweighted) combed slowly through the outer field — their mathematical ratio is said to 'cut through heavy distortions in the electromagnetic biofield.' Tibetan bell struck in the space above and around the client. Long silences. This is the most refined application layer — presence and intention are primary instruments. The cellular level is reached through the quality of stillness, not through mechanical application.",
     primaryInstrumentTypes: ["fibonacci", "bell", "far-field"],
+    entryVector: "field-first",
+    forkPolarity: "unweighted",
   },
 };
 
@@ -455,29 +522,120 @@ export function synthesizeRadianceProfile(activation: RadianceActivation): Radia
   const codonData = CODON_RING_TO_ELEMENT[gateData.codonRing] ?? { element: "Space", dosha: "Vata", quality: "subtle" };
   const lineData = LINE_DATA[line];
 
-  // Build instrument shortlist — center instruments + line additions, deduplicated
-  const centerInst = CENTER_INSTRUMENTS[gateData.center] ?? { primary: [], secondary: [] };
-  const lineAdd = LINE_INSTRUMENTS[line]?.add ?? [];
-  const allPrimary = [...new Set([...centerInst.primary, ...lineAdd])].slice(0, 5);
-  const allSecondary = [...new Set(centerInst.secondary.filter(i => !allPrimary.includes(i)))].slice(0, 3);
-
-  // Convergence check
+  // ── Kosha convergence (original check) ──────────────────────────────────
   const koshasConverge = koshaField.layer === lineData.somaticKoshaLayer;
-  const convergenceNote = koshasConverge
-    ? `Gate and Line both point to ${koshaField.name} — strong convergence. This layer is the primary therapeutic focus for this client.`
-    : `Gate points to ${koshaField.name} (Layer ${koshaField.layer}, field work) while Line points to ${lineData.somaticKoshaName} (Layer ${lineData.somaticKoshaLayer}, somatic depth). Address both: begin with the deeper somatic layer, then expand to the field layer.`;
+
+  // ── Vertical convergence (gate axis × line entry vector) ────────────────
+  // Derives from the consciousness framework: heart is the pivot axis.
+  // Aligned   = both gate and line point the same direction
+  // Bridged   = gate sits at the heart axis (OM is always the anchor here)
+  // Split     = gate and line point opposite directions; heart bridges them
+  // Neutral   = Line 3 bridge — no dominant direction
+  const axis = centerData.axis;
+  const ev   = lineData.entryVector;
+
+  let verticalConvergence: VerticalConvergence;
+  if (axis === "heart") {
+    verticalConvergence = "heart-bridge";
+  } else if (ev === "bridge") {
+    verticalConvergence = "neutral";
+  } else if (
+    (axis === "above" && ev === "field-first") ||
+    (axis === "below" && ev === "somatic-first")
+  ) {
+    verticalConvergence = "aligned";
+  } else {
+    verticalConvergence = "split";
+  }
+
+  // OM fork is the session anchor whenever the heart is involved as pivot
+  const omAnchor = verticalConvergence === "heart-bridge" || verticalConvergence === "split";
+
+  // ── Instrument shortlist — polarity-filtered ─────────────────────────────
+  // For field-first (Lines 4-6): unweighted forks lead; weighted demoted to secondary.
+  // For somatic-first (Lines 1-2): weighted forks lead.
+  // For bridge (Line 3): both classes valid, center instruments as-is.
+  const centerInst = CENTER_INSTRUMENTS[gateData.center] ?? { primary: [], secondary: [] };
+  const lineAdd    = LINE_INSTRUMENTS[line]?.add ?? [];
+
+  const WEIGHTED_IDS   = new Set(["TF-OTTO-128", "TF-BT-SLIDER", "TF-OM-136W", "TF-PW-ROOT", "TF-PW-SACRAL", "TF-PW-SOLAR", "TF-PW-HEART", "TF-PW-THROAT", "TF-PW-3RD", "TF-PW-CROWN", "TF-BT-SCHU-54", "TF-BT-SCHU-62"]);
+  const UNWEIGHTED_IDS = new Set(["TF-BT-FIB-144U", "TF-BT-FIB-89", "TF-BT-222", "BELL-771", "TF-BT-SOL-174", "TF-BT-SOL-417", "TF-BT-SOL-528", "TF-BT-FIB-144W", "BOWL-528", "BOWL-429"]);
+
+  const polarity = lineData.forkPolarity;
+  let mergedPrimary   = [...new Set([...centerInst.primary, ...lineAdd])];
+  let mergedSecondary = [...new Set(centerInst.secondary)];
+
+  if (polarity === "unweighted") {
+    // Field-first: unweighted leads; move weighted forks to secondary
+    const promoted  = mergedPrimary.filter(id => !WEIGHTED_IDS.has(id) || id === "TF-OM-136W");
+    const demoted   = mergedPrimary.filter(id => WEIGHTED_IDS.has(id) && id !== "TF-OM-136W");
+    mergedPrimary   = [...promoted];
+    mergedSecondary = [...new Set([...demoted, ...mergedSecondary])];
+  } else if (polarity === "weighted") {
+    // Somatic-first: weighted leads; move pure far-field unweighted to secondary
+    const farField  = new Set(["TF-BT-FIB-144U", "BELL-771", "BOWL-429", "BOWL-528"]);
+    const demoted   = mergedPrimary.filter(id => farField.has(id));
+    mergedPrimary   = mergedPrimary.filter(id => !farField.has(id));
+    mergedSecondary = [...new Set([...mergedSecondary, ...demoted])];
+  }
+  // bridge: no reordering
+
+  // Always ensure OM fork (TF-OM-136W) appears if omAnchor is true
+  if (omAnchor && !mergedPrimary.includes("TF-OM-136W")) {
+    mergedPrimary.unshift("TF-OM-136W");
+  }
+
+  const allPrimary   = mergedPrimary.filter(id => !mergedSecondary.includes(id) || mergedPrimary.indexOf(id) < mergedSecondary.indexOf(id)).slice(0, 5);
+  const allSecondary = mergedSecondary.filter(id => !allPrimary.includes(id)).slice(0, 3);
+
+  // ── Convergence note (human-readable clinical guidance) ──────────────────
+  const axisLabel = axis === "above" ? "Higher Self / field domain (above heart)"
+                  : axis === "heart" ? "Heart pivot (equilibrium axis)"
+                  : "Lower Self / somatic domain (below heart)";
+
+  const evLabel = ev === "field-first" ? "field-first (frequency → breath → intent)"
+                : ev === "bridge"       ? "bridge (breath as carrier — either direction)"
+                : "somatic-first (body opens the field)";
+
+  let convergenceNote: string;
+
+  if (verticalConvergence === "aligned") {
+    if (axis === "above") {
+      convergenceNote = `Strong alignment — ${axisLabel} and ${evLabel}. Lead with unweighted forks in the air field. Breath and sustained tonal presence are the primary instruments. Physical fork application is secondary and optional. The subtle body organises; the physical body responds downstream.`;
+    } else {
+      convergenceNote = `Strong alignment — ${axisLabel} and ${evLabel}. Lead with weighted fork contact. Begin at the foundational body layer (${lineData.bodyLayer}), allow vibration to anchor before expanding to the field.`;
+    }
+  } else if (verticalConvergence === "heart-bridge") {
+    convergenceNote = `Heart-axis gate — Anāhata (136.10 Hz) is the session pivot. OM fork at the sternum is the opener AND closer. From the heart, work in both directions: weighted forks downward into the somatic body (${lineData.bodyLayer}), unweighted forks upward into the field (${lineData.fieldDepth}). Entry order: OM anchor first, then follow the ${evLabel} entry for the rest of the session.`;
+  } else if (verticalConvergence === "split") {
+    const gateDir = axis === "above" ? "field / unweighted" : "somatic / weighted";
+    const lineDir = ev === "field-first" ? "field / unweighted" : "somatic / weighted";
+    convergenceNote = `Split signal — gate points to ${axisLabel} (${gateDir}) while line points to ${evLabel} (${lineDir}). The heart/OM fork bridges the two halves. Open with OM at the sternum, then honour the line's entry vector (${evLabel}) for the primary work, addressing the gate's chakra layer (${centerData.chakraName}) afterward.`;
+  } else {
+    // neutral (Line 3 bridge)
+    convergenceNote = `Bridge line — entry direction is open. Breath is the primary carrier. Begin with near-field breath awareness, introduce unweighted forks near endocrine sites (${centerData.chakraName} region), then anchor with weighted contact if the client's body calls for it. Glandular/endocrine system responds to sustained tonal presence.`;
+  }
+
+  // Layer convergence addendum
+  if (koshasConverge) {
+    convergenceNote += ` Kosha convergence: both gate and line resolve to ${koshaField.name} (Layer ${koshaField.layer}) — strong therapeutic focus layer.`;
+  } else {
+    convergenceNote += ` Kosha split: gate field layer is ${koshaField.name} (Layer ${koshaField.layer}); line somatic layer is ${lineData.somaticKoshaName} (Layer ${lineData.somaticKoshaLayer}). Address both within the session.`;
+  }
 
   // Nexus summary
   const nexusSummary = [
     `RADIANCE SPHERE — GK ${gate}.${line} (${gateData.name})`,
     `Shadow: ${gateData.shadow} → Gift: ${gateData.gift} → Siddhi: ${gateData.siddhi}`,
     `Codon Ring: ${gateData.codonRing} | Element: ${codonData.element} | Dosha tendency: ${codonData.dosha}`,
-    `HD Center: ${gateData.center} → ${centerData.chakraName} (${centerData.freqHz} Hz)`,
+    `HD Center: ${gateData.center} → ${centerData.chakraName} (${centerData.freqHz} Hz) | Axis: ${centerData.axis}`,
     `Field layer (gate→chakra→kosha): ${koshaField.name} | Biofield: ${koshaField.biofieldPosition}`,
     `Line ${line} — ${lineData.archetype} | Body: ${lineData.bodyLayer}`,
+    `Entry vector: ${lineData.entryVector} | Fork polarity: ${lineData.forkPolarity}`,
     `Somatic layer (line→body→kosha): ${lineData.somaticKoshaName}`,
     `Application depth: ${lineData.fieldDepth}`,
-    koshasConverge ? `Convergence: STRONG — both signals align at Layer ${koshaField.layer}` : `Convergence: SPLIT — field layer ${koshaField.layer}, somatic layer ${lineData.somaticKoshaLayer}`,
+    `Vertical convergence: ${verticalConvergence.toUpperCase()}${omAnchor ? " | OM anchor: YES" : ""}`,
+    koshasConverge ? `Kosha convergence: STRONG — both signals align at Layer ${koshaField.layer}` : `Kosha convergence: SPLIT — field layer ${koshaField.layer}, somatic layer ${lineData.somaticKoshaLayer}`,
     `Primary forks: ${allPrimary.join(", ")}`,
     `Application: ${lineData.applicationMode.slice(0, 120)}...`,
   ].join("\n");
@@ -496,20 +654,25 @@ export function synthesizeRadianceProfile(activation: RadianceActivation): Radia
     chakraName: centerData.chakraName,
     chakraFrequencyHz: centerData.freqHz,
     chakraInstrumentId: centerData.instrumentId,
+    chakraAxis: centerData.axis,
     fieldKoshaLayer: koshaField.layer,
     fieldKoshaName: koshaField.name,
     fieldBiofieldPosition: koshaField.biofieldPosition,
     lineArchetype: lineData.archetype,
     bodyLayer: lineData.bodyLayer,
     bodyLayerDescription: lineData.bodyLayerDesc,
+    entryVector: lineData.entryVector,
+    forkPolarity: lineData.forkPolarity,
     somaticKoshaLayer: lineData.somaticKoshaLayer,
     somaticKoshaName: lineData.somaticKoshaName,
     fieldDepth: lineData.fieldDepth,
     applicationMode: lineData.applicationMode,
     koshasConverge,
+    verticalConvergence,
     convergenceNote,
     primaryInstruments: allPrimary,
     secondaryInstruments: allSecondary,
+    omAnchor,
     nexusSummary,
   };
 }
