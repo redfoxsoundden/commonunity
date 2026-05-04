@@ -167,7 +167,8 @@ function InstrumentCard({ instrument: i }: { instrument: Instrument }) {
                 <img
                   src={`/assets/images/${i.imageFilename}`}
                   alt={i.name}
-                  className="w-full h-full object-contain p-0.5"
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: i.type === 'fork' ? 'top center' : 'center' }}
                 />
               </div>
             ) : (

@@ -60,13 +60,18 @@ export default function InstrumentDetail() {
       <div className="flex items-start gap-6 mb-8">
         {instrument.imageFilename ? (
           <div
-            className="w-20 h-20 rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center"
-            style={{ background: "#0b1120", border: `2px solid ${color}30` }}
+            className="w-20 rounded-2xl flex-shrink-0 overflow-hidden flex items-center justify-center"
+            style={{
+              background: "#0b1120",
+              border: `2px solid ${color}30`,
+              height: instrument.type === 'fork' ? '120px' : '80px',
+            }}
           >
             <img
               src={`/assets/images/${instrument.imageFilename}`}
               alt={instrument.name}
-              className="w-full h-full object-contain p-1"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: instrument.type === 'fork' ? 'top center' : 'center' }}
             />
           </div>
         ) : (

@@ -13,7 +13,7 @@ export async function seedDatabase() {
     // PLANETWARE CHAKRA L WEIGHTED SET
     {
       id: "TF-PW-ROOT", name: "Planetware Root", type: "fork", weighting: "weighted",
-      frequency: 194.18, lineage: "Planetware", imageFilename: "TF-PW-ROOT_main.png",
+      frequency: 194.18, lineage: "Planetware", imageFilename: "TF-PW-ROOT_main.webp",
       audioFilename: "TF-PW-ROOT.mp3",
       masterExplainer: "Tuned to 194.18 Hz — the audible octave of Earth's rotation period around the Sun (Hans Cousto, 1978). This is the 'Earth Day' tone: dynamic, vitalizing, and deeply anchoring. Where OM (136.1 Hz) is sedative and heart-opening, the Earth Day frequency is activating and tonifying — it moves energy rather than settling it. Physiologically, the frequency resonates with the sacral–root axis and has an affinity for the adrenal–kidney complex. Its Chladni pattern shows a 6×8 mandala — complex enough to convey the richness of earth-body resonance, yet ordered enough to reflect the precision of planetary cycles.",
       healingBenefits: JSON.stringify(["grounding","nervous-system-support","circulation-support","energetic-clearing","relaxation"]),
@@ -28,7 +28,7 @@ export async function seedDatabase() {
     },
     {
       id: "TF-PW-SACRAL", name: "Planetware Sacral", type: "fork", weighting: "weighted",
-      frequency: 210.42, lineage: "Planetware", imageFilename: "TF-PW-SACRAL_main.png",
+      frequency: 210.42, lineage: "Planetware", imageFilename: "TF-PW-SACRAL_main.webp",
       audioFilename: "TF-PW-SACRAL.mp3",
       masterExplainer: "Tuned to 210.42 Hz — the Synodic Moon frequency, derived from the 29.53-day lunar cycle octaved into audible range (Cousto). The Moon rules the waters: tidal rhythms, menstrual cycles, lymphatic flow, emotional tides. This fork carries a quality that is both stimulating and releasing — it moves what has become stagnant in the creative and emotional body. Cousto describes it as awakening 'erotic, stimulating energy' and an affinity with sexual-creative vitality. In a therapeutic context, this translates as access to authentic feeling, creative impulse, and the pleasure principle as a healing force. Its orange tone bridges root security and solar-plexus fire.",
       healingBenefits: JSON.stringify(["emotional-clearing","circulation-support","lymphatic-support","relaxation","integration"]),
@@ -43,7 +43,7 @@ export async function seedDatabase() {
     },
     {
       id: "TF-PW-SOLAR", name: "Planetware Solar Plexus", type: "fork", weighting: "weighted",
-      frequency: 126.22, lineage: "Planetware", imageFilename: "TF-PW-SOLAR_main.png",
+      frequency: 126.22, lineage: "Planetware", imageFilename: "TF-PW-SOLAR_main.webp",
       audioFilename: "TF-PW-SOLAR.mp3",
       masterExplainer: "Tuned to 126.22 Hz — the Sun Tone, derived from Earth's yearly orbit (365.25 days octaved up, Cousto). Cousto describes this tone as having a 'transcendental, relaxing and centering quality,' yet it is distinct from OM: where OM (136.1 Hz) is lunar in quality — reflective, heart-opening, sedative — the Sun Tone carries a bright, clarifying solar energy. It resonates with the Maṇipūra (solar plexus) and activates the personal will center, self-esteem, and the capacity for decisive action. Physiologically, it has an affinity for the digestive-metabolic axis (liver, pancreas, stomach). Particularly useful for clients dealing with low self-worth, purpose confusion, or difficulty taking decisive action. The B note (Cousto) and yellow-green color associate this frequency with midpoint between earth and light.",
       healingBenefits: JSON.stringify(["focus","coherence","emotional-clearing","energetic-clearing","meditation-support"]),
@@ -58,7 +58,7 @@ export async function seedDatabase() {
     },
     {
       id: "TF-PW-HEART", name: "Planetware Heart (OM)", type: "fork", weighting: "weighted",
-      frequency: 136.10, lineage: "Planetware", imageFilename: "TF-PW-HEART_main.png",
+      frequency: 136.10, lineage: "Planetware", imageFilename: "TF-PW-HEART_main.webp",
       audioFilename: "TF-PW-HEART.mp3",
       masterExplainer: "136.10 Hz — the Earth Year frequency (Cousto) and one of the most deeply researched therapeutic tones in sound healing. Derived from the 365.25-day solar year converted to sound via octave equivalence, this frequency is near-universally recognized across traditions as the sound of OM. Cousto identifies it as 'sedative, antidepressive, and deeply balancing' — the most tridoshic tone in the Planetware set. Physiologically, it activates the vagal system and promotes heart rate variability coherence. At the sternum it creates a direct resonant pathway to the cardiac plexus. This is the centerpiece of every session: the client's fork in the opener and closer ceremony, held at sternum simultaneous with the practitioner's TF-OM-136W. The two forks at the same frequency in proximity create a resonant entrainment field — the co-chanting container.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","relaxation","nervous-system-support","vagal-tone-support","meditation-support","integration"]),
@@ -73,7 +73,7 @@ export async function seedDatabase() {
     },
     {
       id: "TF-PW-THROAT", name: "Planetware Throat", type: "fork", weighting: "weighted",
-      frequency: 141.27, lineage: "Planetware", imageFilename: "TF-PW-THROAT_main.png",
+      frequency: 141.27, lineage: "Planetware", imageFilename: "TF-PW-THROAT_main.webp",
       audioFilename: "TF-PW-THROAT.mp3",
       masterExplainer: "141.27 Hz — the Mercury frequency (Cousto), derived from Mercury's 87.97-day orbital period. Mercury rules the communicative-intellectual principle in both Vedic and Western astrological traditions — the messenger between inner knowing and outer expression. This fork sits just 5 Hz above the OM frequency (136.1 Hz), creating a natural harmonic proximity that makes the heart-throat transition feel deeply resonant and organic. Physiologically, 141.27 Hz has an affinity with the thyroid-parathyroid complex, the vocal cord mechanism, and the cervical plexus. Where OM sedates and integrates, Mercury activates: it catalyzes the movement of truth from the feeling body into spoken form. Essential for work with expression blocks, habitual silence, and the wounds of not being heard.",
       healingBenefits: JSON.stringify(["expression-support","focus","coherence","energetic-clearing","meditation-support"]),
@@ -88,7 +88,7 @@ export async function seedDatabase() {
     },
     {
       id: "TF-PW-3RD", name: "Planetware Third Eye", type: "fork", weighting: "weighted",
-      frequency: 221.23, lineage: "Planetware", imageFilename: "TF-PW-3RD_main.png",
+      frequency: 221.23, lineage: "Planetware", imageFilename: "TF-PW-3RD_main.webp",
       audioFilename: "TF-PW-3RD.mp3",
       masterExplainer: "221.23 Hz — the Venus frequency (Cousto), derived from Venus's 224.7-day orbital period. Venus rules harmony, beauty, and the aspiration toward higher love — the intelligence that perceives relationship and resonance. In the chakra system, this frequency aligns with Ājñā (third eye): not the martial or ego-driven will, but the witnessing intelligence that perceives patterns across time. Cousto notes a quality of 'higher love energy, harmonic aspiration, and aesthetic sensitivity.' Physiologically, it has an affinity with the pineal-pituitary axis, the visual cortex, and the para-sympathetic quieting that enables inner vision. At 221.23 Hz, this fork is only 1 Hz from TF-BT-222 — the two together create a hypnotic near-unison beating interval that is among the most powerfully entraining combinations in the kit.",
       healingBenefits: JSON.stringify(["intuitive-support","focus","coherence","meditation-support","emotional-clearing"]),
@@ -103,7 +103,7 @@ export async function seedDatabase() {
     },
     {
       id: "TF-PW-CROWN", name: "Planetware Crown", type: "fork", weighting: "weighted",
-      frequency: 172.06, lineage: "Planetware", imageFilename: "TF-PW-CROWN_main.png",
+      frequency: 172.06, lineage: "Planetware", imageFilename: "TF-PW-CROWN_main.webp",
       audioFilename: "TF-PW-CROWN.mp3",
       masterExplainer: "172.06 Hz — the Platonic Year frequency (Cousto), derived from the 25,920-year precession of the equinoxes octaved down to audible range. This is the vastest cosmic cycle translated into sound: the wobble of Earth's axis through all twelve zodiacal ages. Cousto describes its quality as 'cheerful, clarifying, with a spiritual quality of cosmic unity and joy.' Clinically, this translates as antidepressive, perspective-widening, and helpful for clients caught in compressed, claustrophobic mental states. It does not ground in the earthly sense — it liberates by connecting individual consciousness to a time scale so vast that personal problems dissolve in proportion. Use it late in session, after the lower field is cleared and the heart is open, to complete the upward arc of integration. The 5×8 Chladni mode — a sweeping, spacious mandala — reflects this quality visually.",
       healingBenefits: JSON.stringify(["coherence","meditation-support","integration","emotional-clearing","sleep-support","intuitive-support"]),
@@ -119,7 +119,7 @@ export async function seedDatabase() {
     // INDEPENDENT WEIGHTED
     {
       id: "TF-OTTO-128", name: "Otto 128", type: "fork", weighting: "weighted",
-      frequency: 128, lineage: "Independent / classic bodywork fork", imageFilename: "TF-OTTO-128_main.png",
+      frequency: 128, lineage: "Independent / classic bodywork fork", imageFilename: "TF-OTTO-128_main.webp",
       audioFilename: "TF-OTTO-128.mp3",
       masterExplainer: "The Otto 128 is the quintessential weighted body-contact tuning fork — the most direct and physical vibrational tool in the kit. Weighing more than unweighted forks and struck harder, it delivers strong vibrational energy through its stem directly into bone and dense tissue via the bony landmarks of the skeleton. At 128 Hz (near C3), it resonates with the deep musculoskeletal-fascial system: the sternum, sacrum, spine, and major joints. The effect is immediate and tangible — most clients feel the vibration spreading through the body within seconds. Physiologically, it stimulates the piezoelectric properties of bone, supports circulation in dense tissues, promotes parasympathetic activation through physical vibration, and can interrupt pain-spasm cycles. It is the ideal first touch of a session: it communicates safety, physical presence, and care before any more subtle work begins.",
       healingBenefits: JSON.stringify(["grounding","relaxation","tension-relief","pain-support","nervous-system-support","circulation-support","bone-tissue-support","vagal-tone-support"]),
@@ -132,7 +132,7 @@ export async function seedDatabase() {
     },
     {
       id: "TF-OM-136W", name: "OM 136.1 Weighted", type: "fork", weighting: "weighted",
-      frequency: 136.10, lineage: "Independent / OM fork", imageFilename: "TF-OM-136W_main.png",
+      frequency: 136.10, lineage: "Independent / OM fork", imageFilename: "TF-OM-136W_main.webp",
       audioFilename: "TF-OM-136W.mp3",
       masterExplainer: "The practitioner's personal OM fork — the companion to the client's TF-PW-HEART in the signature opener and closer ceremony. Both are at 136.10 Hz (Earth Year / OM), but this version is a weighted aluminum body fork held at the practitioner's own sternum while the client holds theirs. When two identical frequencies are activated in proximity, they reinforce each other through acoustic resonance — creating a shared vibrational field rather than two separate ones. This is the technical basis of the co-chanting container: practitioner and client are literally brought into the same frequency, the same wave. The weighted aluminum construction delivers strong tactile vibration through the sternum, making it particularly effective for practitioners who also wish to use it as a personal regulation and self-grounding tool before and after sessions.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","relaxation","nervous-system-support","vagal-tone-support","meditation-support","integration"]),
@@ -148,7 +148,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SLIDER", name: "Sonic Slider", type: "fork", weighting: "weighted",
       frequency: 93.96, lineage: "Biofield Tuning – Schumann series",
-      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SLIDER_main.png",
+      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SLIDER_main.webp",
       audioFilename: "TF-BT-SLIDER.mp3",
       masterExplainer: "The Sonic Slider is McKusick's signature body-contact fork and the most versatile weighted fork in the Biofield Tuning kit. At 93.96 Hz — the 12th harmonic of the Schumann resonance (7.83 Hz × 12) — it carries the Earth's own electromagnetic pulse frequency into the physical body. The extended handle design allows it to be used in two distinct modes: point contact on bony landmarks (like the Otto 128), and gliding — drawn slowly along the spine, legs, or arms while the body remains still, creating a moving wave of vibration through the fascia and connective tissue. This gliding action is almost unique in therapeutic tuning fork work and produces profound fascial release and systemic settling. It is one of the most reliable parasympathetic activators in the entire kit.",
       healingBenefits: JSON.stringify(["grounding","nervous-system-support","relaxation","fascia-release","circulation-support","lymphatic-support","pain-support","energetic-clearing"]),
@@ -163,7 +163,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SCHU-62", name: "Schumann 62 Hz", type: "fork", weighting: "weighted",
       frequency: 62.64, lineage: "Biofield Tuning – Schumann series",
-      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SCHU-62_main.png",
+      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SCHU-62_main.webp",
       audioFilename: "TF-BT-SCHU-62.mp3",
       masterExplainer: "62.64 Hz — the 8th harmonic of the Schumann resonance. Where the Sonic Slider (93.96 Hz, ×12) is versatile and body-friendly, this fork operates at a lower, more profoundly earthward register. At this frequency, the vibration is felt more as a deep structural tremor than a tone — clients sometimes struggle to hear it clearly but feel it very physically, particularly at the sacrum, feet, and lower spine. Its primary domain is the root and Earth Star zone: the deepest layers of embodied grounding, subconscious field stabilization, and the pre-personal. Useful specifically for very scattered, anxious, or trauma-activated clients where higher-frequency forks would feel stimulating rather than settling. The open cross-like 2×4 Chladni pattern reflects its simplicity: this fork does not complicate things — it anchors.",
       healingBenefits: JSON.stringify(["grounding","relaxation","nervous-system-support","meditation-support","sleep-support","energetic-clearing"]),
@@ -178,7 +178,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SCHU-54", name: "Schumann 54 Hz", type: "fork", weighting: "weighted",
       frequency: 54.81, lineage: "Biofield Tuning – Schumann series",
-      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SCHU-54_main.png",
+      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SCHU-54_main.webp",
       audioFilename: "TF-BT-SCHU-54.mp3",
       masterExplainer: "54.81 Hz — the 7th harmonic of the Schumann resonance and the deepest body-contact fork in the entire kit. At this frequency, the vibration is below the auditory threshold for many environments — it is experienced primarily as a slow, subsonic tremor through dense tissue and bone. This is the ancestral register: the pre-verbal, pre-personal, the substrate layers of the biofield where inherited patterns and deep somatic holding exist. McKusick uses this fork specifically for work at the Ancestral Rivers (the field zones below the feet extending from each side — paternal right, maternal left) and for clients presenting with patterns that feel older than their own biography. It is not a common or frequently used fork — it is reserved for specific moments when the session calls for the deepest possible earthward reach.",
       healingBenefits: JSON.stringify(["grounding","relaxation","nervous-system-support","meditation-support","sleep-support"]),
@@ -192,7 +192,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-FIB-144W", name: "Fibonacci 144 Weighted", type: "fork", weighting: "weighted",
       frequency: 144, lineage: "Biofield Tuning – Fibonacci series",
-      chakraId: "CH-THROAT", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-144W_main.png",
+      chakraId: "CH-THROAT", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-144W_main.webp",
       audioFilename: "TF-BT-FIB-144W.mp3",
       masterExplainer: "144 Hz — a Fibonacci number and part of the most mathematically beautiful sequence in nature: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144… Each number is the sum of the two before it, and the ratio of any two adjacent terms converges toward the golden ratio φ (1.618…). This ratio governs the spiraling architecture of shells, galaxies, plant growth, and — crucially — the proportional geometry of the human body. The Fibonacci forks translate this phi-ratio resonance into vibration. The weighted version applies this directly to the physical structure: bone, fascia, and connective tissue respond to it with a release and reordering quality that is distinct from the more straightforward settling of the Schumann forks. Use it as a mid-session structural bridge — after grounding is established, before field work begins — to help the physical body organize itself around its own inherent geometry.",
       healingBenefits: JSON.stringify(["coherence","integration","nervous-system-support","relaxation","bone-tissue-support","energetic-clearing"]),
@@ -207,7 +207,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-FIB-89", name: "Fibonacci 89 Hz", type: "fork", weighting: "weighted",
       frequency: 89, lineage: "Biofield Tuning – Fibonacci series",
-      chakraId: "CH-SACRAL", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-89_main.png",
+      chakraId: "CH-SACRAL", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-89_main.webp",
       audioFilename: "TF-BT-FIB-89.mp3",
       masterExplainer: "89 Hz — the predecessor Fibonacci number to 144 Hz. Where 144 Hz operates in the upper structural register (spine, sternum, joints of the upper body), 89 Hz belongs to the lower body: the sacrum, hips, femurs, and lower spine. Together, 89 and 144 form the phi-ratio interval (89:144 ≈ 1:1.618), meaning the frequency relationship between them is the golden ratio itself — the most coherence-generating interval in the Fibonacci sequence. This makes the two-fork pair — one at sacrum, one at sternum, or one at each hip — uniquely powerful for creating a whole-body phi-ratio resonance field. Physiologically, 89 Hz is in the deep-bass body register: felt as substantial vibration, settling quickly into the nervous system, with an earthward quality that connects it naturally to the Schumann family.",
       healingBenefits: JSON.stringify(["grounding","coherence","nervous-system-support","integration","fascia-release","relaxation"]),
@@ -220,7 +220,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-FIB-144U", name: "Fibonacci 144 Unweighted", type: "fork", weighting: "unweighted",
       frequency: 144, lineage: "Biofield Tuning – Fibonacci series",
-      chakraId: "CH-THROAT", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-144U_main.png",
+      chakraId: "CH-THROAT", closestChakraAlignment: true, imageFilename: "TF-BT-FIB-144U_main.webp",
       audioFilename: "TF-BT-FIB-144U.mp3",
       masterExplainer: "The unweighted version of the 144 Hz Fibonacci fork — its field counterpart. While the weighted version delivers phi-ratio resonance into the physical structure, the unweighted version extends the same resonance into the biofield as an audible ringing tone that can be swept, held, and moved through space. Unweighted forks are the primary instrument for biofield scanning in McKusick's method: the practitioner moves the ringing fork through the field and listens for changes in the tone quality that indicate distortions (dense = charge, hollow = depletion, static = stuck pattern). The Fibonacci frequency adds a specific organizing quality to this scanning — it seems to support the field in returning to its own inherent geometric order rather than simply clearing distortions. Used in the closing phase to 'seal' the field after clearing, it acts as a coherence net cast over the entire session space.",
       healingBenefits: JSON.stringify(["coherence","energetic-clearing","integration","nervous-system-support","intuitive-support"]),
@@ -232,7 +232,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SOL-174", name: "Solfeggio 174 Hz", type: "fork", weighting: "unweighted",
       frequency: 174, lineage: "Biofield Tuning – Solfeggio series",
-      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-174_main.png",
+      chakraId: "CH-ROOT", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-174_main.webp",
       audioFilename: "TF-BT-SOL-174.mp3",
       masterExplainer: "174 Hz — the workhorse of McKusick's Biofield Tuning method and the single most important fork in the kit for diagnostic and clearing work. This is the primary field-scanning instrument: activated and held at various distances from the body, it becomes a tonal probe of the biofield's condition. McKusick discovered that the tone quality changes measurably in zones of energetic distortion — a practitioner trained to listen for these changes can map the field with remarkable specificity. The Solfeggio system assigns 174 Hz to the foundational level of the frequency ladder — it is the ground tone from which the higher Solfeggio tones ascend. Clinically, it carries an analgesic quality (pain reduction through field-level clearing) and a general settling effect that makes it safe and effective as an opener regardless of presenting issue. No other single fork in this kit does more work in more sessions.",
       healingBenefits: JSON.stringify(["energetic-clearing","pain-support","nervous-system-support","relaxation","grounding","fascia-release"]),
@@ -246,7 +246,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SOL-417", name: "Solfeggio 417 Hz", type: "fork", weighting: "unweighted",
       frequency: 417, lineage: "Biofield Tuning – Solfeggio series",
-      chakraId: "CH-SACRAL", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-417_main.png",
+      chakraId: "CH-SACRAL", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-417_main.webp",
       audioFilename: "TF-BT-SOL-417.mp3",
       masterExplainer: "417 Hz — the Solfeggio 'facilitating change' frequency, traditionally described as the tone of undoing, dissolution of stuck situations, and clearing of limiting patterns. In the context of Biofield Tuning, 417 Hz serves a secondary role after 174 Hz has located and begun clearing a distortion: where 174 Hz finds and marks the stuck zone, 417 Hz dissolves it. The higher frequency vibrates the distortion apart more completely, especially useful for entrenched emotional patterns, long-held belief structures, and places in the field that have responded to 174 Hz but not fully resolved. It is less a scanning fork and more a refinement tool — precise, targeted, and used with intentional care rather than as a broad sweep. The 10×11 Chladni mode is one of the more complex patterns in the set, reflecting its role at a more refined level of field work.",
       healingBenefits: JSON.stringify(["energetic-clearing","emotional-clearing","integration","coherence","focus"]),
@@ -260,7 +260,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-SOL-528", name: "Solfeggio 528 Hz", type: "fork", weighting: "unweighted",
       frequency: 528, lineage: "Biofield Tuning – Solfeggio series",
-      chakraId: "CH-HEART", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-528_main.png",
+      chakraId: "CH-HEART", closestChakraAlignment: true, imageFilename: "TF-BT-SOL-528_main.webp",
       audioFilename: "TF-BT-SOL-528.mp3",
       masterExplainer: "528 Hz — the most widely recognized and discussed frequency in contemporary sound healing, assigned in the Solfeggio tradition to 'Mi' (Mira gestorum — 'miracle'). The claims around this frequency are considerable: Dr. Len Horowitz's work describes it as the 'Love frequency' with DNA repair and transformation properties; cymatics research has shown it produces particularly ordered and symmetrical patterns in water. In therapeutic practice, the most reliable and consistent quality observed is a coherence-generating effect at the heart field: this frequency seems to invite emotional opening, softening of defensive holding, and access to love as a physical felt-sense rather than a concept. It pairs with BOWL-528 (same frequency, much more resonant body) to create one of the most powerful heart-coherence combinations in the kit. The 11×13 Chladni mode — intricate lacework — reflects the fine, coherence-organizing quality of this frequency.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","integration","emotional-clearing","meditation-support","sleep-support"]),
@@ -273,7 +273,7 @@ export async function seedDatabase() {
     {
       id: "TF-BT-222", name: "BT 222 Hz", type: "fork", weighting: "unweighted",
       frequency: 222, lineage: "Biofield Tuning",
-      chakraId: "CH-THIRD-EYE", closestChakraAlignment: true, imageFilename: "TF-BT-222_main.png",
+      chakraId: "CH-THIRD-EYE", closestChakraAlignment: true, imageFilename: "TF-BT-222_main.webp",
       audioFilename: "TF-BT-222.mp3",
       masterExplainer: "222 Hz — a Biofield Tuning kit fork that occupies a unique position in the frequency map: it is almost exactly 1 Hz above the Planetware Third Eye fork (TF-PW-3RD at 221.23 Hz). This near-unison relationship creates one of the most therapeutically interesting interval pairings in the kit: when both forks are activated together, they produce a slow beating pulse at approximately 0.77 Hz — the infra-slow oscillation range associated with deep meditative and restorative states. Both forks together create an interference pattern that many practitioners experience as one of the most profoundly stilling combinations available. Used independently, 222 Hz focuses on the upper field — throat, jaw, temples, and third-eye zone — with a quality that supports the integration of expression and vision, the bridge between what one sees inwardly and what one is able to speak outwardly.",
       healingBenefits: JSON.stringify(["expression-support","intuitive-support","focus","coherence","energetic-clearing"]),
@@ -285,7 +285,7 @@ export async function seedDatabase() {
     // SINGING BOWLS
     {
       id: "BOWL-111", name: "Singing Bowl 111 Hz", type: "bowl", weighting: "n/a",
-      frequency: 111, lineage: "Independent", imageFilename: "BOWL-111_main.png",
+      frequency: 111, lineage: "Independent", imageFilename: "BOWL-111_main.webp",
       audioFilename: "BOWL-111.mp3",
       masterExplainer: "111 Hz is among the most researched frequencies in therapeutic sound work. Acoustically, it falls squarely in the theta-brainwave entrainment range (4–8 Hz × octave equivalence), and both archaeological and contemporary research has associated it with specific neurological effects: a 2008 study by the RSGB found that 111 Hz selectively switches off the prefrontal cortex (the area governing critical judgment and social self-monitoring) while activating right-hemisphere processing — the domain of spatial awareness, intuition, and felt sense. Ancient sacred structures including the Hal Saflieni Hypogeum (Malta) and Newgrange (Ireland) were found to resonate at or near 111 Hz in their central chambers — suggesting intentional acoustic design for altered-state facilitation. In session, the bowl produces a deep, overtone-rich resonance that fills the room and persists for 30–60 seconds per strike. Clients often report entering a theta-like state within minutes of sustained 111 Hz exposure.",
       healingBenefits: JSON.stringify(["nervous-system-support","meditation-support","sleep-support","relaxation","coherence","integration"]),
@@ -298,7 +298,7 @@ export async function seedDatabase() {
     },
     {
       id: "BOWL-272", name: "Singing Bowl 272 Hz", type: "bowl", weighting: "n/a",
-      frequency: 272, frequencyHarmonic: 771, lineage: "Independent", imageFilename: "BOWL-272_main.png",
+      frequency: 272, frequencyHarmonic: 771, lineage: "Independent", imageFilename: "BOWL-272_main.webp",
       audioFilename: "BOWL-272.mp3",
       masterExplainer: "A mid-range singing bowl with a fundamental tone of 272 Hz and a prominent harmonic overtone at 771 Hz — the frequency of the Tibetan Bell in this kit. This harmonic relationship is not coincidental: 771 ÷ 272 ≈ 2.835, close to the ratio 2:1 (octave) × the 3rd harmonic ratio. The result is a bowl that contains both the mid-field frequency of the solar-to-throat zone and the high-bell clarity of the upper field simultaneously in a single strike. The 272 Hz fundamental bridges the solar plexus (clarity, will, identity) and the throat (expression, truth) — the natural arc of moving personal power into spoken form. The bowl is ideal as a spatial anchor during fork work in the middle chakra range, providing a continuous resonant floor beneath more targeted fork applications.",
       healingBenefits: JSON.stringify(["focus","expression-support","coherence","emotional-clearing","integration","relaxation"]),
@@ -309,7 +309,7 @@ export async function seedDatabase() {
     },
     {
       id: "BOWL-385", name: "Singing Bowl 385 Hz", type: "bowl", weighting: "n/a",
-      frequency: 385.5, frequencyHarmonic: 1087, lineage: "Independent", imageFilename: "BOWL-385_main.png",
+      frequency: 385.5, frequencyHarmonic: 1087, lineage: "Independent", imageFilename: "BOWL-385_main.webp",
       audioFilename: "BOWL-385.mp3",
       masterExplainer: "A warm, mid-upper-range bowl at 385.5 Hz with a 1087 Hz upper harmonic. The fundamental sits between the heart zone (136 Hz / 528 Hz) and the throat zone (141 Hz / 741 Hz), making it one of the most naturally positioned bridges in the bowl set. Its warmth and accessibility make it particularly useful when working with clients in emotional processing — the tone is bright enough to be energizing but warm enough to feel safe and held. The 1087 Hz harmonic adds an upper shimmer that prevents the bowl from feeling heavy or dirge-like, even when used during grief or loss work. This is often the bowl to reach for when the clinical work is in the heart-throat corridor and the session calls for sustained ambient warmth without the potency of 528 Hz's coherence-organizing effect.",
       healingBenefits: JSON.stringify(["heart-opening","expression-support","coherence","emotional-clearing","relaxation","meditation-support"]),
@@ -321,7 +321,7 @@ export async function seedDatabase() {
     },
     {
       id: "BOWL-429", name: "Singing Bowl 429 Hz", type: "bowl", weighting: "n/a",
-      frequency: 429, frequencyHarmonic: 1176, lineage: "Independent", imageFilename: "BOWL-429_main.png",
+      frequency: 429, frequencyHarmonic: 1176, lineage: "Independent", imageFilename: "BOWL-429_main.webp",
       audioFilename: "BOWL-429.mp3",
       masterExplainer: "429 Hz — a bowl at the upper edge of the throat zone, 3 Hz below the well-known 432 Hz 'concert pitch' that some traditions treat as a natural tuning. Whether or not the 432 Hz framework is historically accurate (debate continues), the practical effect of this bowl's frequency in the upper throat–third eye zone is clear: it carries a cool, clarifying brightness that supports precision of thought, refined communication, and the particular intelligence that perceives patterns — the bridge between language and vision. The 1176 Hz harmonic (429 × ~2.74, near the 3rd harmonic) adds an upper-field shimmer that gives the bowl a three-dimensional spatial quality. For sessions involving teaching, creative work, or intellectual clarity alongside emotional processing, this bowl provides the appropriate sonic environment.",
       healingBenefits: JSON.stringify(["expression-support","intuitive-support","focus","coherence","emotional-clearing"]),
@@ -332,7 +332,7 @@ export async function seedDatabase() {
     },
     {
       id: "BOWL-528", name: "Singing Bowl 528 Hz", type: "bowl", weighting: "n/a",
-      frequency: 528, lineage: "Independent", imageFilename: "BOWL-528_main.png",
+      frequency: 528, lineage: "Independent", imageFilename: "BOWL-528_main.webp",
       audioFilename: "BOWL-528.mp3",
       masterExplainer: "The 528 Hz singing bowl is the most potent heart-coherence instrument in the kit. While the fork (TF-BT-SOL-528) delivers a focused, directable 528 Hz tone, the bowl provides a sustained, room-filling resonance at the same frequency with a richness of overtones that the fork cannot match. A well-tuned 528 Hz bowl produces not just the fundamental but a complex overtone series that fills the space with a warm, transformative acoustic envelope. Many practitioners treat this bowl as the heart of the instrument set — when in doubt in a heart-opening session, this bowl playing in the background provides an infallible energetic floor. Paired with TF-BT-SOL-528 (fork at same frequency), the two instruments reinforce each other's resonance, creating an exceptionally coherent heart field that clients often describe as physically felt.",
       healingBenefits: JSON.stringify(["heart-opening","coherence","integration","emotional-clearing","meditation-support","sleep-support","energetic-clearing"]),
@@ -345,7 +345,7 @@ export async function seedDatabase() {
     // BELL
     {
       id: "BELL-771", name: "Tibetan Bell 771 Hz", type: "bell", weighting: "n/a",
-      frequency: 771, lineage: "Independent", imageFilename: "BELL-771_main.png",
+      frequency: 771, lineage: "Independent", imageFilename: "BELL-771_main.webp",
       audioFilename: "BELL-771.mp3",
       masterExplainer: "The Tibetan bell is a different instrument category from both forks and bowls: where forks sustain a single frequency and bowls provide a rich overtone wash, the bell delivers a sharp-attack, fast-decay transient — a sound that cuts through and marks time. At 771 Hz, its tone sits in the upper-field register (crown and above), and its penetrating quality has the practical effect of a sonic anchor: a definitive sonic signal that something is beginning, ending, or transitioning. In Buddhist and Hindu traditions, the bell is the instrument of calling and releasing — it opens the threshold between ordinary and sacred space. In clinical practice, this translates directly: the bell strikes at session open to signal that the ceremonial container is being established; it strikes at session close to mark the return to ordinary consciousness. Between those two moments, it can punctuate significant transitions in the protocol. It is never played repeatedly for sustained ambient use.",
       healingBenefits: JSON.stringify(["energetic-clearing","coherence","focus","integration","meditation-support","intuitive-support"]),
