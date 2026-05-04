@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import PageHeader from "@/components/PageHeader";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Search, Filter, Music2, ChevronRight } from "lucide-react";
+import { Search, Filter, Music2, ChevronRight, ShoppingBag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -51,7 +51,17 @@ export default function Inventory() {
         icon={<Music2 size={20}/>}
         title="Instrument Inventory"
         description="25 instruments — tuning forks, singing bowls, and bell — with full practitioner reference cards."
-        actions={<Badge variant="outline">{instruments.length} instruments</Badge>}
+        actions={
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">{instruments.length} instruments</Badge>
+            <Link href="/inventory/audit">
+              <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors" data-testid="link-audit">
+                <ShoppingBag size={12} />
+                Gap Audit
+              </button>
+            </Link>
+          </div>
+        }
       />
 
       {/* Filters */}

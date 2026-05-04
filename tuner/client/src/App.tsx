@@ -25,6 +25,7 @@ import Composer from "./pages/Composer";
 import Sources from "./pages/Sources";
 import WhyOM from "./pages/WhyOM";
 import PractitionerGuide from "./pages/PractitionerGuide";
+import InventoryAudit from "./pages/InventoryAudit";
 import NotFound from "./pages/not-found";
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
           <Switch>
             <Route path="/" component={Inventory} />
             <Route path="/inventory" component={Inventory} />
+            <Route path="/inventory/audit" component={InventoryAudit} />
             <Route path="/inventory/:id" component={InstrumentDetail} />
             <Route path="/chakras" component={ChakraAtlas} />
             <Route path="/chakras/:id" component={ChakraDetail} />

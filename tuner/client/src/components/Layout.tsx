@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import {
   Music2, Brain, Activity, Leaf, Eye, ClipboardList,
   BookOpen, PlayCircle, PenLine, FlaskConical, Layers,
-  Info, BookMarked, ChevronLeft, ChevronRight, Menu, X, Users, Sparkles
+  Info, BookMarked, ChevronLeft, ChevronRight, Menu, X, Users, Sparkles, ShoppingBag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import NexusPanel from "./NexusPanel";
@@ -13,6 +13,7 @@ const NAV_GROUPS = [
     label: "Inventory",
     items: [
       { href: "/inventory", label: "Instruments", icon: Music2 },
+      { href: "/inventory/audit", label: "Gap Audit", icon: ShoppingBag },
     ]
   },
   {
@@ -62,6 +63,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const isActive = (href: string) => {
     if (href === "/inventory" && (location === "/" || location === "/inventory")) return true;
+    if (href === "/inventory/audit") return location === "/inventory/audit";
     return location.startsWith(href) && href !== "/inventory";
   };
 

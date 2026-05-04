@@ -6,6 +6,25 @@ import { seedDatabase } from "./seed";
 import nodemailer from "nodemailer";
 import Anthropic from "@anthropic-ai/sdk";
 
+// ── Types for the inventory audit endpoint ───────────────────────────────
+interface AcquisitionSuggestion {
+  id: string;
+  name: string;
+  type: "fork" | "bowl" | "bell";
+  weighting: string;
+  frequency: number;
+  lineage: string;
+  chakraAffinity: string;
+  category: string;
+  priority: number;
+  rationale: string;
+  buyingGuide: string;
+  searchTerms: string[];
+  coversGap: string[];
+  urgency: "high" | "medium" | "low";
+  covered?: boolean;
+}
+
 const NOTIFY_EMAIL = process.env.NOTIFY_EMAIL ?? "markus@jointidea.com";
 const SMTP_HOST = process.env.SMTP_HOST ?? "";
 const SMTP_PORT = parseInt(process.env.SMTP_PORT ?? "587");
@@ -289,6 +308,254 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ ok: true });
   });
 
+  // ─── INSTRUMENT AUDIT ──────────────────────────────────────────────────────
+  // GET /api/inventory/audit
+  // Returns: gap analysis against the ideal frequency set + prioritised
+  // acquisition suggestions, optionally weighted by the client's radiance profile.
+  app.get("/api/inventory/audit", (_req, res) => {
+    const owned = new Set(storage.getAllInstruments().map((i) => i.id));
+
+    // ── Ideal frequency set ─────────────────────────────────────────────────
+    // Each entry describes a slot in the canonical set; `covered` is true
+    // if an instrument with that ID already exists in the database.
+    const IDEAL_SET: AcquisitionSuggestion[] = [
+      // ── Solfeggio gaps ──────────────────────────────────────────────────
+      {
+        id: "TF-BT-SOL-285",
+        name: "Solfeggio 285 Hz",
+        type: "fork",
+        weighting: "unweighted",
+        frequency: 285,
+        lineage: "Biofield Tuning – Solfeggio series",
+        chakraAffinity: "CH-SACRAL",
+        category: "solfeggio",
+        priority: 1,
+        rationale:
+          "285 Hz is the second Solfeggio tone (Ut queant laxis). It sits between 174 and 396 Hz and is specifically associated with tissue repair, wound healing, and restoring fields that have been depleted rather than merely distorted. Without it the Solfeggio scanning sequence has a significant gap: 174 marks the distortion, 285 begins the repair, 396 fully releases the energetic charge. The jump from 174 directly to 417 skips the repair layer entirely.",
+        buyingGuide:
+          "Source from Biofield Tuning (www.biofieldtuning.com) — their Solfeggio unweighted fork set includes 285 Hz in the correct tuning. Specify \"unweighted\" (no weight on tines). Price: ~$35–45 USD per fork.",
+        searchTerms: ["Solfeggio 285 Hz tuning fork", "Biofield Tuning 285"],
+        coversGap: ["Solfeggio 285 Hz (tissue repair, field replenishment)"],
+        urgency: "high",
+      },
+      {
+        id: "TF-BT-SOL-396",
+        name: "Solfeggio 396 Hz",
+        type: "fork",
+        weighting: "unweighted",
+        frequency: 396,
+        lineage: "Biofield Tuning – Solfeggio series",
+        chakraAffinity: "CH-ROOT",
+        category: "solfeggio",
+        priority: 2,
+        rationale:
+          "396 Hz (Ut queant laxis / Liberating guilt and fear) is the Solfeggio tone most aligned with the root chakra in the Cousto system (Cousto root = 194.18 Hz, 396 Hz is its second octave equivalent at 99 Hz × 4). It is the primary tone for clearing fear-based root patterns — the survival field. Currently 396 Hz is assigned to the root chakra in the seed data but no fork exists in inventory to deliver it directly. This is a notable gap for root-chakra clearing work.",
+        buyingGuide:
+          "Biofield Tuning or any reputable Solfeggio fork supplier. Specify unweighted, 396 Hz exactly. ~$35–45 USD.",
+        searchTerms: ["Solfeggio 396 Hz tuning fork", "396 Hz fear liberation fork"],
+        coversGap: ["Solfeggio 396 Hz (root, fear clearing)"],
+        urgency: "high",
+      },
+      {
+        id: "TF-BT-SOL-639",
+        name: "Solfeggio 639 Hz",
+        type: "fork",
+        weighting: "unweighted",
+        frequency: 639,
+        lineage: "Biofield Tuning – Solfeggio series",
+        chakraAffinity: "CH-HEART",
+        category: "solfeggio",
+        priority: 3,
+        rationale:
+          "639 Hz (Fa — connecting, relationships) is the relational heart tone and the natural sequel to 528 Hz (repair/cohere) in the Solfeggio sequence: 528 coheres the personal heart field; 639 opens it outward into relational connection. In Biofield Tuning, the right side of the field (future-facing, relational) is particularly responsive to 639 Hz. Without it the upper Solfeggio arc (528 → 639 → 741 → 852 → 963) is entirely absent.",
+        buyingGuide:
+          "Biofield Tuning unweighted Solfeggio series, or SomaEnergetics (www.somaenergetics.com). Specify 639 Hz unweighted. ~$35–45 USD.",
+        searchTerms: ["Solfeggio 639 Hz tuning fork", "639 Hz relationship heart fork"],
+        coversGap: ["Solfeggio 639 Hz (relational heart, connection)"],
+        urgency: "medium",
+      },
+      {
+        id: "TF-BT-SOL-741",
+        name: "Solfeggio 741 Hz",
+        type: "fork",
+        weighting: "unweighted",
+        frequency: 741,
+        lineage: "Biofield Tuning – Solfeggio series",
+        chakraAffinity: "CH-THROAT",
+        category: "solfeggio",
+        priority: 4,
+        rationale:
+          "741 Hz (Sol — awakening intuition, expression) is the Solfeggio tone for the throat/upper field and particularly useful for clearing toxic patterns in the expression zone. Notably, BELL-771 is close (30 Hz higher) but has a very different delivery — transient, sharp attack — whereas a 741 Hz fork delivers a sustained, directable tone that can be held in the field during slow scanning work.",
+        buyingGuide:
+          "Biofield Tuning or SomaEnergetics. Specify unweighted, 741 Hz. ~$35–45 USD.",
+        searchTerms: ["Solfeggio 741 Hz tuning fork", "741 Hz expression throat fork"],
+        coversGap: ["Solfeggio 741 Hz (throat, expression, toxin clearing)"],
+        urgency: "medium",
+      },
+      {
+        id: "TF-BT-SOL-852",
+        name: "Solfeggio 852 Hz",
+        type: "fork",
+        weighting: "unweighted",
+        frequency: 852,
+        lineage: "Biofield Tuning – Solfeggio series",
+        chakraAffinity: "CH-THIRD-EYE",
+        category: "solfeggio",
+        priority: 5,
+        rationale:
+          "852 Hz (La — returning to spiritual order) is the third-eye Solfeggio tone. In the current kit, the third-eye zone is served by TF-PW-3RD (221.23 Hz) and TF-BT-222 (222 Hz) — both in the 221–222 Hz range. 852 Hz would add a much higher frequency option for this center, useful for clearing upper-field patterns (the back of the head, dream field, intuitive knowing zone) that do not respond to lower frequencies.",
+        buyingGuide:
+          "Biofield Tuning or SomaEnergetics. Specify unweighted, 852 Hz. ~$35–45 USD.",
+        searchTerms: ["Solfeggio 852 Hz tuning fork", "852 Hz third eye intuition"],
+        coversGap: ["Solfeggio 852 Hz (third eye, returning to order)"],
+        urgency: "low",
+      },
+      {
+        id: "TF-BT-SOL-963",
+        name: "Solfeggio 963 Hz",
+        type: "fork",
+        weighting: "unweighted",
+        frequency: 963,
+        lineage: "Biofield Tuning – Solfeggio series",
+        chakraAffinity: "CH-CROWN",
+        category: "solfeggio",
+        priority: 6,
+        rationale:
+          "963 Hz (Ti — divine consciousness, light) is the crown Solfeggio tone and the highest in the canonical 9-tone set. It pairs naturally with BELL-771 for crown/above work but unlike the bell delivers a sustained tone that can be used for held-field scanning in the Sun Star and transpersonal zones above the head. The crown in the current kit has TF-PW-CROWN (172.06 Hz) and BELL-771 (771 Hz); 963 Hz would complete the crown frequency range.",
+        buyingGuide:
+          "Biofield Tuning or SomaEnergetics. Specify unweighted, 963 Hz. ~$35–45 USD.",
+        searchTerms: ["Solfeggio 963 Hz tuning fork", "963 Hz divine crown fork"],
+        coversGap: ["Solfeggio 963 Hz (crown, divine consciousness)"],
+        urgency: "low",
+      },
+      // ── OM unweighted ────────────────────────────────────────────────────
+      {
+        id: "TF-OM-136U",
+        name: "OM 136.1 Hz Unweighted",
+        type: "fork",
+        weighting: "unweighted",
+        frequency: 136.1,
+        lineage: "Planetware / Cosmic Octave",
+        chakraAffinity: "CH-HEART",
+        category: "om",
+        priority: 7,
+        rationale:
+          "Currently TF-OM-136W is weighted — ideal for body contact (sternum, chest wall, back heart center) during the OM ceremony. An unweighted 136.1 Hz fork would extend OM into the field domain: held in the aura around the heart rather than on the body. For Line 4-5-6 clients (field-first entry) where body contact is not preferred, the unweighted OM fork delivers the heart frequency non-invasively. Also supports the bilateral heart-field scan at 136.10 Hz that the vertical convergence protocol calls for.",
+        buyingGuide:
+          "Planetware (www.planetware.de) or Biofield Tuning. Specify 136.1 Hz unweighted (no weight on tines), OM / Heart of the Earth. ~$40–60 USD.",
+        searchTerms: ["OM tuning fork 136 Hz unweighted", "136.1 Hz heart fork unweighted"],
+        coversGap: ["OM 136.1 Hz unweighted (field-domain OM ceremony, Line 4–6 clients)"],
+        urgency: "high",
+      },
+      // ── Fibonacci series gaps ────────────────────────────────────────────
+      {
+        id: "TF-BT-FIB-55",
+        name: "Fibonacci 55 Hz",
+        type: "fork",
+        weighting: "weighted",
+        frequency: 55,
+        lineage: "Biofield Tuning – Fibonacci series",
+        chakraAffinity: "CH-ROOT",
+        category: "fibonacci",
+        priority: 8,
+        rationale:
+          "55 Hz is the Fibonacci number below 89 Hz. The current Fibonacci set starts at 89 — but 55 Hz occupies a deeply grounding sub-bass register that is particularly effective for the Earth Star zone (below the feet), ancestral field work, and clients with severe dissociation or ungrounding. Weighted, it delivers tactile vibration when placed on the sacrum or feet. In the Fibonacci sequence, 55 bridges the deeply somatic (34 Hz, 21 Hz) with the more conscious 89 Hz field work.",
+        buyingGuide:
+          "Biofield Tuning (www.biofieldtuning.com) sells Fibonacci weighted forks individually. Specify 55 Hz, weighted. ~$35–50 USD.",
+        searchTerms: ["Fibonacci 55 Hz tuning fork", "Biofield Tuning 55 Hz weighted"],
+        coversGap: ["Fibonacci 55 Hz (Earth Star, deep grounding, ancestral field)"],
+        urgency: "medium",
+      },
+      {
+        id: "TF-BT-FIB-233",
+        name: "Fibonacci 233 Hz",
+        type: "fork",
+        weighting: "unweighted",
+        frequency: 233,
+        lineage: "Biofield Tuning – Fibonacci series",
+        chakraAffinity: "CH-THROAT",
+        category: "fibonacci",
+        priority: 9,
+        rationale:
+          "233 Hz is the Fibonacci number above 144 Hz. It sits between 144 Hz and 377 Hz — occupying the throat-to-upper zone. While TF-BT-222 (BT 222 Hz) covers nearby territory, 233 Hz is the true Fibonacci step and maintains the mathematical ratio property (each pair of consecutive Fibonacci numbers approaches phi = 1.618). Unweighted for field work in the upper expression zone.",
+        buyingGuide:
+          "Biofield Tuning. Specify 233 Hz unweighted Fibonacci fork. ~$35–45 USD.",
+        searchTerms: ["Fibonacci 233 Hz tuning fork", "233 Hz fork"],
+        coversGap: ["Fibonacci 233 Hz (throat-upper field, phi-ratio sequence completion)"],
+        urgency: "low",
+      },
+      // ── Bowl gaps ────────────────────────────────────────────────────────
+      {
+        id: "BOWL-CRYSTAL-432",
+        name: "Crystal Bowl ~432 Hz (F#)",
+        type: "bowl",
+        weighting: "n/a",
+        frequency: 432,
+        lineage: "Crystal singing bowls",
+        chakraAffinity: "CH-HEART",
+        category: "bowl",
+        priority: 10,
+        rationale:
+          "The entire bowl collection is Himalayan metal bowls. Crystal bowls produce a qualitatively different resonance: purer fundamental, fewer overtone harmonics, longer sustain, and a quality that many practitioners describe as more effective for the upper field (above the body) and transpersonal zones. A frosted or clear quartz bowl at ~432 Hz (F# in the 432 Hz tuning system, close to BOWL-429) would provide a sustained upper-heart / throat wash in a medium that current metal bowls cannot replicate. Crystal bowl energy is generally considered more expansive than grounding — appropriate for above-the-body, upper-chakra, and closing-phase work.",
+        buyingGuide:
+          "Crystal Tones (www.crystalsingingbowls.com) or Singing Bowls (www.singingbowls.com). A 10\"–12\" frosted quartz bowl in F# (432 Hz tuning). ~$120–250 USD depending on size and quality.",
+        searchTerms: ["crystal singing bowl 432 Hz", "frosted quartz bowl F# heart"],
+        coversGap: ["Crystal bowl (upper-field quality, sustained upper-heart wash)"],
+        urgency: "low",
+      },
+      {
+        id: "BOWL-196",
+        name: "Singing Bowl ~196 Hz (Root / G)",
+        type: "bowl",
+        weighting: "n/a",
+        frequency: 196,
+        lineage: "Independent",
+        chakraAffinity: "CH-ROOT",
+        category: "bowl",
+        priority: 11,
+        rationale:
+          "Every current bowl sits at 111 Hz or above (upper root / mid-field / upper field). There is no root-frequency bowl. A bowl at ~194–196 Hz (matching the Cousto root frequency / Western G3) would provide a room-filling grounding wash during root chakra sessions. This is particularly valuable for group work or deep somatic sessions where a single fork strike cannot sustain the grounding field for the duration of the work.",
+        buyingGuide:
+          "Hand-hammered Himalayan bowl suppliers: Tibet Shop, Dakini, or direct from Nepal importers. Request a bowl tuned to G3 / 196 Hz. ~$60–180 USD depending on size. Bring a 194.18 Hz fork to the shop to test resonance before buying.",
+        searchTerms: ["singing bowl 196 Hz root chakra", "G3 Himalayan bowl root"],
+        coversGap: ["Root-frequency bowl (~194–196 Hz, Cousto / Western G3)"],
+        urgency: "medium",
+      },
+    ];
+
+    // Mark which suggestions are already covered
+    const suggestions = IDEAL_SET.map((s) => ({
+      ...s,
+      covered: owned.has(s.id),
+    }));
+
+    // Coverage stats
+    const total = suggestions.length;
+    const covered = suggestions.filter((s) => s.covered).length;
+    const gaps = suggestions.filter((s) => !s.covered);
+
+    // Categorised coverage
+    const byCat: Record<string, { total: number; covered: number }> = {};
+    for (const s of suggestions) {
+      if (!byCat[s.category]) byCat[s.category] = { total: 0, covered: 0 };
+      byCat[s.category].total++;
+      if (s.covered) byCat[s.category].covered++;
+    }
+
+    res.json({
+      ownedCount: owned.size,
+      idealSetCount: total,
+      coveredCount: covered,
+      gapCount: gaps.length,
+      coveragePercent: Math.round((covered / total) * 100),
+      categoryCoverage: byCat,
+      suggestions: suggestions.sort((a, b) => {
+        if (a.covered !== b.covered) return a.covered ? 1 : -1; // uncovered first
+        return a.priority - b.priority;
+      }),
+    });
+  });
+
   // ─── HEALTH ───────────────────────────────────────────────────────────────────
   app.get("/health", (_req, res) => res.json({ ok: true }));
 
@@ -310,6 +577,7 @@ You are not a generic assistant. You are a knowledgeable companion for the sound
 - Session design: opening with OM at 136.10 Hz, sequencing instruments, grounding, clearing, heart-centering
 - Practical contraindications: pacemakers, pregnancy, acute inflammation, post-surgery
 - The OM practice: two heart-frequency forks at the sternum during co-chanting at 136.10 Hz is the ceremonial container
+- The Instrument Gap Audit: the practitioner owns 25 instruments, with identified gaps including Solfeggio 285, 396, 639, 741, 852, 963 Hz; unweighted OM 136.1 Hz; Fibonacci 55 Hz and 233 Hz; a root-frequency bowl (~196 Hz); and a crystal bowl. When the practitioner is on the Gap Audit page, you can discuss any of these suggestions, explain priorities, or help them decide what to acquire next.
 
 Your nature:
 - Precise, not generic. Every response should feel specifically relevant to this practitioner and what they are working on.
