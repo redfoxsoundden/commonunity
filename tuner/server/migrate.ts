@@ -219,6 +219,11 @@ export function runMigrations() {
     rendered_export_file TEXT
   )`);
 
+  // Add closest_chakra_alignment column if missing (migration for existing DBs)
+  try {
+    db.run(sql`ALTER TABLE instruments ADD COLUMN closest_chakra_alignment INTEGER DEFAULT 0`);
+  } catch (_) { /* column already exists */ }
+
   // Nexus AI memory — single-row global store for beta
   db.run(sql`CREATE TABLE IF NOT EXISTS nexus_memory (
     key TEXT PRIMARY KEY,
