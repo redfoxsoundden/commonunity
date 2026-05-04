@@ -428,25 +428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         coversGap: ["Solfeggio 963 Hz (crown, divine consciousness)"],
         urgency: "low",
       },
-      // ── OM unweighted ────────────────────────────────────────────────────
-      {
-        id: "TF-OM-136U",
-        name: "OM 136.1 Hz Unweighted",
-        type: "fork",
-        weighting: "unweighted",
-        frequency: 136.1,
-        lineage: "Planetware / Cosmic Octave",
-        chakraAffinity: "CH-HEART",
-        category: "om",
-        priority: 7,
-        rationale:
-          "Currently TF-OM-136W is weighted — ideal for body contact (sternum, chest wall, back heart center) during the OM ceremony. An unweighted 136.1 Hz fork would extend OM into the field domain: held in the aura around the heart rather than on the body. For Line 4-5-6 clients (field-first entry) where body contact is not preferred, the unweighted OM fork delivers the heart frequency non-invasively. Also supports the bilateral heart-field scan at 136.10 Hz that the vertical convergence protocol calls for.",
-        buyingGuide:
-          "Planetware (www.planetware.de) or Biofield Tuning. Specify 136.1 Hz unweighted (no weight on tines), OM / Heart of the Earth. ~$40–60 USD.",
-        searchTerms: ["OM tuning fork 136 Hz unweighted", "136.1 Hz heart fork unweighted"],
-        coversGap: ["OM 136.1 Hz unweighted (field-domain OM ceremony, Line 4–6 clients)"],
-        urgency: "high",
-      },
+
       // ── Fibonacci series gaps ────────────────────────────────────────────
       {
         id: "TF-BT-FIB-55",
@@ -577,7 +559,7 @@ You are not a generic assistant. You are a knowledgeable companion for the sound
 - Session design: opening with OM at 136.10 Hz, sequencing instruments, grounding, clearing, heart-centering
 - Practical contraindications: pacemakers, pregnancy, acute inflammation, post-surgery
 - The OM practice: two heart-frequency forks at the sternum during co-chanting at 136.10 Hz is the ceremonial container
-- The Instrument Gap Audit: the practitioner owns 25 instruments, with identified gaps including Solfeggio 285, 396, 639, 741, 852, 963 Hz; unweighted OM 136.1 Hz; Fibonacci 55 Hz and 233 Hz; a root-frequency bowl (~196 Hz); and a crystal bowl. When the practitioner is on the Gap Audit page, you can discuss any of these suggestions, explain priorities, or help them decide what to acquire next.
+- The Instrument Gap Audit: the practitioner owns 26 instruments (25 original + unweighted OM 136.1 Hz confirmed owned), with identified gaps including Solfeggio 285, 396, 639, 741, 852, 963 Hz; Fibonacci 55 Hz and 233 Hz; a root-frequency bowl (~196 Hz); and a crystal bowl. When the practitioner is on the Gap Audit page, you can discuss any of these suggestions, explain priorities, or help them decide what to acquire next.
 
 Your nature:
 - Precise, not generic. Every response should feel specifically relevant to this practitioner and what they are working on.

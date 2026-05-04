@@ -144,6 +144,21 @@ export async function seedDatabase() {
       chakraId: "CH-HEART", elementalAssociation: "air",
       doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying","kapha-pacifying"]),
     },
+    {
+      id: "TF-OM-136U", name: "OM 136.1 Unweighted", type: "fork", weighting: "unweighted",
+      frequency: 136.10, lineage: "Planetware / Cosmic Octave", imageFilename: "TF-OM-136W_main.webp",
+      audioFilename: "TF-OM-136W.mp3",
+      masterExplainer: "The unweighted companion to TF-OM-136W — same 136.10 Hz Earth Year / OM frequency but without the weighted ball on the tines. Where the weighted fork excels at body contact (sternum, chest wall, back heart center), the unweighted fork radiates sound into the field around the body rather than into tissue. This makes it the preferred OM instrument for Line 4–6 clients (field-first entry vector), for off-body heart-field scanning, and for practitioner self-regulation from a distance. With both forks in hand — one weighted at the sternum, one unweighted sweeping the heart field — the entire heart zone (somatic core and auric field simultaneously) can be held in OM resonance. Also used bilaterally: two unweighted OM forks, one each side of the chest, creating a torus-shaped OM envelope around the heart center.",
+      healingBenefits: JSON.stringify(["heart-opening","coherence","field-clearing","nervous-system-support","vagal-tone-support","meditation-support","integration"]),
+      sessionRole: JSON.stringify(["opener","closer","field-scanner","integrator","stabilizer"]),
+      contraindications: JSON.stringify(["pacemaker-caution","implanted-device-caution","pregnancy-caution"]),
+      contraNote: "Off-body use only for clients with cardiac devices.",
+      notes: JSON.stringify(["Primary use case: bilateral heart-field scan — one unweighted OM fork either side of the chest, held 10–20 cm from the body, creating a sustained torus-shaped resonance envelope.","For Line 4–5–6 clients (field-first entry): begin the OM ceremony with the unweighted fork in the field before any weighted body contact. Many field-first clients find the unweighted version more comfortable as an opener.","Pair with TF-OM-136W for simultaneous somatic + field delivery: weighted at sternum, unweighted sweeping the heart field. This is the most complete OM protocol available with both forks.","Also useful for closing ceremony: after the weighted OM has settled, sweep the unweighted fork outward through the field to carry the OM frequency into the edges of the aura before the client sits up.","The unweighted fork produces a cleaner, more audible tone (less damping from the weight) — clients often hear it clearly even in the final minutes of a session when auditory sensitivity is heightened."]),
+      toneName: "Earth Year (OM)", colorHex: "#00CED1", colorName: "turquoise",
+      chakraId: "CH-HEART", elementalAssociation: "air",
+      doshaTags: JSON.stringify(["vata-pacifying","pitta-pacifying","kapha-pacifying"]),
+      sourceReference: "Cousto, The Cosmic Octave; Planetware 2009"
+    },
     // BIOFIELD TUNING KIT
     {
       id: "TF-BT-SLIDER", name: "Sonic Slider", type: "fork", weighting: "weighted",
