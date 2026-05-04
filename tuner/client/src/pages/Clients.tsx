@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { QuestionnaireResponse } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { isCommonUnityKey } from "@sdk/key-schema";
 
 const DOSHA_COLORS: Record<string, string> = {
   vata: "#a78bfa", pitta: "#f97316", kapha: "#34d399", balanced: "#6ee7b7",
@@ -43,7 +44,8 @@ export default function Clients() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load a profile from a JSON file previously exported from this app
+  // Load a profile from a CommonUnity Key JSON file
+  // Accepts both the current Key format and legacy _tunerExport files
   function handleLoadJSON(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -51,21 +53,40 @@ export default function Clients() {
     reader.onload = async (ev) => {
       try {
         const data = JSON.parse(ev.target?.result as string);
-        if (!data._tunerExport) {
-          toast({ title: "Not a Tuner profile file", variant: "destructive" });
-          return;
+        let imported = 0;
+
+        if (isCommonUnityKey(data)) {
+          // ── CommonUnity Key format ──────────────────────────────────────
+          const clients = data.tuner?.clients ?? [];
+          const ownProfile = data.tuner?.ownProfile;
+          const profiles = ownProfile ? [...clients, ownProfile] : clients;
+          if (profiles.length === 0) {
+            toast({ title: "Key contains no Tuner profiles", variant: "destructive" });
+            return;
+          }
+          for (const profile of profiles) {
+            const { radianceProfile: _rp, updatedAt: _ua, ...payload } = profile as any;
+            await apiRequest("POST", "/api/questionnaires", payload);
+            imported++;
+          }
+          qc.invalidateQueries({ queryKey: ["/api/questionnaires"] });
+          toast({ title: `Key loaded — ${imported} profile${imported !== 1 ? "s" : ""} imported` });
+
+        } else if (data._tunerExport) {
+          // ── Legacy single-profile format (pre-Key) ──────────────────────
+          const { _tunerExport, _exportedAt, id, ...payload } = data;
+          await apiRequest("POST", "/api/questionnaires", payload);
+          qc.invalidateQueries({ queryKey: ["/api/questionnaires"] });
+          toast({ title: `Loaded: ${data.clientName ?? "profile"}` });
+
+        } else {
+          toast({ title: "Not a CommonUnity Key file", variant: "destructive" });
         }
-        // Strip internal export metadata + id so it imports as a new record
-        const { _tunerExport, _exportedAt, id, ...payload } = data;
-        await apiRequest("POST", "/api/questionnaires", payload);
-        qc.invalidateQueries({ queryKey: ["/api/questionnaires"] });
-        toast({ title: `Loaded: ${data.clientName ?? "profile"}` });
       } catch {
         toast({ title: "Error loading file — invalid JSON", variant: "destructive" });
       }
     };
     reader.readAsText(file);
-    // Reset so same file can be re-loaded
     e.target.value = "";
   }
 

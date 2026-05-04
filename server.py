@@ -1161,6 +1161,11 @@ _hatha_exam_dir = _os.path.join(_os.path.dirname(__file__), 'hatha-practical-exa
 if _os.path.isdir(_hatha_exam_dir):
     app.mount("/hatha-practical-exam", StaticFiles(directory=_hatha_exam_dir, html=True), name="hatha-practical-exam")
 
+# Serve CommonUnity SDK (shared gene keys engine + key schema JS builds)
+_sdk_dir = pathlib.Path(__file__).parent / "sdk"
+if _sdk_dir.exists():
+    app.mount("/sdk", StaticFiles(directory=str(_sdk_dir)), name="sdk")
+
 @app.get("/studio")
 async def serve_studio():
     studio = pathlib.Path(__file__).parent / "studio.html"

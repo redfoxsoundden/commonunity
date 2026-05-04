@@ -11,6 +11,8 @@ import type { QuestionnaireResponse } from "@shared/schema";
 import RadianceCard from "@/components/RadianceCard";
 import { setNexusContext } from "../components/NexusPanel";
 import type { RadianceProfile } from "@shared/genekeys";
+import type { CommonUnityKey } from "@sdk/key-schema";
+import { KEY_SCHEMA_VERSION } from "@sdk/key-schema";
 import { useToast } from "@/hooks/use-toast";
 
 const DOSHA_COLORS: Record<string, string> = {
@@ -39,21 +41,52 @@ export default function QuestionnaireResult() {
   const qc = useQueryClient();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  // Save this profile as a local JSON file — same pattern as Compass / Studio
+  // Save this profile as a CommonUnity Key JSON file
+  // The Key is the portable identity carrier for the entire ecosystem.
+  // Format: {name}-commonunity-{date}.json
   function saveProfileJSON() {
     if (!result) return;
-    const payload = { ...result, _tunerExport: true, _exportedAt: new Date().toISOString() };
-    const name = (result.clientName ?? "profile").toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
+    const clientProfile = {
+      clientName:               result.clientName,
+      clientEmail:              (result as any).clientEmail,
+      practitionerName:         (result as any).practitionerName,
+      sessionDate:              result.sessionDate,
+      dominantDosha:            result.dominantDosha,
+      dominantCenter:           result.dominantCenter,
+      suggestedChakraFocus:     result.suggestedChakraFocus,
+      recommendedProtocolId:    result.recommendedProtocolId,
+      recommendedComfortTier:   result.recommendedComfortTier,
+      intentionText:            result.intentionText,
+      contraindicationFlags:    result.contraindicationFlags,
+      birthDate:                (result as any).birthDate,
+      birthTime:                (result as any).birthTime,
+      birthPlace:               (result as any).birthPlace,
+      radianceProfile:          radianceProfile ?? undefined,
+      updatedAt:                new Date().toISOString(),
+    };
+
+    const key: CommonUnityKey = {
+      _schemaVersion:   KEY_SCHEMA_VERSION,
+      _exportedAt:      new Date().toISOString(),
+      _exportedBy:      "tuner",
+      _commonUnityKey:  true,
+      name:             result.clientName ?? "profile",
+      tuner: {
+        clients: [clientProfile],
+      },
+    };
+
+    const slug = (result.clientName ?? "profile").toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
     const date = new Date().toISOString().slice(0, 10);
-    const filename = `${name}-tuner-${date}.json`;
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const filename = `${slug}-commonunity-${date}.json`;
+    const blob = new Blob([JSON.stringify(key, null, 2)], { type: "application/json" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href     = url;
     a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
-    toast({ title: `Saved: ${filename}` });
+    toast({ title: `Key saved: ${filename}` });
   }
 
   const { data: result, isLoading } = useQuery<QuestionnaireResponse>({
