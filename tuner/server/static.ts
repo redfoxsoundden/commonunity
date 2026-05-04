@@ -24,6 +24,24 @@ export function serveStatic(app: Express) {
     }));
   }
 
+  // CommonUnity public homepage + Studio mirror — served from the Tuner
+  // deployment so the shared Railway domain has a public landing page at /home
+  // and a Studio mirror at /studio. Routes are registered before the SPA
+  // catch-all so they take precedence over Tuner's index.html.
+  const noStoreHeaders: Record<string, string> = {
+    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
+  };
+  app.get("/home", (_req, res) => {
+    res.set(noStoreHeaders);
+    res.sendFile(path.resolve(distPath, "homepage.html"));
+  });
+  app.get("/studio", (_req, res) => {
+    res.set(noStoreHeaders);
+    res.sendFile(path.resolve(distPath, "studio.html"));
+  });
+
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 0 760 132" width="760" height="132" role="img" aria-label="CommonUnity">
+  <title>CommonUnity</title>
+  <defs>
+    <filter id="om-glow" x="-50%" y="-80%" width="200%" height="260%">
+      <feGaussianBlur stdDeviation="2.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="-30" width="760" height="132" fill="#0b1120"/>
+  <text x="350" y="108" text-anchor="middle"
+        font-family="Josefin Sans, Plus Jakarta Sans, system-ui, sans-serif"
+        font-weight="600" font-size="80" letter-spacing="6"
+        text-rendering="geometricPrecision">
+    <tspan fill="#FAF8F4" fill-opacity="0.96">C</tspan><tspan fill="#d4a04a" filter="url(#om-glow)">OM</tspan><tspan fill="#FAF8F4" fill-opacity="0.96">MONUNITY</tspan>
+  </text>
+  <path d="M 94 38 Q 124 26 154 38" fill="none" stroke="#d4a04a" stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
+  <path d="M 124 14 L 128 19 L 124 24 L 120 19 Z" fill="#d4a04a" opacity="0.95"/>
+</svg>
