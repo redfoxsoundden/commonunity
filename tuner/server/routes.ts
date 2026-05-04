@@ -151,6 +151,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ ok: true });
   });
 
+  // PATCH /api/questionnaires/:id — partial update (birth data editing from RadianceCard)
+  app.patch("/api/questionnaires/:id", (req, res) => {
+    const updated = storage.updateQuestionnaire(Number(req.params.id), req.body);
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json(updated);
+  });
+
   app.get("/api/questionnaires/:id", (req, res) => {
     const item = storage.getQuestionnaireById(Number(req.params.id));
     if (!item) return res.status(404).json({ error: "Not found" });
@@ -168,16 +175,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (raw.acuteCrisis) flags.push("acute-trauma-caution", "severe-mental-health-caution");
     if (raw.pregnancyStatus === "yes") flags.push("pregnancy-caution");
 
-    // Dosha tally
-    const doshaCounts: Record<string, number> = { vata: 0, pitta: 0, kapha: 0 };
+    // Dosha tally — balanced is now a first-class outcome
+    const doshaCounts: Record<string, number> = { vata: 0, pitta: 0, kapha: 0, balanced: 0 };
     const doshaFields = ["doshaBody","doshaMind","doshaSleep","doshaAppetite","doshaEnergy","doshaEmotions"];
     for (const f of doshaFields) {
       const v = raw[f];
       if (v === "vata-like") doshaCounts.vata++;
       else if (v === "pitta-like") doshaCounts.pitta++;
       else if (v === "kapha-like") doshaCounts.kapha++;
+      else if (v === "balanced") doshaCounts.balanced++;
     }
-    const dominantDosha = Object.entries(doshaCounts).sort((a,b) => b[1]-a[1])[0][0];
+    // Dominant: whichever category scored highest.
+    // Tie between balanced and a dosha -> balanced wins (sattvic state takes priority).
+    const sorted = Object.entries(doshaCounts).sort((a, b) => b[1] - a[1]);
+    const topScore = sorted[0][1];
+    // If balanced is tied for top, prefer it
+    const dominantDosha = doshaCounts.balanced === topScore ? "balanced" : sorted[0][0];
 
     // Center tally
     const centerCounts: Record<string, number> = { physical: 0, emotional: 0, intellectual: 0 };
@@ -199,13 +212,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     else if (raw.vocalization === "yes" && raw.chakraFamiliarity === "experienced") comfortTier = 5;
     else if (raw.vocalization === "yes") comfortTier = 4;
 
-    // Chakra focus from stress + dosha
-    const doshaChakraMap: Record<string, string> = { vata: "CH-ROOT", pitta: "CH-SOLAR", kapha: "CH-SACRAL" };
+    // Chakra focus from dosha — balanced state centres on the heart
+    const doshaChakraMap: Record<string, string> = {
+      vata: "CH-ROOT", pitta: "CH-SOLAR", kapha: "CH-SACRAL", balanced: "CH-HEART",
+    };
     const suggestedChakraFocus = doshaChakraMap[dominantDosha] || "CH-HEART";
 
-    // Protocol recommendation
+    // Protocol recommendation — balanced routes to integration/maintenance
     const protocolMap: Record<string, string> = {
       vata: "PROTO-VATA", pitta: "PROTO-PITTA", kapha: "PROTO-KAPHA",
+      balanced: "PROTO-FULL-ASCENDING",
     };
     const focusProtocol = protocolMap[dominantDosha] || "PROTO-GROUNDING";
 

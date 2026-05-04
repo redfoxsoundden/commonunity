@@ -16,6 +16,7 @@ const DOSHA_COLORS: Record<string, string> = {
   vata: "#a78bfa",
   pitta: "#f97316",
   kapha: "#34d399",
+  balanced: "#6ee7b7", // emerald — sattvic
 };
 
 const CONTRA_LABELS: Record<string, string> = {
@@ -204,6 +205,8 @@ export default function QuestionnaireResult() {
       <RadianceCard
         birthDate={(result as any).birthDate}
         birthTime={(result as any).birthTime}
+        birthPlace={(result as any).birthPlace}
+        questionnaireId={result.id}
       />
 
       {/* Actions */}

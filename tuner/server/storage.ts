@@ -48,6 +48,7 @@ export interface IStorage {
   getQuestionnairesByClient(clientId: number): QuestionnaireResponse[];
   getQuestionnaireById(id: number): QuestionnaireResponse | undefined;
   createQuestionnaire(data: InsertQuestionnaire): QuestionnaireResponse;
+  updateQuestionnaire(id: number, data: Partial<InsertQuestionnaire>): QuestionnaireResponse | undefined;
   deleteQuestionnaire(id: number): void;
 
   // Protocol templates
@@ -140,6 +141,9 @@ export class DatabaseStorage implements IStorage {
   }
   createQuestionnaire(data: InsertQuestionnaire): QuestionnaireResponse {
     return db.insert(questionnaireResponses).values(data).returning().get() as QuestionnaireResponse;
+  }
+  updateQuestionnaire(id: number, data: Partial<InsertQuestionnaire>): QuestionnaireResponse | undefined {
+    return db.update(questionnaireResponses).set(data).where(eq(questionnaireResponses.id, id)).returning().get() as QuestionnaireResponse | undefined;
   }
   deleteQuestionnaire(id: number): void {
     db.delete(questionnaireResponses).where(eq(questionnaireResponses.id, id)).run();

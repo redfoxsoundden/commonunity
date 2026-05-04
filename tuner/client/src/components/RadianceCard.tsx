@@ -5,17 +5,23 @@
  * If no birth data is present, renders a soft "Add birth data" prompt.
  *
  * Props:
- *   birthDate  — ISO "YYYY-MM-DD" (required for calculation)
- *   birthTime  — "HH:MM" (optional, improves line accuracy)
- *   compact    — if true, renders a condensed single-row summary (for result pages)
+ *   birthDate       — ISO "YYYY-MM-DD" (required for calculation)
+ *   birthTime       — "HH:MM" (optional, improves line accuracy)
+ *   compact         — if true, renders a condensed single-row summary (for result pages)
+ *   questionnaireId — if provided, enables inline birth data editing via PATCH
+ *   onBirthDataSaved — callback fired after a successful PATCH (passes updated questionnaire)
  */
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Sparkles, ChevronDown, ChevronUp, Link2, AlertTriangle, Zap } from "lucide-react";
+import { Sparkles, ChevronDown, ChevronUp, Link2, AlertTriangle, Zap, Pencil, X, Check } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import type { RadianceProfile } from "@shared/genekeys";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 // ─── Colour helpers ───────────────────────────────────────────────────────────
 
@@ -67,6 +73,117 @@ function InstrumentBadge({ id }: { id: string }) {
   );
 }
 
+// ─── Inline birth data edit form ──────────────────────────────────────────────
+
+interface BirthEditFormProps {
+  questionnaireId: number;
+  currentDate?: string | null;
+  currentTime?: string | null;
+  currentPlace?: string | null;
+  onSaved: (updated: any) => void;
+  onCancel: () => void;
+}
+
+function BirthEditForm({
+  questionnaireId,
+  currentDate,
+  currentTime,
+  currentPlace,
+  onSaved,
+  onCancel,
+}: BirthEditFormProps) {
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const [date, setDate] = useState(currentDate ?? "");
+  const [time, setTime] = useState(currentTime ?? "");
+  const [place, setPlace] = useState(currentPlace ?? "");
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("PATCH", `/api/questionnaires/${questionnaireId}`, {
+        birthDate: date || null,
+        birthTime: time || null,
+        birthPlace: place || null,
+      });
+      return res.json();
+    },
+    onSuccess: (updated) => {
+      // Invalidate this questionnaire's cache so QuestionnaireResult re-fetches
+      qc.invalidateQueries({ queryKey: ["/api/questionnaires", String(questionnaireId)] });
+      // Also invalidate the radiance query so the card recalculates
+      qc.invalidateQueries({ queryKey: ["/api/radiance"] });
+      toast({ title: "Birth data saved" });
+      onSaved(updated);
+    },
+    onError: () => {
+      toast({ title: "Save failed", description: "Could not update birth data.", variant: "destructive" });
+    },
+  });
+
+  return (
+    <div className="mt-4 pt-4 border-t border-white/10 space-y-3" data-testid="radiance-birth-edit-form">
+      <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Edit Birth Data</p>
+      <div className="space-y-3">
+        <div className="space-y-1.5">
+          <Label className="text-xs text-[var(--muted)]">Date of birth</Label>
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="bg-[var(--bg)] border-white/20 h-8 text-sm"
+            data-testid="radiance-edit-birthDate"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs text-[var(--muted)]">Time <span className="text-white/30">(optional)</span></Label>
+            <Input
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="bg-[var(--bg)] border-white/20 h-8 text-sm"
+              data-testid="radiance-edit-birthTime"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-[var(--muted)]">Place <span className="text-white/30">(optional)</span></Label>
+            <Input
+              value={place}
+              onChange={(e) => setPlace(e.target.value)}
+              placeholder="City, Country"
+              className="bg-[var(--bg)] border-white/20 h-8 text-sm"
+              data-testid="radiance-edit-birthPlace"
+            />
+          </div>
+        </div>
+        <div className="flex gap-2 pt-1">
+          <Button
+            size="sm"
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending || !date}
+            className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 h-7 text-xs px-3"
+            data-testid="radiance-edit-save"
+          >
+            <Check size={12} className="mr-1" />
+            {mutation.isPending ? "Saving…" : "Save"}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onCancel}
+            disabled={mutation.isPending}
+            className="border-white/20 text-[var(--muted)] h-7 text-xs px-3"
+            data-testid="radiance-edit-cancel"
+          >
+            <X size={12} className="mr-1" />
+            Cancel
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Compact variant (for QuestionnaireResult) ─────────────────────────────────
 
 function RadianceCompact({ profile }: { profile: RadianceProfile }) {
@@ -111,8 +228,25 @@ function RadianceCompact({ profile }: { profile: RadianceProfile }) {
 
 // ─── Full card ────────────────────────────────────────────────────────────────
 
-function RadianceFull({ profile }: { profile: RadianceProfile }) {
+interface RadianceFullProps {
+  profile: RadianceProfile;
+  questionnaireId?: number;
+  currentBirthDate?: string | null;
+  currentBirthTime?: string | null;
+  currentBirthPlace?: string | null;
+  onBirthDataSaved?: (updated: any) => void;
+}
+
+function RadianceFull({
+  profile,
+  questionnaireId,
+  currentBirthDate,
+  currentBirthTime,
+  currentBirthPlace,
+  onBirthDataSaved,
+}: RadianceFullProps) {
   const [expanded, setExpanded] = useState(false);
+  const [editing, setEditing] = useState(false);
   const color = getChakraColor(profile.chakraId);
 
   return (
@@ -147,6 +281,17 @@ function RadianceFull({ profile }: { profile: RadianceProfile }) {
               GK {profile.activation.gate}.{profile.activation.line} — {profile.gkName}
             </p>
           </div>
+          {/* Edit birth data button — only shown when questionnaireId is provided */}
+          {questionnaireId && !editing && (
+            <button
+              onClick={() => setEditing(true)}
+              className="shrink-0 p-1.5 rounded-md text-[var(--muted)] hover:text-white hover:bg-white/10 transition-colors"
+              title="Edit birth data"
+              data-testid="radiance-edit-toggle"
+            >
+              <Pencil size={13} />
+            </button>
+          )}
         </div>
 
         {/* Shadow / Gift / Siddhi row */}
@@ -302,6 +447,21 @@ function RadianceFull({ profile }: { profile: RadianceProfile }) {
             </p>
           </div>
         )}
+
+        {/* Inline edit form */}
+        {editing && questionnaireId && (
+          <BirthEditForm
+            questionnaireId={questionnaireId}
+            currentDate={currentBirthDate}
+            currentTime={currentBirthTime}
+            currentPlace={currentBirthPlace}
+            onSaved={(updated) => {
+              setEditing(false);
+              onBirthDataSaved?.(updated);
+            }}
+            onCancel={() => setEditing(false)}
+          />
+        )}
       </div>
     </div>
   );
@@ -309,29 +469,54 @@ function RadianceFull({ profile }: { profile: RadianceProfile }) {
 
 // ─── No birth data prompt ─────────────────────────────────────────────────────
 
-function RadianceEmpty({ onAddBirthData }: { onAddBirthData?: () => void }) {
+interface RadianceEmptyProps {
+  questionnaireId?: number;
+  onAddBirthData?: () => void;
+}
+
+function RadianceEmpty({ questionnaireId, onAddBirthData }: RadianceEmptyProps) {
+  const [editing, setEditing] = useState(false);
+  const qc = useQueryClient();
+
+  const handleSaved = (updated: any) => {
+    setEditing(false);
+    qc.invalidateQueries({ queryKey: ["/api/questionnaires", String(questionnaireId)] });
+    qc.invalidateQueries({ queryKey: ["/api/radiance"] });
+    onAddBirthData?.();
+  };
+
   return (
     <div
-      className="bg-[var(--card)] border border-dashed border-white/15 rounded-xl p-5 flex items-center gap-4"
+      className="bg-[var(--card)] border border-dashed border-white/15 rounded-xl p-5"
       data-testid="radiance-empty"
     >
-      <div className="shrink-0 w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center">
-        <Sparkles size={16} className="text-white/25" />
+      <div className="flex items-center gap-4">
+        <div className="shrink-0 w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center">
+          <Sparkles size={16} className="text-white/25" />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-white/50">Radiance Sphere</p>
+          <p className="text-xs text-[var(--muted)] mt-0.5">
+            Add a date of birth to unlock the Gene Keys Radiance synthesis — chakra, kosha, body layer, and instrument recommendations derived from this client's path to health.
+          </p>
+        </div>
+        {(questionnaireId || onAddBirthData) && !editing && (
+          <button
+            onClick={() => questionnaireId ? setEditing(true) : onAddBirthData?.()}
+            className="shrink-0 text-xs text-[var(--primary)] hover:text-white border border-[var(--primary)]/40 hover:border-[var(--primary)] rounded-lg px-3 py-1.5 transition-colors"
+            data-testid="radiance-add-birth"
+          >
+            Add birth data
+          </button>
+        )}
       </div>
-      <div className="flex-1">
-        <p className="text-sm font-medium text-white/50">Radiance Sphere</p>
-        <p className="text-xs text-[var(--muted)] mt-0.5">
-          Add a date of birth to unlock the Gene Keys Radiance synthesis — chakra, kosha, body layer, and instrument recommendations derived from this client's path to health.
-        </p>
-      </div>
-      {onAddBirthData && (
-        <button
-          onClick={onAddBirthData}
-          className="shrink-0 text-xs text-[var(--primary)] hover:text-white border border-[var(--primary)]/40 hover:border-[var(--primary)] rounded-lg px-3 py-1.5 transition-colors"
-          data-testid="radiance-add-birth"
-        >
-          Add birth data
-        </button>
+
+      {editing && questionnaireId && (
+        <BirthEditForm
+          questionnaireId={questionnaireId}
+          onSaved={handleSaved}
+          onCancel={() => setEditing(false)}
+        />
       )}
     </div>
   );
@@ -342,11 +527,22 @@ function RadianceEmpty({ onAddBirthData }: { onAddBirthData?: () => void }) {
 interface RadianceCardProps {
   birthDate?: string | null;
   birthTime?: string | null;
+  birthPlace?: string | null;
   compact?: boolean;
+  questionnaireId?: number;
   onAddBirthData?: () => void;
+  onBirthDataSaved?: (updated: any) => void;
 }
 
-export default function RadianceCard({ birthDate, birthTime, compact = false, onAddBirthData }: RadianceCardProps) {
+export default function RadianceCard({
+  birthDate,
+  birthTime,
+  birthPlace,
+  compact = false,
+  questionnaireId,
+  onAddBirthData,
+  onBirthDataSaved,
+}: RadianceCardProps) {
   const { data: profile, isLoading, isError } = useQuery<RadianceProfile>({
     queryKey: ["/api/radiance", birthDate, birthTime],
     queryFn: () =>
@@ -356,7 +552,12 @@ export default function RadianceCard({ birthDate, birthTime, compact = false, on
   });
 
   if (!birthDate) {
-    return compact ? null : <RadianceEmpty onAddBirthData={onAddBirthData} />;
+    return compact ? null : (
+      <RadianceEmpty
+        questionnaireId={questionnaireId}
+        onAddBirthData={onAddBirthData}
+      />
+    );
   }
 
   if (isLoading) {
@@ -378,5 +579,14 @@ export default function RadianceCard({ birthDate, birthTime, compact = false, on
   }
 
   if (compact) return <RadianceCompact profile={profile} />;
-  return <RadianceFull profile={profile} />;
+  return (
+    <RadianceFull
+      profile={profile}
+      questionnaireId={questionnaireId}
+      currentBirthDate={birthDate}
+      currentBirthTime={birthTime}
+      currentBirthPlace={birthPlace}
+      onBirthDataSaved={onBirthDataSaved}
+    />
+  );
 }

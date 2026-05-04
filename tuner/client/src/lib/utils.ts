@@ -80,6 +80,7 @@ export const DOSHA_LABELS: Record<string, string> = {
   vata: "Vāta (Air + Space)",
   pitta: "Pitta (Fire + Water)",
   kapha: "Kapha (Earth + Water)",
+  balanced: "Sattva (Balanced)",
 };
 
 // Center display names

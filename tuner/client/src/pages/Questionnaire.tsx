@@ -384,6 +384,7 @@ export default function Questionnaire() {
                 key: "doshaBody",
                 question: "How does your body feel today?",
                 options: [
+                  { value: "balanced", label: "Grounded, comfortable, and present" },
                   { value: "vata-like", label: "Light, restless, cold, or scattered" },
                   { value: "pitta-like", label: "Warm, tense, sharp, or intense" },
                   { value: "kapha-like", label: "Heavy, slow, cool, or sluggish" },
@@ -393,6 +394,7 @@ export default function Questionnaire() {
                 key: "doshaMind",
                 question: "How is your mind right now?",
                 options: [
+                  { value: "balanced", label: "Clear, settled, and at ease" },
                   { value: "vata-like", label: "Racing, anxious, or jumping between thoughts" },
                   { value: "pitta-like", label: "Focused but pressured, critical, or irritated" },
                   { value: "kapha-like", label: "Foggy, slow, withdrawn, or flat" },
@@ -402,18 +404,40 @@ export default function Questionnaire() {
                 key: "doshaSleep",
                 question: "How has your sleep been lately?",
                 options: [
+                  { value: "balanced", label: "Restful, consistent, and restorative" },
                   { value: "vata-like", label: "Light, interrupted, or not enough" },
                   { value: "pitta-like", label: "Vivid dreams, waking hot, or short and intense" },
                   { value: "kapha-like", label: "Heavy, long, or hard to wake from" },
                 ],
               },
               {
+                key: "doshaAppetite",
+                question: "How is your appetite and digestion today?",
+                options: [
+                  { value: "balanced", label: "Regular hunger, digesting comfortably" },
+                  { value: "vata-like", label: "Irregular or forgetting to eat, gassy or bloated" },
+                  { value: "pitta-like", label: "Strong or sharp hunger, acid or heat in digestion" },
+                  { value: "kapha-like", label: "Low appetite, slow or heavy after eating" },
+                ],
+              },
+              {
                 key: "doshaEnergy",
                 question: "How is your energy today?",
                 options: [
+                  { value: "balanced", label: "Steady, sustained, and well-paced" },
                   { value: "vata-like", label: "Erratic — bursts of energy then crashes" },
                   { value: "pitta-like", label: "Driven but depleted — pushing hard" },
                   { value: "kapha-like", label: "Low and hard to mobilise" },
+                ],
+              },
+              {
+                key: "doshaEmotions",
+                question: "How are you feeling emotionally right now?",
+                options: [
+                  { value: "balanced", label: "Open, equanimous, and connected" },
+                  { value: "vata-like", label: "Anxious, scattered, or emotionally ungrounded" },
+                  { value: "pitta-like", label: "Irritable, critical, or carrying frustration" },
+                  { value: "kapha-like", label: "Withdrawn, heavy, or emotionally flat" },
                 ],
               },
             ].map(({ key, question, options }) => (
