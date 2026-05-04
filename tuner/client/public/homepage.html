@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CommonUnity — Align the inner. Shape the outer.</title>
-<meta name="description" content="CommonUnity is a living field for unified living, rooted in timeless principles and brought into practice through self-knowledge, frequency, community, and conscious action.">
+<meta name="description" content="CommonUnity is an evolutionary field for unified living, rooted in timeless principles and brought into practice through self-knowledge, frequency, community, and conscious action.">
 <meta name="theme-color" content="#0b1120">
 <meta property="og:title" content="CommonUnity — Align the inner. Shape the outer.">
-<meta property="og:description" content="A living field for unified living. Rooted in timeless principles. Brought into practice through self-knowledge, frequency, community, and conscious action.">
+<meta property="og:description" content="An evolutionary field for unified living. Rooted in timeless principles. Brought into practice through self-knowledge, frequency, community, and conscious action.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://commonunity.io/">
 <link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
@@ -507,6 +507,105 @@
     letter-spacing: 0.04em;
   }
 
+  /* ─────────── Waitlist ─────────── */
+  .waitlist {
+    margin: 56px auto 0;
+    max-width: 520px;
+    text-align: left;
+    border-top: 1px solid var(--line);
+    padding-top: 40px;
+  }
+  .waitlist .wl-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 500;
+  }
+  .waitlist h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(22px, 3vw, 28px);
+    text-align: center;
+    margin: 0 0 10px;
+    color: var(--cream);
+  }
+  .waitlist .wl-lede {
+    text-align: center;
+    color: var(--cream-faint);
+    margin: 0 0 24px;
+    line-height: 1.55;
+  }
+  .waitlist form {
+    display: grid;
+    gap: 14px;
+  }
+  .waitlist label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .waitlist input[type="email"],
+  .waitlist input[type="text"],
+  .waitlist select {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(250,248,244,0.03);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    color: var(--cream);
+    font-family: inherit;
+    font-size: 15px;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .waitlist input:focus,
+  .waitlist select:focus {
+    outline: none;
+    border-color: var(--gold-soft);
+    background: rgba(250,248,244,0.05);
+  }
+  .waitlist .wl-honey {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .waitlist .wl-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .waitlist .wl-note {
+    text-align: center;
+    color: var(--cream-faint);
+    font-size: 12px;
+    margin: 14px 0 0;
+    letter-spacing: 0.04em;
+  }
+  .waitlist .wl-thanks {
+    text-align: center;
+    color: var(--gold-soft);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 18px;
+    margin: 12px 0 0;
+  }
+  @media (min-width: 560px) {
+    .waitlist .wl-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+  }
+
   /* ─────────── Footer ─────────── */
   footer.site {
     border-top: 1px solid var(--line);
@@ -653,7 +752,7 @@
     <svg class="lockup-hero" viewBox="-30 0 760 132" aria-hidden="true"><use href="#logo-lockup"/></svg>
     <h1>Align the inner. Shape the <em>outer.</em></h1>
     <p class="lede">
-      CommonUnity is a living field for unified living, rooted in timeless
+      CommonUnity is an evolutionary field for unified living, rooted in timeless
       principles and brought into practice through self-knowledge, frequency,
       community, and conscious action.
     </p>
@@ -1041,6 +1140,48 @@
         Open Tuner
       </a>
     </div>
+
+    <div class="waitlist reveal" id="waitlist">
+      <div class="wl-eyebrow">Beta</div>
+      <h3>Join the CommonUnity beta</h3>
+      <p class="wl-lede">
+        Receive early access notes as Compass, Studio, Tuner, and Nexus evolve.
+      </p>
+      <form method="post" action="https://commonunity-production.up.railway.app/api/waitlist" id="waitlist-form" novalidate>
+        <div>
+          <label for="wl-email">Email <span aria-hidden="true">·</span> required</label>
+          <input type="email" id="wl-email" name="email" autocomplete="email" required placeholder="you@domain.com">
+        </div>
+        <div class="wl-row-2">
+          <div>
+            <label for="wl-name">Name <span aria-hidden="true">·</span> optional</label>
+            <input type="text" id="wl-name" name="name" autocomplete="name" placeholder="How shall we greet you?">
+          </div>
+          <div>
+            <label for="wl-interest">Interest <span aria-hidden="true">·</span> optional</label>
+            <select id="wl-interest" name="interest">
+              <option value="">— select —</option>
+              <option value="compass">Compass</option>
+              <option value="studio">Studio</option>
+              <option value="tuner">Tuner</option>
+              <option value="practitioner">Practitioner community</option>
+              <option value="collaboration">Collaboration</option>
+            </select>
+          </div>
+        </div>
+        <div class="wl-honey" aria-hidden="true">
+          <label for="wl-website">Leave this field empty</label>
+          <input type="text" id="wl-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <input type="hidden" name="source" value="homepage">
+        <div class="wl-actions">
+          <button type="submit" class="btn btn-primary">
+            Join the beta <span class="arrow">→</span>
+          </button>
+        </div>
+        <p class="wl-note">No spam. Your data stays yours.</p>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -1053,7 +1194,7 @@
           <svg class="lockup" viewBox="-30 0 760 132" aria-hidden="true" style="height:24px"><use href="#logo-lockup"/></svg>
         </div>
         <p class="colophon">
-          A living field for unified living. Anchored in Oṁ.
+          An evolutionary field for unified living. Anchored in Oṁ.
           Built on universal principles, open schemas, and attributed lineages.
           Your data stays yours.
         </p>
@@ -1100,6 +1241,23 @@
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+  })();
+
+  // Waitlist: show thank-you state when the FastAPI handler redirects back with ?joined=1.
+  (function () {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('joined') !== '1') return;
+      var form = document.getElementById('waitlist-form');
+      if (!form) return;
+      var thanks = document.createElement('p');
+      thanks.className = 'wl-thanks';
+      thanks.setAttribute('role', 'status');
+      thanks.textContent = 'Thank you. You are on the list — we will be in touch.';
+      form.parentNode.replaceChild(thanks, form);
+      var wl = document.getElementById('waitlist');
+      if (wl && wl.scrollIntoView) wl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (e) { /* no-op */ }
   })();
 </script>
 

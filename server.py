@@ -1209,3 +1209,65 @@ async def redirect_to_tuner():
         return RedirectResponse(url=TUNER_URL, status_code=302)
     return {"message": "CommonUnity Tuner is not yet deployed. Set TUNER_URL env var on the root Railway service."}
 
+# ── Beta waitlist ────────────────────────────────────────────────────────────
+# Lightweight CSV-backed waitlist for the homepage beta signup form.
+# Storage: WAITLIST_PATH env var, defaults to <repo>/waitlist.csv.
+# No dependencies beyond stdlib + FastAPI Form.
+import csv as _csv
+import datetime as _dt
+import threading as _threading
+from fastapi import Request as _Request
+
+_WAITLIST_PATH = pathlib.Path(_os_env.getenv("WAITLIST_PATH", str(pathlib.Path(__file__).parent / "waitlist.csv")))
+_WAITLIST_LOCK = _threading.Lock()
+_WAITLIST_FIELDS = ["timestamp", "email", "name", "interest", "source", "user_agent", "ip"]
+
+def _waitlist_append(row: dict) -> None:
+    with _WAITLIST_LOCK:
+        new_file = not _WAITLIST_PATH.exists()
+        _WAITLIST_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with _WAITLIST_PATH.open("a", newline="", encoding="utf-8") as fh:
+            writer = _csv.DictWriter(fh, fieldnames=_WAITLIST_FIELDS, extrasaction="ignore")
+            if new_file:
+                writer.writeheader()
+            writer.writerow(row)
+
+@app.post("/api/waitlist")
+async def waitlist_submit(
+    request: _Request,
+    email: str = Form(...),
+    name: Optional[str] = Form(None),
+    interest: Optional[str] = Form(None),
+    source: Optional[str] = Form(None),
+    website: Optional[str] = Form(None),  # honeypot
+):
+    # Honeypot: if filled, silently redirect as if accepted.
+    if website:
+        return RedirectResponse(url="/home?joined=1", status_code=303)
+
+    cleaned_email = (email or "").strip()
+    if "@" not in cleaned_email or len(cleaned_email) > 254:
+        raise HTTPException(status_code=400, detail="Invalid email")
+
+    user_agent = request.headers.get("user-agent", "")[:300]
+    client_ip = (request.client.host if request.client else "") or ""
+
+    row = {
+        "timestamp": _dt.datetime.utcnow().isoformat(timespec="seconds") + "Z",
+        "email": cleaned_email,
+        "name": (name or "").strip()[:200],
+        "interest": (interest or "").strip()[:80],
+        "source": (source or "homepage").strip()[:80],
+        "user_agent": user_agent,
+        "ip": client_ip,
+    }
+
+    try:
+        _waitlist_append(row)
+    except Exception:
+        # Fail soft so a transient disk error doesn't break the public form.
+        # The submission is still acknowledged via the redirect.
+        pass
+
+    return RedirectResponse(url="/home?joined=1", status_code=303)
+
