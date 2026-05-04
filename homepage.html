@@ -593,28 +593,25 @@
     </filter>
     <!-- Primary lockup: COMMONUNITY with OM highlighted, crescent + bindu above OM.
          Strategy: a single <text> with three <tspan>s so the kerning and tracking are
-         identical across cream and gold runs. The crescent + bindu are positioned by
-         relative percentage above the OM letter pair.
-         Layout target: text-anchor middle at x=350; OM is the 2nd–3rd letter of 11.
-         For a centered string, OM's visual center sits left of the wordmark center —
-         we anchor the crescent based on measured layout below. -->
-    <symbol id="logo-lockup" viewBox="0 0 700 132">
+         identical across cream and gold runs.
+         Geometry (measured from rendered Josefin Sans 600 / 80px / +6 tracking, anchor=middle, x=350):
+           C-tspan glyph extends to x≈-15 on the left and Y to x≈716 on the right of a 0..700 box —
+           hence viewBox is widened to "-30 0 760 132" with ~14–15px breathing room each side.
+           The gold OM tspan (letters 2–3 of 11) spans x≈47..201, optical center x≈124 —
+           crescent and bindu are centered on x=124, NOT the previous x=180 (which fell over the
+           second M). -->
+    <symbol id="logo-lockup" viewBox="-30 0 760 132">
       <text x="350" y="108" text-anchor="middle"
             font-family="Josefin Sans, Plus Jakarta Sans, system-ui, sans-serif"
             font-weight="600" font-size="80" letter-spacing="6"
             text-rendering="geometricPrecision">
         <tspan fill="#FAF8F4" fill-opacity="0.96">C</tspan><tspan fill="#d4a04a" filter="url(#om-glow)">OM</tspan><tspan fill="#FAF8F4" fill-opacity="0.96">MONUNITY</tspan>
       </text>
-      <!-- Crescent (chandra) + bindu above the OM letters.
-           For text-anchor=middle on COMMONUNITY at x=350 with 80px Josefin Sans 600 + 6 tracking,
-           total width is ~520px, so wordmark spans roughly x=90..610. The OM pair sits at
-           letters 2–3 (0-indexed 1,2), with center near x = 90 + (1.5/11)*520 ≈ 161.
-           We center the crescent above x=180 (slightly right to optically align with the M's
-           heavy stem balanced against the open O). -->
-      <path d="M 152 38 Q 180 26 208 38" fill="none" stroke="#d4a04a"
+      <!-- Crescent (chandra) centered over the OM tspan optical midpoint (x=124). -->
+      <path d="M 94 38 Q 124 26 154 38" fill="none" stroke="#d4a04a"
             stroke-width="2.2" stroke-linecap="round" opacity="0.88"/>
-      <!-- bindu: small filled diamond above crescent -->
-      <path d="M 180 14 L 184 19 L 180 24 L 176 19 Z" fill="#d4a04a" opacity="0.95"/>
+      <!-- Bindu: small filled diamond above crescent, centered on x=124. -->
+      <path d="M 124 14 L 128 19 L 124 24 L 120 19 Z" fill="#d4a04a" opacity="0.95"/>
     </symbol>
 
     <!-- Compact OM mark: typographic OM in gold with crescent + bindu above.
@@ -659,7 +656,7 @@
 <header class="site">
   <div class="wrap nav">
     <a class="brand" href="/" aria-label="CommonUnity home">
-      <svg class="lockup" viewBox="0 0 700 132" aria-hidden="true"><use href="#logo-lockup"/></svg>
+      <svg class="lockup" viewBox="-30 0 760 132" aria-hidden="true"><use href="#logo-lockup"/></svg>
     </a>
     <nav class="nav-links" aria-label="Primary">
       <a href="#practice">Practice</a>
@@ -674,7 +671,7 @@
 <!-- ─────────── Hero ─────────── -->
 <section class="hero">
   <div class="wrap">
-    <svg class="lockup-hero" viewBox="0 0 700 132" aria-hidden="true"><use href="#logo-lockup"/></svg>
+    <svg class="lockup-hero" viewBox="-30 0 760 132" aria-hidden="true"><use href="#logo-lockup"/></svg>
     <div class="opening">
       <span>Open</span>
       <span class="om">Oṁ</span>
@@ -1088,7 +1085,7 @@
     <div class="foot">
       <div>
         <div class="brand" style="margin-bottom:14px;">
-          <svg class="lockup" viewBox="0 0 700 132" aria-hidden="true" style="height:24px"><use href="#logo-lockup"/></svg>
+          <svg class="lockup" viewBox="-30 0 760 132" aria-hidden="true" style="height:24px"><use href="#logo-lockup"/></svg>
         </div>
         <p class="colophon">
           A living field for unified living. Anchored in Oṁ (136.10 Hz).
