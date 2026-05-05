@@ -3002,10 +3002,9 @@ input, textarea { font: inherit; color: inherit; }
 .studio-info-popup-title { font-size: var(--text-sm) !important; }
 
 /* ============================================================
-   ENTRANCE: subtitle + Preview-Studio-v1.1 link
+   ENTRANCE: subtitle
    "Studio is where your Compass becomes form." sits under the
-   wordmark and frames the page for first-time visitors. The
-   preview link opens the Studio v1.1 conceptual layer screen.
+   wordmark and frames the page for first-time visitors.
    ============================================================ */
 .entrance-subtitle {
   margin: 0;
@@ -3021,117 +3020,113 @@ input, textarea { font: inherit; color: inherit; }
   font-style: italic;
   font-weight: 500;
 }
-.entrance-preview-link {
-  margin-top: var(--space-3);
-  background: transparent;
-  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
-  color: var(--rose-color, #c4b5fd);
-  font: inherit;
-  font-size: var(--text-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 8px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  align-self: flex-start;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-.entrance-preview-link:hover,
-.entrance-preview-link:focus-visible {
-  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 12%, transparent);
-  border-color: var(--rose-color, #c4b5fd);
-  color: var(--text);
-  outline: none;
-}
-
 /* ============================================================
-   SCREEN 3: THE Oṁ FIELD — Studio v1.1 demo layer
-   One screen, one interaction. Reuses existing tokens. No new
-   framework. Mirrors the dark palette + rose-color accents used
-   by the rest of Studio.
+   THE Oṁ FIELD — persistent global widget
+   Lives on top of every Studio screen (entrance + room). Default
+   state is a compact pill-card docked to the top-right; expanded
+   state shows the Oṁ disc, the current Spark prompt, metadata
+   tags (Movement / Arc / For), and actions (Draw another Spark,
+   Compose in Field Notes). The widget is the same DOM node on
+   every screen — when the active room changes, the "For" target
+   updates from the room context.
    ============================================================ */
-#screen-concept {
-  flex-direction: column;
-  align-items: stretch;
-  min-height: 100dvh;
-  overflow-y: auto;
-  padding: clamp(var(--space-6), 4vw, var(--space-10));
-  gap: var(--space-6);
-}
-.concept-wrap {
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
+.om-widget {
+  position: fixed;
+  top: clamp(12px, 2vh, 24px);
+  right: clamp(12px, 2vw, 24px);
+  z-index: 80;
+  width: clamp(260px, 28vw, 340px);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg) 86%, var(--rose-color, #c4b5fd) 6%);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 32%, var(--border));
+  box-shadow:
+    0 14px 38px -18px color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, transparent),
+    0 0 32px -10px color-mix(in srgb, var(--rose-color, #c4b5fd) 22%, transparent) inset;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text);
+  font-size: var(--text-sm);
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  transition: width 0.25s ease, padding 0.25s ease, border-radius 0.25s ease;
+  pointer-events: auto;
 }
-.concept-head {
-  display: flex;
-  flex-direction: column;
+.om-widget[hidden] { display: none !important; }
+.om-widget.is-collapsed {
+  width: auto;
+  padding: 8px 14px 8px 8px;
+  border-radius: 999px;
   gap: var(--space-2);
-  text-align: center;
-  align-items: center;
+  cursor: pointer;
 }
-.concept-eyebrow {
-  font-size: var(--text-xs);
+.om-widget.is-collapsed .om-widget-body,
+.om-widget.is-collapsed .om-widget-foot { display: none; }
+.om-widget.is-collapsed .om-widget-head { gap: 8px; }
+.om-widget.is-collapsed .om-widget-title { font-size: 11px; }
+.om-widget.is-collapsed .om-widget-room  { display: none; }
+
+.om-widget-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.om-widget-title {
+  flex: 1;
+  font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--rose-color, #c4b5fd);
   font-weight: 700;
+  white-space: nowrap;
 }
-.concept-title {
-  margin: 0;
-  font-size: var(--text-xl);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--text);
-  line-height: 1.15;
-  max-width: 24ch;
+.om-widget-room {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  white-space: nowrap;
 }
-.concept-title em {
-  font-style: italic;
-  font-weight: 500;
-  color: var(--rose-color, #c4b5fd);
-}
-.concept-lede {
-  margin: var(--space-2) 0 0;
-  color: var(--text-muted);
-  max-width: 56ch;
-  line-height: 1.6;
-}
-.concept-back {
-  align-self: flex-start;
+.om-widget-room.is-set { color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, var(--text-muted)); }
+.om-widget-toggle {
   background: transparent;
   border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
   color: var(--text-muted);
-  padding: 6px 12px;
-  border-radius: 999px;
-  font: inherit;
-  font-size: var(--text-xs);
-  letter-spacing: 0.04em;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
   transition: color 0.15s ease, border-color 0.15s ease;
-  margin-bottom: var(--space-2);
+  flex-shrink: 0;
 }
-.concept-back:hover { color: var(--text); border-color: color-mix(in srgb, var(--text-muted) 60%, transparent); }
+.om-widget-toggle:hover,
+.om-widget-toggle:focus-visible {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
+  outline: none;
+}
 
-/* ── The Oṁ Field disc + rings ─────────────────────────── */
-.om-field {
+.om-widget-body {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) 0 var(--space-2);
+  gap: var(--space-3);
+  align-items: flex-start;
 }
+.om-widget-disc-wrap { flex-shrink: 0; }
 .om-disc {
   position: relative;
-  width: clamp(180px, 36vw, 240px);
-  height: clamp(180px, 36vw, 240px);
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background:
     radial-gradient(circle at 50% 45%,
-      color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, transparent) 0%,
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent) 0%,
       color-mix(in srgb, var(--rose-color, #c4b5fd) 18%, transparent) 38%,
       transparent 70%);
   border: none;
@@ -3142,15 +3137,16 @@ input, textarea { font: inherit; color: inherit; }
   outline: none;
   transition: transform 0.4s cubic-bezier(.2,.7,.3,1);
 }
-.om-disc:hover  { transform: scale(1.02); }
-.om-disc:active { transform: scale(0.98); }
+.om-widget.is-collapsed .om-disc { width: 30px; height: 30px; }
+.om-disc:hover  { transform: scale(1.04); }
+.om-disc:active { transform: scale(0.96); }
 .om-disc:focus-visible {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, transparent);
 }
 .om-disc.is-pulsing { animation: om-pulse 1.4s cubic-bezier(.2,.7,.3,1); }
 @keyframes om-pulse {
   0%   { box-shadow: 0 0 0 0  color-mix(in srgb, var(--rose-color,#c4b5fd) 60%, transparent); }
-  60%  { box-shadow: 0 0 0 28px color-mix(in srgb, var(--rose-color,#c4b5fd) 0%,  transparent); }
+  60%  { box-shadow: 0 0 0 18px color-mix(in srgb, var(--rose-color,#c4b5fd) 0%,  transparent); }
   100% { box-shadow: 0 0 0 0  color-mix(in srgb, var(--rose-color,#c4b5fd) 0%,  transparent); }
 }
 .om-rings {
@@ -3163,232 +3159,146 @@ input, textarea { font: inherit; color: inherit; }
   inset: 0;
   border-radius: 50%;
   border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, transparent);
-  opacity: 0.6;
-  animation: om-ring-spin 32s linear infinite;
+  opacity: 0.55;
+  animation: om-ring-spin 36s linear infinite;
 }
 .om-ring.r1 { transform: scale(0.78); animation-duration: 36s; opacity: 0.55; }
 .om-ring.r2 { transform: scale(0.92) rotate(20deg); border-style: dashed; animation-duration: 48s; animation-direction: reverse; opacity: 0.4; }
-.om-ring.r3 { transform: scale(1.04); border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 16%, transparent); animation-duration: 60s; opacity: 0.35; }
 @keyframes om-ring-spin {
-  from { transform: rotate(0deg) scale(var(--s, 1)); }
-  to   { transform: rotate(360deg) scale(var(--s, 1)); }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .om-ring, .om-disc.is-pulsing { animation: none; }
+  .om-ring, .om-disc.is-pulsing, .spark-prompt-row.is-emitting { animation: none; }
 }
 .om-glyph {
   font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
   font-style: italic;
-  font-size: clamp(48px, 7vw, 64px);
+  font-size: 22px;
   color: color-mix(in srgb, var(--text) 90%, var(--rose-color, #c4b5fd));
-  text-shadow: 0 0 24px color-mix(in srgb, var(--rose-color, #c4b5fd) 65%, transparent);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--rose-color, #c4b5fd) 70%, transparent);
   user-select: none;
   pointer-events: none;
 }
-.om-call {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: var(--text-sm);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.om-call .om-call-line.muted { color: var(--text-faint); }
-.om-call .om-call-sep {
-  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
-}
+.om-widget.is-collapsed .om-glyph { font-size: 13px; }
 
-/* ── Holographic Spark card ────────────────────────────── */
-.spark-stage {
-  display: flex;
-  justify-content: center;
-}
-.spark-holo {
-  width: 100%;
-  border-radius: 14px;
-  padding: clamp(var(--space-5), 3vw, var(--space-8));
-  background:
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--rose-color, #c4b5fd) 8%, transparent),
-      color-mix(in srgb, var(--rose-color, #c4b5fd) 2%, transparent));
-  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 32%, var(--border));
-  box-shadow:
-    0 0 40px -10px color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, transparent) inset,
-    0 12px 36px -16px color-mix(in srgb, var(--rose-color, #c4b5fd) 25%, transparent);
+.om-widget-content {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  position: relative;
-  overflow: hidden;
-}
-.spark-holo::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    linear-gradient(120deg,
-      transparent 30%,
-      color-mix(in srgb, var(--rose-color, #c4b5fd) 16%, transparent) 50%,
-      transparent 70%);
-  opacity: 0.6;
-  mix-blend-mode: screen;
-}
-.spark-holo.is-emitting { animation: spark-emit 0.7s cubic-bezier(.2,.7,.3,1); }
-@keyframes spark-emit {
-  0%   { transform: translateY(8px) scale(0.985); opacity: 0.4; }
-  100% { transform: translateY(0)   scale(1);     opacity: 1; }
+  gap: 8px;
 }
 .spark-rise {
-  font-size: var(--text-xs);
-  letter-spacing: 0.22em;
+  font-size: 10px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--rose-color, #c4b5fd);
+  color: var(--text-faint);
   font-weight: 600;
 }
-.spark-prompt {
-  margin: 0;
+.spark-prompt-row {
   font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
-  font-size: clamp(20px, 2.6vw, 26px);
+  font-size: clamp(15px, 1.4vw, 17px);
   font-weight: 500;
   line-height: 1.4;
   color: var(--text);
   letter-spacing: -0.005em;
+  margin: 0;
+}
+.spark-prompt-row.is-emitting { animation: spark-emit 0.6s cubic-bezier(.2,.7,.3,1); }
+@keyframes spark-emit {
+  0%   { transform: translateY(4px); opacity: 0.4; }
+  100% { transform: translateY(0);   opacity: 1; }
 }
 .spark-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  margin-top: 4px;
+  gap: 4px 6px;
+  margin-top: 2px;
 }
+.spark-meta[hidden] { display: none; }
 .spark-tag {
-  font-size: 10px;
-  letter-spacing: 0.18em;
+  font-size: 9px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-faint);
   font-weight: 600;
   border: 1px solid color-mix(in srgb, var(--text-faint) 40%, transparent);
-  padding: 3px 9px;
+  padding: 2px 7px;
   border-radius: 999px;
+  white-space: nowrap;
 }
 .spark-tag.movement { color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-muted)); border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 40%, transparent); }
 .spark-tag.arc      { color: var(--text-muted); }
 .spark-tag.target   { color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, var(--text-muted)); }
-.spark-actions {
+
+.om-widget-actions {
   display: flex;
-  gap: var(--space-2);
   flex-wrap: wrap;
-  margin-top: var(--space-2);
+  gap: 6px;
 }
-.spark-btn {
+.om-widget-btn {
   background: transparent;
-  color: var(--rose-color, #c4b5fd);
-  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, transparent);
-  padding: 8px 16px;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
+  padding: 6px 12px;
   font: inherit;
-  font-size: var(--text-sm);
+  font-size: 12px;
   font-weight: 500;
+  letter-spacing: 0.02em;
   border-radius: 999px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.spark-btn:hover,
-.spark-btn:focus-visible {
+.om-widget-btn:hover,
+.om-widget-btn:focus-visible {
   background: color-mix(in srgb, var(--rose-color, #c4b5fd) 12%, transparent);
   color: var(--text);
-  border-color: var(--rose-color, #c4b5fd);
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, transparent);
   outline: none;
+}
+.om-widget-btn.is-primary {
+  color: var(--rose-color, #c4b5fd);
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, transparent);
+}
+.om-widget-btn[hidden] { display: none; }
+
+.om-widget-foot {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-faint);
+  margin: 0;
 }
 
-/* ── Connected Field Notes card ────────────────────────── */
-.fieldnotes-card {
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  border-radius: 12px;
-  padding: clamp(var(--space-5), 3vw, var(--space-6));
-  background: color-mix(in srgb, var(--input-bg) 70%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+/* Mobile: widget docks to the bottom-right and shrinks */
+@media (max-width: 600px) {
+  .om-widget {
+    top: auto;
+    bottom: clamp(12px, 2vh, 20px);
+    right: clamp(12px, 2vw, 16px);
+    left: clamp(12px, 2vw, 16px);
+    width: auto;
+  }
+  .om-widget.is-collapsed {
+    left: auto;
+    width: auto;
+  }
 }
-.fieldnotes-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-.fieldnotes-label {
-  font-size: var(--text-sm);
-  font-weight: 600;
+
+/* Subtle "available to Nexus" line under the existing notepad,
+   shown after a save. Reuses the rose-color accent. */
+.notepad-nexus-hint {
+  margin: 6px 0 0;
+  font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--text);
-}
-.fieldnotes-tag {
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
   color: var(--text-faint);
+  line-height: 1.5;
+  display: none;
 }
-.fieldnotes-area {
-  width: 100%;
-  resize: vertical;
-  min-height: 140px;
-  background: color-mix(in srgb, var(--bg) 75%, transparent);
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  border-radius: 10px;
-  padding: var(--space-4);
-  color: var(--text);
-  font: inherit;
-  font-size: var(--text-base);
-  line-height: 1.6;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-.fieldnotes-area::placeholder { color: var(--text-faint); font-style: italic; }
-.fieldnotes-area:focus {
-  outline: none;
-  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, transparent);
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-}
-.fieldnotes-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-.concept-chip {
-  background: transparent;
-  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  padding: 6px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
-}
-.concept-chip:hover,
-.concept-chip:focus-visible {
-  color: var(--text);
-  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
-  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 10%, transparent);
-  outline: none;
-}
-.concept-chip.is-saved {
-  color: var(--rose-color, #c4b5fd);
-  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
-}
-.fieldnotes-foot {
-  margin: 4px 0 0;
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-  line-height: 1.55;
-}
-.fieldnotes-foot em {
-  font-style: italic;
-  color: color-mix(in srgb, var(--text) 90%, var(--rose-color, #c4b5fd));
+.notepad-nexus-hint.is-visible { display: block; }
+.notepad-nexus-hint strong {
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 70%, var(--text-muted));
+  font-weight: 500;
 }
 
 /* ── Toast for placeholder feedback ────────────────────── */
@@ -3495,9 +3405,6 @@ input, textarea { font: inherit; color: inherit; }
     </div>
     <p class="entrance-subtitle">Studio is where your <em>Compass</em> becomes form.</p>
     <div class="entrance-name" id="entrance-name"></div>
-    <button class="entrance-preview-link" id="entrance-preview-link" type="button" aria-label="Preview the Studio v1.1 conceptual layer">
-      Preview Studio v1.1 <span aria-hidden="true">→</span>
-    </button>
 
     <!-- Seed prompt — tap to expand name + calculator -->
     <button class="entrance-seed-btn" id="entrance-seed-btn">
@@ -3874,18 +3781,21 @@ input, textarea { font: inherit; color: inherit; }
       <div class="notepad-surface">
         <div class="notepad-header">
   <div style="display:flex;align-items:center;gap:var(--space-2);">
-          <span class="notepad-label">Notepad</span>
-          <button class="studio-info-btn" data-info="info-notepad-overlay" title="About the Notepad"><i>i</i></button>
+          <span class="notepad-label">Field Notes</span>
+          <button class="studio-info-btn" data-info="info-notepad-overlay" title="About Field Notes"><i>i</i></button>
         </div>
           <div class="notepad-actions">
             <button class="voice-btn" id="voice-record-btn" title="Record voice note">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
             </button>
-            <button class="notepad-save-btn" id="btn-save-entry">Save ⌘↵</button>
+            <button class="notepad-save-btn" id="btn-save-entry" title="Save to Field Notes (⌘↵)">Save to Field Notes <span aria-hidden="true">⌘↵</span></button>
           </div>
         </div>
         <textarea class="notepad-textarea" id="workbench-input"
-          placeholder="Write freely. Reflections, questions, fragments, intentions. This space is yours."></textarea>
+          placeholder="Write freely. Reflections, questions, fragments, intentions. This space is yours.&#10;&#10;Or — Save to Field Notes is the Save button above. Saved Field Notes become available to Nexus."></textarea>
+        <p class="notepad-nexus-hint" id="notepad-nexus-hint" role="status" aria-live="polite">
+          <strong>Saved.</strong> This Field Note is now available to Nexus for reflection, profile, website, and personal-OS shaping.
+        </p>
         <div class="notepad-entries">
           <div class="workbench-entries" id="workbench-entries"></div>
           <div id="voice-entries" style="display:none;"></div>
@@ -3995,85 +3905,48 @@ input, textarea { font: inherit; color: inherit; }
 
 
 <!-- ============================================================
-     SCREEN 3: THE Oṁ FIELD — Studio v1.1 demo layer
-     Replaces the prior dashboard-style preview (Ignition / Rooms /
-     Path Progress / Nexus Sidecar). One screen, one interaction:
-     touch the Oṁ Field, draw a Spark, sit with the prompt, write
-     in the connected Field Notes, save it. The torus is the muse.
-     Nexus listens to the archive without showing as a separate room.
+     THE Oṁ FIELD — persistent global widget
+     Lives at the document level, fixed-positioned, visible on
+     every Studio screen (entrance + room). The active room
+     populates the "For ·" tag so Sparks become room-aware.
+     Compose in Field Notes drops the prompt into the existing
+     #workbench-input notepad on the room screen, then focuses it.
      ============================================================ -->
-<div id="screen-concept" class="screen" aria-labelledby="concept-title">
-  <div class="concept-wrap">
-
-    <button class="concept-back" id="concept-back" type="button">← Back to entrance</button>
-
-    <header class="concept-head">
-      <div class="concept-eyebrow">Studio · The Oṁ Field</div>
-      <h1 class="concept-title" id="concept-title">Studio is where your <em>Compass becomes form.</em></h1>
-      <p class="concept-lede">
-        Touch the Oṁ Field. Draw a Spark. A question rises from the field —
-        sit with it, answer in your Field Notes, and let the archive grow.
-      </p>
-    </header>
-
-    <!-- The Oṁ Field — torus / muse interaction -->
-    <section class="om-field" aria-label="The Oṁ Field">
+<aside id="om-widget" class="om-widget is-collapsed" aria-label="The Oṁ Field">
+  <div class="om-widget-head">
+    <button type="button" class="om-widget-toggle" id="om-toggle"
+            aria-expanded="false" aria-controls="om-widget-body"
+            title="Expand the Oṁ Field">+</button>
+    <span class="om-widget-title">Oṁ Field · Studio Spark</span>
+    <span class="om-widget-room" id="om-widget-room">—</span>
+  </div>
+  <div class="om-widget-body" id="om-widget-body">
+    <div class="om-widget-disc-wrap">
       <button type="button" class="om-disc" id="om-disc"
               aria-label="Touch the Oṁ Field to draw a Spark">
         <span class="om-rings" aria-hidden="true">
           <span class="om-ring r1"></span>
           <span class="om-ring r2"></span>
-          <span class="om-ring r3"></span>
         </span>
         <span class="om-glyph" aria-hidden="true">Oṁ</span>
       </button>
-      <p class="om-call">
-        <span class="om-call-line">Touch the Oṁ Field</span>
-        <span class="om-call-sep" aria-hidden="true">·</span>
-        <span class="om-call-line muted">Draw a Spark</span>
-      </p>
-    </section>
-
-    <!-- Holographic Spark card — emitted from the Oṁ Field -->
-    <section class="spark-stage" id="spark-stage" aria-live="polite" aria-atomic="true">
-      <article class="spark-holo" id="spark-card">
-        <div class="spark-rise">A question rises from the field</div>
-        <p class="spark-prompt" id="spark-prompt">Touch the Oṁ Field to receive your first Spark.</p>
-        <div class="spark-meta" id="spark-meta" hidden>
-          <span class="spark-tag movement" id="spark-movement">Movement · —</span>
-          <span class="spark-tag arc"      id="spark-arc">Arc · —</span>
-          <span class="spark-tag target"   id="spark-target">For · —</span>
-        </div>
-        <div class="spark-actions">
-          <button class="spark-btn" id="spark-draw" type="button">Draw another Spark</button>
-        </div>
-      </article>
-    </section>
-
-    <!-- Connected Field Notes — the answer surface -->
-    <section class="fieldnotes-card" aria-labelledby="fieldnotes-title">
-      <header class="fieldnotes-head">
-        <span class="fieldnotes-label" id="fieldnotes-title">Field Notes</span>
-        <span class="fieldnotes-tag">Your answer to the Spark</span>
-      </header>
-      <textarea class="fieldnotes-area" id="fieldnotes-area"
-        placeholder="Begin where you are. Write toward the question, not around it. Nothing here is final — Field Notes is the loose page before the form."
-        rows="6"
-        aria-label="Write your answer to the current Spark"></textarea>
-      <div class="fieldnotes-actions">
-        <button class="concept-chip" id="save-fieldnotes" type="button" data-toast="Saved to Field Notes.">Save to Field Notes</button>
-        <button class="concept-chip" id="save-nexus"      type="button" data-toast="Sent to Nexus for reflection.">Save for Nexus</button>
+    </div>
+    <div class="om-widget-content">
+      <span class="spark-rise">A question rises from the field</span>
+      <p class="spark-prompt-row" id="spark-prompt">Touch the Oṁ Field to draw a Spark.</p>
+      <div class="spark-meta" id="spark-meta" hidden>
+        <span class="spark-tag movement" id="spark-movement">Movement · —</span>
+        <span class="spark-tag arc"      id="spark-arc">Arc · —</span>
+        <span class="spark-tag target"   id="spark-target">For · —</span>
       </div>
-      <p class="fieldnotes-foot">
-        Saved Field Notes become queryable by Nexus. Nexus listens to the archive
-        and translates reflections into your <em>living profile</em>,
-        <em>website</em>, and <em>personal OS</em> — without doing the becoming
-        for you.
-      </p>
-    </section>
-
+      <div class="om-widget-actions">
+        <button type="button" class="om-widget-btn is-primary" id="spark-draw">Draw another Spark</button>
+        <button type="button" class="om-widget-btn" id="spark-compose" hidden>Compose in Field Notes</button>
+      </div>
+    </div>
   </div>
-</div><!-- /screen-concept -->
+  <p class="om-widget-foot">Answer in Field Notes. Saved Field Notes become available to Nexus.</p>
+</aside>
 
 <!-- Lightweight feedback toast for placeholder actions -->
 <div id="concept-toast" class="concept-toast" role="status" aria-live="polite"></div>
@@ -7211,40 +7084,43 @@ if (document.readyState === 'loading') {
 }
 
 /* ============================================================
-   STUDIO — The Oṁ Field (v1.1 demo layer)
-   - Toggle between #screen-entrance and #screen-concept.
-   - Touch the Oṁ disc → emit a holographic Studio Spark.
-   - "Draw another Spark" rotates a small library of prompts
-     rooted in the 8 movements, the Gene Keys arc, and an output
-     target (Living Profile / Website Seed / Personal OS / etc.).
-   - Save chips show a non-destructive toast and a "saved" state.
-     No persistence, no network calls — placeholder by design.
+   STUDIO — The Oṁ Field (persistent global widget)
+   - Lives at the document level; visible on every Studio screen.
+   - Draws Sparks from the 8 movements + Gene Keys arc library.
+   - Reads the active room (.room-pill.active) so each Spark gets
+     a room-aware "For" target. The widget is the same DOM node
+     in every room — no duplication.
+   - "Compose in Field Notes" pipes the current Spark prompt into
+     the existing #workbench-input notepad, then focuses it.
+   - The notepad's Save button is the only save. After save we
+     surface a small confirmation that the Field Note is now
+     available to Nexus.
+   - No persistence beyond what the existing Studio already does.
    ============================================================ */
-(function initStudioOmField() {
+(function initOmField() {
   function go() {
-    var entrance = document.getElementById('screen-entrance');
-    var concept  = document.getElementById('screen-concept');
-    var openBtn  = document.getElementById('entrance-preview-link');
-    var backBtn  = document.getElementById('concept-back');
-    if (!entrance || !concept || !openBtn || !backBtn) return;
-
-    function showConcept() {
-      entrance.classList.remove('active');
-      concept.classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
-    }
-    function showEntrance() {
-      concept.classList.remove('active');
-      entrance.classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
-    }
-    openBtn.addEventListener('click', showConcept);
-    backBtn.addEventListener('click', showEntrance);
+    var widget   = document.getElementById('om-widget');
+    var disc     = document.getElementById('om-disc');
+    var promptEl = document.getElementById('spark-prompt');
+    var metaEl   = document.getElementById('spark-meta');
+    var movementEl = document.getElementById('spark-movement');
+    var arcEl      = document.getElementById('spark-arc');
+    var targetEl   = document.getElementById('spark-target');
+    var roomEl     = document.getElementById('om-widget-room');
+    var drawBtn    = document.getElementById('spark-draw');
+    var composeBtn = document.getElementById('spark-compose');
+    var toggleBtn  = document.getElementById('om-toggle');
+    var bodyEl     = document.getElementById('om-widget-body');
+    var nexusHint  = document.getElementById('notepad-nexus-hint');
+    var saveBtn    = document.getElementById('btn-save-entry');
+    var workbench  = document.getElementById('workbench-input');
+    if (!widget || !disc || !promptEl) return;
 
     // ── Studio Spark library ───────────────────────────────
-    // Each spark carries the four-part matrix from the Studio
-    // architecture: Movement (one of 8) + Arc (Shadow→Gift /
-    // Gift→Siddhi) + Target (where the answer can become form).
+    // Same set carried forward from the previous Spark pass —
+    // each carries Movement (one of 8) + Arc (Shadow → Gift /
+    // Gift → Siddhi) + a default Target. The active room can
+    // override the Target so the Spark feels room-aware.
     var SPARKS = [
       { movement: 'Relationship',  arc: 'Shadow → Gift', target: 'Living Profile', prompt: 'Write the first sentence of your living profile — the one a normal social profile cannot hold.' },
       { movement: 'Practice',      arc: 'Shadow → Gift', target: 'Personal OS',    prompt: 'What practice already holds your life together, even quietly? Name it without inflating it.' },
@@ -7263,31 +7139,58 @@ if (document.readyState === 'loading') {
       { movement: 'Unity',         arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'If your website were a threshold into your field, what should someone feel, know, and do when they arrive?' }
     ];
 
-    var disc       = document.getElementById('om-disc');
-    var card       = document.getElementById('spark-card');
-    var promptEl   = document.getElementById('spark-prompt');
-    var metaEl     = document.getElementById('spark-meta');
-    var movementEl = document.getElementById('spark-movement');
-    var arcEl      = document.getElementById('spark-arc');
-    var targetEl   = document.getElementById('spark-target');
-    var drawBtn    = document.getElementById('spark-draw');
-    var lastIdx    = -1;
+    // Map active Studio rooms to a Spark "For" target. The four
+    // existing rooms map onto four facets of "where the answer
+    // becomes form." If no room is active (entrance screen) the
+    // Spark uses its default target.
+    var ROOM_TARGETS = {
+      work:  'Living Profile',
+      lens:  'Personal OS',
+      field: 'Website Seed',
+      call:  'Offering'
+    };
+    var ROOM_LABELS = {
+      work:  'The Work',
+      lens:  'The Lens',
+      field: 'The Field',
+      call:  'The Call'
+    };
 
-    function renderSpark(s) {
+    var lastIdx     = -1;
+    var currentSpark = null;
+
+    function getActiveRoomKey() {
+      var pill = document.querySelector('.room-pill.active');
+      return pill && pill.dataset.room ? pill.dataset.room : null;
+    }
+
+    function refreshRoomLabel() {
+      var key = getActiveRoomKey();
+      if (key && ROOM_LABELS[key]) {
+        roomEl.textContent = ROOM_LABELS[key];
+        roomEl.classList.add('is-set');
+      } else {
+        roomEl.textContent = 'In the Studio entrance';
+        roomEl.classList.remove('is-set');
+      }
+      // Re-render the current Spark so the "For" tag follows the room.
+      if (currentSpark) renderSpark(currentSpark, /*reanimate*/ false);
+    }
+
+    function renderSpark(s, reanimate) {
+      currentSpark = s;
       promptEl.textContent   = s.prompt;
       movementEl.textContent = 'Movement · ' + s.movement;
       arcEl.textContent      = 'Arc · '      + s.arc;
-      targetEl.textContent   = 'For · '      + s.target;
+      var roomKey = getActiveRoomKey();
+      var target  = (roomKey && ROOM_TARGETS[roomKey]) ? ROOM_TARGETS[roomKey] : s.target;
+      targetEl.textContent   = 'For · '      + target;
       if (metaEl) metaEl.hidden = false;
-      // Re-trigger the holographic emit animation.
-      if (card) {
-        card.classList.remove('is-emitting');
-        // force reflow so the animation restarts
-        // eslint-disable-next-line no-unused-expressions
-        void card.offsetWidth;
-        card.classList.add('is-emitting');
-      }
-      if (disc) {
+      if (composeBtn) composeBtn.hidden = false;
+      if (reanimate !== false) {
+        promptEl.classList.remove('is-emitting');
+        void promptEl.offsetWidth; // restart animation
+        promptEl.classList.add('is-emitting');
         disc.classList.remove('is-pulsing');
         void disc.offsetWidth;
         disc.classList.add('is-pulsing');
@@ -7300,32 +7203,139 @@ if (document.readyState === 'loading') {
       do { idx = Math.floor(Math.random() * SPARKS.length); }
       while (idx === lastIdx);
       lastIdx = idx;
-      renderSpark(SPARKS[idx]);
+      renderSpark(SPARKS[idx], true);
+      // If the widget is collapsed, expand so the new Spark is visible.
+      if (widget.classList.contains('is-collapsed')) {
+        setCollapsed(false);
+      }
     }
 
-    if (disc)    disc.addEventListener('click', drawSpark);
-    if (drawBtn) drawBtn.addEventListener('click', drawSpark);
+    function setCollapsed(collapsed) {
+      widget.classList.toggle('is-collapsed', collapsed);
+      toggleBtn.textContent = collapsed ? '+' : '−';
+      toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      toggleBtn.title = collapsed ? 'Expand the Oṁ Field' : 'Minimize the Oṁ Field';
+    }
 
-    // ── Toast for placeholder actions ──────────────────────
+    // Compose: pipe the current Spark prompt into the room-screen
+    // notepad. If we're on the entrance screen, the textarea is
+    // not yet in view — switch to whatever the user opened most
+    // recently is out of scope, so we fall back to a toast that
+    // points to a room.
+    function composeInFieldNotes() {
+      if (!currentSpark) return;
+      if (workbench && document.getElementById('screen-room') &&
+          document.getElementById('screen-room').classList.contains('active')) {
+        // Prepend the Spark prompt as a quoted line so the user
+        // can answer underneath without losing what they were
+        // already drafting.
+        var existing = workbench.value || '';
+        var prefix = '> ' + currentSpark.prompt + '\n\n';
+        workbench.value = prefix + existing;
+        workbench.focus();
+        // Place caret after the prefix so the user types into
+        // their answer space, not the quoted question.
+        var pos = prefix.length;
+        try { workbench.setSelectionRange(pos, pos); } catch (_) {}
+        // Brief minimize so the notepad is unobstructed.
+        setCollapsed(true);
+        showLocalToast('Spark dropped into Field Notes — answer below.');
+      } else {
+        showLocalToast('Open a room to answer this Spark in Field Notes.');
+      }
+    }
+
+    // ── Toast for placeholder actions (uses the existing
+    // #concept-toast element, kept from the previous pass). ──
     var toast = document.getElementById('concept-toast');
     var toastTimer = null;
-    function showToast(msg) {
+    function showLocalToast(msg) {
       if (!toast) return;
       toast.textContent = msg;
       toast.classList.add('show');
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+      toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
     }
 
-    concept.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-toast]');
-      if (!btn) return;
-      // Mark Save chips as saved on click.
-      if (btn.classList.contains('concept-chip')) {
-        btn.classList.add('is-saved');
-      }
-      showToast(btn.getAttribute('data-toast') || 'Done.');
+    // ── Wire up controls ───────────────────────────────────
+    disc.addEventListener('click', drawSpark);
+    if (drawBtn)    drawBtn.addEventListener('click', drawSpark);
+    if (composeBtn) composeBtn.addEventListener('click', composeInFieldNotes);
+    toggleBtn.addEventListener('click', function () {
+      setCollapsed(!widget.classList.contains('is-collapsed'));
     });
+    // Tapping the collapsed widget anywhere expands it.
+    widget.addEventListener('click', function (e) {
+      if (!widget.classList.contains('is-collapsed')) return;
+      if (e.target.closest('.om-widget-toggle')) return;
+      setCollapsed(false);
+    });
+
+    // ── Room-awareness via DOM mutation observer ──────────
+    // The existing Studio code toggles ".room-pill.active". We
+    // observe attribute changes on those pills and refresh the
+    // "For" tag and room label when the active room changes.
+    var pills = document.querySelectorAll('.room-pill');
+    if (pills.length && 'MutationObserver' in window) {
+      var obs = new MutationObserver(refreshRoomLabel);
+      pills.forEach(function (p) {
+        obs.observe(p, { attributes: true, attributeFilter: ['class'] });
+      });
+    }
+    // Also observe screen-active toggling so the label flips
+    // back to "entrance" when the user returns to the portal.
+    var entrance = document.getElementById('screen-entrance');
+    var roomScreen = document.getElementById('screen-room');
+    [entrance, roomScreen].forEach(function (el) {
+      if (!el) return;
+      new MutationObserver(refreshRoomLabel).observe(el, {
+        attributes: true, attributeFilter: ['class']
+      });
+    });
+
+    refreshRoomLabel();
+
+    // ── Notepad save: surface "available to Nexus" hint ───
+    // We don't replace the existing save handler; we add a
+    // capture-phase listener on the Save button so we can show
+    // the hint after the existing save completes. The hint
+    // auto-fades; pressing Save again restarts it.
+    if (saveBtn && nexusHint) {
+      var hintTimer = null;
+      saveBtn.addEventListener('click', function () {
+        // Defer a tick so the existing handler runs first and
+        // empties the textarea. If the textarea was empty, the
+        // existing handler returns early and we shouldn't show
+        // the hint either — guard on it being non-trivial.
+        var hadText = workbench && workbench.value && workbench.value.trim().length > 0;
+        if (!hadText) return;
+        setTimeout(function () {
+          nexusHint.classList.add('is-visible');
+          if (hintTimer) clearTimeout(hintTimer);
+          hintTimer = setTimeout(function () {
+            nexusHint.classList.remove('is-visible');
+          }, 5000);
+        }, 50);
+      });
+      // Keyboard save (⌘↵ / Ctrl↵) — same hint.
+      if (workbench) {
+        workbench.addEventListener('keydown', function (e) {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+            // The existing code handles the save itself; we just
+            // surface the hint after a tick.
+            var hadText = workbench.value && workbench.value.trim().length > 0;
+            if (!hadText) return;
+            setTimeout(function () {
+              nexusHint.classList.add('is-visible');
+              if (hintTimer) clearTimeout(hintTimer);
+              hintTimer = setTimeout(function () {
+                nexusHint.classList.remove('is-visible');
+              }, 5000);
+            }, 50);
+          }
+        });
+      }
+    }
   }
 
   if (document.readyState === 'loading') {
