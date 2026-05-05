@@ -41,10 +41,15 @@ export function serveStatic(app: Express) {
     res.set(noStoreHeaders);
     res.sendFile(path.resolve(distPath, "studio.html"));
   });
-  app.get("/manifesto", (_req, res) => {
+  // /source-code is the canonical public URL for the CommonUnity Source Code
+  // page (formerly the Manifesto). /manifesto stays as a permanent alias so
+  // existing inbound links don't break. Both serve manifesto.html.
+  const serveSourceCode = (_req: express.Request, res: express.Response) => {
     res.set(noStoreHeaders);
     res.sendFile(path.resolve(distPath, "manifesto.html"));
-  });
+  };
+  app.get("/source-code", serveSourceCode);
+  app.get("/manifesto", serveSourceCode);
 
   app.use(express.static(distPath));
 

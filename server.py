@@ -1195,18 +1195,22 @@ async def serve_homepage():
         })
     return {"error": "Homepage not found"}
 
-# CommonUnity public manifesto. Open under CC BY 4.0; surfaces the
-# philosophy/origin so the ethos can ripple outward with attribution.
+# CommonUnity public Source Code (formerly "Manifesto"). Open under CC BY 4.0;
+# surfaces the philosophy / lineages / path / open-attribution so the ethos
+# can ripple outward with attribution. /source-code is the canonical public
+# URL; /manifesto stays as a permanent alias so existing inbound links don't
+# break. Both serve the same manifesto.html file.
+@app.get("/source-code")
 @app.get("/manifesto")
-async def serve_manifesto():
-    manifesto = pathlib.Path(__file__).parent / "manifesto.html"
-    if manifesto.exists():
-        return FileResponse(manifesto, headers={
+async def serve_source_code():
+    page = pathlib.Path(__file__).parent / "manifesto.html"
+    if page.exists():
+        return FileResponse(page, headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",
             "Expires": "0"
         })
-    return {"error": "Manifesto not found"}
+    return {"error": "Source Code page not found"}
 
 # ── Tuner redirect ───────────────────────────────────────────────────────────
 # Update TUNER_URL after Railway deployment is complete.

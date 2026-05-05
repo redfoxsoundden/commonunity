@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CommonUnity Manifesto — Make unity practical.</title>
-<meta name="description" content="The CommonUnity manifesto: why we exist, the fragmentation we are responding to, and the alternative we are building. Open under Creative Commons Attribution 4.0.">
+<title>CommonUnity Source Code — A manifesto, path, and open invitation for unified living.</title>
+<meta name="description" content="The CommonUnity Source Code: a manifesto, a path, and an open invitation for unified living. Eight movements of good living, the lineages we honor, and how the tools serve the path. Open under Creative Commons Attribution 4.0.">
 <meta name="theme-color" content="#0b1120">
-<meta property="og:title" content="CommonUnity Manifesto — Make unity practical.">
-<meta property="og:description" content="A trust architecture for becoming whole in a fragmented digital world. Open under Creative Commons Attribution 4.0.">
+<meta property="og:title" content="CommonUnity Source Code — A manifesto, path, and open invitation for unified living.">
+<meta property="og:description" content="A contemporary practice field for ancient questions: how to live with integrity, create from the heart, and use technology without becoming owned by it. Open under CC BY 4.0.">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://commonunity.io/manifesto">
+<meta property="og:url" content="https://commonunity.io/source-code">
+<link rel="canonical" href="https://commonunity.io/source-code">
 <link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="mask-icon" href="/assets/brand/mono-mark.svg" color="#B8872E">
 <link rel="license" href="https://creativecommons.org/licenses/by/4.0/">
@@ -66,7 +67,7 @@
   }
   a { color: var(--gold-soft); text-decoration: none; border-bottom: 1px solid rgba(212,160,74,0.35); transition: color .15s ease, border-color .15s ease; }
   a:hover { color: var(--cream); border-color: var(--cream-dim); }
-  a:focus-visible, button:focus-visible {
+  a:focus-visible, button:focus-visible, summary:focus-visible {
     outline: 2px solid var(--gold-soft);
     outline-offset: 3px;
     border-radius: 3px;
@@ -157,14 +158,14 @@
   }
 
   /* Article */
-  article.manifesto {
+  article.source-code {
     padding-bottom: clamp(60px, 9vh, 110px);
   }
-  article.manifesto section {
+  article.source-code section {
     padding-top: clamp(40px, 5vh, 64px);
     padding-bottom: 0;
   }
-  article.manifesto h2 {
+  article.source-code h2 {
     font-family: var(--font-display);
     font-weight: 500;
     font-size: clamp(26px, 3.4vw, 38px);
@@ -173,8 +174,8 @@
     margin: 0 0 18px;
     color: var(--cream);
   }
-  article.manifesto h2 em { font-style: italic; color: var(--gold-soft); font-weight: 400; }
-  article.manifesto h3 {
+  article.source-code h2 em { font-style: italic; color: var(--gold-soft); font-weight: 400; }
+  article.source-code h3 {
     font-family: var(--font-display);
     font-weight: 500;
     font-size: clamp(20px, 2.2vw, 24px);
@@ -182,24 +183,25 @@
     color: var(--cream);
     letter-spacing: -0.005em;
   }
-  article.manifesto p {
+  article.source-code p {
     color: var(--cream-dim);
     font-size: clamp(16px, 1.55vw, 18px);
     line-height: 1.72;
     margin: 0 0 18px;
   }
-  article.manifesto p strong { color: var(--cream); font-weight: 500; }
-  article.manifesto ul {
+  article.source-code p strong { color: var(--cream); font-weight: 500; }
+  article.source-code ul {
     margin: 0 0 22px;
     padding-left: 22px;
     color: var(--cream-dim);
   }
-  article.manifesto ul li {
-    margin: 6px 0;
+  article.source-code ul li {
+    margin: 8px 0;
     line-height: 1.65;
     font-size: clamp(16px, 1.55vw, 18px);
   }
-  article.manifesto blockquote {
+  article.source-code ul li strong { color: var(--cream); font-weight: 500; }
+  article.source-code blockquote {
     margin: 28px 0;
     padding: 4px 0 4px 22px;
     border-left: 2px solid var(--gold);
@@ -224,6 +226,118 @@
     border-top: 1px solid var(--line);
     margin: 0;
   }
+
+  /* Movements (accordion) */
+  .movements {
+    margin: 8px 0 12px;
+    border-top: 1px solid var(--line);
+  }
+  .movement {
+    border-bottom: 1px solid var(--line);
+  }
+  .movement > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 0;
+    display: grid;
+    grid-template-columns: 38px 1fr auto;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .movement > summary::-webkit-details-marker { display: none; }
+  .movement .num {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold-soft);
+    font-size: 16px;
+    letter-spacing: 0.05em;
+  }
+  .movement .name {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(20px, 2.2vw, 26px);
+    color: var(--cream);
+    letter-spacing: -0.005em;
+  }
+  .movement .hint {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+    align-self: center;
+    transition: color .15s ease;
+  }
+  .movement[open] .hint { color: var(--gold-soft); }
+  .movement > summary::after {
+    content: "+";
+    font-family: var(--font-display);
+    font-size: 24px;
+    line-height: 1;
+    color: var(--gold-soft);
+    grid-column: 3;
+    transition: transform .25s ease;
+  }
+  .movement[open] > summary::after { content: "−"; }
+  .movement .body {
+    padding: 0 0 20px 54px;
+    color: var(--cream-dim);
+  }
+  @media (max-width: 520px) {
+    .movement > summary { grid-template-columns: 28px 1fr auto; gap: 12px; }
+    .movement .body { padding-left: 40px; }
+    .movement .hint { display: none; }
+  }
+  .movement .gloss {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--cream);
+    font-size: clamp(17px, 1.8vw, 19px);
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+  .movement .body p { margin: 0 0 12px; font-size: clamp(15px, 1.5vw, 17px); line-height: 1.7; }
+  .movement .body p:last-child { margin-bottom: 0; }
+  .movement .in-practice {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-left: 2px solid var(--forest);
+    background: rgba(92,122,62,0.06);
+    border-radius: 0 6px 6px 0;
+    font-size: clamp(14px, 1.4vw, 16px);
+    color: var(--cream-dim);
+  }
+  .movement .in-practice strong { color: var(--cream); font-weight: 500; }
+
+  /* Tools list */
+  .tools-list { list-style: none; padding: 0; margin: 8px 0 0; }
+  .tools-list li {
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 18px;
+    align-items: baseline;
+  }
+  .tools-list li:last-child { border-bottom: 1px solid var(--line); }
+  .tools-list .t-name {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--cream);
+  }
+  .tools-list .t-name.compass  { color: var(--teal-soft); }
+  .tools-list .t-name.studio   { color: var(--gold-soft); }
+  .tools-list .t-name.tuner    { color: var(--terracotta); }
+  .tools-list .t-name.nexus    { color: var(--forest); }
+  .tools-list .t-name.key      { color: var(--gold); }
+  .tools-list .t-text { color: var(--cream-dim); font-size: clamp(15px, 1.5vw, 17px); line-height: 1.6; }
+  @media (max-width: 520px) {
+    .tools-list li { grid-template-columns: 1fr; gap: 6px; }
+  }
+
+  /* Lineages */
+  .lineages-list { margin: 0; padding-left: 22px; }
+  .lineages-list li { margin: 10px 0; }
 
   /* License section */
   .license-card {
@@ -262,22 +376,44 @@
     line-height: 1.6;
   }
 
+  /* From-Markus card */
+  .markus-card {
+    margin-top: 48px;
+    padding: 28px 30px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(42,107,140,0.05), rgba(250,248,244,0.01));
+  }
+  .markus-card h2 { margin-top: 0; }
+  .markus-card p:last-child { margin-bottom: 0; }
+
   /* Closing CTA */
   .closing {
-    margin-top: 64px;
-    padding: 40px 32px;
+    margin-top: 72px;
+    padding: 48px 32px 16px;
     border-top: 1px solid var(--line);
     text-align: center;
   }
-  .closing h2 {
+  .closing .first-sound {
     font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(26px, 3.4vw, 36px);
-    line-height: 1.2;
-    margin: 0 0 14px;
+    font-style: italic;
+    font-size: clamp(28px, 3.6vw, 38px);
+    color: var(--cream);
+    margin: 0 0 8px;
+    line-height: 1.25;
   }
-  .closing h2 em { font-style: italic; color: var(--gold-soft); font-weight: 400; }
-  .closing p { max-width: 560px; margin: 0 auto 28px; color: var(--cream-dim); }
+  .closing .first-ripple {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--gold-soft);
+    font-size: clamp(20px, 2.4vw, 26px);
+    margin: 0 0 22px;
+  }
+  .closing p.body {
+    max-width: 580px;
+    margin: 0 auto 30px;
+    color: var(--cream-dim);
+  }
   .cta-row {
     display: flex;
     gap: 14px;
@@ -353,10 +489,7 @@
 <!-- ─────────── Inline SVG defs for repeated marks ─────────── -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <!-- Typographic COMMONUNITY lockup.
-         OM is discovered inside the wordmark by highlighting letters 2–3 (O,M)
-         in gold with a subtle glow. A restrained crescent + bindu sit above
-         the OM letters — the chandra/bindu of Devanagari Oṁ, embedded in language. -->
+    <!-- Typographic COMMONUNITY lockup. -->
     <filter id="om-glow" x="-50%" y="-80%" width="200%" height="260%">
       <feGaussianBlur stdDeviation="2.6" result="b"/>
       <feMerge>
@@ -364,15 +497,6 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <!-- Primary lockup: COMMONUNITY with OM highlighted, crescent + bindu above OM.
-         Strategy: a single <text> with three <tspan>s so the kerning and tracking are
-         identical across cream and gold runs.
-         Geometry (measured from rendered Josefin Sans 600 / 80px / +6 tracking, anchor=middle, x=350):
-           C-tspan glyph extends to x≈-15 on the left and Y to x≈716 on the right of a 0..700 box —
-           hence viewBox is widened to "-30 0 760 132" with ~14–15px breathing room each side.
-           The gold OM tspan (letters 2–3 of 11) spans x≈47..201, optical center x≈124 —
-           crescent and bindu are centered on x=124, NOT the previous x=180 (which fell over the
-           second M). -->
     <symbol id="logo-lockup" viewBox="-30 0 760 132">
       <text x="350" y="108" text-anchor="middle"
             font-family="Josefin Sans, Plus Jakarta Sans, system-ui, sans-serif"
@@ -380,13 +504,9 @@
             text-rendering="geometricPrecision">
         <tspan fill="#FAF8F4" fill-opacity="0.96">C</tspan><tspan fill="#d4a04a" filter="url(#om-glow)">OM</tspan><tspan fill="#FAF8F4" fill-opacity="0.96">MONUNITY</tspan>
       </text>
-      <!-- Crescent (chandra) optically centered over the OM pair at x=122 (nudged 2px left of
-           geometric tspan midpoint to compensate for M's heavier weight) and lifted to y=26/38
-           so the curve clears the M cap-top with breathing room. Shares om-glow filter. -->
       <path d="M 92 26 Q 122 38 152 26" fill="none" stroke="#d4a04a"
             stroke-width="2.2" stroke-linecap="round" opacity="0.92"
             filter="url(#om-glow)"/>
-      <!-- Bindu: small filled diamond above crescent, centered on x=122, lifted to y=4..14. -->
       <path d="M 122 4 L 126 9 L 122 14 L 118 9 Z" fill="#d4a04a" opacity="0.96"
             filter="url(#om-glow)"/>
     </symbol>
@@ -406,7 +526,7 @@
       <a href="/home#nexus">Nexus</a>
       <a href="/home#tools">Tools</a>
       <a href="/home#key">The Key</a>
-      <a href="/manifesto" class="current" aria-current="page">Manifesto</a>
+      <a href="/source-code" class="current" aria-current="page">Source Code</a>
       <a href="/home#field">Enter the field</a>
     </nav>
   </div>
@@ -415,250 +535,510 @@
 <!-- Hero -->
 <section class="hero">
   <div class="wrap">
-    <div class="eyebrow">CommonUnity Manifesto</div>
-    <h1>Make unity <em>practical.</em></h1>
+    <div class="eyebrow">Source Code</div>
+    <h1>A manifesto, path, and open invitation for <em>unified living.</em></h1>
     <p class="lede">
-      A trust architecture for becoming whole in a fragmented digital world.
-      Build your field, not just your profile.
+      CommonUnity is not a new doctrine. It is a contemporary practice field
+      for ancient questions: how to live with integrity, create from the
+      heart, remain awake inside ordinary life, use technology without
+      becoming owned by it, and build trust with others in a fragmented age.
     </p>
-    <p class="meta">Version 0.1 · Open under Creative Commons Attribution 4.0</p>
+    <p class="lede">
+      This is the source code of CommonUnity — not code in the technical
+      sense alone, but the deeper source: the principles, lineages, practices,
+      and commitments from which the whole ecosystem is meant to grow.
+    </p>
+    <p class="meta">Version 1.0 · Open under Creative Commons Attribution 4.0</p>
   </div>
 </section>
 
 <hr class="rule" />
 
-<article class="manifesto">
+<article class="source-code">
   <div class="wrap">
 
-    <!-- Why we exist -->
-    <section id="why">
-      <h2>Why CommonUnity <em>exists.</em></h2>
+    <!-- The origin -->
+    <section id="origin">
+      <h2>The <em>origin.</em></h2>
       <p>
-        CommonUnity exists to help people make unity practical. Not as
-        philosophy, brand, or aesthetic — as a daily working relationship
-        between inner truth and outer life.
+        CommonUnity began from a simple tension: the desire to live from the
+        deepest truth of who we are, while still participating in the
+        practical realities of work, money, technology, and community.
       </p>
       <p>
-        We believe technology should help people become more whole, not more
-        divided. We believe livelihood and spiritual practice belong in the
-        same conversation. We believe the digital self should belong to the
-        person it represents. And we believe community can hold sovereignty,
-        pluralism, and shared practice at the same time.
+        For many of us, these worlds have been split apart. Spiritual life
+        becomes private. Work becomes performative. Digital identity becomes
+        a profile shaped by someone else's system. Community becomes another
+        container with hidden incentives. The result is fragmentation.
+      </p>
+      <p>
+        CommonUnity asks a different question: what would it mean to build
+        from unity first?
       </p>
       <blockquote>
-        What would technology look like if it helped us become more whole,
-        rather than more divided?
+        Not unity as sameness. Not unity as belief. Unity as practice — the
+        ongoing work of bringing inner life, outer action, digital
+        expression, and shared creation into honest relationship.
       </blockquote>
     </section>
 
-    <!-- The fragmentation -->
-    <section id="fragmentation">
-      <h2>The fragmentation we are responding <em>to.</em></h2>
+    <!-- The condition we are responding to -->
+    <section id="condition">
+      <h2>The condition we are responding <em>to.</em></h2>
       <p>
-        Modern tools promise connection, visibility, and productivity. They
-        often deliver fragmentation. They ask us to become profiles, brands,
-        users, creators, customers, and data points inside systems we do not
-        own. Our attention becomes fuel for someone else's growth. Our digital
-        selves are scattered across platforms that rarely reflect who we
-        truly are.
+        We live inside tools that shape us before we consciously choose how
+        to use them.
       </p>
-      <p>For many people, the split becomes painful:</p>
-      <ul>
-        <li>Inner truth feels separate from outer livelihood.</li>
-        <li>Spiritual practice feels separate from money and work.</li>
-        <li>Technology feels powerful but extractive.</li>
-        <li>Online identity feels visible but not authentic.</li>
-        <li>Community begins with spark but often becomes ego, admin, or business-model pressure.</li>
-        <li>The deeper self has no coherent digital home.</li>
-      </ul>
       <p>
-        This is not a personal failing. It is the shape of the systems we
-        live inside. CommonUnity exists to address it.
+        Most digital platforms ask us to become profiles inside systems we
+        do not own. Our attention becomes fuel. Our expression becomes
+        content. Our data becomes an asset. Our inner life is flattened into
+        categories, feeds, metrics, and performance.
+      </p>
+      <p>
+        Technology itself is not the problem. The problem is technology
+        designed without reverence for the human core.
+      </p>
+      <p>
+        CommonUnity is an attempt to re-enter our relationship with
+        technology consciously: to create tools that strengthen
+        self-knowledge, protect personal sovereignty, deepen community, and
+        support the work of becoming more fully human.
       </p>
     </section>
 
-    <!-- The alternative -->
-    <section id="alternative">
-      <h2>The <em>alternative.</em></h2>
+    <!-- The lineages we honor -->
+    <section id="lineages">
+      <h2>The lineages we <em>honor.</em></h2>
       <p>
-        CommonUnity is not anti-technology, anti-money, or anti-business. It
-        is a new relationship with these forces. An evolutionary field where
-        self-study, technology, community, and creation can work together
-        without fragmenting the person using them.
+        CommonUnity does not claim to invent the path.
       </p>
-      <p>It aims to help people:</p>
-      <ul>
-        <li>Study themselves without becoming trapped in someone else's system.</li>
-        <li>Build a digital self that belongs to them.</li>
-        <li>Use intelligent tools without outsourcing wisdom.</li>
-        <li>Bring spirit and livelihood into conscious relationship.</li>
-        <li>Create from the open heart rather than from fragmentation.</li>
-        <li>Work on themselves out loud, in community, without becoming content for a platform.</li>
-        <li>Carry their practice, context, and identity across tools they can trust.</li>
+      <p>
+        We inherit from lineages, practices, and wisdom traditions that have
+        held human beings through the work of awakening, discipline,
+        embodiment, service, and union. We adapt with respect, name our
+        sources where we can, and avoid collapsing distinct traditions into
+        one vague spiritual language.
+      </p>
+      <p>Among the lineages that inform this work:</p>
+      <ul class="lineages-list">
+        <li>
+          <strong>The 8 limbs of yoga.</strong> In the Yoga Sutras, Patanjali
+          describes an eightfold path of practice known as Ashtanga, literally
+          "eight limbs." These limbs move from ethical relationship and
+          personal discipline through body, breath, attention, meditation,
+          and samadhi. CommonUnity respectfully translates this architecture
+          into eight movements of good living for modern life.
+        </li>
+        <li>
+          <strong>The Fourth Way.</strong> A reminder that awakening need not
+          belong only to monasteries, caves, or retreat centers. Ordinary
+          life — work, relationship, responsibility — can also become the
+          path.
+        </li>
+        <li>
+          <strong>The Gene Keys.</strong> A contemplative language for
+          shadow, gift, essence, purpose, radiance, and evolution.
+        </li>
+        <li>
+          <strong>Sound and frequency traditions.</strong> The recognition
+          that vibration, silence, resonance, and listening shape
+          consciousness.
+        </li>
+        <li>
+          <strong>Living community.</strong> The understanding that
+          transformation is not only private. It is relational, cultural,
+          and practical.
+        </li>
       </ul>
-      <div class="pull">
-        <p>
-          <strong>Align the inner. Shape the outer.</strong>
-          Build your field, not just your profile. Use tools that remember
-          without owning you.
-        </p>
+      <p>
+        CommonUnity is one contemporary expression of these influences. It
+        is not a replacement for them.
+      </p>
+    </section>
+
+    <!-- Oṁ as the underlying principle -->
+    <section id="om">
+      <h2>Oṁ as the underlying <em>principle.</em></h2>
+      <p>
+        Oṁ is the underlying reminder. It is not used here as decoration or
+        spiritual branding. It points to a movement: sound, resonance,
+        integration, and silence. The sound begins the path. The silence
+        teaches us how to live.
+      </p>
+      <p>
+        In CommonUnity, Oṁ is not something to display loudly. It is the
+        source tone beneath the work — the reminder that every act of
+        creation carries a frequency, and that the deepest intelligence
+        often appears when we return to stillness before we act.
+      </p>
+      <blockquote>
+        Begin with the sound. Follow the ripple. Shape it into practice.
+        Return to the silence that holds it all.
+      </blockquote>
+    </section>
+
+    <!-- The CommonUnity Path -->
+    <section id="path">
+      <h2>The CommonUnity <em>Path.</em></h2>
+      <p>
+        The CommonUnity Path is inspired by the 8 limbs of yoga: a timeless
+        map for ethical life, disciplined practice, embodied awareness,
+        breath, attention, meditation, and union.
+      </p>
+      <p>
+        We translate that structure into eight movements of good living for
+        the realities of our time: digital life, creative work, community,
+        technology, self-expression, and trust.
+      </p>
+      <p>
+        This is not a replacement for yoga. It is one respectful adaptation
+        of a living inheritance. These are <em>movements</em> because they
+        are never finished. We return to them again and again.
+      </p>
+    </section>
+
+    <!-- 8 movements (accordion) -->
+    <section id="movements">
+      <h2>The 8 movements of <em>good living.</em></h2>
+      <p>
+        Open each movement to read more. Each one names what it asks of us,
+        and how it shows up in practice across CommonUnity.
+      </p>
+
+      <div class="movements">
+        <details class="movement" id="m-relationship">
+          <summary>
+            <span class="num">i</span>
+            <span class="name">Relationship</span>
+            <span class="hint">Open</span>
+          </summary>
+          <div class="body">
+            <p class="gloss">How we meet ourselves, each other, and the systems we use.</p>
+            <p>
+              Relationship is the first practice because nothing exists in
+              isolation. We are always in relationship: with ourselves, our
+              bodies, our work, our tools, our communities, our money, our
+              attention, and the unseen motives that shape our choices.
+            </p>
+            <p>
+              In CommonUnity, relationship asks: does this strengthen trust,
+              or does it extract from it? Does this deepen contact, or does
+              it turn people into objects? Does this tool help us meet more
+              honestly, or does it hide the real exchange?
+            </p>
+            <p class="in-practice">
+              <strong>In practice.</strong> We design onboarding as a
+              human-to-human process. We begin with conversation, not
+              conversion. We treat trust as infrastructure.
+            </p>
+          </div>
+        </details>
+
+        <details class="movement" id="m-practice">
+          <summary>
+            <span class="num">ii</span>
+            <span class="name">Practice</span>
+            <span class="hint">Open</span>
+          </summary>
+          <div class="body">
+            <p class="gloss">What we return to, refine, and take responsibility for.</p>
+            <p>
+              Practice is how intention becomes real. A person can believe
+              in unity, sovereignty, creativity, or awakening and still live
+              in ways that reinforce fragmentation. Practice closes the gap
+              between what we value and what we repeatedly do.
+            </p>
+            <p>
+              In CommonUnity, practice means building rhythms that support
+              clarity: reflection, saving what matters, returning to one's
+              purpose, naming what is being worked on, and allowing tools to
+              serve continuity rather than distraction.
+            </p>
+            <p class="in-practice">
+              <strong>In practice.</strong> Compass begins the practice by
+              helping a person name their work, evolution, radiance, and
+              purpose. Studio continues it by giving those insights
+              somewhere to live and grow.
+            </p>
+          </div>
+        </details>
+
+        <details class="movement" id="m-embodiment">
+          <summary>
+            <span class="num">iii</span>
+            <span class="name">Embodiment</span>
+            <span class="hint">Open</span>
+          </summary>
+          <div class="body">
+            <p class="gloss">How insight becomes lived through the body, voice, work, and space.</p>
+            <p>
+              Embodiment means that truth is not only understood — it is
+              lived. Many systems of knowledge remain mental. They generate
+              language, concepts, and identity, but do not always change
+              how a person breathes, speaks, creates, listens, earns, rests,
+              or enters a room.
+            </p>
+            <p>
+              CommonUnity treats embodiment as essential. A profile is not
+              enough. A beautiful idea is not enough. Insight becomes
+              meaningful when it changes posture, rhythm, expression,
+              relationship, and action.
+            </p>
+            <p class="in-practice">
+              <strong>In practice.</strong> Tuner, Studio, and Compass each
+              support embodiment in different ways: through frequency,
+              creative form, reflection, and the translation of inner
+              knowing into outer expression.
+            </p>
+          </div>
+        </details>
+
+        <details class="movement" id="m-breath">
+          <summary>
+            <span class="num">iv</span>
+            <span class="name">Breath</span>
+            <span class="hint">Open</span>
+          </summary>
+          <div class="body">
+            <p class="gloss">The rhythm beneath action.</p>
+            <p>
+              Breath is the bridge between impulse and response. In a
+              distracted world, we are constantly pulled into acceleration.
+              We react before we feel. We publish before we digest. We
+              optimize before we understand what is truly needed.
+            </p>
+            <p>
+              Breath restores rhythm. It reminds us that energy must be
+              regulated before it can be wisely directed.
+            </p>
+            <p class="in-practice">
+              <strong>In practice.</strong> We design tools that do not only
+              push people forward. We create spaces for pause, reflection,
+              review, and integration.
+            </p>
+          </div>
+        </details>
+
+        <details class="movement" id="m-attention">
+          <summary>
+            <span class="num">v</span>
+            <span class="name">Attention</span>
+            <span class="hint">Open</span>
+          </summary>
+          <div class="body">
+            <p class="gloss">Where your gaze rests, your life begins to form.</p>
+            <p>
+              Attention is one of the most valuable human capacities, and one
+              of the most heavily contested. Modern platforms are built to
+              capture it, fragment it, and sell access to it. The result is
+              that many people no longer know where their own attention
+              naturally wants to go.
+            </p>
+            <p>
+              CommonUnity treats attention as sacred infrastructure. To
+              reclaim attention is to reclaim the conditions of creation.
+            </p>
+            <p class="in-practice">
+              <strong>In practice.</strong> The CommonUnity Key, Studio
+              projects, and Nexus memory should help a person remember what
+              matters without trapping them inside another attention economy.
+            </p>
+          </div>
+        </details>
+
+        <details class="movement" id="m-focus">
+          <summary>
+            <span class="num">vi</span>
+            <span class="name">Focus</span>
+            <span class="hint">Open</span>
+          </summary>
+          <div class="body">
+            <p class="gloss">A steady direction of mind.</p>
+            <p>
+              Focus is attention given a direction. Without focus, insight
+              disperses. Inspiration becomes another open tab. Good
+              intentions become unfinished fragments.
+            </p>
+            <p>
+              Focus is not rigidity. It is the choice to protect what is
+              worthy of becoming real.
+            </p>
+            <p class="in-practice">
+              <strong>In practice.</strong> Studio is the workbench of
+              focus. It gives a person a place to shape what they are
+              becoming into something visible, usable, and shareable.
+            </p>
+          </div>
+        </details>
+
+        <details class="movement" id="m-contemplation">
+          <summary>
+            <span class="num">vii</span>
+            <span class="name">Contemplation</span>
+            <span class="hint">Open</span>
+          </summary>
+          <div class="body">
+            <p class="gloss">Meeting what is, without rushing to reduce it.</p>
+            <p>
+              Contemplation is the practice of staying with what is not yet
+              fully known. This matters especially in the age of artificial
+              intelligence. If AI becomes only a tool for faster answers, it
+              may weaken the very capacities we most need: discernment,
+              intuition, patience, reflection, and inner authority.
+            </p>
+            <p>
+              Nexus exists for another purpose. It is an intelligence layer
+              designed to support insight, not replace it. It can reflect
+              patterns, connect ideas, remember context, and help a person
+              see more clearly — but it should not do the work of becoming
+              for them.
+            </p>
+            <p class="in-practice">
+              <strong>In practice.</strong> Nexus should ask better
+              questions, surface deeper connections, and support the user's
+              evolution without pretending to be the source of wisdom.
+            </p>
+          </div>
+        </details>
+
+        <details class="movement" id="m-unity">
+          <summary>
+            <span class="num">viii</span>
+            <span class="name">Unity</span>
+            <span class="hint">Open</span>
+          </summary>
+          <div class="body">
+            <p class="gloss">The whole that holds the parts.</p>
+            <p>
+              Unity is not escape from the world. It is the gradual
+              recognition that inner life and outer action, spirit and
+              money, self and community, technology and humanity, silence
+              and creation do not need to remain enemies.
+            </p>
+            <p>
+              Unity does not erase difference. It gives difference a field
+              in which it can belong.
+            </p>
+            <p class="in-practice">
+              <strong>In practice.</strong> CommonUnity becomes real when
+              people use it to create more coherent lives, more honest work,
+              more sovereign digital presence, and more trustworthy forms
+              of community.
+            </p>
+          </div>
+        </details>
       </div>
     </section>
 
-    <!-- Technology that strengthens the human core -->
-    <section id="human-core">
-      <h2>Technology that strengthens the <em>human core.</em></h2>
+    <!-- How the tools serve the path -->
+    <section id="tools">
+      <h2>How the tools serve the <em>path.</em></h2>
       <p>
-        Most software optimizes for engagement, retention, and conversion.
-        We optimize for something different: deeper attention, discernment,
-        creativity, responsibility, and conscious action.
+        The tools of CommonUnity are not separate products. They are
+        instruments of one practice field.
       </p>
-      <p>
-        Intelligence — including AI — should support the human doing the
-        work. Not replace them. Not pretend to know them better than they
-        know themselves. Not declare destiny, diagnose identity, or create
-        dependency. Reflect, connect, remember, ask clarifying questions,
-        attribute sources. Then return discernment to the person.
-      </p>
-      <p>
-        We use modern technology without asking people to outsource wisdom.
-        The goal is not automation of the self. The goal is a self capable
-        of meeting its own life.
-      </p>
+      <ul class="tools-list">
+        <li>
+          <span class="t-name compass">Compass</span>
+          <span class="t-text">Begins the path through guided self-knowledge and human-to-human onboarding.</span>
+        </li>
+        <li>
+          <span class="t-name studio">Studio</span>
+          <span class="t-text">Gives the path a workbench where identity, expression, projects, websites, and digital life can be shaped consciously.</span>
+        </li>
+        <li>
+          <span class="t-name tuner">Tuner</span>
+          <span class="t-text">Brings the path into frequency, listening, embodiment, and practitioner work.</span>
+        </li>
+        <li>
+          <span class="t-name nexus">Nexus</span>
+          <span class="t-text">Supports the path as a synthesis engine and intelligence layer, bridging human and AI intelligence without replacing human agency.</span>
+        </li>
+        <li>
+          <span class="t-name key">The CommonUnity Key</span>
+          <span class="t-text">Protects the path through trust architecture: the person's pattern travels with them, and the system remembers without owning them.</span>
+        </li>
+      </ul>
     </section>
 
-    <!-- Trust architecture -->
-    <section id="trust">
-      <h2>Trust <em>architecture.</em></h2>
-      <p>
-        Most platforms ask people to build identity inside someone else's
-        system. CommonUnity begins from a different assumption: your
-        pattern, practice, and context should travel with you.
-      </p>
-      <p>
-        That assumption needs more than good intentions. It needs
-        architecture. We call ours the CommonUnity Key — a portable
-        self-profile owned by the person it describes. Your tools can
-        remember without owning you. Continuity without lock-in.
-      </p>
-      <p>
-        Trust is not a marketing claim. It is a property of how a system is
-        built: who holds the data, who can read it, who can carry it, and
-        who can leave with it intact. We hold ourselves to that standard,
-        and we publish how we work so others can hold us to it as well.
-      </p>
-    </section>
-
-    <!-- Community of communities -->
-    <section id="community">
-      <h2>A community of <em>communities.</em></h2>
-      <p>
-        CommonUnity is a community of communities, not a platform that owns
-        the people inside it. We want to call people into shared practice
-        while protecting sovereignty, pluralism, and local expression.
-      </p>
-      <p>
-        That means no audience capture. No guru-centered hierarchy. No
-        coercive "join our movement" framing. It means making space for
-        circles, retreats, studios, learning groups, collectives, networks,
-        and practice communities to keep their spark without being
-        flattened into a centralized ego structure.
-      </p>
-      <p>
-        Walk the path together, at your own pace. Make unity common.
-      </p>
-    </section>
-
-    <!-- Symbolic center -->
-    <section id="om">
-      <h2>Oṁ — the symbolic <em>center.</em></h2>
-      <p>
-        At the center of CommonUnity is Oṁ: source tone, silence, unity
-        principle, and a reminder that creation begins from vibration and
-        returns to stillness. We hold Oṁ with care, not as ornament.
-      </p>
-      <p>
-        We also hold the heart as the meeting point between material and
-        immaterial life — between spirit and livelihood, between personal
-        truth and public expression. Creation, in our view, begins from the
-        open heart. Inner alignment, brought into form.
-      </p>
-      <blockquote>
-        Begin from listening. Move through resonance. Return toward
-        coherence.
-      </blockquote>
-    </section>
-
-    <!-- Who this is for -->
-    <section id="who">
-      <h2>Who this is <em>for.</em></h2>
-      <p>
-        CommonUnity is for people seeking to reconcile spirit, money,
-        technology, authentic self-expression, and community. People who
-        feel the split between inner truth and outer livelihood, between
-        digital identity and true self, between technology and sovereignty,
-        between self-work and community — and are ready to build something
-        more coherent.
-      </p>
-      <p>
-        Their title is secondary. The shared condition is primary. Among
-        the early adopter circles you will find practitioners of inner
-        work, conscious creators and independent professionals, digital
-        sovereignty seekers, and community builders. There will be others.
-        There should be others.
-      </p>
-    </section>
-
-    <!-- Open attribution -->
+    <!-- Open source, open attribution -->
     <section id="open">
-      <h2>Open <em>attribution.</em></h2>
+      <h2>Open source, open <em>attribution.</em></h2>
       <p>
-        These ideas do not belong to a single company. They belong to a
-        wider movement of people working on the relationship between inner
-        life, livelihood, technology, and community. We have tried to put
-        words to a pattern many already feel. Take what is useful.
+        This Source Code is offered as part of CommonUnity's public
+        foundation. You may read it, adapt it, challenge it, practice with
+        it, or use it as a model for your own community, project, or field
+        of work.
       </p>
       <p>
-        We are publishing this manifesto openly so that it can ripple
-        outward with integrity. You may quote it, adapt it, translate it,
-        or build from it — and we ask only that you carry attribution and
-        a link back, so the lineage stays visible.
+        We ask only that you honor the spirit in which it is offered:
+        attribute what you use, name the lineages that have shaped you, and
+        do not turn living wisdom into private extraction.
       </p>
+      <div class="pull">
+        <p>
+          <strong>CommonUnity is not here to own the path.</strong>
+          It is here to make unity common.
+        </p>
+      </div>
 
       <div class="license-card">
         <span class="cc-mark">CC BY 4.0</span>
         <h2>License — share, adapt, attribute.</h2>
         <p>
-          This manifesto is shared under a
+          This Source Code is shared under a
           <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
           You may quote, adapt, or build from it with attribution to
           CommonUnity and a link to
-          <a href="https://commonunity.io">https://commonunity.io</a>.
+          <a href="https://commonunity.io/source-code">https://commonunity.io/source-code</a>.
         </p>
         <p>
-          This is open attribution, not public domain. The ideas are
-          shared so they can be used and extended; the attribution stays
-          so the lineage stays visible. If you publish a derivative work,
-          please indicate what you changed.
+          This is open attribution, not public domain. The ideas are shared
+          so they can be used and extended; the attribution stays so the
+          lineage stays visible. If you publish a derivative work, please
+          indicate what you changed.
         </p>
         <p style="margin-top:8px;"><strong>Suggested attribution:</strong></p>
         <div class="attribution">
-          Adapted from the CommonUnity Manifesto (CC BY 4.0) —
-          https://commonunity.io/manifesto
+          Adapted from the CommonUnity Source Code (CC BY 4.0) —
+          https://commonunity.io/source-code
         </div>
+      </div>
+    </section>
+
+    <!-- A note from Markus -->
+    <section id="note">
+      <div class="markus-card">
+        <h2>A note from <em>Markus.</em></h2>
+        <p>
+          I began CommonUnity from my own search for a way to bring spirit,
+          work, technology, creativity, and community into a more honest
+          relationship. But the moment this work becomes real, it is no
+          longer mine alone.
+        </p>
+        <p>
+          In the spirit of Namaste, I understand this as a meeting: the
+          living essence in me recognizing and calling forth the living
+          essence in you.
+        </p>
+        <p>
+          CommonUnity begins where that recognition becomes practice.
+        </p>
       </div>
     </section>
 
     <!-- Closing -->
     <div class="closing">
-      <h2>For people ready to make unity <em>practical.</em></h2>
-      <p>
-        If this resonates, the next step is small: begin where you are.
-        Read again. Share with someone. Try a tool. Or write to us.
+      <p class="first-sound">Make the first sound.</p>
+      <p class="first-ripple">Send the first ripple.</p>
+      <p class="body">
+        Begin with what is true, shape what wants to emerge, and practice
+        in the company of others who are also learning how to live whole.
       </p>
       <div class="cta-row">
         <a class="btn btn-primary" href="/home#field">
-          Enter the field <span class="arrow">→</span>
+          Send the first ripple <span class="arrow">→</span>
         </a>
         <a class="btn btn-ghost" href="/home">
           Back to homepage
@@ -678,15 +1058,15 @@
           <svg class="lockup" viewBox="-30 0 760 132" aria-hidden="true" style="height:24px"><use href="#logo-lockup"/></svg>
         </div>
         <p class="colophon">
-          An evolutionary field for unified living. Anchored in Oṁ.
-          Built on universal principles, open schemas, and attributed lineages.
-          Your data stays yours.
+          An evolutionary field for unified living. Built on universal
+          principles, open schemas, and attributed lineages. Your data
+          stays yours.
         </p>
       </div>
       <div>
         <h5>Read</h5>
         <a href="/home">Homepage</a>
-        <a href="/manifesto">Manifesto</a>
+        <a href="/source-code">Source Code</a>
       </div>
       <div>
         <h5>The Field</h5>
@@ -700,7 +1080,7 @@
       </div>
     </div>
     <div class="foot-meta">
-      <span>© CommonUnity · HearthVS · Manifesto v0.1 · CC BY 4.0</span>
+      <span>© CommonUnity · HearthVS · Source Code v1.0 · CC BY 4.0</span>
       <span>commonunity.io</span>
     </div>
   </div>
