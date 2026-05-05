@@ -256,6 +256,27 @@
     max-width: 700px;
     line-height: 1.5;
   }
+  .principles-lead {
+    margin-top: 22px;
+    color: var(--cream-dim);
+    font-size: clamp(15px, 1.5vw, 17px);
+    line-height: 1.65;
+    max-width: 700px;
+  }
+  .principles-link {
+    margin-top: 14px;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+  .principles-link a {
+    color: var(--gold-soft);
+    border-bottom: 1px solid rgba(212,160,74,0.35);
+    transition: color .15s ease, border-color .15s ease;
+    padding-bottom: 1px;
+  }
+  .principles-link a:hover { color: var(--cream); border-color: var(--cream-dim); }
+  .principles-link .arrow { display: inline-block; transition: transform .2s ease; }
+  .principles-link a:hover .arrow { transform: translateX(3px); }
 
   /* ─────────── Nexus / Human core ─────────── */
   .core-grid {
@@ -985,8 +1006,8 @@
       </div>
       <div class="principle reveal">
         <div class="num">ii</div>
-        <h4>Discipline</h4>
-        <p>The quiet daily yes. What we return to without needing to be seen.</p>
+        <h4>Practice</h4>
+        <p>What we return to, refine, and take responsibility for.</p>
       </div>
       <div class="principle reveal">
         <div class="num">iii</div>
@@ -1024,6 +1045,15 @@
       CommonUnity cultivates these as core human skills — and uses the latest
       technology in a way that strengthens, rather than substitutes for, the
       human core.
+    </p>
+
+    <p class="principles-lead reveal">
+      The 8 movements are introduced here as a simple map for unified living.
+      In the Source Code, they become the founding principles behind how
+      CommonUnity is built, practiced, and shared.
+    </p>
+    <p class="principles-link reveal">
+      <a href="/source-code">Go deeper: how the 8 movements shape our Source Code <span class="arrow">→</span></a>
     </p>
   </div>
 </section>
