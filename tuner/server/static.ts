@@ -41,6 +41,10 @@ export function serveStatic(app: Express) {
     res.set(noStoreHeaders);
     res.sendFile(path.resolve(distPath, "studio.html"));
   });
+  app.get("/manifesto", (_req, res) => {
+    res.set(noStoreHeaders);
+    res.sendFile(path.resolve(distPath, "manifesto.html"));
+  });
 
   app.use(express.static(distPath));
 

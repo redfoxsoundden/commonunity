@@ -1195,6 +1195,19 @@ async def serve_homepage():
         })
     return {"error": "Homepage not found"}
 
+# CommonUnity public manifesto. Open under CC BY 4.0; surfaces the
+# philosophy/origin so the ethos can ripple outward with attribution.
+@app.get("/manifesto")
+async def serve_manifesto():
+    manifesto = pathlib.Path(__file__).parent / "manifesto.html"
+    if manifesto.exists():
+        return FileResponse(manifesto, headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        })
+    return {"error": "Manifesto not found"}
+
 # ── Tuner redirect ───────────────────────────────────────────────────────────
 # Update TUNER_URL after Railway deployment is complete.
 # Set env var TUNER_URL on the root Railway service, or update the fallback below.
