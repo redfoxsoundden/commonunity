@@ -10,7 +10,7 @@
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Josefin+Sans:wght@500;600;700&display=swap" rel="stylesheet">
 
 <style>
 /* ============================================================
@@ -212,6 +212,48 @@ input, textarea { font: inherit; color: inherit; }
   gap: 10px;
   text-shadow: 0 0 20px color-mix(in srgb, var(--rose-color,#c4b5fd) 40%, transparent);
   animation: wordmark-glow 5s ease-in-out infinite;
+}
+/* CommonUnity brand lockup inside Studio wordmarks.
+   Reuses the inline #cu-logo-lockup symbol so Studio matches
+   the homepage / Source Code lockup byte-for-byte (gold OM,
+   crescent, bindu). The "Studio" suffix sits next to the
+   lockup at small caps to read as one mark. */
+.cu-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.cu-wordmark .cu-lockup {
+  display: block;
+  height: 22px;
+  width: auto;
+  flex-shrink: 0;
+}
+.cu-wordmark.cu-wordmark-sm .cu-lockup { height: 16px; }
+.cu-wordmark .cu-wordmark-suffix {
+  font-family: 'Josefin Sans', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding-left: 8px;
+  border-left: 1px solid color-mix(in srgb, var(--text-muted) 35%, transparent);
+}
+.cu-wordmark.cu-wordmark-sm .cu-wordmark-suffix {
+  font-size: 10px;
+  padding-left: 6px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
 }
 @keyframes wordmark-glow {
   0%,100% { text-shadow: 0 0 12px color-mix(in srgb, var(--rose-color,#c4b5fd) 30%, transparent); opacity: 0.8; }
@@ -3003,10 +3045,10 @@ input, textarea { font: inherit; color: inherit; }
 }
 
 /* ============================================================
-   SCREEN 3: STUDIO v1.1 — visible concept layer (Athens demo)
-   Five panels: Studio Ignition, Rooms preview, Studio Spark,
-   Path Progress, Nexus Sidecar. No persistence; demo-ready.
-   Intentionally lightweight. Reuses existing tokens.
+   SCREEN 3: THE Oṁ FIELD — Studio v1.1 demo layer
+   One screen, one interaction. Reuses existing tokens. No new
+   framework. Mirrors the dark palette + rose-color accents used
+   by the rest of Studio.
    ============================================================ */
 #screen-concept {
   flex-direction: column;
@@ -3018,7 +3060,7 @@ input, textarea { font: inherit; color: inherit; }
 }
 .concept-wrap {
   width: 100%;
-  max-width: 1080px;
+  max-width: 760px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -3028,6 +3070,8 @@ input, textarea { font: inherit; color: inherit; }
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  text-align: center;
+  align-items: center;
 }
 .concept-eyebrow {
   font-size: var(--text-xs);
@@ -3043,6 +3087,7 @@ input, textarea { font: inherit; color: inherit; }
   letter-spacing: -0.01em;
   color: var(--text);
   line-height: 1.15;
+  max-width: 24ch;
 }
 .concept-title em {
   font-style: italic;
@@ -3052,7 +3097,7 @@ input, textarea { font: inherit; color: inherit; }
 .concept-lede {
   margin: var(--space-2) 0 0;
   color: var(--text-muted);
-  max-width: 60ch;
+  max-width: 56ch;
   line-height: 1.6;
 }
 .concept-back {
@@ -3067,95 +3112,259 @@ input, textarea { font: inherit; color: inherit; }
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
 }
 .concept-back:hover { color: var(--text); border-color: color-mix(in srgb, var(--text-muted) 60%, transparent); }
 
-/* Panel base */
-.concept-panel {
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-  border-radius: 12px;
-  padding: clamp(var(--space-5), 3vw, var(--space-8));
-  background: color-mix(in srgb, var(--input-bg) 60%, transparent);
-}
-.concept-panel-head {
+/* ── The Oṁ Field disc + rings ─────────────────────────── */
+.om-field {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-2);
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0 var(--space-2);
 }
-.concept-panel h2 {
+.om-disc {
+  position: relative;
+  width: clamp(180px, 36vw, 240px);
+  height: clamp(180px, 36vw, 240px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 45%,
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, transparent) 0%,
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 18%, transparent) 38%,
+      transparent 70%);
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  outline: none;
+  transition: transform 0.4s cubic-bezier(.2,.7,.3,1);
+}
+.om-disc:hover  { transform: scale(1.02); }
+.om-disc:active { transform: scale(0.98); }
+.om-disc:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, transparent);
+}
+.om-disc.is-pulsing { animation: om-pulse 1.4s cubic-bezier(.2,.7,.3,1); }
+@keyframes om-pulse {
+  0%   { box-shadow: 0 0 0 0  color-mix(in srgb, var(--rose-color,#c4b5fd) 60%, transparent); }
+  60%  { box-shadow: 0 0 0 28px color-mix(in srgb, var(--rose-color,#c4b5fd) 0%,  transparent); }
+  100% { box-shadow: 0 0 0 0  color-mix(in srgb, var(--rose-color,#c4b5fd) 0%,  transparent); }
+}
+.om-rings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.om-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, transparent);
+  opacity: 0.6;
+  animation: om-ring-spin 32s linear infinite;
+}
+.om-ring.r1 { transform: scale(0.78); animation-duration: 36s; opacity: 0.55; }
+.om-ring.r2 { transform: scale(0.92) rotate(20deg); border-style: dashed; animation-duration: 48s; animation-direction: reverse; opacity: 0.4; }
+.om-ring.r3 { transform: scale(1.04); border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 16%, transparent); animation-duration: 60s; opacity: 0.35; }
+@keyframes om-ring-spin {
+  from { transform: rotate(0deg) scale(var(--s, 1)); }
+  to   { transform: rotate(360deg) scale(var(--s, 1)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .om-ring, .om-disc.is-pulsing { animation: none; }
+}
+.om-glyph {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(48px, 7vw, 64px);
+  color: color-mix(in srgb, var(--text) 90%, var(--rose-color, #c4b5fd));
+  text-shadow: 0 0 24px color-mix(in srgb, var(--rose-color, #c4b5fd) 65%, transparent);
+  user-select: none;
+  pointer-events: none;
+}
+.om-call {
   margin: 0;
-  font-size: var(--text-lg);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-sm);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.om-call .om-call-line.muted { color: var(--text-faint); }
+.om-call .om-call-sep {
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
+}
+
+/* ── Holographic Spark card ────────────────────────────── */
+.spark-stage {
+  display: flex;
+  justify-content: center;
+}
+.spark-holo {
+  width: 100%;
+  border-radius: 14px;
+  padding: clamp(var(--space-5), 3vw, var(--space-8));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 8%, transparent),
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 2%, transparent));
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 32%, var(--border));
+  box-shadow:
+    0 0 40px -10px color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, transparent) inset,
+    0 12px 36px -16px color-mix(in srgb, var(--rose-color, #c4b5fd) 25%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  overflow: hidden;
+}
+.spark-holo::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg,
+      transparent 30%,
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 16%, transparent) 50%,
+      transparent 70%);
+  opacity: 0.6;
+  mix-blend-mode: screen;
+}
+.spark-holo.is-emitting { animation: spark-emit 0.7s cubic-bezier(.2,.7,.3,1); }
+@keyframes spark-emit {
+  0%   { transform: translateY(8px) scale(0.985); opacity: 0.4; }
+  100% { transform: translateY(0)   scale(1);     opacity: 1; }
+}
+.spark-rise {
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose-color, #c4b5fd);
   font-weight: 600;
+}
+.spark-prompt {
+  margin: 0;
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 500;
+  line-height: 1.4;
   color: var(--text);
   letter-spacing: -0.005em;
 }
-.concept-panel h2 em { font-style: italic; font-weight: 500; color: var(--rose-color, #c4b5fd); }
-.concept-panel-tag {
+.spark-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  margin-top: 4px;
+}
+.spark-tag {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+  border: 1px solid color-mix(in srgb, var(--text-faint) 40%, transparent);
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+.spark-tag.movement { color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-muted)); border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 40%, transparent); }
+.spark-tag.arc      { color: var(--text-muted); }
+.spark-tag.target   { color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, var(--text-muted)); }
+.spark-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+.spark-btn {
+  background: transparent;
+  color: var(--rose-color, #c4b5fd);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, transparent);
+  padding: 8px 16px;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.spark-btn:hover,
+.spark-btn:focus-visible {
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 12%, transparent);
+  color: var(--text);
+  border-color: var(--rose-color, #c4b5fd);
+  outline: none;
+}
+
+/* ── Connected Field Notes card ────────────────────────── */
+.fieldnotes-card {
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 12px;
+  padding: clamp(var(--space-5), 3vw, var(--space-6));
+  background: color-mix(in srgb, var(--input-bg) 70%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.fieldnotes-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.fieldnotes-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+.fieldnotes-tag {
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
-.concept-panel-lede {
-  margin: 0 0 var(--space-5);
-  color: var(--text-muted);
-  line-height: 1.6;
-  max-width: 64ch;
-}
-
-/* Ignition cards grid */
-.ignition-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--space-4);
-}
-.ignition-card {
+.fieldnotes-area {
+  width: 100%;
+  resize: vertical;
+  min-height: 140px;
+  background: color-mix(in srgb, var(--bg) 75%, transparent);
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   border-radius: 10px;
-  padding: var(--space-5);
-  background: color-mix(in srgb, var(--bg) 35%, transparent);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  transition: border-color 0.2s ease;
-}
-.ignition-card:hover { border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border)); }
-.ignition-card .ic-label {
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--rose-color, #c4b5fd);
-  font-weight: 600;
-}
-.ignition-card .ic-name {
-  font-size: var(--text-base);
+  padding: var(--space-4);
   color: var(--text);
-  font-weight: 500;
+  font: inherit;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
-.ignition-card .ic-seed {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  line-height: 1.55;
-  margin: 0;
+.fieldnotes-area::placeholder { color: var(--text-faint); font-style: italic; }
+.fieldnotes-area:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, transparent);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
 }
-.ignition-card .ic-actions {
+.fieldnotes-actions {
   display: flex;
-  gap: var(--space-2);
   flex-wrap: wrap;
-  margin-top: var(--space-2);
+  gap: var(--space-2);
 }
 .concept-chip {
   background: transparent;
   border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
   color: var(--text-muted);
   font: inherit;
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  padding: 4px 10px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
   border-radius: 999px;
   cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
@@ -3171,170 +3380,18 @@ input, textarea { font: inherit; color: inherit; }
   color: var(--rose-color, #c4b5fd);
   border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
 }
-
-/* Rooms preview */
-.rooms-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: var(--space-3);
-}
-.rooms-list li {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: baseline;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--bg) 30%, transparent);
-}
-.rooms-list .room-name {
-  font-weight: 500;
-  color: var(--text);
-}
-.rooms-list .room-purpose {
-  font-size: var(--text-sm);
+.fieldnotes-foot {
+  margin: 4px 0 0;
   color: var(--text-muted);
-  display: block;
-  margin-top: 2px;
-  line-height: 1.5;
-}
-.rooms-list .room-status {
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  white-space: nowrap;
-}
-.rooms-list .room-status.is-seeded { color: var(--rose-color, #c4b5fd); }
-
-/* Studio Spark */
-.spark-card {
-  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, var(--border));
-  border-radius: 12px;
-  padding: var(--space-6);
-  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 5%, var(--input-bg));
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-.spark-meta {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  align-items: center;
-}
-.spark-tag {
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--rose-color, #c4b5fd);
-  font-weight: 600;
-}
-.spark-tag.movement { color: var(--text-muted); }
-.spark-tag.arc      { color: var(--text-faint); }
-.spark-prompt {
-  margin: 0;
-  font-size: var(--text-lg);
-  color: var(--text);
-  line-height: 1.45;
-  font-weight: 500;
-}
-.spark-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-.spark-btn {
-  background: var(--rose-color, #c4b5fd);
-  color: var(--bg);
-  border: 1px solid var(--rose-color, #c4b5fd);
-  padding: 8px 16px;
-  font: inherit;
   font-size: var(--text-sm);
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  line-height: 1.55;
 }
-.spark-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-
-/* Path progress */
-.progress-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.progress-list li {
-  display: grid;
-  grid-template-columns: 22px 1fr auto;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-}
-.progress-list li:last-child { border-bottom: none; }
-.progress-tick {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--text-muted) 60%, transparent);
-  display: inline-block;
-}
-.progress-list li.is-seeded .progress-tick {
-  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, transparent);
-  border-color: var(--rose-color, #c4b5fd);
-}
-.progress-label { color: var(--text); font-weight: 500; }
-.progress-state {
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-.progress-list li.is-seeded .progress-state { color: var(--rose-color, #c4b5fd); }
-
-/* Nexus Sidecar */
-.sidecar-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-2);
-  margin-top: var(--space-4);
-}
-.sidecar-btn {
-  background: transparent;
-  border: 1px solid color-mix(in srgb, var(--border) 90%, transparent);
-  color: var(--text);
-  font: inherit;
-  font-size: var(--text-sm);
-  padding: 10px 14px;
-  border-radius: 8px;
-  text-align: left;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-.sidecar-btn:hover,
-.sidecar-btn:focus-visible {
-  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
-  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 8%, transparent);
-  outline: none;
-}
-.sidecar-btn .sb-glyph {
-  color: var(--rose-color, #c4b5fd);
-  font-size: var(--text-base);
-  line-height: 1;
+.fieldnotes-foot em {
+  font-style: italic;
+  color: color-mix(in srgb, var(--text) 90%, var(--rose-color, #c4b5fd));
 }
 
-/* Tiny toast for placeholder action feedback */
+/* ── Toast for placeholder feedback ────────────────────── */
 .concept-toast {
   position: fixed;
   bottom: var(--space-6);
@@ -3356,15 +3413,43 @@ input, textarea { font: inherit; color: inherit; }
   transform: translateX(-50%) translateY(0);
 }
 
-@media (max-width: 600px) {
-  .concept-panel-head { flex-direction: column; align-items: flex-start; gap: 4px; }
-  .rooms-list li { grid-template-columns: 1fr; gap: 4px; }
-  .rooms-list .room-status { align-self: flex-start; }
-}
-
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     CommonUnity brand lockup — inline SVG defs.
+     Mirrors homepage.html / manifesto.html so the Studio header
+     uses the same wordmark (COMMONUNITY with gold OM, crescent,
+     and bindu) as the rest of the site. Source of truth is
+     assets/brand/primary-logo.svg; this inline copy must stay in
+     sync (same convention as the marketing pages). See
+     assets/brand/README.md.
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="cu-om-glow" x="-50%" y="-80%" width="200%" height="260%">
+      <feGaussianBlur stdDeviation="2.6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <symbol id="cu-logo-lockup" viewBox="-30 0 760 132">
+      <text x="350" y="108" text-anchor="middle"
+            font-family="Josefin Sans, Plus Jakarta Sans, system-ui, sans-serif"
+            font-weight="600" font-size="80" letter-spacing="6"
+            text-rendering="geometricPrecision">
+        <tspan fill="#FAF8F4" fill-opacity="0.96">C</tspan><tspan fill="#d4a04a" filter="url(#cu-om-glow)">OM</tspan><tspan fill="#FAF8F4" fill-opacity="0.96">MONUNITY</tspan>
+      </text>
+      <path d="M 92 26 Q 122 38 152 26" fill="none" stroke="#d4a04a"
+            stroke-width="2.2" stroke-linecap="round" opacity="0.92"
+            filter="url(#cu-om-glow)"/>
+      <path d="M 122 4 L 126 9 L 122 14 L 118 9 Z" fill="#d4a04a" opacity="0.96"
+            filter="url(#cu-om-glow)"/>
+    </symbol>
+  </defs>
+</svg>
 
 <!-- ============================================================
      SCREEN 1: ENTRANCE
@@ -3402,7 +3487,12 @@ input, textarea { font: inherit; color: inherit; }
   <!-- Right sidebar -->
   <div class="entrance-right" id="entrance-right">
 
-    <div class="entrance-wordmark">CommonUnity Studio <span class="studio-beta">Beta</span></div>
+    <div class="entrance-wordmark cu-wordmark">
+      <svg class="cu-lockup" viewBox="-30 0 760 132" aria-hidden="true"><use href="#cu-logo-lockup"/></svg>
+      <span class="cu-wordmark-suffix">Studio</span>
+      <span class="studio-beta">Beta</span>
+      <span class="visually-hidden">CommonUnity Studio</span>
+    </div>
     <p class="entrance-subtitle">Studio is where your <em>Compass</em> becomes form.</p>
     <div class="entrance-name" id="entrance-name"></div>
     <button class="entrance-preview-link" id="entrance-preview-link" type="button" aria-label="Preview the Studio v1.1 conceptual layer">
@@ -3542,7 +3632,11 @@ input, textarea { font: inherit; color: inherit; }
     <div style="display:flex;align-items:center;gap:var(--space-3);flex-shrink:0;">
     <button class="room-back" id="btn-back-to-entrance">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-<span class="studio-header-wordmark">CommonUnity Studio</span> <span style="font-size:8px;font-weight:700;letter-spacing:0.12em;color:var(--rose-color,#c4b5fd);border:1px solid var(--rose-color,#c4b5fd);border-radius:999px;padding:1px 6px;opacity:0.6;margin-left:4px;">Beta</span>
+<span class="studio-header-wordmark cu-wordmark cu-wordmark-sm">
+  <svg class="cu-lockup" viewBox="-30 0 760 132" aria-hidden="true"><use href="#cu-logo-lockup"/></svg>
+  <span class="cu-wordmark-suffix">Studio</span>
+  <span class="visually-hidden">CommonUnity Studio</span>
+</span> <span style="font-size:8px;font-weight:700;letter-spacing:0.12em;color:var(--rose-color,#c4b5fd);border:1px solid var(--rose-color,#c4b5fd);border-radius:999px;padding:1px 6px;opacity:0.6;margin-left:4px;">Beta</span>
     </button>
     <button class="room-back" id="btn-studio-save" title="Save session" style="gap:var(--space-1);">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -3901,259 +3995,81 @@ input, textarea { font: inherit; color: inherit; }
 
 
 <!-- ============================================================
-     SCREEN 3: STUDIO v1.1 — visible concept layer
-     Demo-ready panels that make Studio's future shape legible:
-     Ignition, Rooms preview, Studio Spark, Path Progress, Nexus
-     Sidecar. No persistence. No new framework. Pure HTML/CSS +
-     a small vanilla-JS spark randomizer.
+     SCREEN 3: THE Oṁ FIELD — Studio v1.1 demo layer
+     Replaces the prior dashboard-style preview (Ignition / Rooms /
+     Path Progress / Nexus Sidecar). One screen, one interaction:
+     touch the Oṁ Field, draw a Spark, sit with the prompt, write
+     in the connected Field Notes, save it. The torus is the muse.
+     Nexus listens to the archive without showing as a separate room.
      ============================================================ -->
-<div id="screen-concept" class="screen">
+<div id="screen-concept" class="screen" aria-labelledby="concept-title">
   <div class="concept-wrap">
 
     <button class="concept-back" id="concept-back" type="button">← Back to entrance</button>
 
     <header class="concept-head">
-      <div class="concept-eyebrow">Studio v1.1 · Visible concept layer</div>
-      <h1 class="concept-title">Studio is where your <em>Compass becomes form.</em></h1>
+      <div class="concept-eyebrow">Studio · The Oṁ Field</div>
+      <h1 class="concept-title" id="concept-title">Studio is where your <em>Compass becomes form.</em></h1>
       <p class="concept-lede">
-        Compass gives orientation. Nexus seeds the field. Studio gives the
-        rooms. The 8 movements give the path. The Gene Keys arc gives depth.
-        The Key remembers. This page previews how those parts fit together —
-        a digital workbench for unified living, not another dashboard.
+        Touch the Oṁ Field. Draw a Spark. A question rises from the field —
+        sit with it, answer in your Field Notes, and let the archive grow.
       </p>
     </header>
 
-    <!-- ──────────────── Studio Ignition ──────────────── -->
-    <section class="concept-panel" id="ignition" aria-labelledby="ignition-title">
-      <div class="concept-panel-head">
-        <h2 id="ignition-title">Studio <em>Ignition</em></h2>
-        <span class="concept-panel-tag">Seeded by Nexus</span>
-      </div>
-      <p class="concept-panel-lede">
-        Nexus has read your Compass profile and onboarding notes. Here is a
-        first field map for you to refine. Nothing is final. Everything is
-        yours to shape.
+    <!-- The Oṁ Field — torus / muse interaction -->
+    <section class="om-field" aria-label="The Oṁ Field">
+      <button type="button" class="om-disc" id="om-disc"
+              aria-label="Touch the Oṁ Field to draw a Spark">
+        <span class="om-rings" aria-hidden="true">
+          <span class="om-ring r1"></span>
+          <span class="om-ring r2"></span>
+          <span class="om-ring r3"></span>
+        </span>
+        <span class="om-glyph" aria-hidden="true">Oṁ</span>
+      </button>
+      <p class="om-call">
+        <span class="om-call-line">Touch the Oṁ Field</span>
+        <span class="om-call-sep" aria-hidden="true">·</span>
+        <span class="om-call-line muted">Draw a Spark</span>
       </p>
-
-      <div class="ignition-grid">
-        <article class="ignition-card">
-          <span class="ic-label">Work in the world</span>
-          <span class="ic-name">A quiet authority that helps people see the work behind their work.</span>
-          <p class="ic-seed">Seeded from your Compass Work point. You return to this whether or not anyone is watching — refine into one sentence you would say out loud.</p>
-          <div class="ic-actions">
-            <button class="concept-chip" data-toast="Refine — open a Nexus reflection on this card.">Refine</button>
-            <button class="concept-chip" data-toast="Sent to the Profile room.">Send to room</button>
-            <button class="concept-chip" data-toast="Saved to your CommonUnity Key.">Save to Key</button>
-          </div>
-        </article>
-
-        <article class="ignition-card">
-          <span class="ic-label">Evolution edge</span>
-          <span class="ic-name">Letting the work be received before it is fully proven.</span>
-          <p class="ic-seed">Drawn from your Lens point and recurring patterns in onboarding. The growth here is less about doing more and more about being received without armor.</p>
-          <div class="ic-actions">
-            <button class="concept-chip" data-toast="Refine — open a Nexus reflection on this card.">Refine</button>
-            <button class="concept-chip" data-toast="Sent to the Field Notes room.">Send to room</button>
-            <button class="concept-chip" data-toast="Saved to your CommonUnity Key.">Save to Key</button>
-          </div>
-        </article>
-
-        <article class="ignition-card">
-          <span class="ic-label">Radiance</span>
-          <span class="ic-name">Warm, unhurried clarity. The room settles when you arrive.</span>
-          <p class="ic-seed">Drawn from your Field point and the qualities people most often name in your presence. This is the frequency your work transmits before words.</p>
-          <div class="ic-actions">
-            <button class="concept-chip" data-toast="Refine — open a Nexus reflection on this card.">Refine</button>
-            <button class="concept-chip" data-toast="Sent to the Frequency room.">Send to room</button>
-            <button class="concept-chip" data-toast="Saved to your CommonUnity Key.">Save to Key</button>
-          </div>
-        </article>
-
-        <article class="ignition-card">
-          <span class="ic-label">Purpose</span>
-          <span class="ic-name">To make unity practical for people who feel the split between inner truth and outer livelihood.</span>
-          <p class="ic-seed">A first articulation drawn from your Call point. Not a slogan — a working sentence you can edit as the field clarifies.</p>
-          <div class="ic-actions">
-            <button class="concept-chip" data-toast="Refine — open a Nexus reflection on this card.">Refine</button>
-            <button class="concept-chip" data-toast="Sent to the Profile room.">Send to room</button>
-            <button class="concept-chip" data-toast="Saved to your CommonUnity Key.">Save to Key</button>
-          </div>
-        </article>
-
-        <article class="ignition-card">
-          <span class="ic-label">Voice</span>
-          <span class="ic-name">Plain, considered, a little dry. Says less than it could.</span>
-          <p class="ic-seed">Detected from your written reflections. Studio will use this as the default tone for website and offering drafts — adjustable any time.</p>
-          <div class="ic-actions">
-            <button class="concept-chip" data-toast="Refine — open a Nexus reflection on this card.">Refine</button>
-            <button class="concept-chip" data-toast="Sent to the Website room.">Send to room</button>
-            <button class="concept-chip" data-toast="Saved to your CommonUnity Key.">Save to Key</button>
-          </div>
-        </article>
-
-        <article class="ignition-card">
-          <span class="ic-label">First project</span>
-          <span class="ic-name">A small public note: the question you are living right now.</span>
-          <p class="ic-seed">Suggested by Nexus as the smallest honest version of your current field. It can become the seed of your Website, your Offering, or simply a Field Note you keep.</p>
-          <div class="ic-actions">
-            <button class="concept-chip" data-toast="Refine — open a Nexus reflection on this card.">Refine</button>
-            <button class="concept-chip" data-toast="Sent to the Project room.">Send to room</button>
-            <button class="concept-chip" data-toast="Saved to your CommonUnity Key.">Save to Key</button>
-          </div>
-        </article>
-      </div>
     </section>
 
-    <!-- ──────────────── Rooms preview ──────────────── -->
-    <section class="concept-panel" id="rooms" aria-labelledby="rooms-title">
-      <div class="concept-panel-head">
-        <h2 id="rooms-title">The <em>rooms</em> of Studio</h2>
-        <span class="concept-panel-tag">Parts of one field, not separate apps</span>
-      </div>
-      <p class="concept-panel-lede">
-        Each room holds one dimension of your digital life and creative work.
-        Open them at your own pace.
-      </p>
-      <ul class="rooms-list">
-        <li>
-          <div>
-            <span class="room-name">Profile</span>
-            <span class="room-purpose">Shape the living profile — a richer picture of you than any social profile can hold.</span>
-          </div>
-          <span class="room-status is-seeded">Seeded</span>
-        </li>
-        <li>
-          <div>
-            <span class="room-name">Website</span>
-            <span class="room-purpose">Shape the public digital window you own, not a profile inside someone else's system.</span>
-          </div>
-          <span class="room-status">Draft</span>
-        </li>
-        <li>
-          <div>
-            <span class="room-name">Project</span>
-            <span class="room-purpose">Shape the originating project — the smallest honest version of what wants to be made.</span>
-          </div>
-          <span class="room-status">Draft</span>
-        </li>
-        <li>
-          <div>
-            <span class="room-name">Offering</span>
-            <span class="room-purpose">Clarify what you serve, sell, teach, host, or contribute — and to whom.</span>
-          </div>
-          <span class="room-status">Open</span>
-        </li>
-        <li>
-          <div>
-            <span class="room-name">Field Notes</span>
-            <span class="room-purpose">Hold reflections, questions, decisions, and raw material as they appear.</span>
-          </div>
-          <span class="room-status">Open</span>
-        </li>
-        <li>
-          <div>
-            <span class="room-name">Frequency</span>
-            <span class="room-purpose">Tune the felt sense of your digital field — color, sound, rhythm, voice.</span>
-          </div>
-          <span class="room-status">Open</span>
-        </li>
-        <li>
-          <div>
-            <span class="room-name">Nexus</span>
-            <span class="room-purpose">Co-creative reflection and translation — supports without doing the becoming for you.</span>
-          </div>
-          <span class="room-status is-seeded">Listening</span>
-        </li>
-      </ul>
-    </section>
-
-    <!-- ──────────────── Studio Spark ──────────────── -->
-    <section class="concept-panel" id="spark" aria-labelledby="spark-title">
-      <div class="concept-panel-head">
-        <h2 id="spark-title">Studio <em>Spark</em></h2>
-        <span class="concept-panel-tag">Not sure where to begin?</span>
-      </div>
-      <p class="concept-panel-lede">
-        Each spark draws on the 8 movements and the Gene Keys arc from
-        shadow to gift. Receive one, sit with it, or draw another.
-      </p>
-      <div class="spark-card" id="spark-card">
-        <div class="spark-meta">
-          <span class="spark-tag" id="spark-room">Room · Profile</span>
-          <span class="spark-tag movement" id="spark-movement">Movement · Relationship</span>
-          <span class="spark-tag arc" id="spark-arc">Arc · Shadow → Gift</span>
+    <!-- Holographic Spark card — emitted from the Oṁ Field -->
+    <section class="spark-stage" id="spark-stage" aria-live="polite" aria-atomic="true">
+      <article class="spark-holo" id="spark-card">
+        <div class="spark-rise">A question rises from the field</div>
+        <p class="spark-prompt" id="spark-prompt">Touch the Oṁ Field to receive your first Spark.</p>
+        <div class="spark-meta" id="spark-meta" hidden>
+          <span class="spark-tag movement" id="spark-movement">Movement · —</span>
+          <span class="spark-tag arc"      id="spark-arc">Arc · —</span>
+          <span class="spark-tag target"   id="spark-target">For · —</span>
         </div>
-        <p class="spark-prompt" id="spark-prompt">
-          Write the first sentence of your living profile — the one a normal
-          social profile cannot hold.
-        </p>
         <div class="spark-actions">
-          <button class="spark-btn" id="spark-draw" type="button">Draw another spark</button>
-          <button class="concept-chip" data-toast="Saved to Field Notes." type="button">Save to Field Notes</button>
-          <button class="concept-chip" data-toast="Sent to Nexus for reflection." type="button">Ask Nexus</button>
+          <button class="spark-btn" id="spark-draw" type="button">Draw another Spark</button>
         </div>
-      </div>
+      </article>
     </section>
 
-    <!-- ──────────────── Path Progress ──────────────── -->
-    <section class="concept-panel" id="progress" aria-labelledby="progress-title">
-      <div class="concept-panel-head">
-        <h2 id="progress-title">Path <em>progress</em></h2>
-        <span class="concept-panel-tag">Where you are on the path</span>
+    <!-- Connected Field Notes — the answer surface -->
+    <section class="fieldnotes-card" aria-labelledby="fieldnotes-title">
+      <header class="fieldnotes-head">
+        <span class="fieldnotes-label" id="fieldnotes-title">Field Notes</span>
+        <span class="fieldnotes-tag">Your answer to the Spark</span>
+      </header>
+      <textarea class="fieldnotes-area" id="fieldnotes-area"
+        placeholder="Begin where you are. Write toward the question, not around it. Nothing here is final — Field Notes is the loose page before the form."
+        rows="6"
+        aria-label="Write your answer to the current Spark"></textarea>
+      <div class="fieldnotes-actions">
+        <button class="concept-chip" id="save-fieldnotes" type="button" data-toast="Saved to Field Notes.">Save to Field Notes</button>
+        <button class="concept-chip" id="save-nexus"      type="button" data-toast="Sent to Nexus for reflection.">Save for Nexus</button>
       </div>
-      <p class="concept-panel-lede">
-        These are the five thresholds Studio helps you cross. They unfold at
-        your pace — the path is never finished, only practiced.
+      <p class="fieldnotes-foot">
+        Saved Field Notes become queryable by Nexus. Nexus listens to the archive
+        and translates reflections into your <em>living profile</em>,
+        <em>website</em>, and <em>personal OS</em> — without doing the becoming
+        for you.
       </p>
-      <ul class="progress-list">
-        <li class="is-seeded">
-          <span class="progress-tick" aria-hidden="true"></span>
-          <span class="progress-label">Living profile</span>
-          <span class="progress-state">Seeded</span>
-        </li>
-        <li>
-          <span class="progress-tick" aria-hidden="true"></span>
-          <span class="progress-label">Website seed</span>
-          <span class="progress-state">In draft</span>
-        </li>
-        <li>
-          <span class="progress-tick" aria-hidden="true"></span>
-          <span class="progress-label">First offering</span>
-          <span class="progress-state">Open</span>
-        </li>
-        <li>
-          <span class="progress-tick" aria-hidden="true"></span>
-          <span class="progress-label">Originating project</span>
-          <span class="progress-state">Open</span>
-        </li>
-        <li>
-          <span class="progress-tick" aria-hidden="true"></span>
-          <span class="progress-label">CommonUnity Key updated</span>
-          <span class="progress-state">Pending</span>
-        </li>
-      </ul>
-    </section>
-
-    <!-- ──────────────── Nexus Sidecar ──────────────── -->
-    <section class="concept-panel" id="sidecar" aria-labelledby="sidecar-title">
-      <div class="concept-panel-head">
-        <h2 id="sidecar-title">Nexus <em>Sidecar</em></h2>
-        <span class="concept-panel-tag">Translates reflection into structure</span>
-      </div>
-      <p class="concept-panel-lede">
-        Nexus supports your evolution and translates reflection into
-        structure — without replacing your agency. It can ask better
-        questions, surface deeper connections, and help you shape what is
-        already alive in you. It does not do the becoming for you.
-      </p>
-      <div class="sidecar-actions" role="group" aria-label="Nexus actions">
-        <button class="sidecar-btn" type="button" data-toast="Nexus is reflecting on the current card."><span class="sb-glyph">◌</span> Reflect</button>
-        <button class="sidecar-btn" type="button" data-toast="Nexus is asking a clarifying question."><span class="sb-glyph">?</span> Clarify</button>
-        <button class="sidecar-btn" type="button" data-toast="Nexus is naming the shadow pattern at play."><span class="sb-glyph">∴</span> Find the shadow</button>
-        <button class="sidecar-btn" type="button" data-toast="Nexus is naming the gift expression of the same pattern."><span class="sb-glyph">✶</span> Name the gift</button>
-        <button class="sidecar-btn" type="button" data-toast="Nexus has shaped this into draft copy."><span class="sb-glyph">¶</span> Shape into copy</button>
-        <button class="sidecar-btn" type="button" data-toast="Saved to your CommonUnity Key."><span class="sb-glyph">⌘</span> Save to Key</button>
-      </div>
     </section>
 
   </div>
@@ -7295,14 +7211,16 @@ if (document.readyState === 'loading') {
 }
 
 /* ============================================================
-   STUDIO v1.1 — visible concept layer (Athens demo)
+   STUDIO — The Oṁ Field (v1.1 demo layer)
    - Toggle between #screen-entrance and #screen-concept.
-   - "Draw another spark" rotates a small library of prompts
-     rooted in the 8 movements + Gene Keys arc.
-   - data-toast="…" attribute on any button shows a tiny non-
-     destructive confirmation. No persistence, no network.
+   - Touch the Oṁ disc → emit a holographic Studio Spark.
+   - "Draw another Spark" rotates a small library of prompts
+     rooted in the 8 movements, the Gene Keys arc, and an output
+     target (Living Profile / Website Seed / Personal OS / etc.).
+   - Save chips show a non-destructive toast and a "saved" state.
+     No persistence, no network calls — placeholder by design.
    ============================================================ */
-(function initStudioConcept() {
+(function initStudioOmField() {
   function go() {
     var entrance = document.getElementById('screen-entrance');
     var concept  = document.getElementById('screen-concept');
@@ -7323,37 +7241,57 @@ if (document.readyState === 'loading') {
     openBtn.addEventListener('click', showConcept);
     backBtn.addEventListener('click', showEntrance);
 
-    // ── Studio Spark randomizer ────────────────────────────
+    // ── Studio Spark library ───────────────────────────────
+    // Each spark carries the four-part matrix from the Studio
+    // architecture: Movement (one of 8) + Arc (Shadow→Gift /
+    // Gift→Siddhi) + Target (where the answer can become form).
     var SPARKS = [
-      { room: 'Profile',     movement: 'Relationship',  arc: 'Shadow → Gift', prompt: 'Write the first sentence of your living profile — the one a normal social profile cannot hold.' },
-      { room: 'Profile',     movement: 'Practice',      arc: 'Shadow → Gift', prompt: 'What practice already holds your life together, even quietly? Name it without inflating it.' },
-      { room: 'Website',     movement: 'Attention',     arc: 'Shadow → Gift', prompt: 'Where does your public presence feel shaped by performing? Rewrite your homepage opening from the gift state, in one sentence.' },
-      { room: 'Website',     movement: 'Embodiment',    arc: 'Shadow → Gift', prompt: 'What should your digital space feel like in the body when someone arrives? Three words, then one room you have stood in that matches.' },
-      { room: 'Project',     movement: 'Focus',         arc: 'Shadow → Gift', prompt: 'What is the smallest honest version of this project — the one sentence that would make it real enough to begin?' },
-      { room: 'Project',     movement: 'Breath',        arc: 'Shadow → Gift', prompt: 'Where are you rushing the project before the field is ready? Name what needs more space before it goes public.' },
-      { room: 'Offering',    movement: 'Relationship',  arc: 'Shadow → Gift', prompt: 'Where might this offering be shaped by proving, rescuing, or seeking approval? Write one version of it from service rather than performance.' },
-      { room: 'Offering',    movement: 'Focus',         arc: 'Shadow → Gift', prompt: 'Draft your first offering in one paragraph. Lead with the need it serves, not the form it takes.' },
-      { room: 'Field Notes', movement: 'Contemplation', arc: 'Shadow → Gift', prompt: 'What question keeps returning lately? Write it as a question, not a conclusion. Save it to Field Notes and let it stay open.' },
-      { room: 'Field Notes', movement: 'Contemplation', arc: 'Shadow → Gift', prompt: 'What pattern is asking to be understood right now? Name the shadow expression, then the gift expression of the same energy.' },
-      { room: 'Frequency',   movement: 'Embodiment',    arc: 'Shadow → Gift', prompt: 'Choose one color and one frequency that match your current phase. Why these, today, not yesterday?' },
-      { room: 'Frequency',   movement: 'Attention',     arc: 'Shadow → Gift', prompt: 'What must be removed from your digital field so the essential can be seen? Name one thing you will retire this week.' },
-      { room: 'Profile',     movement: 'Unity',         arc: 'Gift → Siddhi', prompt: 'What thread connects your story, offering, project, and practice? Write it without spiritual language.' },
-      { room: 'Project',     movement: 'Practice',      arc: 'Shadow → Gift', prompt: 'What needs to become repeatable if this work is to become real? Pick one rhythm you can hold for thirty days.' },
-      { room: 'Website',     movement: 'Unity',         arc: 'Shadow → Gift', prompt: 'If your website were a threshold into your field, what should someone feel, know, and do when they arrive?' }
+      { movement: 'Relationship',  arc: 'Shadow → Gift', target: 'Living Profile', prompt: 'Write the first sentence of your living profile — the one a normal social profile cannot hold.' },
+      { movement: 'Practice',      arc: 'Shadow → Gift', target: 'Personal OS',    prompt: 'What practice already holds your life together, even quietly? Name it without inflating it.' },
+      { movement: 'Attention',     arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'Where does your public presence feel shaped by performing? Rewrite your homepage opening from the gift state, in one sentence.' },
+      { movement: 'Embodiment',    arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'What should your digital space feel like in the body when someone arrives? Three words, then one room you have stood in that matches.' },
+      { movement: 'Focus',         arc: 'Shadow → Gift', target: 'Project',        prompt: 'What is the smallest honest version of this project — the one sentence that would make it real enough to begin?' },
+      { movement: 'Breath',        arc: 'Shadow → Gift', target: 'Project',        prompt: 'Where are you rushing the project before the field is ready? Name what needs more space before it goes public.' },
+      { movement: 'Relationship',  arc: 'Shadow → Gift', target: 'Offering',       prompt: 'Where might this offering be shaped by proving, rescuing, or seeking approval? Write one version of it from service rather than performance.' },
+      { movement: 'Focus',         arc: 'Shadow → Gift', target: 'Offering',       prompt: 'Draft your first offering in one paragraph. Lead with the need it serves, not the form it takes.' },
+      { movement: 'Contemplation', arc: 'Shadow → Gift', target: 'Living Profile', prompt: 'What pattern is asking to be understood right now? Name the shadow expression, then the gift expression of the same energy.' },
+      { movement: 'Contemplation', arc: 'Shadow → Gift', target: 'Personal OS',    prompt: 'What question keeps returning lately? Write it as a question, not a conclusion. Let it stay open.' },
+      { movement: 'Embodiment',    arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'Choose one color and one frequency that match your current phase. Why these, today, not yesterday?' },
+      { movement: 'Attention',     arc: 'Shadow → Gift', target: 'Personal OS',    prompt: 'What must be removed from your digital field so the essential can be seen? Name one thing you will retire this week.' },
+      { movement: 'Unity',         arc: 'Gift → Siddhi', target: 'Living Profile', prompt: 'What thread connects your story, offering, project, and practice? Write it without spiritual language.' },
+      { movement: 'Practice',      arc: 'Shadow → Gift', target: 'Project',        prompt: 'What needs to become repeatable if this work is to become real? Pick one rhythm you can hold for thirty days.' },
+      { movement: 'Unity',         arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'If your website were a threshold into your field, what should someone feel, know, and do when they arrive?' }
     ];
 
+    var disc       = document.getElementById('om-disc');
+    var card       = document.getElementById('spark-card');
     var promptEl   = document.getElementById('spark-prompt');
-    var roomEl     = document.getElementById('spark-room');
+    var metaEl     = document.getElementById('spark-meta');
     var movementEl = document.getElementById('spark-movement');
     var arcEl      = document.getElementById('spark-arc');
+    var targetEl   = document.getElementById('spark-target');
     var drawBtn    = document.getElementById('spark-draw');
-    var lastIdx    = 0;
+    var lastIdx    = -1;
 
     function renderSpark(s) {
       promptEl.textContent   = s.prompt;
-      roomEl.textContent     = 'Room · ' + s.room;
       movementEl.textContent = 'Movement · ' + s.movement;
-      arcEl.textContent      = 'Arc · ' + s.arc;
+      arcEl.textContent      = 'Arc · '      + s.arc;
+      targetEl.textContent   = 'For · '      + s.target;
+      if (metaEl) metaEl.hidden = false;
+      // Re-trigger the holographic emit animation.
+      if (card) {
+        card.classList.remove('is-emitting');
+        // force reflow so the animation restarts
+        // eslint-disable-next-line no-unused-expressions
+        void card.offsetWidth;
+        card.classList.add('is-emitting');
+      }
+      if (disc) {
+        disc.classList.remove('is-pulsing');
+        void disc.offsetWidth;
+        disc.classList.add('is-pulsing');
+      }
     }
 
     function drawSpark() {
@@ -7365,6 +7303,7 @@ if (document.readyState === 'loading') {
       renderSpark(SPARKS[idx]);
     }
 
+    if (disc)    disc.addEventListener('click', drawSpark);
     if (drawBtn) drawBtn.addEventListener('click', drawSpark);
 
     // ── Toast for placeholder actions ──────────────────────
@@ -7381,8 +7320,8 @@ if (document.readyState === 'loading') {
     concept.addEventListener('click', function (e) {
       var btn = e.target.closest('[data-toast]');
       if (!btn) return;
-      // Mark Save-to-Key chips as saved on the Ignition cards.
-      if (btn.classList.contains('concept-chip') && /save to key/i.test(btn.textContent)) {
+      // Mark Save chips as saved on click.
+      if (btn.classList.contains('concept-chip')) {
         btn.classList.add('is-saved');
       }
       showToast(btn.getAttribute('data-toast') || 'Done.');
