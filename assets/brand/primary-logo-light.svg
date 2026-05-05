@@ -7,6 +7,6 @@
         text-rendering="geometricPrecision">
     <tspan fill="#1A1410">C</tspan><tspan fill="#1A35C8">OM</tspan><tspan fill="#1A1410">MONUNITY</tspan>
   </text>
-  <path d="M 94 38 Q 124 50 154 38" fill="none" stroke="#1A35C8" stroke-width="2.6" stroke-linecap="round"/>
-  <path d="M 124 14 L 128 19 L 124 24 L 120 19 Z" fill="#1A35C8"/>
+  <path d="M 92 26 Q 122 38 152 26" fill="none" stroke="#1A35C8" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M 122 4 L 126 9 L 122 14 L 118 9 Z" fill="#1A35C8"/>
 </svg>
