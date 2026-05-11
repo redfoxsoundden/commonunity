@@ -5718,17 +5718,59 @@ function saveWorkbenchEntry() {
   const text = input.value.trim();
   if (!text) return;
 
+  // Read pending builder target BEFORE we clear the textarea / dataset.
+  // The Oṁ Field's compose flow stamps these data-* attrs onto the
+  // textarea when the user picks "Compose in Field Notes". If absent,
+  // this save is a plain note and no capture is registered.
+  const builderTarget  = input.dataset.builderTarget  || (input.getAttribute('data-builder-target')  || '');
+  const builderBuilder = input.dataset.builderBuilder || (input.getAttribute('data-builder-builder') || '');
+  const builderPrompt  = input.dataset.builderPrompt  || (input.getAttribute('data-builder-prompt')  || '');
+
   const entry = {
     text,
     date: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
   };
+  if (builderTarget) {
+    entry.builderTarget  = builderTarget;
+    entry.builderBuilder = builderBuilder || 'profile';
+  }
   if (!state.rooms[currentRoom].entries) state.rooms[currentRoom].entries = [];
   state.rooms[currentRoom].entries.push(entry);
+
+  // Capture into builder readiness. Mirror the shape the Oṁ Field's
+  // IIFE uses (state.builder.captures[fieldId] = [{at, prompt, excerpt}])
+  // so the readiness modal — which is rendered by that IIFE — reflects
+  // this save without needing the IIFE's closure path to fire.
+  if (builderTarget) {
+    if (!state.builder) state.builder = { captures: {}, osMeta: { projectActive: false, notesActive: false, reviewRhythm: '' } };
+    if (!state.builder.captures) state.builder.captures = {};
+    if (!state.builder.captures[builderTarget]) state.builder.captures[builderTarget] = [];
+    state.builder.captures[builderTarget].push({
+      at: new Date().toISOString(),
+      prompt: builderPrompt,
+      excerpt: text.slice(0, 280),
+      builder: builderBuilder || 'profile'
+    });
+  }
+
   saveState();
   input.value = '';
+  // Clear the builder-target tags so the next plain Save doesn't double-capture.
+  if (builderTarget) {
+    input.removeAttribute('data-builder-target');
+    input.removeAttribute('data-builder-builder');
+    input.removeAttribute('data-builder-prompt');
+    try { window.CommonUnity && window.CommonUnity.builder && (window.CommonUnity.builder._pending = null); } catch (_) {}
+  }
   renderWorkbenchEntries(currentRoom);
   renderArchive(currentRoom);
-  showToast('Entry saved');
+  // Re-render the builder readiness modal if it's open.
+  try {
+    if (window.CommonUnity && window.CommonUnity.builder && typeof window.CommonUnity.builder._renderTracks === 'function') {
+      window.CommonUnity.builder._renderTracks();
+    }
+  } catch (_) {}
+  showToast(builderTarget ? 'Entry saved — captured for builder' : 'Entry saved');
 }
 
 // ============================================================
@@ -8233,8 +8275,18 @@ if (document.readyState === 'loading') {
           renderTracks();
         }
         return window.CommonUnity.builder.readiness();
-      }
+      },
+      // Internal hook so saveWorkbenchEntry can refresh the readiness
+      // modal without reaching into the IIFE's private scope.
+      _renderTracks: renderTracks
     };
+    // Convenience top-level aliases so console / QA can call
+    //   window.captureNow(...) and window.simulateComposeAndSave(...)
+    // without remembering the CommonUnity.builder path.
+    try {
+      window.captureNow             = window.CommonUnity.builder.captureNow;
+      window.simulateComposeAndSave = window.CommonUnity.builder.simulateComposeAndSave;
+    } catch (_) {}
   }
 
   if (document.readyState === 'loading') {
