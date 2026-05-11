@@ -3777,6 +3777,219 @@ input, textarea { font: inherit; color: inherit; }
   border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
 }
 
+/* ============================================================
+   LIVING PROFILE PREVIEW v0.1
+   Modal that renders a structured Living Profile draft from
+   imported Compass data + Field Notes captures. Reuses the
+   builder-modal frame so palette stays consistent.
+   ============================================================ */
+.lp-preview-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-2);
+  appearance: none;
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 45%, var(--border));
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+.lp-preview-cta:hover,
+.lp-preview-cta:focus-visible {
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 22%, transparent);
+  border-color: var(--rose-color, #c4b5fd);
+  outline: none;
+}
+.lp-preview-cta .spb-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--rose-color, #c4b5fd);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
+}
+
+.lp-modal-card {
+  max-width: 780px;
+}
+.lp-source-note {
+  font-size: 11px;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.lp-source-note .lp-source-tag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 40%, var(--border));
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-muted));
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.lp-coverage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 4px 0 0;
+}
+.lp-coverage-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+.lp-coverage-chip.is-compass {
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-muted));
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
+}
+.lp-coverage-chip.is-captured {
+  color: #88b15c;
+  border-color: color-mix(in srgb, #88b15c 60%, transparent);
+}
+.lp-coverage-chip.is-empty { color: var(--text-faint); }
+
+.lp-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.lp-section {
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 10px;
+  padding: var(--space-4) var(--space-5);
+  background: color-mix(in srgb, var(--input-bg) 50%, transparent);
+}
+.lp-section.s-work  { border-left: 3px solid var(--work,  #c4b5fd); }
+.lp-section.s-lens  { border-left: 3px solid var(--lens,  #c4b5fd); }
+.lp-section.s-field { border-left: 3px solid var(--field, #c4b5fd); }
+.lp-section.s-call  { border-left: 3px solid var(--call,  #c4b5fd); }
+.lp-section.s-meta  { border-left: 3px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, var(--border)); }
+.lp-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.lp-section-label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+.lp-section-source {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.lp-section-source.is-compass {
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-muted));
+}
+.lp-section-source.is-captured { color: #88b15c; }
+.lp-section-source.is-mixed {
+  color: color-mix(in srgb, #88b15c 50%, var(--rose-color, #c4b5fd));
+}
+.lp-section-source.is-empty { color: var(--text-faint); }
+
+.lp-name {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.lp-context {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+.lp-essence {
+  margin: 0;
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(16px, 1.8vw, 20px);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--text) 90%, var(--rose-color, #c4b5fd));
+}
+.lp-body {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+.lp-roles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.lp-roles li {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, var(--border));
+  color: var(--text);
+}
+.lp-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 18px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+@media (max-width: 520px) { .lp-meta-grid { grid-template-columns: 1fr; } }
+.lp-meta-grid dt {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+  margin: 0;
+}
+.lp-meta-grid dd { margin: 0 0 4px; color: var(--text); }
+.lp-empty {
+  margin: 0;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-faint);
+  line-height: 1.55;
+}
+.lp-tags {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.lp-tags li {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  color: var(--text-muted);
+}
+
 </style>
 </head>
 <body>
@@ -3880,6 +4093,10 @@ input, textarea { font: inherit; color: inherit; }
       <button type="button" class="studio-path-btn studio-path-trail-cta" id="studio-path-open-entrance">
         <span class="spb-dot" aria-hidden="true"></span>
         Open Studio Path
+      </button>
+      <button type="button" class="lp-preview-cta" id="living-profile-open-entrance" style="margin-top:6px;align-self:flex-start;">
+        <span class="spb-dot" aria-hidden="true"></span>
+        Preview Living Profile
       </button>
     </div>
 
@@ -4468,6 +4685,34 @@ input, textarea { font: inherit; color: inherit; }
       <em>The Lens</em> · how you see, learn, interpret. &nbsp;
       <em>The Field</em> · what supports you, what you radiate. &nbsp;
       <em>The Call</em> · the current calling, what wants to emerge.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     Living Profile Preview v0.1 — modal
+     Renders a structured Living Profile draft from compassData +
+     Field Notes captures. Opened from Studio Path (Level 1),
+     room header, and window.openLivingProfile().
+     ============================================================ -->
+<div id="living-profile-modal" class="builder-modal" role="dialog" aria-labelledby="living-profile-title" aria-modal="true">
+  <div class="builder-modal-card lp-modal-card" id="living-profile-card">
+    <div class="builder-modal-head">
+      <div>
+        <div class="builder-modal-eyebrow">Living Profile · v0.1 · Level 1</div>
+        <h2 class="builder-modal-title" id="living-profile-title">Your <em>minimum viable digital self.</em></h2>
+        <p class="builder-modal-lede" id="living-profile-lede">
+          A first draft, assembled locally from your Compass material and any
+          Field Notes you have captured. Honesty over performance — this is
+          what Studio sees so far. Keep, refine, or rewrite comes next.
+        </p>
+      </div>
+      <button type="button" class="builder-modal-close" id="living-profile-close" aria-label="Close">×</button>
+    </div>
+    <div id="living-profile-body"></div>
+    <p class="builder-footnote" id="living-profile-foot">
+      Drafted locally from Compass import + Field Notes captures.
+      Not a public website — that is Level 2.
     </p>
   </div>
 </div>
@@ -8174,6 +8419,12 @@ if (document.readyState === 'loading') {
           '<p class="builder-track-lede">' + spec.lede + '</p>' +
           '<div class="builder-progress"><div class="builder-progress-bar" style="width:' + prog.pct + '%"></div></div>' +
           '<div class="builder-progress-meta">' + prog.seeded + ' of ' + prog.total + ' fields seeded · ' + prog.pct + '%</div>';
+        // Level 1 — Living Profile gets a preview CTA so the first
+        // reward (a visible draft) is one click away from Studio Path.
+        if (key === 'profile') {
+          html += '<button type="button" class="lp-preview-cta" data-action="open-living-profile">' +
+            '<span class="spb-dot" aria-hidden="true"></span>Preview Living Profile</button>';
+        }
         // Render four section cards, each listing its fields.
         html += '<div class="builder-sections">';
         ['work','lens','field','call'].forEach(function (sec) {
@@ -8213,7 +8464,419 @@ if (document.readyState === 'loading') {
       html += '</ul></section>';
 
       tracksEl.innerHTML = html;
+      // Wire any Living Profile CTAs rendered above.
+      Array.prototype.forEach.call(
+        tracksEl.querySelectorAll('[data-action="open-living-profile"]'),
+        function (btn) { btn.addEventListener('click', openLivingProfile); }
+      );
     }
+
+    // ============================================================
+    // LIVING PROFILE PREVIEW v0.1
+    // Deterministic local renderer: reads state.compassData and
+    // state.builder.captures, returns a structured Living Profile
+    // model, then renders it into #living-profile-modal. No LLM
+    // call — fast, reliable, honest.
+    // ============================================================
+    var lpModal      = document.getElementById('living-profile-modal');
+    var lpBody       = document.getElementById('living-profile-body');
+    var lpCloseBtn   = document.getElementById('living-profile-close');
+
+    function lpEscape(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+    function lpTrim(str, max) {
+      if (!str) return '';
+      var s = String(str).trim();
+      if (s.length <= max) return s;
+      var cut = s.slice(0, max);
+      var lastDot = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
+      if (lastDot > max * 0.6) return cut.slice(0, lastDot + 1);
+      var lastSpace = cut.lastIndexOf(' ');
+      return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + '…';
+    }
+    function lpFirst() {
+      for (var i = 0; i < arguments.length; i++) {
+        var v = arguments[i];
+        if (v == null) continue;
+        if (typeof v === 'string') {
+          var t = v.trim();
+          if (t) return t;
+        } else if (Array.isArray(v) && v.length) {
+          return v;
+        } else if (typeof v === 'object') {
+          return v;
+        }
+      }
+      return '';
+    }
+    function lpJoin(arr, sep) {
+      if (!Array.isArray(arr)) return '';
+      return arr.map(function (x) { return String(x || '').trim(); })
+                .filter(Boolean).join(sep || ', ');
+    }
+    function lpCaptureText(fieldId) {
+      try {
+        var caps = (window.state && window.state.builder && window.state.builder.captures) || {};
+        var arr = caps[fieldId];
+        if (!arr || !arr.length) return '';
+        // Most recent capture wins; older ones surface as supporting tags.
+        return String(arr[arr.length - 1].excerpt || '').trim();
+      } catch (_) { return ''; }
+    }
+    function lpCaptureCount(fieldId) {
+      try {
+        var caps = (window.state && window.state.builder && window.state.builder.captures) || {};
+        var arr = caps[fieldId];
+        return arr ? arr.length : 0;
+      } catch (_) { return 0; }
+    }
+
+    // Build the structured Living Profile model from current state.
+    // Each section returns { value, source, tags } where source is
+    // 'compass' | 'captured' | 'mixed' | 'empty' so the UI can show
+    // honest provenance and the coverage counter.
+    function buildLivingProfile() {
+      var cd      = (window.state && window.state.compassData) || {};
+      var profile = cd.profile || {};
+      var points  = cd.points  || {};
+      var pw = points.work  || {};
+      var pl = points.lens  || {};
+      var pf = points.field || {};
+      var pc = points.call  || {};
+
+      var personName = (window.state && window.state.person) || cd.companion || '';
+      var capName    = lpCaptureText('name-context');
+
+      // ── Name & context ──────────────────────────────────────
+      var contextBits = [];
+      if (cd.pob)       contextBits.push(String(cd.pob).trim());
+      if (cd.tradition) contextBits.push('Tradition: ' + String(cd.tradition).trim());
+      if (cd.guide)     contextBits.push('Guide: ' + String(cd.guide).trim());
+      if (profile.communities && profile.communities.length) {
+        contextBits.push('Communities: ' + lpJoin(profile.communities));
+      }
+      var nameSection = {
+        name: personName || '',
+        context: lpFirst(capName, contextBits.length ? contextBits.join(' · ') : ''),
+        source: capName ? (contextBits.length ? 'mixed' : 'captured')
+                        : (contextBits.length ? 'compass' : 'empty')
+      };
+
+      // ── Role constellation ─────────────────────────────────
+      var roles = [];
+      var capRoles = lpCaptureText('roles');
+      if (capRoles) {
+        capRoles.split(/[\n,;]+/).forEach(function (r) {
+          var t = r.trim().replace(/^[-•*]\s*/, '');
+          if (t) roles.push(t);
+        });
+      }
+      if (profile.work_background) {
+        // work_background can be a string or array of role objects.
+        if (Array.isArray(profile.work_background)) {
+          profile.work_background.forEach(function (wb) {
+            if (!wb) return;
+            if (typeof wb === 'string') roles.push(wb);
+            else {
+              var label = [wb.title || wb.role, wb.company || wb.org].filter(Boolean).join(' — ');
+              if (label) roles.push(label);
+            }
+          });
+        } else if (typeof profile.work_background === 'string') {
+          profile.work_background.split(/[\n;]+/).forEach(function (r) {
+            var t = r.trim().replace(/^[-•*]\s*/, '');
+            if (t) roles.push(t);
+          });
+        }
+      }
+      // QA answers under work can carry the explicit role list.
+      if (Array.isArray(pw.qa_answers)) {
+        pw.qa_answers.forEach(function (qa) {
+          var a = qa && (qa.answer || qa.a || qa.text);
+          if (!a) return;
+          var k = String(qa.question || qa.q || qa.key || '').toLowerCase();
+          if (/role|title|hat|wear/.test(k)) {
+            String(a).split(/[\n,;]+/).forEach(function (r) {
+              var t = r.trim().replace(/^[-•*]\s*/, '');
+              if (t && roles.indexOf(t) === -1) roles.push(t);
+            });
+          }
+        });
+      }
+      // De-dupe, cap to 8 to keep the card readable.
+      var seen = {};
+      roles = roles.filter(function (r) {
+        var key = r.toLowerCase();
+        if (seen[key]) return false;
+        seen[key] = true;
+        return r.length <= 80;
+      }).slice(0, 8);
+      var rolesSection = {
+        roles: roles,
+        source: capRoles ? (roles.length > (capRoles.split(/[\n,;]+/).length) ? 'mixed' : 'captured')
+                         : (roles.length ? 'compass' : 'empty')
+      };
+
+      // ── Essence line ───────────────────────────────────────
+      var capEssence = lpCaptureText('essence-line');
+      var essenceFromCompass = lpFirst(pl.web_heading, pl.theme, pw.web_heading);
+      var essenceSection = {
+        value: capEssence || (essenceFromCompass ? lpTrim(essenceFromCompass, 200) : ''),
+        source: capEssence ? 'captured' : (essenceFromCompass ? 'compass' : 'empty')
+      };
+
+      // ── Work / Lens / Field / Call summaries ───────────────
+      function summarySection(point, fieldId) {
+        var cap = lpCaptureText(fieldId);
+        var fromCompass = lpFirst(point.summary, point.web_intro, point.raw);
+        var tags = [];
+        if (point.theme) tags.push(point.theme);
+        if (Array.isArray(point.highlights)) {
+          point.highlights.slice(0, 3).forEach(function (h) {
+            if (h) tags.push(typeof h === 'string' ? h : (h.text || h.label || ''));
+          });
+        }
+        tags = tags.map(function (t) { return String(t || '').trim(); })
+                   .filter(Boolean).filter(function (t) { return t.length <= 60; });
+        return {
+          value: cap || (fromCompass ? lpTrim(fromCompass, 480) : ''),
+          source: cap ? 'captured' : (fromCompass ? 'compass' : 'empty'),
+          tags: tags.slice(0, 4)
+        };
+      }
+      var workSummary  = summarySection(pw, 'work-summary');
+      var lensSummary  = summarySection(pl, 'lens-summary');
+      var fieldSummary = summarySection(pf, 'field-summary');
+      var callSummary  = summarySection(pc, 'call-summary');
+
+      // ── Practices / contact / invitation ───────────────────
+      var capContact = lpCaptureText('contact');
+      var practices = [];
+      if (Array.isArray(profile.practices)) {
+        profile.practices.forEach(function (p) {
+          if (!p) return;
+          if (typeof p === 'string') practices.push(p);
+          else practices.push(p.name || p.label || p.title || '');
+        });
+        practices = practices.filter(Boolean).slice(0, 6);
+      } else if (typeof profile.practices === 'string') {
+        practices = profile.practices.split(/[\n,;]+/).map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 6);
+      }
+      var contactBits = [];
+      if (profile.linkedin_url) contactBits.push('LinkedIn: ' + profile.linkedin_url);
+      if (profile.education) {
+        if (Array.isArray(profile.education)) {
+          var eduStrs = profile.education.map(function (e) {
+            if (!e) return '';
+            if (typeof e === 'string') return e;
+            return [e.degree || e.qualification, e.institution || e.school].filter(Boolean).join(', ');
+          }).filter(Boolean);
+          if (eduStrs.length) contactBits.push('Education: ' + eduStrs.join(' · '));
+        } else if (typeof profile.education === 'string') {
+          contactBits.push('Education: ' + profile.education);
+        }
+      }
+      var contactSection = {
+        invitation: capContact || '',
+        practices: practices,
+        meta: contactBits,
+        source: capContact ? (contactBits.length || practices.length ? 'mixed' : 'captured')
+                           : ((contactBits.length || practices.length) ? 'compass' : 'empty')
+      };
+
+      // ── Source / transcripts footer ────────────────────────
+      var transcripts = Array.isArray(cd.transcripts) ? cd.transcripts : [];
+      var transcriptCount = transcripts.length;
+      var transcriptSummary = transcripts
+        .map(function (t) { return t && (t.summary || t.filename || ''); })
+        .filter(Boolean).slice(0, 3);
+
+      var sections = {
+        nameContext:  nameSection,
+        roles:        rolesSection,
+        essence:      essenceSection,
+        workSummary:  workSummary,
+        lensSummary:  lensSummary,
+        fieldSummary: fieldSummary,
+        callSummary:  callSummary,
+        contact:      contactSection
+      };
+
+      // Coverage counters — for the honest source note.
+      var counts = { compass: 0, captured: 0, mixed: 0, empty: 0, total: 0 };
+      Object.keys(sections).forEach(function (k) {
+        counts.total += 1;
+        counts[sections[k].source] += 1;
+      });
+
+      return {
+        sections: sections,
+        counts: counts,
+        transcripts: { count: transcriptCount, summaries: transcriptSummary },
+        gk: {
+          work:  pw.gk_num  ? (pw.gk_num  + (pw.gk_line  ? '.' + pw.gk_line  : '')) : '',
+          lens:  pl.gk_num  ? (pl.gk_num  + (pl.gk_line  ? '.' + pl.gk_line  : '')) : '',
+          field: pf.gk_num  ? (pf.gk_num  + (pf.gk_line  ? '.' + pf.gk_line  : '')) : '',
+          call:  pc.gk_num  ? (pc.gk_num  + (pc.gk_line  ? '.' + pc.gk_line  : '')) : ''
+        }
+      };
+    }
+
+    function lpSourceTag(source) {
+      var label = {
+        compass:  'From Compass',
+        captured: 'From Field Notes',
+        mixed:    'Compass + Field Notes',
+        empty:    'Awaiting source'
+      }[source] || '';
+      var cls = {
+        compass: 'is-compass', captured: 'is-captured',
+        mixed: 'is-mixed', empty: 'is-empty'
+      }[source] || '';
+      return '<span class="lp-section-source ' + cls + '">' + label + '</span>';
+    }
+    function lpEmpty(text) {
+      return '<p class="lp-empty">' + lpEscape(text) + '</p>';
+    }
+    function lpTagsList(tags) {
+      if (!tags || !tags.length) return '';
+      return '<ul class="lp-tags">' + tags.map(function (t) {
+        return '<li>' + lpEscape(t) + '</li>';
+      }).join('') + '</ul>';
+    }
+
+    function renderLivingProfile() {
+      if (!lpBody) return;
+      var model = buildLivingProfile();
+      var s = model.sections;
+      var html = '';
+
+      // ── Coverage / source note ─────────────────────────────
+      var c = model.counts;
+      var coverageChips =
+        '<span class="lp-coverage-chip is-compass">From Compass · ' + (c.compass + c.mixed) + ' / ' + c.total + '</span>' +
+        '<span class="lp-coverage-chip is-captured">From Field Notes · ' + (c.captured + c.mixed) + ' / ' + c.total + '</span>' +
+        '<span class="lp-coverage-chip is-empty">Awaiting · ' + c.empty + ' / ' + c.total + '</span>';
+      var sourceLine =
+        'Drafted from Compass import + Field Notes captures' +
+        (model.transcripts.count ? ' · ' + model.transcripts.count + ' transcript' + (model.transcripts.count === 1 ? '' : 's') : '') +
+        '.';
+      html += '<section class="lp-section s-meta">' +
+        '<p class="lp-source-note"><span class="lp-source-tag">Source</span>' + lpEscape(sourceLine) + '</p>' +
+        '<div class="lp-coverage">' + coverageChips + '</div>' +
+        '</section>';
+
+      // ── Name & context ─────────────────────────────────────
+      html += '<section class="lp-section s-work">' +
+        '<div class="lp-section-head"><span class="lp-section-label">Name &amp; context</span>' + lpSourceTag(s.nameContext.source) + '</div>';
+      if (s.nameContext.name || s.nameContext.context) {
+        if (s.nameContext.name) html += '<h3 class="lp-name">' + lpEscape(s.nameContext.name) + '</h3>';
+        if (s.nameContext.context) html += '<p class="lp-context">' + lpEscape(s.nameContext.context) + '</p>';
+      } else {
+        html += lpEmpty('Not enough source material yet — your name and the wider context you stand in will appear here.');
+      }
+      html += '</section>';
+
+      // ── Role constellation ─────────────────────────────────
+      html += '<section class="lp-section s-work">' +
+        '<div class="lp-section-head"><span class="lp-section-label">Role constellation</span>' + lpSourceTag(s.roles.source) + '</div>';
+      if (s.roles.roles && s.roles.roles.length) {
+        html += '<ul class="lp-roles">' + s.roles.roles.map(function (r) {
+          return '<li>' + lpEscape(r) + '</li>';
+        }).join('') + '</ul>';
+      } else {
+        html += lpEmpty('Not enough source material yet — the roles you actually hold will appear here.');
+      }
+      html += '</section>';
+
+      // ── Essence line ───────────────────────────────────────
+      html += '<section class="lp-section s-lens">' +
+        '<div class="lp-section-head"><span class="lp-section-label">Essence line</span>' + lpSourceTag(s.essence.source) + '</div>';
+      if (s.essence.value) {
+        html += '<p class="lp-essence">' + lpEscape(s.essence.value) + '</p>';
+      } else {
+        html += lpEmpty('Not enough source material yet — one sentence a normal profile cannot hold.');
+      }
+      html += '</section>';
+
+      // ── Work / Lens / Field / Call summaries ───────────────
+      function renderSummary(label, section, sec, gk) {
+        var gkBadge = gk ? ' <span class="lp-section-source is-compass">GK ' + lpEscape(gk) + '</span>' : '';
+        var h = '<section class="lp-section s-' + sec + '">' +
+          '<div class="lp-section-head"><span class="lp-section-label">' + label + gkBadge + '</span>' +
+          lpSourceTag(section.source) + '</div>';
+        if (section.value) {
+          h += '<p class="lp-body">' + lpEscape(section.value) + '</p>';
+          h += lpTagsList(section.tags || []);
+        } else {
+          h += lpEmpty('Not enough source material yet — work in The ' +
+            (sec.charAt(0).toUpperCase() + sec.slice(1)) +
+            ' will surface here as you fill it in.');
+        }
+        h += '</section>';
+        return h;
+      }
+      html += renderSummary('Work summary',  s.workSummary,  'work',  model.gk.work);
+      html += renderSummary('Lens summary',  s.lensSummary,  'lens',  model.gk.lens);
+      html += renderSummary('Field summary', s.fieldSummary, 'field', model.gk.field);
+      html += renderSummary('Call summary',  s.callSummary,  'call',  model.gk.call);
+
+      // ── Contact & invitation ───────────────────────────────
+      html += '<section class="lp-section s-call">' +
+        '<div class="lp-section-head"><span class="lp-section-label">Contact &amp; invitation</span>' + lpSourceTag(s.contact.source) + '</div>';
+      var contactBody = '';
+      if (s.contact.invitation) {
+        contactBody += '<p class="lp-body">' + lpEscape(s.contact.invitation) + '</p>';
+      }
+      if (s.contact.practices && s.contact.practices.length) {
+        contactBody += '<dl class="lp-meta-grid"><dt>Practices</dt><dd>' +
+          lpEscape(s.contact.practices.join(' · ')) + '</dd></dl>';
+      }
+      if (s.contact.meta && s.contact.meta.length) {
+        contactBody += '<dl class="lp-meta-grid">' +
+          s.contact.meta.map(function (m) {
+            var parts = String(m).split(/:\s*/);
+            var k = parts[0] || '';
+            var v = parts.slice(1).join(': ');
+            return '<dt>' + lpEscape(k) + '</dt><dd>' + lpEscape(v) + '</dd>';
+          }).join('') +
+          '</dl>';
+      }
+      if (!contactBody) {
+        contactBody = lpEmpty('Not enough source material yet — how and on what terms you welcome people in.');
+      }
+      html += contactBody + '</section>';
+
+      lpBody.innerHTML = html;
+    }
+
+    function openLivingProfile() {
+      if (!lpModal) return;
+      renderLivingProfile();
+      // If Studio Path modal is open, close it so the preview lands clean.
+      if (modal && modal.classList.contains('is-open')) modal.classList.remove('is-open');
+      lpModal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLivingProfile() {
+      if (!lpModal) return;
+      lpModal.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+    if (lpCloseBtn) lpCloseBtn.addEventListener('click', closeLivingProfile);
+    if (lpModal) lpModal.addEventListener('click', function (e) {
+      if (e.target === lpModal) closeLivingProfile();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && lpModal && lpModal.classList.contains('is-open')) closeLivingProfile();
+    });
+    window.openLivingProfile = openLivingProfile;
+    window.buildLivingProfile = buildLivingProfile;
 
     function openModal() {
       renderTracks();
@@ -8240,6 +8903,8 @@ if (document.readyState === 'loading') {
     var entrancePathBtn = document.getElementById('studio-path-open-entrance');
     if (headerPathBtn)   headerPathBtn.addEventListener('click', openModal);
     if (entrancePathBtn) entrancePathBtn.addEventListener('click', openModal);
+    var lpEntranceBtn = document.getElementById('living-profile-open-entrance');
+    if (lpEntranceBtn) lpEntranceBtn.addEventListener('click', openLivingProfile);
 
     // ── Wire up Spark controls ────────────────────────────
     disc.addEventListener('click', drawSpark);
