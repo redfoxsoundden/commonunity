@@ -3406,6 +3406,278 @@ input, textarea { font: inherit; color: inherit; }
   transform: translateX(-50%) translateY(0);
 }
 
+/* ============================================================
+   FOURFOLD BUILDER — readiness affordance
+   A lightweight review surface that shows where Profile, Website,
+   and Personal OS stand. Lives behind a "Review readiness" link
+   inside the Oṁ widget; opens as a modal sheet so it never
+   obstructs the room workspace. Reuses Studio's dark palette.
+   ============================================================ */
+.builder-review-link {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--rose-color, #c4b5fd);
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 0;
+}
+.builder-review-link:hover,
+.builder-review-link:focus-visible {
+  color: var(--text);
+  text-decoration-color: var(--text);
+  outline: none;
+}
+
+.builder-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 3vw, 24px);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.builder-modal.is-open { display: flex; }
+.builder-modal-card {
+  width: 100%;
+  max-width: 760px;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--bg) 92%, var(--rose-color, #c4b5fd) 4%);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 26%, var(--border));
+  border-radius: 14px;
+  box-shadow: 0 20px 60px -20px color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, transparent);
+  padding: clamp(var(--space-5), 3vw, var(--space-8));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.builder-modal-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.builder-modal-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--rose-color, #c4b5fd);
+  font-weight: 700;
+}
+.builder-modal-title {
+  margin: 4px 0 0;
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--text);
+}
+.builder-modal-title em { font-style: italic; color: var(--rose-color, #c4b5fd); font-weight: 500; }
+.builder-modal-lede {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  max-width: 60ch;
+}
+.builder-modal-close {
+  appearance: none;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  color: var(--text-muted);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.builder-modal-close:hover { color: var(--text); border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent); }
+
+.builder-track {
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 10px;
+  padding: var(--space-4) var(--space-5);
+  background: color-mix(in srgb, var(--input-bg) 60%, transparent);
+}
+.builder-track + .builder-track { margin-top: var(--space-3); }
+.builder-track-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.builder-track-name {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.005em;
+}
+.builder-track-status {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--text-faint) 40%, transparent);
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.builder-track-status.s-seeded     { color: color-mix(in srgb, var(--rose-color, #c4b5fd) 75%, var(--text-muted)); border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent); }
+.builder-track-status.s-drafting   { color: color-mix(in srgb, var(--rose-color, #c4b5fd) 85%, var(--text)); border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent); }
+.builder-track-status.s-review     { color: var(--rose-color, #c4b5fd); border-color: var(--rose-color, #c4b5fd); }
+.builder-track-status.s-publish    { color: #88b15c; border-color: color-mix(in srgb, #88b15c 70%, transparent); }
+.builder-track-status.s-published  { color: #88b15c; border-color: #88b15c; background: color-mix(in srgb, #88b15c 12%, transparent); }
+.builder-track-status.s-locked     { color: var(--text-faint); }
+.builder-track-status.s-unlocked   { color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, var(--text-muted)); }
+.builder-track-status.s-active     { color: #88b15c; border-color: color-mix(in srgb, #88b15c 70%, transparent); }
+.builder-track-status.s-evolving   { color: #d4a04a; border-color: color-mix(in srgb, #d4a04a 70%, transparent); }
+.builder-track-lede {
+  margin: 0 0 var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+.builder-progress {
+  height: 4px;
+  background: color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 0 var(--space-3);
+}
+.builder-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, transparent), color-mix(in srgb, var(--rose-color, #c4b5fd) 40%, transparent));
+  transition: width 0.4s cubic-bezier(.2,.7,.3,1);
+}
+.builder-progress-meta {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: -8px 0 var(--space-3);
+}
+
+.builder-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+@media (max-width: 600px) { .builder-sections { grid-template-columns: 1fr; } }
+.builder-section {
+  border-left: 2px solid color-mix(in srgb, var(--border) 80%, transparent);
+  padding: 4px 0 4px 12px;
+}
+.builder-section.is-seeded { border-left-color: var(--rose-color, #c4b5fd); }
+.builder-section.s-work    { border-left-color: var(--work,  #c4b5fd); }
+.builder-section.s-lens    { border-left-color: var(--lens,  #c4b5fd); }
+.builder-section.s-field   { border-left-color: var(--field, #c4b5fd); }
+.builder-section.s-call    { border-left-color: var(--call,  #c4b5fd); }
+.builder-section-name {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.builder-section-name .bs-mark {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+.builder-section.is-seeded .builder-section-name .bs-mark { color: var(--rose-color, #c4b5fd); }
+.builder-section-desc {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 4px 0 0;
+}
+.builder-section-fields {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+.builder-section-fields li {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.builder-section-fields li::before {
+  content: "○";
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1;
+}
+.builder-section-fields li.is-seeded { color: var(--text); }
+.builder-section-fields li.is-seeded::before { content: "●"; color: var(--rose-color, #c4b5fd); }
+
+.builder-os-criteria {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+.builder-os-criteria li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+.builder-os-criteria li:first-child { border-top: none; }
+.builder-os-criteria li::before {
+  content: "○";
+  color: var(--text-faint);
+  font-size: 11px;
+  line-height: 1;
+}
+.builder-os-criteria li.is-met { color: var(--text); }
+.builder-os-criteria li.is-met::before { content: "●"; color: #88b15c; }
+
+.builder-footnote {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+.builder-footnote em {
+  font-style: italic;
+  color: color-mix(in srgb, var(--text) 85%, var(--rose-color, #c4b5fd));
+}
+
+/* Inline builder target tag inside the spark card */
+.spark-tag.target.is-builder {
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 85%, var(--text));
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
+}
+
 </style>
 </head>
 <body>
@@ -4029,11 +4301,47 @@ input, textarea { font: inherit; color: inherit; }
       </div>
     </div>
   </div>
-  <p class="om-widget-foot">Answer in Field Notes. Saved Field Notes become available to Nexus.</p>
+  <p class="om-widget-foot">
+    Answer in Field Notes. Saved Field Notes become available to Nexus.
+    <button type="button" class="builder-review-link" id="builder-review-open">Review builder readiness</button>
+  </p>
 </aside>
 
 <!-- Lightweight feedback toast for placeholder actions -->
 <div id="concept-toast" class="concept-toast" role="status" aria-live="polite"></div>
+
+<!-- ============================================================
+     Fourfold Builder — readiness review modal
+     Shows the live status of Profile, Website, and Personal OS
+     against the v0.1 fourfold builder standard. Driven by the
+     BUILDER_STANDARD and BUILDER_STATE objects in the second
+     script block — open the modal, see what's seeded vs missing
+     across The Work / The Lens / The Field / The Call.
+     ============================================================ -->
+<div id="builder-modal" class="builder-modal" role="dialog" aria-labelledby="builder-modal-title" aria-modal="true">
+  <div class="builder-modal-card" id="builder-modal-card">
+    <div class="builder-modal-head">
+      <div>
+        <div class="builder-modal-eyebrow">Fourfold Builder · v0.1</div>
+        <h2 class="builder-modal-title" id="builder-modal-title">Where the <em>building stands.</em></h2>
+        <p class="builder-modal-lede">
+          Three quiet tracks unfold in parallel. Each Spark you answer in
+          Field Notes seeds a field on one of the tracks. Profile and
+          Website fill at your pace; the Personal OS unlocks when both are
+          ready and a project is alive.
+        </p>
+      </div>
+      <button type="button" class="builder-modal-close" id="builder-modal-close" aria-label="Close">×</button>
+    </div>
+    <div id="builder-tracks"></div>
+    <p class="builder-footnote">
+      <em>The Work</em> · what you do, build, offer, serve. &nbsp;
+      <em>The Lens</em> · how you see, learn, interpret. &nbsp;
+      <em>The Field</em> · what supports you, what you radiate. &nbsp;
+      <em>The Call</em> · the current calling, what wants to emerge.
+    </p>
+  </div>
+</div>
 
 
 <!-- ============================================================
@@ -4287,6 +4595,10 @@ function loadState() {
     if (s) {
       const parsed = JSON.parse(s);
       state = { ...state, ...parsed };
+      // Keep window.state in sync — see the explicit assignment at
+      // the end of this script block; loadState() rebinds `state`
+      // to a new object, so re-publish the reference.
+      window.state = state;
     }
   } catch(e) {}
 }
@@ -6809,6 +7121,13 @@ function renderVoiceEntries(roomKey) {
   });
 }
 
+// Expose the live Studio state + saveState to the Builder IIFE in
+// the next <script> block. `let state` does not auto-attach to
+// window, so do it explicitly; saveState already does as a top-
+// level function declaration but we name it for clarity.
+window.state = state;
+window.saveState = saveState;
+
 </script>
 
 <!-- Freq reopen button -->
@@ -7168,23 +7487,121 @@ if (document.readyState === 'loading') {
 }
 
 /* ============================================================
-   STUDIO — The Oṁ Field (persistent global widget)
-   - Lives at the document level; visible on every Studio screen.
-   - Draws Sparks from the 8 movements + Gene Keys arc library.
-   - Reads the active room (.room-pill.active) so each Spark gets
-     a room-aware "For" target. The widget is the same DOM node
-     in every room — no duplication.
-   - "Compose in Field Notes" pipes the current Spark prompt into
-     the existing #workbench-input notepad, then focuses it.
-   - The notepad's Save button is the only save. After save we
-     surface a small confirmation that the Field Note is now
-     available to Nexus.
-   - No persistence beyond what the existing Studio already does.
+   STUDIO — The Oṁ Field + Fourfold Builder (v0.1)
+   Single source of truth for:
+     - BUILDER_STANDARD : Profile / Website / Personal OS spec
+     - SPARK_LIBRARY    : prompts mapped to required builder fields
+     - readiness logic  : computes status from saved Field Notes
+     - widget behaviour : draws Sparks, opens the readiness modal,
+                          drops prompts into the existing notepad
+   The widget itself is the same persistent global pattern from the
+   previous pass — bottom-left dock on desktop, hidden on entrance,
+   draggable, mini-torus visual, room-aware. This pass replaces the
+   old "For · {room}" mapping with builder-target-aware Sparks and
+   adds a readiness review modal.
    ============================================================ */
-(function initOmField() {
+(function initStudioBuilder() {
+
+  // ============================================================
+  // FOURFOLD BUILDER STANDARD v0.1
+  // Central, editable data model. Future builds extend by adding
+  // fields/sections/prompts here — no other code needs touching.
+  // ============================================================
+  var FOURFOLD = {
+    work:  { name: 'The Work',  short: 'What you do, build, offer, serve.' },
+    lens:  { name: 'The Lens',  short: 'How you see, learn, interpret.' },
+    field: { name: 'The Field', short: 'What supports you, what you radiate.' },
+    call:  { name: 'The Call',  short: 'The current calling, what wants to emerge.' }
+  };
+
+  var BUILDER_STANDARD = {
+    statusLevels: {
+      track: ['Seeded', 'Drafting', 'Ready for review', 'Ready to publish', 'Published'],
+      os:    ['Locked', 'Unlocked', 'Seeding', 'Active', 'Evolving']
+    },
+
+    profile: {
+      key: 'profile',
+      name: 'Living Profile',
+      lede: 'A richer picture of you than any normal social profile can hold. Built from your own words, not a form.',
+      fields: [
+        { id: 'name-context',  section: 'work',  label: 'Name & context',     prompt: 'Who you are, what you go by, and the wider context you stand in.' },
+        { id: 'roles',         section: 'work',  label: 'Role constellation', prompt: 'The roles you actually hold — not titles, the working shapes of your life.' },
+        { id: 'essence-line',  section: 'lens',  label: 'Essence line',       prompt: 'One sentence a normal profile cannot hold.' },
+        { id: 'work-summary',  section: 'work',  label: 'Work summary',       prompt: 'What you do, build, offer, or serve, in your own voice.' },
+        { id: 'lens-summary',  section: 'lens',  label: 'Lens summary',       prompt: 'How you see, learn, interpret. The way your attention moves.' },
+        { id: 'field-summary', section: 'field', label: 'Field summary',      prompt: 'What holds you, what you radiate, the frequency you transmit.' },
+        { id: 'call-summary',  section: 'call',  label: 'Call summary',       prompt: 'The current calling. What is asking to emerge through you.' },
+        { id: 'contact',       section: 'call',  label: 'Contact & invitation', prompt: 'How and on what terms you welcome people in.' }
+      ]
+    },
+
+    website: {
+      key: 'website',
+      name: 'Personal Website',
+      lede: 'A public threshold into your field — a window you own, not another profile inside someone else’s system.',
+      fields: [
+        { id: 'threshold',     section: 'work',  label: 'Threshold',     prompt: 'What someone should feel, know, and do on arrival.' },
+        { id: 'site-work',     section: 'work',  label: 'Work section',  prompt: 'The public face of what you do — concise, honest, undefensive.' },
+        { id: 'site-lens',     section: 'lens',  label: 'Lens section',  prompt: 'How you see the field you work inside. Not credentials — orientation.' },
+        { id: 'site-field',    section: 'field', label: 'Field section', prompt: 'What people walk into when they meet your work. The room they enter.' },
+        { id: 'site-call',     section: 'call',  label: 'Call section',  prompt: 'What you are inviting people toward, right now.' },
+        { id: 'connect',       section: 'call',  label: 'Connect',       prompt: 'The contact path. What you welcome and what you do not.' },
+        { id: 'visual-tone',   section: 'field', label: 'Visual direction', prompt: 'Three words and one room that match the felt sense.' },
+        { id: 'public-review', section: 'lens',  label: 'Public / private review', prompt: 'What stays public, what stays private, what stays draft.' }
+      ]
+    },
+
+    os: {
+      key: 'os',
+      name: 'Personal OS',
+      lede: 'Unlocks when Profile and Website are ready, a project is alive, Field Notes are flowing, and a review rhythm is chosen.',
+      criteria: [
+        { id: 'profile-ready',  label: 'Profile ready for review',                 test: function (s) { return s.profile.status === 'Ready for review' || s.profile.status === 'Ready to publish' || s.profile.status === 'Published'; } },
+        { id: 'website-ready',  label: 'Website ready for review',                 test: function (s) { return s.website.status === 'Ready for review' || s.website.status === 'Ready to publish' || s.website.status === 'Published'; } },
+        { id: 'project-active', label: 'At least one active project or offering',  test: function (s) { return s.osMeta.projectActive; } },
+        { id: 'notes-active',   label: 'Field Notes archive active',               test: function (s) { return s.osMeta.notesActive; } },
+        { id: 'review-rhythm',  label: 'Review rhythm selected',                   test: function (s) { return !!s.osMeta.reviewRhythm; } }
+      ]
+    }
+  };
+
+  // ============================================================
+  // SPARK LIBRARY — every prompt knows where it lands
+  // Each carries: movement, arc, section, builder, target (field
+  // id inside the builder), prompt copy. The widget renders the
+  // target as a builder-aware tag and the readiness model uses it
+  // to know which field a saved Field Note has seeded.
+  // ============================================================
+  var SPARK_LIBRARY = [
+    // ── Profile / Work ─────────────────────────────────────
+    { id: 'sp-profile-roles',        movement: 'Relationship',  arc: 'Shadow → Gift',  section: 'work',  builder: 'profile', target: 'roles',         prompt: 'Name the role constellation you actually hold. Not the titles — the working shapes of your life this season.' },
+    { id: 'sp-profile-essence',      movement: 'Unity',         arc: 'Gift → Siddhi',  section: 'lens',  builder: 'profile', target: 'essence-line',  prompt: 'Write the first sentence of your living profile — the one a normal social profile cannot hold.' },
+    { id: 'sp-profile-work-sum',     movement: 'Focus',         arc: 'Shadow → Gift',  section: 'work',  builder: 'profile', target: 'work-summary',  prompt: 'In one paragraph: what do you do, build, offer, or serve? Lead with the need it meets, not the form it takes.' },
+    { id: 'sp-profile-lens-sum',     movement: 'Contemplation', arc: 'Shadow → Gift',  section: 'lens',  builder: 'profile', target: 'lens-summary',  prompt: 'How do you see the field you work inside? Where does your attention naturally rest? Two or three sentences.' },
+    { id: 'sp-profile-field-sum',    movement: 'Embodiment',    arc: 'Shadow → Gift',  section: 'field', builder: 'profile', target: 'field-summary', prompt: 'Name the qualities people most often feel in your presence. What does your work transmit before words?' },
+    { id: 'sp-profile-call-sum',     movement: 'Practice',      arc: 'Shadow → Gift',  section: 'call',  builder: 'profile', target: 'call-summary',  prompt: 'What is calling you right now that you have not yet given permission to? Write the shape of it.' },
+    { id: 'sp-profile-contact',      movement: 'Relationship',  arc: 'Shadow → Gift',  section: 'call',  builder: 'profile', target: 'contact',       prompt: 'How do you welcome people in — and what terms make the welcome real rather than performative?' },
+    { id: 'sp-profile-name',         movement: 'Relationship',  arc: 'Shadow → Gift',  section: 'work',  builder: 'profile', target: 'name-context',  prompt: 'Beyond your name: what wider context do you stand in? Lineages, places, communities that locate you.' },
+
+    // ── Website ────────────────────────────────────────────
+    { id: 'sp-site-threshold',       movement: 'Attention',     arc: 'Shadow → Gift',  section: 'work',  builder: 'website', target: 'threshold',     prompt: 'If your website were a threshold into your field, what should someone feel, know, and do when they arrive?' },
+    { id: 'sp-site-work',            movement: 'Focus',         arc: 'Shadow → Gift',  section: 'work',  builder: 'website', target: 'site-work',     prompt: 'Rewrite your public Work section from the gift state. Honest, undefensive, in your voice.' },
+    { id: 'sp-site-lens',            movement: 'Contemplation', arc: 'Shadow → Gift',  section: 'lens',  builder: 'website', target: 'site-lens',     prompt: 'Public Lens — not credentials, orientation. Where do you stand when you look at the field?' },
+    { id: 'sp-site-field',           movement: 'Embodiment',    arc: 'Shadow → Gift',  section: 'field', builder: 'website', target: 'site-field',    prompt: 'When someone walks into your work, what room have they entered? Describe the air, the light, the temperature.' },
+    { id: 'sp-site-call',            movement: 'Practice',      arc: 'Shadow → Gift',  section: 'call',  builder: 'website', target: 'site-call',     prompt: 'What are you inviting people toward right now? Be specific to this season, not your forever calling.' },
+    { id: 'sp-site-connect',         movement: 'Relationship',  arc: 'Shadow → Gift',  section: 'call',  builder: 'website', target: 'connect',       prompt: 'The Connect section. What you welcome, what you do not, and the simplest way to begin a conversation.' },
+    { id: 'sp-site-visual',          movement: 'Embodiment',    arc: 'Shadow → Gift',  section: 'field', builder: 'website', target: 'visual-tone',   prompt: 'Three words and one room that match the felt sense of your field. Studio will tune toward them.' },
+    { id: 'sp-site-public-private',  movement: 'Breath',        arc: 'Shadow → Gift',  section: 'lens',  builder: 'website', target: 'public-review', prompt: 'What stays public, what stays private, what stays draft? Name the line you want to hold.' },
+
+    // ── Personal OS seed prompts ───────────────────────────
+    { id: 'sp-os-project',           movement: 'Focus',         arc: 'Shadow → Gift',  section: 'call',  builder: 'os', target: 'project-active', prompt: 'What is the smallest honest version of an active project right now? The one sentence that would make it real enough to begin.' },
+    { id: 'sp-os-rhythm',            movement: 'Breath',        arc: 'Shadow → Gift',  section: 'field', builder: 'os', target: 'review-rhythm',  prompt: 'What review rhythm could you actually hold — weekly, fortnightly, monthly? Choose what is honest, not aspirational.' }
+  ];
+
   function go() {
-    var widget   = document.getElementById('om-widget');
-    var disc     = document.getElementById('om-disc');
+    var widget = document.getElementById('om-widget');
+    var disc   = document.getElementById('om-disc');
     var promptEl = document.getElementById('spark-prompt');
     var metaEl   = document.getElementById('spark-meta');
     var movementEl = document.getElementById('spark-movement');
@@ -7194,53 +7611,93 @@ if (document.readyState === 'loading') {
     var drawBtn    = document.getElementById('spark-draw');
     var composeBtn = document.getElementById('spark-compose');
     var toggleBtn  = document.getElementById('om-toggle');
-    var bodyEl     = document.getElementById('om-widget-body');
     var nexusHint  = document.getElementById('notepad-nexus-hint');
     var saveBtn    = document.getElementById('btn-save-entry');
     var workbench  = document.getElementById('workbench-input');
+    var reviewLink = document.getElementById('builder-review-open');
+    var modal      = document.getElementById('builder-modal');
+    var modalClose = document.getElementById('builder-modal-close');
+    var tracksEl   = document.getElementById('builder-tracks');
     if (!widget || !disc || !promptEl) return;
 
-    // ── Studio Spark library ───────────────────────────────
-    // Same set carried forward from the previous Spark pass —
-    // each carries Movement (one of 8) + Arc (Shadow → Gift /
-    // Gift → Siddhi) + a default Target. The active room can
-    // override the Target so the Spark feels room-aware.
-    var SPARKS = [
-      { movement: 'Relationship',  arc: 'Shadow → Gift', target: 'Living Profile', prompt: 'Write the first sentence of your living profile — the one a normal social profile cannot hold.' },
-      { movement: 'Practice',      arc: 'Shadow → Gift', target: 'Personal OS',    prompt: 'What practice already holds your life together, even quietly? Name it without inflating it.' },
-      { movement: 'Attention',     arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'Where does your public presence feel shaped by performing? Rewrite your homepage opening from the gift state, in one sentence.' },
-      { movement: 'Embodiment',    arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'What should your digital space feel like in the body when someone arrives? Three words, then one room you have stood in that matches.' },
-      { movement: 'Focus',         arc: 'Shadow → Gift', target: 'Project',        prompt: 'What is the smallest honest version of this project — the one sentence that would make it real enough to begin?' },
-      { movement: 'Breath',        arc: 'Shadow → Gift', target: 'Project',        prompt: 'Where are you rushing the project before the field is ready? Name what needs more space before it goes public.' },
-      { movement: 'Relationship',  arc: 'Shadow → Gift', target: 'Offering',       prompt: 'Where might this offering be shaped by proving, rescuing, or seeking approval? Write one version of it from service rather than performance.' },
-      { movement: 'Focus',         arc: 'Shadow → Gift', target: 'Offering',       prompt: 'Draft your first offering in one paragraph. Lead with the need it serves, not the form it takes.' },
-      { movement: 'Contemplation', arc: 'Shadow → Gift', target: 'Living Profile', prompt: 'What pattern is asking to be understood right now? Name the shadow expression, then the gift expression of the same energy.' },
-      { movement: 'Contemplation', arc: 'Shadow → Gift', target: 'Personal OS',    prompt: 'What question keeps returning lately? Write it as a question, not a conclusion. Let it stay open.' },
-      { movement: 'Embodiment',    arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'Choose one color and one frequency that match your current phase. Why these, today, not yesterday?' },
-      { movement: 'Attention',     arc: 'Shadow → Gift', target: 'Personal OS',    prompt: 'What must be removed from your digital field so the essential can be seen? Name one thing you will retire this week.' },
-      { movement: 'Unity',         arc: 'Gift → Siddhi', target: 'Living Profile', prompt: 'What thread connects your story, offering, project, and practice? Write it without spiritual language.' },
-      { movement: 'Practice',      arc: 'Shadow → Gift', target: 'Project',        prompt: 'What needs to become repeatable if this work is to become real? Pick one rhythm you can hold for thirty days.' },
-      { movement: 'Unity',         arc: 'Shadow → Gift', target: 'Website Seed',   prompt: 'If your website were a threshold into your field, what should someone feel, know, and do when they arrive?' }
-    ];
+    // ── State helpers ─────────────────────────────────────
+    // We do not introduce a new persistence store. Instead the
+    // builder state is computed live from window.state.rooms (the
+    // existing notepad entries) plus a small Builder-only stash
+    // on state.builder for the Personal-OS criteria the user
+    // toggles manually. Existing saveState() handles persistence.
+    function ensureBuilderState() {
+      if (!window.state) return null;
+      if (!window.state.builder) {
+        window.state.builder = {
+          captures: {},          // { fieldId: [{date, excerpt}] }
+          osMeta: {
+            projectActive: false,
+            notesActive:   false,
+            reviewRhythm:  ''
+          }
+        };
+      }
+      return window.state.builder;
+    }
 
-    // Map active Studio rooms to a Spark "For" target. The four
-    // existing rooms map onto four facets of "where the answer
-    // becomes form." If no room is active (entrance screen) the
-    // Spark uses its default target.
-    var ROOM_TARGETS = {
-      work:  'Living Profile',
-      lens:  'Personal OS',
-      field: 'Website Seed',
-      call:  'Offering'
-    };
-    var ROOM_LABELS = {
-      work:  'The Work',
-      lens:  'The Lens',
-      field: 'The Field',
-      call:  'The Call'
-    };
+    function isFieldSeeded(fieldId) {
+      var b = ensureBuilderState();
+      if (!b) return false;
+      var arr = b.captures[fieldId];
+      return !!(arr && arr.length);
+    }
 
-    var lastIdx     = -1;
+    function totalEntryCount() {
+      if (!window.state || !window.state.rooms) return 0;
+      return ['work','lens','field','call'].reduce(function (acc, k) {
+        var es = window.state.rooms[k] && window.state.rooms[k].entries;
+        return acc + (es ? es.length : 0);
+      }, 0);
+    }
+
+    function trackStatus(trackKey) {
+      var spec = BUILDER_STANDARD[trackKey];
+      if (!spec || !spec.fields) return 'Seeded';
+      var seeded = spec.fields.filter(function (f) { return isFieldSeeded(f.id); }).length;
+      var total  = spec.fields.length;
+      if (seeded === 0) return 'Seeded';
+      if (seeded < Math.ceil(total / 2)) return 'Drafting';
+      if (seeded < total)                 return 'Ready for review';
+      return 'Ready to publish';
+    }
+
+    function osStatus() {
+      var b = ensureBuilderState();
+      if (!b) return 'Locked';
+      // Sync ambient flags from the existing studio state.
+      b.osMeta.notesActive = totalEntryCount() >= 3;
+      var snap = {
+        profile:  { status: trackStatus('profile') },
+        website:  { status: trackStatus('website') },
+        osMeta:   b.osMeta
+      };
+      var met = BUILDER_STANDARD.os.criteria.filter(function (c) { return c.test(snap); }).length;
+      if (met === 0) return 'Locked';
+      if (met < BUILDER_STANDARD.os.criteria.length) {
+        return met < 3 ? 'Unlocked' : 'Seeding';
+      }
+      return 'Active';
+    }
+
+    function statusClass(level) {
+      var map = {
+        'Seeded': 's-seeded', 'Drafting': 's-drafting',
+        'Ready for review': 's-review', 'Ready to publish': 's-publish',
+        'Published': 's-published',
+        'Locked': 's-locked', 'Unlocked': 's-unlocked',
+        'Seeding': 's-seeded', 'Active': 's-active', 'Evolving': 's-evolving'
+      };
+      return map[level] || '';
+    }
+
+    // ── Spark drawing ─────────────────────────────────────
+    var lastIdx = -1;
     var currentSpark = null;
 
     function getActiveRoomKey() {
@@ -7250,20 +7707,31 @@ if (document.readyState === 'loading') {
 
     function refreshRoomLabel() {
       var key = getActiveRoomKey();
-      if (key && ROOM_LABELS[key]) {
-        roomEl.textContent = ROOM_LABELS[key];
+      if (key && FOURFOLD[key]) {
+        roomEl.textContent = FOURFOLD[key].name;
         roomEl.classList.add('is-set');
       } else {
         roomEl.textContent = 'In the Studio entrance';
         roomEl.classList.remove('is-set');
       }
-      // Show the widget only when the user is inside an active
-      // working room — never on the entrance / setup screen.
       var roomScreen = document.getElementById('screen-room');
       var inRoom = !!(roomScreen && roomScreen.classList.contains('active'));
       widget.classList.toggle('is-room-only', !inRoom);
-      // Re-render the current Spark so the "For" tag follows the room.
-      if (currentSpark) renderSpark(currentSpark, /*reanimate*/ false);
+      if (currentSpark) renderSpark(currentSpark, false);
+    }
+
+    function builderFieldLabel(spark) {
+      var spec = BUILDER_STANDARD[spark.builder];
+      if (!spec) return spark.target;
+      if (spec.fields) {
+        var f = spec.fields.find(function (x) { return x.id === spark.target; });
+        if (f) return spec.name + ' · ' + f.label;
+      }
+      if (spec.criteria) {
+        var c = spec.criteria.find(function (x) { return x.id === spark.target; });
+        if (c) return spec.name + ' · ' + c.label;
+      }
+      return spec.name;
     }
 
     function renderSpark(s, reanimate) {
@@ -7271,14 +7739,13 @@ if (document.readyState === 'loading') {
       promptEl.textContent   = s.prompt;
       movementEl.textContent = 'Movement · ' + s.movement;
       arcEl.textContent      = 'Arc · '      + s.arc;
-      var roomKey = getActiveRoomKey();
-      var target  = (roomKey && ROOM_TARGETS[roomKey]) ? ROOM_TARGETS[roomKey] : s.target;
-      targetEl.textContent   = 'For · '      + target;
+      targetEl.textContent   = 'For · '      + builderFieldLabel(s);
+      targetEl.classList.add('is-builder');
       if (metaEl) metaEl.hidden = false;
       if (composeBtn) composeBtn.hidden = false;
       if (reanimate !== false) {
         promptEl.classList.remove('is-emitting');
-        void promptEl.offsetWidth; // restart animation
+        void promptEl.offsetWidth;
         promptEl.classList.add('is-emitting');
         disc.classList.remove('is-pulsing');
         void disc.offsetWidth;
@@ -7287,16 +7754,23 @@ if (document.readyState === 'loading') {
     }
 
     function drawSpark() {
-      if (SPARKS.length <= 1) return;
-      var idx;
-      do { idx = Math.floor(Math.random() * SPARKS.length); }
-      while (idx === lastIdx);
-      lastIdx = idx;
-      renderSpark(SPARKS[idx], true);
-      // If the widget is collapsed, expand so the new Spark is visible.
-      if (widget.classList.contains('is-collapsed')) {
-        setCollapsed(false);
+      if (SPARK_LIBRARY.length <= 1) return;
+      // Soft preference: if a room is active, prefer Sparks whose
+      // section matches it. Falls back to the full library so we
+      // never deadlock.
+      var key = getActiveRoomKey();
+      var pool = SPARK_LIBRARY;
+      if (key) {
+        var filtered = SPARK_LIBRARY.filter(function (s) { return s.section === key; });
+        if (filtered.length >= 2) pool = filtered;
       }
+      var idx;
+      do { idx = Math.floor(Math.random() * pool.length); }
+      while (pool.length > 1 && pool[idx] === currentSpark);
+      var picked = pool[idx];
+      lastIdx = SPARK_LIBRARY.indexOf(picked);
+      renderSpark(picked, true);
+      if (widget.classList.contains('is-collapsed')) setCollapsed(false);
     }
 
     function setCollapsed(collapsed) {
@@ -7306,36 +7780,55 @@ if (document.readyState === 'loading') {
       toggleBtn.title = collapsed ? 'Expand the Oṁ Field' : 'Minimize the Oṁ Field';
     }
 
-    // Compose: pipe the current Spark prompt into the room-screen
-    // notepad. If we're on the entrance screen, the textarea is
-    // not yet in view — switch to whatever the user opened most
-    // recently is out of scope, so we fall back to a toast that
-    // points to a room.
+    // ── Compose: drop Spark into Field Notes ──────────────
+    // Tag the next save with the active Spark's builder target so
+    // the readiness model knows which field this Field Note seeds.
+    var pendingTarget = null;
+
     function composeInFieldNotes() {
       if (!currentSpark) return;
-      if (workbench && document.getElementById('screen-room') &&
-          document.getElementById('screen-room').classList.contains('active')) {
-        // Prepend the Spark prompt as a quoted line so the user
-        // can answer underneath without losing what they were
-        // already drafting.
+      var roomScreen = document.getElementById('screen-room');
+      if (workbench && roomScreen && roomScreen.classList.contains('active')) {
         var existing = workbench.value || '';
         var prefix = '> ' + currentSpark.prompt + '\n\n';
         workbench.value = prefix + existing;
         workbench.focus();
-        // Place caret after the prefix so the user types into
-        // their answer space, not the quoted question.
         var pos = prefix.length;
         try { workbench.setSelectionRange(pos, pos); } catch (_) {}
-        // Brief minimize so the notepad is unobstructed.
+        // Remember which builder field this answer is meant for —
+        // the next save will register it.
+        pendingTarget = { builder: currentSpark.builder, fieldId: currentSpark.target, prompt: currentSpark.prompt };
         setCollapsed(true);
-        showLocalToast('Spark dropped into Field Notes — answer below.');
+        showLocalToast('Spark dropped into Field Notes — for ' + builderFieldLabel(currentSpark) + '.');
       } else {
         showLocalToast('Open a room to answer this Spark in Field Notes.');
       }
     }
 
-    // ── Toast for placeholder actions (uses the existing
-    // #concept-toast element, kept from the previous pass). ──
+    // ── Capture saved note → builder field ────────────────
+    function captureFromSave() {
+      if (!pendingTarget) return;
+      var text = (workbench && workbench.value) || '';
+      // The existing handler clears the textarea before this runs
+      // in some paths, so we sample text before save in the keyup
+      // pre-listener too (below). Best-effort.
+      var b = ensureBuilderState();
+      if (!b) return;
+      if (!b.captures[pendingTarget.fieldId]) b.captures[pendingTarget.fieldId] = [];
+      b.captures[pendingTarget.fieldId].push({
+        at: new Date().toISOString(),
+        prompt: pendingTarget.prompt,
+        excerpt: (lastSampleBeforeSave || text).slice(0, 280)
+      });
+      try { if (typeof window.saveState === 'function') window.saveState(); } catch (_) {}
+      pendingTarget = null;
+      lastSampleBeforeSave = '';
+      renderTracks(); // keep the modal fresh if it's open
+    }
+
+    var lastSampleBeforeSave = '';
+
+    // ── Toast / utility ───────────────────────────────────
     var toast = document.getElementById('concept-toast');
     var toastTimer = null;
     function showLocalToast(msg) {
@@ -7343,61 +7836,153 @@ if (document.readyState === 'loading') {
       toast.textContent = msg;
       toast.classList.add('show');
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2000);
+      toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
     }
 
-    // ── Wire up controls ───────────────────────────────────
+    // ── Builder readiness modal ───────────────────────────
+    function trackProgress(trackKey) {
+      var spec = BUILDER_STANDARD[trackKey];
+      if (!spec || !spec.fields) return { seeded: 0, total: 0, pct: 0 };
+      var seeded = spec.fields.filter(function (f) { return isFieldSeeded(f.id); }).length;
+      return { seeded: seeded, total: spec.fields.length, pct: Math.round(seeded / spec.fields.length * 100) };
+    }
+
+    function renderTracks() {
+      if (!tracksEl) return;
+      var html = '';
+
+      // Profile + Website share the same renderer.
+      ['profile', 'website'].forEach(function (key) {
+        var spec = BUILDER_STANDARD[key];
+        var status = trackStatus(key);
+        var prog = trackProgress(key);
+        html += '<section class="builder-track"><div class="builder-track-head"><div class="builder-track-name">' + spec.name + '</div>' +
+          '<span class="builder-track-status ' + statusClass(status) + '">' + status + '</span></div>' +
+          '<p class="builder-track-lede">' + spec.lede + '</p>' +
+          '<div class="builder-progress"><div class="builder-progress-bar" style="width:' + prog.pct + '%"></div></div>' +
+          '<div class="builder-progress-meta">' + prog.seeded + ' of ' + prog.total + ' fields seeded · ' + prog.pct + '%</div>';
+        // Render four section cards, each listing its fields.
+        html += '<div class="builder-sections">';
+        ['work','lens','field','call'].forEach(function (sec) {
+          var inSec = spec.fields.filter(function (f) { return f.section === sec; });
+          if (!inSec.length) return;
+          var anySeeded = inSec.some(function (f) { return isFieldSeeded(f.id); });
+          html += '<div class="builder-section s-' + sec + (anySeeded ? ' is-seeded' : '') + '">';
+          html += '<div class="builder-section-name">' + FOURFOLD[sec].name + '<span class="bs-mark">' + (anySeeded ? 'Seeded' : 'Open') + '</span></div>';
+          html += '<p class="builder-section-desc">' + FOURFOLD[sec].short + '</p>';
+          html += '<ul class="builder-section-fields">';
+          inSec.forEach(function (f) {
+            html += '<li' + (isFieldSeeded(f.id) ? ' class="is-seeded"' : '') + '>' + f.label + '</li>';
+          });
+          html += '</ul></div>';
+        });
+        html += '</div></section>';
+      });
+
+      // Personal OS panel — status + checklist of criteria.
+      var b = ensureBuilderState();
+      var osLevel = osStatus();
+      var snap = {
+        profile: { status: trackStatus('profile') },
+        website: { status: trackStatus('website') },
+        osMeta:  b ? b.osMeta : { projectActive: false, notesActive: false, reviewRhythm: '' }
+      };
+      var osSpec = BUILDER_STANDARD.os;
+      html += '<section class="builder-track"><div class="builder-track-head"><div class="builder-track-name">' + osSpec.name + '</div>' +
+        '<span class="builder-track-status ' + statusClass(osLevel) + '">' + osLevel + '</span></div>' +
+        '<p class="builder-track-lede">' + osSpec.lede + '</p>' +
+        '<ul class="builder-os-criteria">';
+      osSpec.criteria.forEach(function (c) {
+        var met = c.test(snap);
+        html += '<li' + (met ? ' class="is-met"' : '') + '>' + c.label + '</li>';
+      });
+      html += '</ul></section>';
+
+      tracksEl.innerHTML = html;
+    }
+
+    function openModal() {
+      renderTracks();
+      modal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      modal.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    if (reviewLink) reviewLink.addEventListener('click', openModal);
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (modal) modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal && modal.classList.contains('is-open')) closeModal();
+    });
+
+    // ── Wire up Spark controls ────────────────────────────
     disc.addEventListener('click', drawSpark);
     if (drawBtn)    drawBtn.addEventListener('click', drawSpark);
     if (composeBtn) composeBtn.addEventListener('click', composeInFieldNotes);
-    toggleBtn.addEventListener('click', function () {
-      setCollapsed(!widget.classList.contains('is-collapsed'));
-    });
-    // Tapping the collapsed widget anywhere expands it.
+    toggleBtn.addEventListener('click', function () { setCollapsed(!widget.classList.contains('is-collapsed')); });
     widget.addEventListener('click', function (e) {
       if (!widget.classList.contains('is-collapsed')) return;
       if (e.target.closest('.om-widget-toggle')) return;
       setCollapsed(false);
     });
 
-    // ── Drag-to-reposition (desktop only) ──────────────────
-    // The widget head doubles as a grab handle when expanded.
-    // Pointer Events cover mouse + touch + pen with one path. The
-    // widget is fixed-positioned; while dragging we set inline
-    // top/left so it overrides the default bottom/left dock. On
-    // <=600px viewports we skip dragging so the mobile bottom
-    // strip stays predictable. Position is session-local only —
-    // no localStorage write — so reload returns to the dock.
+    // ── Room-awareness observers ──────────────────────────
+    var pills = document.querySelectorAll('.room-pill');
+    if (pills.length && 'MutationObserver' in window) {
+      var obs = new MutationObserver(refreshRoomLabel);
+      pills.forEach(function (p) { obs.observe(p, { attributes: true, attributeFilter: ['class'] }); });
+    }
+    var entrance = document.getElementById('screen-entrance');
+    var roomScreen = document.getElementById('screen-room');
+    [entrance, roomScreen].forEach(function (el) {
+      if (!el) return;
+      new MutationObserver(refreshRoomLabel).observe(el, { attributes: true, attributeFilter: ['class'] });
+    });
+    refreshRoomLabel();
+
+    // ── Notepad save: sample text + register capture ──────
+    // Sample the text before the existing handler clears it.
+    function sampleAndScheduleCapture() {
+      if (!workbench) return;
+      var hadText = workbench.value && workbench.value.trim().length > 0;
+      if (!hadText) return;
+      lastSampleBeforeSave = workbench.value;
+      setTimeout(function () {
+        if (nexusHint) {
+          nexusHint.classList.add('is-visible');
+          setTimeout(function () { nexusHint.classList.remove('is-visible'); }, 5000);
+        }
+        captureFromSave();
+      }, 60);
+    }
+    if (saveBtn) saveBtn.addEventListener('click', sampleAndScheduleCapture);
+    if (workbench) {
+      workbench.addEventListener('keydown', function (e) {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') sampleAndScheduleCapture();
+      });
+    }
+
+    // ── Drag-to-reposition (desktop only) ─────────────────
     (function setupDrag() {
       var head = widget.querySelector('.om-widget-head');
       if (!head) return;
       var dragState = null;
       var MIN_PAD = 8;
-
-      function onPointerDown(e) {
-        // Skip when collapsed (single-click expands), when target
-        // is the toggle button, on small viewports, or for any
-        // non-primary pointer button.
+      head.addEventListener('pointerdown', function (e) {
         if (widget.classList.contains('is-collapsed')) return;
         if (e.target.closest('.om-widget-toggle')) return;
         if (window.matchMedia('(max-width: 600px)').matches) return;
         if (e.button !== undefined && e.button !== 0) return;
-
         var rect = widget.getBoundingClientRect();
-        dragState = {
-          dx: e.clientX - rect.left,
-          dy: e.clientY - rect.top,
-          width: rect.width,
-          height: rect.height,
-          pointerId: e.pointerId,
-          moved: false
-        };
+        dragState = { dx: e.clientX - rect.left, dy: e.clientY - rect.top, width: rect.width, height: rect.height, pointerId: e.pointerId };
         widget.classList.add('is-dragging');
         try { head.setPointerCapture(e.pointerId); } catch (_) {}
         e.preventDefault();
-      }
-
-      function onPointerMove(e) {
+      });
+      window.addEventListener('pointermove', function (e) {
         if (!dragState || e.pointerId !== dragState.pointerId) return;
         var nx = e.clientX - dragState.dx;
         var ny = e.clientY - dragState.dy;
@@ -7410,34 +7995,15 @@ if (document.readyState === 'loading') {
         widget.classList.add('is-dragged');
         widget.style.setProperty('--om-left', nx + 'px');
         widget.style.setProperty('--om-top',  ny + 'px');
-        // Detect a real drag (>3px) so a tiny click on the head
-        // doesn't accidentally drag-position the widget.
-        if (Math.abs(e.movementX) + Math.abs(e.movementY) > 0) {
-          dragState.moved = true;
-        }
-      }
-
-      function onPointerUp(e) {
+      });
+      function endDrag(e) {
         if (!dragState || e.pointerId !== dragState.pointerId) return;
         widget.classList.remove('is-dragging');
         try { head.releasePointerCapture(e.pointerId); } catch (_) {}
-        // If the user merely tapped without moving, drop the
-        // dragged-state so the widget keeps its dock placement
-        // (no harm done, but cleaner).
-        if (!dragState.moved) {
-          // No-op — the widget still has bottom/left dock unless
-          // a previous drag moved it; we leave that alone.
-        }
         dragState = null;
       }
-
-      head.addEventListener('pointerdown', onPointerDown);
-      window.addEventListener('pointermove', onPointerMove);
-      window.addEventListener('pointerup',   onPointerUp);
-      window.addEventListener('pointercancel', onPointerUp);
-
-      // Keep the widget on-screen if the window resizes while
-      // it's been dragged.
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
       window.addEventListener('resize', function () {
         if (!widget.classList.contains('is-dragged')) return;
         var rect = widget.getBoundingClientRect();
@@ -7450,71 +8016,22 @@ if (document.readyState === 'loading') {
       });
     })();
 
-    // ── Room-awareness via DOM mutation observer ──────────
-    // The existing Studio code toggles ".room-pill.active". We
-    // observe attribute changes on those pills and refresh the
-    // "For" tag and room label when the active room changes.
-    var pills = document.querySelectorAll('.room-pill');
-    if (pills.length && 'MutationObserver' in window) {
-      var obs = new MutationObserver(refreshRoomLabel);
-      pills.forEach(function (p) {
-        obs.observe(p, { attributes: true, attributeFilter: ['class'] });
-      });
-    }
-    // Also observe screen-active toggling so the label flips
-    // back to "entrance" when the user returns to the portal.
-    var entrance = document.getElementById('screen-entrance');
-    var roomScreen = document.getElementById('screen-room');
-    [entrance, roomScreen].forEach(function (el) {
-      if (!el) return;
-      new MutationObserver(refreshRoomLabel).observe(el, {
-        attributes: true, attributeFilter: ['class']
-      });
-    });
-
-    refreshRoomLabel();
-
-    // ── Notepad save: surface "available to Nexus" hint ───
-    // We don't replace the existing save handler; we add a
-    // capture-phase listener on the Save button so we can show
-    // the hint after the existing save completes. The hint
-    // auto-fades; pressing Save again restarts it.
-    if (saveBtn && nexusHint) {
-      var hintTimer = null;
-      saveBtn.addEventListener('click', function () {
-        // Defer a tick so the existing handler runs first and
-        // empties the textarea. If the textarea was empty, the
-        // existing handler returns early and we shouldn't show
-        // the hint either — guard on it being non-trivial.
-        var hadText = workbench && workbench.value && workbench.value.trim().length > 0;
-        if (!hadText) return;
-        setTimeout(function () {
-          nexusHint.classList.add('is-visible');
-          if (hintTimer) clearTimeout(hintTimer);
-          hintTimer = setTimeout(function () {
-            nexusHint.classList.remove('is-visible');
-          }, 5000);
-        }, 50);
-      });
-      // Keyboard save (⌘↵ / Ctrl↵) — same hint.
-      if (workbench) {
-        workbench.addEventListener('keydown', function (e) {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-            // The existing code handles the save itself; we just
-            // surface the hint after a tick.
-            var hadText = workbench.value && workbench.value.trim().length > 0;
-            if (!hadText) return;
-            setTimeout(function () {
-              nexusHint.classList.add('is-visible');
-              if (hintTimer) clearTimeout(hintTimer);
-              hintTimer = setTimeout(function () {
-                nexusHint.classList.remove('is-visible');
-              }, 5000);
-            }, 50);
-          }
-        });
+    // Expose the standard so future passes (or the console for
+    // demos) can read the model without touching DOM. Read-only
+    // by convention; do not write to it from outside.
+    window.CommonUnity = window.CommonUnity || {};
+    window.CommonUnity.builder = {
+      STANDARD: BUILDER_STANDARD,
+      SPARKS:   SPARK_LIBRARY,
+      FOURFOLD: FOURFOLD,
+      readiness: function () {
+        return {
+          profile: trackStatus('profile'),
+          website: trackStatus('website'),
+          os:      osStatus()
+        };
       }
-    }
+    };
   }
 
   if (document.readyState === 'loading') {
