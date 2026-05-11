@@ -3987,6 +3987,55 @@ input, textarea { font: inherit; color: inherit; }
   padding: 2px 8px;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+/* Website Preview v0.1 — reuses lp-* primitives, adds one-page feel. */
+.wp-hero {
+  padding: var(--space-5) var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 6%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wp-hero-heading {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--text);
+}
+.wp-hero-intro {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.wp-highlights {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wp-highlights li {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
+  color: var(--text);
+}
+.wp-closing {
+  margin: 0;
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(15px, 1.7vw, 18px);
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--text) 90%, var(--rose-color, #c4b5fd));
   color: var(--text-muted);
 }
 
@@ -4097,6 +4146,10 @@ input, textarea { font: inherit; color: inherit; }
       <button type="button" class="lp-preview-cta" id="living-profile-open-entrance" style="margin-top:6px;align-self:flex-start;">
         <span class="spb-dot" aria-hidden="true"></span>
         Preview Living Profile
+      </button>
+      <button type="button" class="lp-preview-cta" id="website-preview-open-entrance" style="margin-top:6px;align-self:flex-start;">
+        <span class="spb-dot" aria-hidden="true"></span>
+        Preview Personal Website
       </button>
     </div>
 
@@ -4713,6 +4766,35 @@ input, textarea { font: inherit; color: inherit; }
     <p class="builder-footnote" id="living-profile-foot">
       Drafted locally from Compass import + Field Notes captures.
       Not a public website — that is Level 2.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     Personal Website Preview v0.1 — modal
+     Renders a one-page public threshold preview from compassData
+     points (web_heading / web_intro / highlights / web_closing)
+     plus profile + builder captures. Reuses Living Profile modal
+     styling. Deterministic, local, no LLM, not published.
+     ============================================================ -->
+<div id="website-preview-modal" class="builder-modal" role="dialog" aria-labelledby="website-preview-title" aria-modal="true">
+  <div class="builder-modal-card lp-modal-card" id="website-preview-card">
+    <div class="builder-modal-head">
+      <div>
+        <div class="builder-modal-eyebrow">Personal Website · v0.1 · Level 2 · Not published</div>
+        <h2 class="builder-modal-title" id="website-preview-title">Your <em>authentic digital self in motion.</em></h2>
+        <p class="builder-modal-lede" id="website-preview-lede">
+          A living public threshold showing where you are now through
+          The Work, The Lens, The Field, and The Call. Drafted locally
+          from your Compass material — preview only, nothing published.
+        </p>
+      </div>
+      <button type="button" class="builder-modal-close" id="website-preview-close" aria-label="Close">×</button>
+    </div>
+    <div id="website-preview-body"></div>
+    <p class="builder-footnote" id="website-preview-foot">
+      Drafted locally from Compass import + Field Notes captures.
+      Publishing is not part of v0.1 — this is a preview.
     </p>
   </div>
 </div>
@@ -8425,6 +8507,11 @@ if (document.readyState === 'loading') {
           html += '<button type="button" class="lp-preview-cta" data-action="open-living-profile">' +
             '<span class="spb-dot" aria-hidden="true"></span>Preview Living Profile</button>';
         }
+        // Level 2 — Personal Website preview CTA. Not published.
+        if (key === 'website') {
+          html += '<button type="button" class="lp-preview-cta" data-action="open-website-preview">' +
+            '<span class="spb-dot" aria-hidden="true"></span>Preview Personal Website</button>';
+        }
         // Render four section cards, each listing its fields.
         html += '<div class="builder-sections">';
         ['work','lens','field','call'].forEach(function (sec) {
@@ -8468,6 +8555,15 @@ if (document.readyState === 'loading') {
       Array.prototype.forEach.call(
         tracksEl.querySelectorAll('[data-action="open-living-profile"]'),
         function (btn) { btn.addEventListener('click', openLivingProfile); }
+      );
+      // Wire Website Preview CTAs (Level 2).
+      Array.prototype.forEach.call(
+        tracksEl.querySelectorAll('[data-action="open-website-preview"]'),
+        function (btn) {
+          btn.addEventListener('click', function () {
+            if (typeof window.openWebsitePreview === 'function') window.openWebsitePreview();
+          });
+        }
       );
     }
 
@@ -8536,6 +8632,94 @@ if (document.readyState === 'loading') {
       } catch (_) { return 0; }
     }
 
+    // Lightweight role cleanup: drop section labels, service
+    // boilerplate, contact lines, malformed repeats. Normalise case
+    // for dedupe. Heuristic only — favours dropping ambiguous lines
+    // over showing messy imported text. Returns capped, de-duped list.
+    var LP_ROLE_BLOCKLIST = [
+      'availability', 'pricing', 'contact', 'contact for pricing',
+      'rates', 'rate card', 'hourly rate', 'fees', 'price on request',
+      'see website', 'see profile', 'message me', 'inquire', 'enquire',
+      'dm for details', 'message for details', 'open to opportunities',
+      'open to work', '#opentowork', 'currently available', 'currently unavailable',
+      'services', 'offerings', 'work with me', 'book a call',
+      'about', 'about me', 'summary', 'overview', 'experience',
+      'education', 'skills', 'certifications', 'languages',
+      'role', 'roles', 'title', 'titles', 'position', 'positions',
+      'present', 'current', 'former', 'previous', 'n/a', 'tbd'
+    ];
+    function lpCleanRoles(roles) {
+      if (!Array.isArray(roles)) return [];
+      var out = [];
+      var seen = {};
+      for (var i = 0; i < roles.length; i++) {
+        var raw = String(roles[i] || '').trim();
+        if (!raw) continue;
+        // strip leading list bullets/markers
+        raw = raw.replace(/^[-•*·–—]+\s*/, '').trim();
+        // strip URL fragments
+        if (/^https?:\/\//i.test(raw)) continue;
+        // strip very long lines (service paragraphs)
+        if (raw.length < 2 || raw.length > 80) continue;
+        // require some letters
+        if (!/[a-zA-Z]/.test(raw)) continue;
+        // drop emoji/symbol-heavy lines
+        if (raw.replace(/[a-zA-Z0-9\s\-—–·,&/().'"]/g, '').length > 2) continue;
+        // drop section-label / boilerplate lines
+        var lower = raw.toLowerCase().replace(/[:.]$/, '').trim();
+        if (LP_ROLE_BLOCKLIST.indexOf(lower) !== -1) continue;
+        // drop "Contact for X" style boilerplate
+        if (/^(contact|message|dm|email|reach)\b.*\b(for|to)\b/i.test(raw)) continue;
+        // drop lines that are mostly punctuation/repeat
+        if (/^(.)\1{4,}$/.test(raw)) continue;
+        // drop awkward duplicated-token lines like "Strategist Strategist"
+        var tokens = lower.split(/\s+/);
+        if (tokens.length >= 2 && tokens.length <= 4 &&
+            tokens.every(function (t) { return t === tokens[0]; })) continue;
+        // de-dupe case/punct-insensitive
+        var key = lower.replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+        if (!key || seen[key]) continue;
+        seen[key] = true;
+        out.push(raw);
+        if (out.length >= 8) break;
+      }
+      return out;
+    }
+
+    function transcriptsRawText(cd) {
+      var ts = (cd && Array.isArray(cd.transcripts)) ? cd.transcripts : [];
+      var parts = [];
+      ts.forEach(function (t) {
+        if (!t) return;
+        if (typeof t === 'string') parts.push(t);
+        else if (t.raw) parts.push(String(t.raw));
+        else if (t.text) parts.push(String(t.text));
+      });
+      return parts.join('\n').slice(0, 20000);
+    }
+    // Pull role-like phrases out of free text: "Conscious Business
+    // Strategist", "creator of Corporate Unplugged", "Advisor to ...".
+    // Conservative — only matches strong patterns.
+    function lpExtractRoleLikePhrases(text) {
+      if (!text) return [];
+      var found = [];
+      var titleWords = '(?:Founder|Co-?Founder|Creator|Advisor|Strategist|Coach|Consultant|Mentor|Teacher|Practitioner|Director|Partner|Host|Curator|Guide|Facilitator|Author|Speaker|Producer|Designer|Architect|Engineer|Therapist|Healer|Storyteller)';
+      var rx1 = new RegExp('\\b((?:[A-Z][\\w\\-]+\\s+){0,3}' + titleWords + ')\\b', 'g');
+      var m;
+      while ((m = rx1.exec(text)) !== null && found.length < 20) {
+        found.push(m[1].trim());
+      }
+      // "creator/founder of X", "advisor to X"
+      var rx2 = /\b(?:creator|founder|co-?founder|advisor|host|curator)\s+(?:of|to|at)\s+([A-Z][\w&'\-]+(?:\s+[A-Z][\w&'\-]+){0,3})\b/g;
+      while ((m = rx2.exec(text)) !== null && found.length < 30) {
+        // Normalise to "Founder of X" form
+        var head = m[0].split(/\s+/)[0];
+        head = head.charAt(0).toUpperCase() + head.slice(1).toLowerCase();
+        found.push(head + ' of ' + m[1].trim());
+      }
+      return found;
+    }
+
     // Build the structured Living Profile model from current state.
     // Each section returns { value, source, tags } where source is
     // 'compass' | 'captured' | 'mixed' | 'empty' so the UI can show
@@ -8568,6 +8752,10 @@ if (document.readyState === 'loading') {
       };
 
       // ── Role constellation ─────────────────────────────────
+      // Roles often arrive messy from LinkedIn/PDF imports: section
+      // labels ("Availability", "Pricing"), service boilerplate, and
+      // duplicates with case/punctuation drift. We dedupe and filter
+      // heuristically — no LLM. See lpCleanRoles below.
       var roles = [];
       var capRoles = lpCaptureText('roles');
       if (capRoles) {
@@ -8608,14 +8796,24 @@ if (document.readyState === 'loading') {
           }
         });
       }
-      // De-dupe, cap to 8 to keep the card readable.
-      var seen = {};
-      roles = roles.filter(function (r) {
-        var key = r.toLowerCase();
-        if (seen[key]) return false;
-        seen[key] = true;
-        return r.length <= 80;
-      }).slice(0, 8);
+      // Mine transcripts for role-like phrases when nothing else surfaces.
+      if (!roles.length) {
+        var rawText = transcriptsRawText(cd);
+        if (rawText) roles = roles.concat(lpExtractRoleLikePhrases(rawText));
+      }
+      // Mine points.work highlights / web copy for role-shaped labels.
+      ['work', 'lens', 'field', 'call'].forEach(function (sec) {
+        var p = points[sec] || {};
+        if (Array.isArray(p.highlights)) {
+          p.highlights.forEach(function (h) {
+            var t = typeof h === 'string' ? h : (h && (h.text || h.label || ''));
+            if (t && /^(founder|co[- ]?founder|creator|advisor|strategist|coach|consultant|mentor|teacher|practitioner|director|partner|host|curator|guide|facilitator)\b/i.test(t)) {
+              roles.push(t);
+            }
+          });
+        }
+      });
+      roles = lpCleanRoles(roles);
       var rolesSection = {
         roles: roles,
         source: capRoles ? (roles.length > (capRoles.split(/[\n,;]+/).length) ? 'mixed' : 'captured')
@@ -8668,18 +8866,31 @@ if (document.readyState === 'loading') {
         practices = profile.practices.split(/[\n,;]+/).map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 6);
       }
       var contactBits = [];
-      if (profile.linkedin_url) contactBits.push('LinkedIn: ' + profile.linkedin_url);
+      if (profile.linkedin_url && /^https?:\/\//i.test(profile.linkedin_url)) {
+        contactBits.push('LinkedIn: ' + profile.linkedin_url);
+      }
       if (profile.education) {
+        var eduStrs = [];
         if (Array.isArray(profile.education)) {
-          var eduStrs = profile.education.map(function (e) {
+          eduStrs = profile.education.map(function (e) {
             if (!e) return '';
             if (typeof e === 'string') return e;
             return [e.degree || e.qualification, e.institution || e.school].filter(Boolean).join(', ');
-          }).filter(Boolean);
-          if (eduStrs.length) contactBits.push('Education: ' + eduStrs.join(' · '));
+          });
         } else if (typeof profile.education === 'string') {
-          contactBits.push('Education: ' + profile.education);
+          eduStrs = [profile.education];
         }
+        // Skip boilerplate fragments that sometimes leak from PDF imports.
+        eduStrs = eduStrs
+          .map(function (s) { return String(s || '').trim(); })
+          .filter(Boolean)
+          .filter(function (s) {
+            var low = s.toLowerCase();
+            if (LP_ROLE_BLOCKLIST.indexOf(low) !== -1) return false;
+            if (/^contact\b.*\b(for|to)\b/i.test(s)) return false;
+            return s.length <= 200;
+          });
+        if (eduStrs.length) contactBits.push('Education: ' + eduStrs.join(' · '));
       }
       var contactSection = {
         invitation: capContact || '',
@@ -8878,6 +9089,227 @@ if (document.readyState === 'loading') {
     window.openLivingProfile = openLivingProfile;
     window.buildLivingProfile = buildLivingProfile;
 
+    // ============================================================
+    // PERSONAL WEBSITE PREVIEW v0.1
+    // Deterministic local renderer: reads compass points
+    // (web_heading / web_intro / highlights / web_closing) and
+    // builder captures, returns a structured one-page model, then
+    // renders it into #website-preview-modal. No LLM, not published.
+    // ============================================================
+    var wpModal    = document.getElementById('website-preview-modal');
+    var wpBody     = document.getElementById('website-preview-body');
+    var wpCloseBtn = document.getElementById('website-preview-close');
+
+    function wpPointSection(point, key, captureId) {
+      var p = point || {};
+      var cap = lpCaptureText(captureId);
+      var heading = lpFirst(cap && '', p.web_heading, p.theme, '');
+      var intro   = lpFirst(p.web_intro, p.summary, p.raw, '');
+      var closing = String(p.web_closing || '').trim();
+      var highlights = [];
+      if (Array.isArray(p.highlights)) {
+        p.highlights.forEach(function (h) {
+          var t = typeof h === 'string' ? h : (h && (h.text || h.label || ''));
+          if (t) highlights.push(String(t).trim());
+        });
+      }
+      highlights = highlights.filter(Boolean).slice(0, 6);
+      var hasCompass = !!(heading || intro || closing || highlights.length);
+      return {
+        heading: heading ? lpTrim(heading, 140) : '',
+        intro:   cap || (intro ? lpTrim(intro, 600) : ''),
+        closing: closing ? lpTrim(closing, 280) : '',
+        highlights: highlights,
+        source: cap ? (hasCompass ? 'mixed' : 'captured')
+                    : (hasCompass ? 'compass' : 'empty')
+      };
+    }
+
+    function buildWebsitePreview() {
+      var cd      = (window.state && window.state.compassData) || {};
+      var profile = cd.profile || {};
+      var points  = cd.points  || {};
+      var pw = points.work  || {};
+      var pl = points.lens  || {};
+      var pf = points.field || {};
+      var pc = points.call  || {};
+
+      var personName = (window.state && window.state.person) || cd.companion || '';
+
+      // ── Threshold / hero ───────────────────────────────────
+      // Prefer captured "threshold" + lens web heading; fall back to
+      // work web heading, then person name.
+      var capThreshold = lpCaptureText('threshold');
+      var heroHeading = lpFirst(
+        capThreshold && '',
+        pl.web_heading, pw.web_heading, pf.web_heading, pc.web_heading,
+        personName ? personName : ''
+      );
+      var heroIntroCompass = lpFirst(pl.web_intro, pw.web_intro, pl.summary, pw.summary);
+      var hero = {
+        heading: heroHeading ? lpTrim(heroHeading, 140) : (personName || ''),
+        intro:   capThreshold || (heroIntroCompass ? lpTrim(heroIntroCompass, 480) : ''),
+        source:  capThreshold ? (heroIntroCompass ? 'mixed' : 'captured')
+                              : (heroIntroCompass || heroHeading ? 'compass' : 'empty')
+      };
+
+      // ── Four sections ──────────────────────────────────────
+      var workSec  = wpPointSection(pw, 'work',  'site-work');
+      var lensSec  = wpPointSection(pl, 'lens',  'site-lens');
+      var fieldSec = wpPointSection(pf, 'field', 'site-field');
+      var callSec  = wpPointSection(pc, 'call',  'site-call');
+
+      // ── Invitation / contact ───────────────────────────────
+      var capConnect = lpCaptureText('connect');
+      var capContact = lpCaptureText('contact');
+      var inviteFromCompass = lpFirst(pc.web_closing, pc.web_intro, pc.summary);
+      var contactBits = [];
+      if (profile.linkedin_url && /^https?:\/\//i.test(profile.linkedin_url)) {
+        contactBits.push('LinkedIn: ' + profile.linkedin_url);
+      }
+      if (profile.email && /@/.test(profile.email)) {
+        contactBits.push('Email: ' + profile.email);
+      }
+      if (profile.website && /^https?:\/\//i.test(profile.website)) {
+        contactBits.push('Site: ' + profile.website);
+      }
+      var invitation = {
+        body:    capConnect || capContact || (inviteFromCompass ? lpTrim(inviteFromCompass, 480) : ''),
+        contact: contactBits,
+        source:  (capConnect || capContact)
+                   ? (contactBits.length || inviteFromCompass ? 'mixed' : 'captured')
+                   : (contactBits.length || inviteFromCompass ? 'compass' : 'empty')
+      };
+
+      var sections = {
+        hero: hero, work: workSec, lens: lensSec,
+        field: fieldSec, call: callSec, invitation: invitation
+      };
+      var counts = { compass: 0, captured: 0, mixed: 0, empty: 0, total: 0 };
+      Object.keys(sections).forEach(function (k) {
+        counts.total += 1;
+        counts[sections[k].source] += 1;
+      });
+
+      var transcripts = Array.isArray(cd.transcripts) ? cd.transcripts : [];
+      return {
+        name: personName || '',
+        sections: sections,
+        counts: counts,
+        transcripts: { count: transcripts.length }
+      };
+    }
+
+    function wpRenderSection(label, sec, cssTag) {
+      var html = '<section class="lp-section s-' + cssTag + '">' +
+        '<div class="lp-section-head"><span class="lp-section-label">' +
+        lpEscape(label) + '</span>' + lpSourceTag(sec.source) + '</div>';
+      if (sec.heading) {
+        html += '<h3 class="lp-name" style="font-size:clamp(18px,2vw,22px);">' +
+          lpEscape(sec.heading) + '</h3>';
+      }
+      if (sec.intro) {
+        html += '<p class="lp-body">' + lpEscape(sec.intro) + '</p>';
+      }
+      if (sec.highlights && sec.highlights.length) {
+        html += '<ul class="wp-highlights">' + sec.highlights.map(function (h) {
+          return '<li>' + lpEscape(h) + '</li>';
+        }).join('') + '</ul>';
+      }
+      if (sec.closing) {
+        html += '<p class="wp-closing" style="margin-top:8px;">' + lpEscape(sec.closing) + '</p>';
+      }
+      if (!sec.heading && !sec.intro && !(sec.highlights && sec.highlights.length) && !sec.closing) {
+        html += lpEmpty('Not enough source material yet — fill in this section in The ' + label.replace(' section','') + '.');
+      }
+      html += '</section>';
+      return html;
+    }
+
+    function renderWebsitePreview() {
+      if (!wpBody) return;
+      var model = buildWebsitePreview();
+      var s = model.sections;
+      var c = model.counts;
+      var html = '';
+
+      // Coverage / source banner
+      var coverageChips =
+        '<span class="lp-coverage-chip is-compass">From Compass · ' + (c.compass + c.mixed) + ' / ' + c.total + '</span>' +
+        '<span class="lp-coverage-chip is-captured">From Field Notes · ' + (c.captured + c.mixed) + ' / ' + c.total + '</span>' +
+        '<span class="lp-coverage-chip is-empty">Awaiting · ' + c.empty + ' / ' + c.total + '</span>';
+      var sourceLine = 'Drafted from Compass points (Work / Lens / Field / Call) + Field Notes captures' +
+        (model.transcripts.count ? ' · ' + model.transcripts.count + ' transcript' +
+          (model.transcripts.count === 1 ? '' : 's') : '') + '.';
+      html += '<section class="lp-section s-meta">' +
+        '<p class="lp-source-note"><span class="lp-source-tag">Preview</span>' +
+        lpEscape(sourceLine) + '</p>' +
+        '<div class="lp-coverage">' + coverageChips + '</div>' +
+        '</section>';
+
+      // Hero / threshold
+      var hero = s.hero;
+      html += '<section class="lp-section s-work">' +
+        '<div class="lp-section-head"><span class="lp-section-label">Threshold</span>' +
+        lpSourceTag(hero.source) + '</div>' +
+        '<div class="wp-hero">';
+      if (hero.heading) html += '<h3 class="wp-hero-heading">' + lpEscape(hero.heading) + '</h3>';
+      if (hero.intro)   html += '<p class="wp-hero-intro">' + lpEscape(hero.intro) + '</p>';
+      if (!hero.heading && !hero.intro) {
+        html += '<p class="lp-empty">Not enough source material yet — your threshold copy will appear here.</p>';
+      }
+      html += '</div></section>';
+
+      // Four sections
+      html += wpRenderSection('Work section',  s.work,  'work');
+      html += wpRenderSection('Lens section',  s.lens,  'lens');
+      html += wpRenderSection('Field section', s.field, 'field');
+      html += wpRenderSection('Call section',  s.call,  'call');
+
+      // Invitation / contact
+      var inv = s.invitation;
+      html += '<section class="lp-section s-call">' +
+        '<div class="lp-section-head"><span class="lp-section-label">Invitation &amp; contact</span>' +
+        lpSourceTag(inv.source) + '</div>';
+      if (inv.body) html += '<p class="lp-body">' + lpEscape(inv.body) + '</p>';
+      if (inv.contact && inv.contact.length) {
+        html += '<dl class="lp-meta-grid">' + inv.contact.map(function (m) {
+          var parts = String(m).split(/:\s*/);
+          var k = parts[0] || '';
+          var v = parts.slice(1).join(': ');
+          return '<dt>' + lpEscape(k) + '</dt><dd>' + lpEscape(v) + '</dd>';
+        }).join('') + '</dl>';
+      }
+      if (!inv.body && !(inv.contact && inv.contact.length)) {
+        html += lpEmpty('Not enough source material yet — how people meet you and where to find you.');
+      }
+      html += '</section>';
+
+      wpBody.innerHTML = html;
+    }
+
+    function openWebsitePreview() {
+      if (!wpModal) return;
+      renderWebsitePreview();
+      if (modal && modal.classList.contains('is-open')) modal.classList.remove('is-open');
+      wpModal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeWebsitePreview() {
+      if (!wpModal) return;
+      wpModal.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+    if (wpCloseBtn) wpCloseBtn.addEventListener('click', closeWebsitePreview);
+    if (wpModal) wpModal.addEventListener('click', function (e) {
+      if (e.target === wpModal) closeWebsitePreview();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && wpModal && wpModal.classList.contains('is-open')) closeWebsitePreview();
+    });
+    window.openWebsitePreview = openWebsitePreview;
+    window.buildWebsitePreview = buildWebsitePreview;
+
     function openModal() {
       renderTracks();
       modal.classList.add('is-open');
@@ -8905,6 +9337,10 @@ if (document.readyState === 'loading') {
     if (entrancePathBtn) entrancePathBtn.addEventListener('click', openModal);
     var lpEntranceBtn = document.getElementById('living-profile-open-entrance');
     if (lpEntranceBtn) lpEntranceBtn.addEventListener('click', openLivingProfile);
+    var wpEntranceBtn = document.getElementById('website-preview-open-entrance');
+    if (wpEntranceBtn) wpEntranceBtn.addEventListener('click', function () {
+      if (typeof window.openWebsitePreview === 'function') window.openWebsitePreview();
+    });
 
     // ── Wire up Spark controls ────────────────────────────
     disc.addEventListener('click', drawSpark);
