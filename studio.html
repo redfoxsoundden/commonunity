@@ -4540,6 +4540,40 @@ function buildSessionHistorySummary() {
   }).join('\n');
 }
 
+function buildTranscriptContext(roomKey, maxChars) {
+  // Fold compassData.transcripts[*].raw into a single context blob so
+  // uploaded PDFs / pasted briefings flow into Nexus prompts. If a room
+  // key is given and a transcript's summary/filename hints at that room,
+  // its content is preferred (placed first).
+  const transcripts = state.compassData?.transcripts;
+  if (!Array.isArray(transcripts) || transcripts.length === 0) return '';
+  const cap = typeof maxChars === 'number' ? maxChars : 2000;
+  const hint = roomKey ? String(roomKey).toLowerCase() : '';
+  const matches = (t) => {
+    if (!hint) return false;
+    const hay = ((t.filename || '') + ' ' + (t.summary || '')).toLowerCase();
+    return hay.indexOf(hint) !== -1;
+  };
+  const ordered = transcripts.slice().sort((a, b) => {
+    const am = matches(a) ? 0 : 1;
+    const bm = matches(b) ? 0 : 1;
+    return am - bm;
+  });
+  const parts = [];
+  let used = 0;
+  for (const t of ordered) {
+    const raw = (t && typeof t.raw === 'string') ? t.raw.trim() : '';
+    if (!raw) continue;
+    const remaining = cap - used;
+    if (remaining <= 100) break;
+    const head = t.filename ? `[Transcript: ${t.filename}]\n` : '[Transcript]\n';
+    const body = raw.length > remaining - head.length ? raw.slice(0, remaining - head.length) : raw;
+    parts.push(head + body);
+    used += head.length + body.length + 2;
+  }
+  return parts.join('\n\n');
+}
+
 function buildGKProfileLabels() {
   // Full Gene Keys profile as Shadow→Gift→Siddhi strings for all four directions
   const result = { gk_work: '', gk_lens: '', gk_field: '', gk_call: '' };
@@ -4575,6 +4609,8 @@ function updateNexusMemory() {
   if (gkLabels.gk_call) parts.push(`The Call: ${gkLabels.gk_call}`);
   if (totalSessions > 0) parts.push(`Sessions: ${totalSessions} · ${totalMinutes} min total`);
   if (allEntries.length) parts.push(`Recent writing across rooms:\n${allEntries.join('\n').slice(0, 800)}`);
+  const transcriptCtx = buildTranscriptContext(null, 800);
+  if (transcriptCtx) parts.push(`Source material from imported transcripts:\n${transcriptCtx}`);
 
   state.nexusMemory = parts.join('\n');
   saveState();
@@ -5131,8 +5167,10 @@ function showRosePrompt() {
   let prompt;
   if (state.compassData) {
     // Draw from compass material
-    const allRaw = Object.values(state.compassData.points || {})
+    const pointsRaw = Object.values(state.compassData.points || {})
       .map(p => p?.raw || '').filter(Boolean).join(' ');
+    const transcriptCtx = buildTranscriptContext(null, 1500);
+    const allRaw = [pointsRaw, transcriptCtx].filter(Boolean).join('\n\n');
     if (allRaw.length > 50) {
       prompt = fetchRosePrompt(allRaw);
       return;
@@ -5517,7 +5555,7 @@ async function initRoomRose(roomKey) {
           gk_shadow: gkData.shadow,
           gk_gift: gkData.gift,
           gk_siddhi: gkData.siddhi,
-          session_notes: pt?.raw?.slice(0, 800) || '',
+          session_notes: ((pt?.raw || '') + (buildTranscriptContext(roomKey, 1200) ? '\n\n' + buildTranscriptContext(roomKey, 1200) : '')).slice(0, 2000),
           companion: state.compassData?.companion || state.person || '',
           all_rooms_summary: buildCrossRoomSummary(roomKey),
           session_history: buildSessionHistorySummary(),
@@ -5593,7 +5631,8 @@ async function sendMirrorMessage() {
 
   // Build context
   const history = (state.rooms[currentRoom]?.mirrorHistory || []).slice(-8);
-  const sessionContext = pt?.raw || '';
+  const transcriptCtx = buildTranscriptContext(currentRoom, 1200);
+  const sessionContext = [pt?.raw || '', transcriptCtx].filter(Boolean).join('\n\n');
   const workbenchContext = (state.rooms[currentRoom]?.entries || []).slice(-3).map(e => e.text).join('\n\n');
 
   // — Cross-room summary: all four rooms' recent entries
@@ -5618,7 +5657,7 @@ async function sendMirrorMessage() {
         gk_shadow: gkData?.shadow || '',
         gk_gift: gkData?.gift || '',
         gk_siddhi: gkData?.siddhi || '',
-        session_notes: sessionContext.slice(0, 800),
+        session_notes: sessionContext.slice(0, 2000),
         workbench_entries: workbenchContext.slice(0, 600),
         history: history,
         companion: state.compassData?.companion || state.person || '',
