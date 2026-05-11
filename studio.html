@@ -5210,15 +5210,15 @@ input, textarea { font: inherit; color: inherit; }
       <div class="studio-path-trail-levels">
         <div class="studio-path-trail-level">
           <span class="spl-num">L1</span>
-          <span><span class="spl-name">Living Profile</span> — your minimum viable digital self.</span>
+          <span><span class="spl-name">Living Profile</span> — your real-time presence, calling card, and Studio doorway.</span>
         </div>
         <div class="studio-path-trail-level">
           <span class="spl-num">L2</span>
-          <span><span class="spl-name">Personal Home</span> — your digital home, four rooms around The Work, Lens, Field, Call.</span>
+          <span><span class="spl-name">Personal Home</span> — your four-room bridge to the wider web (Work · Lens · Field · Call).</span>
         </div>
         <div class="studio-path-trail-level">
           <span class="spl-num">L3</span>
-          <span><span class="spl-name">Personal OS</span> — your AI-integrated studio for becoming.</span>
+          <span><span class="spl-name">Personal OS</span> — your inner studio for becoming, creating, and co-emerging with AI.</span>
         </div>
       </div>
       <button type="button" class="studio-path-btn studio-path-trail-cta" id="studio-path-open-entrance">
@@ -5800,11 +5800,13 @@ input, textarea { font: inherit; color: inherit; }
   <div class="builder-modal-card" id="builder-modal-card">
     <div class="builder-modal-head">
       <div>
-        <div class="builder-modal-eyebrow">Studio Path · v0.1</div>
+        <div class="builder-modal-eyebrow">Studio Path · v0.2</div>
         <h2 class="builder-modal-title" id="builder-modal-title">Three levels of <em>your authentic digital self.</em></h2>
         <p class="builder-modal-lede">
-          Studio builds three things, in order — <strong>Living Profile</strong>,
-          then <strong>Personal Home</strong>, then <strong>Personal OS</strong>.
+          Studio builds three things, in order — <strong>Living Profile</strong>
+          (your real-time presence and Studio doorway), then <strong>Personal Home</strong>
+          (a four-room bridge to the wider web), then <strong>Personal OS</strong>
+          (the inner studio where you create, learn, serve, and co-emerge with AI).
           You feed them by working in the four rooms: <em>The Work</em>,
           <em>The Lens</em>, <em>The Field</em>, <em>The Call</em>. Imported
           Compass material is reviewed first; Sparks fill the gaps in your
@@ -5815,11 +5817,11 @@ input, textarea { font: inherit; color: inherit; }
     </div>
     <div id="builder-tracks"></div>
     <p class="builder-footnote">
-      Four streams feed three levels.
-      <em>The Work</em> · what you do, build, offer, serve. &nbsp;
-      <em>The Lens</em> · how you see, learn, interpret. &nbsp;
-      <em>The Field</em> · what supports you, what you radiate. &nbsp;
-      <em>The Call</em> · the current calling, what wants to emerge.
+      Four streams feed three levels — a deepening sequence.
+      <em>The Work</em> · surface, what you do now. &nbsp;
+      <em>The Lens</em> · interpretation, how you see and the lessons you carry. &nbsp;
+      <em>The Field</em> · radiance, communities you thrive with. &nbsp;
+      <em>The Call</em> · essence, what is asking and how others can support.
     </p>
   </div>
 </div>
@@ -9109,34 +9111,64 @@ if (document.readyState === 'loading') {
 }
 
 /* ============================================================
-   STUDIO — The Oṁ Field + Fourfold Builder (v0.1)
+   STUDIO — The Oṁ Field + Fourfold Builder (v0.2)
    Single source of truth for:
      - BUILDER_STANDARD : Living Profile / Personal Home / Personal OS spec
      - SPARK_LIBRARY    : prompts mapped to required builder fields
      - readiness logic  : computes status from saved Field Notes
      - widget behaviour : draws Sparks, opens the readiness modal,
                           drops prompts into the existing notepad
-   The widget itself is the same persistent global pattern from the
-   previous pass — bottom-left dock on desktop, hidden on entrance,
-   draggable, mini-torus visual, room-aware. This pass replaces the
-   old "For · {room}" mapping with builder-target-aware Sparks and
-   adds a readiness review modal.
+
+   v0.2 Field Map (this pass):
+   Formalises the schema/standard so Studio has a stable shape for
+   future auto-seeding (Compass → field), visual-identity questions
+   (profile image, sigil, room atmosphere), and gap-aware Sparks.
+   Field IDs are backward-compatible — every v0.1 ID is either kept
+   as-is or re-exposed via `aliases`, so existing captures keep their
+   Seeded state. New visual-identity / call-support / good-living
+   fields are additive; previews read them as optional overrides
+   and fall back to v0.1 behaviour when empty. Each field also
+   carries optional `compassPaths` (source hints for a future
+   auto-seeder) and `desc` (extended copy for the readiness modal).
+   Auto-seeding itself is not implemented yet.
    ============================================================ */
 (function initStudioBuilder() {
 
   // ============================================================
-  // FOURFOLD BUILDER STANDARD v0.1
+  // FOURFOLD BUILDER STANDARD v0.2
   // Central, editable data model. Future builds extend by adding
   // fields/sections/prompts here — no other code needs touching.
+  // Fourfold descriptions are tightened around the deepening
+  // sequence: surface → interpretation → radiance → essence.
   // ============================================================
   var FOURFOLD = {
-    work:  { name: 'The Work',  short: 'What you do, build, offer, serve.' },
-    lens:  { name: 'The Lens',  short: 'How you see, learn, interpret.' },
-    field: { name: 'The Field', short: 'What supports you, what you radiate.' },
-    call:  { name: 'The Call',  short: 'The current calling, what wants to emerge.' }
+    work:  { name: 'The Work',  short: 'Surface · what you do, build, offer, serve now.' },
+    lens:  { name: 'The Lens',  short: 'Interpretation · how you see, learn, the lessons you carry.' },
+    field: { name: 'The Field', short: 'Radiance · communities you thrive with, tips for good living.' },
+    call:  { name: 'The Call',  short: 'Essence · what is asking to emerge, how others can support.' }
   };
 
+  // ── Builder Field Map v0.2 ──────────────────────────────────
+  // Field shape (all keys optional except id/section/label/prompt):
+  //   { id, section, label, prompt,
+  //     desc?         : long-form description for the readiness modal,
+  //     aliases?      : [string]  — older field IDs whose captures
+  //                                 should still count as seeding this
+  //                                 field (backward compatibility),
+  //     compassPaths? : [string]  — dot-path hints into compassData
+  //                                 for the future auto-seeder. Not
+  //                                 read by current code.
+  //     kind?         : 'text' | 'visual' | 'meta' — hint for future
+  //                     UI; defaults to 'text'. 'visual' fields are
+  //                     placeholders for the upcoming visual-identity
+  //                     pass (profile image, sigil, atmosphere).
+  //   }
+  // Backward-compatibility rule: never rename an existing capture ID.
+  // To introduce a clearer name, KEEP the old ID and add `aliases`
+  // or add a NEW field that lists the old ID in `aliases`.
+  // ────────────────────────────────────────────────────────────
   var BUILDER_STANDARD = {
+    version: '0.2',
     statusLevels: {
       track: ['Seeded', 'Drafting', 'Ready for review', 'Ready to publish', 'Published'],
       os:    ['Locked', 'Unlocked', 'Seeding', 'Active', 'Evolving']
@@ -9146,17 +9178,87 @@ if (document.readyState === 'loading') {
       key: 'profile',
       name: 'Living Profile',
       level: 1,
-      tagline: 'Level 1 · Your minimum viable digital self',
-      lede: 'A clear, honest profile built from who you actually are — not platform templates, performance, or fragments. The first level of authentic self-representation.',
+      tagline: 'Level 1 · Your real-time community presence',
+      lede: 'Your digital calling card and Studio doorway — a clear, honest signpost built from who you actually are, not platform templates. Shows at a glance who you are and how to engage now. The first level of authentic self-representation.',
       fields: [
-        { id: 'name-context',  section: 'work',  label: 'Name & context',     prompt: 'Who you are, what you go by, and the wider context you stand in.' },
-        { id: 'roles',         section: 'work',  label: 'Role constellation', prompt: 'The roles you actually hold — not titles, the working shapes of your life.' },
-        { id: 'essence-line',  section: 'lens',  label: 'Essence line',       prompt: 'One sentence a normal profile cannot hold.' },
-        { id: 'work-summary',  section: 'work',  label: 'Work summary',       prompt: 'What you do, build, offer, or serve, in your own voice.' },
-        { id: 'lens-summary',  section: 'lens',  label: 'Lens summary',       prompt: 'How you see, learn, interpret. The way your attention moves.' },
-        { id: 'field-summary', section: 'field', label: 'Field summary',      prompt: 'What holds you, what you radiate, the frequency you transmit.' },
-        { id: 'call-summary',  section: 'call',  label: 'Call summary',       prompt: 'The current calling. What is asking to emerge through you.' },
-        { id: 'contact',       section: 'call',  label: 'Contact & invitation', prompt: 'How and on what terms you welcome people in.' }
+        // ── Work · surface ───────────────────────────────────
+        { id: 'name-context',  section: 'work',  label: 'Name & context',
+          prompt: 'Who you are, what you go by, and the wider context you stand in.',
+          desc: 'Name plus the lineages, places, and communities that locate you. Not just a label — the wider context.',
+          compassPaths: ['companion', 'profile.communities', 'pob', 'tradition'] },
+        { id: 'roles',         section: 'work',  label: 'Role constellation',
+          prompt: 'The roles you actually hold — not titles, the working shapes of your life.',
+          desc: 'The working shapes of your life this season — not job titles, the real constellation of hats you wear.',
+          aliases: ['role-constellation'],
+          compassPaths: ['profile.work_background', 'points.work.qa_answers', 'points.work.highlights'] },
+        { id: 'work-summary',  section: 'work',  label: 'Work now',
+          prompt: 'What you are doing, building, offering, or serving right now — in your own voice.',
+          desc: 'Current projects, offers, services — what you are actively building or serving this season.',
+          aliases: ['work-now', 'working-on-now'],
+          compassPaths: ['points.work.summary', 'points.work.web_intro', 'points.work.raw'] },
+        { id: 'offer-serve',   section: 'work',  label: 'Offering · serving',
+          prompt: 'What is on offer right now? What can people request, hire, join, or receive from you?',
+          desc: 'Concrete offers and services that someone visiting could engage with right now. Optional v0.2 field — empty by default.',
+          aliases: ['offering-serving'],
+          kind: 'text',
+          compassPaths: ['profile.practices', 'points.work.highlights'] },
+        // ── Lens · interpretation ────────────────────────────
+        { id: 'essence-line',  section: 'lens',  label: 'Essence line',
+          prompt: 'One sentence a normal social profile cannot hold.',
+          desc: 'The line that points to who you actually are. Not a tagline — an honest essence.',
+          compassPaths: ['points.lens.web_heading', 'points.lens.theme', 'points.work.web_heading'] },
+        { id: 'lens-summary',  section: 'lens',  label: 'Lens · how I see',
+          prompt: 'How you see, learn, interpret. The way your attention moves.',
+          desc: 'Where your attention naturally rests; the angle of your seeing.',
+          compassPaths: ['points.lens.summary', 'points.lens.web_intro', 'points.lens.raw'] },
+        { id: 'learning-life-lesson', section: 'lens', label: 'Learning · biggest life lesson',
+          prompt: 'What is the biggest lesson life has taught you — the one you actually live by?',
+          desc: 'Not a quotation — a lesson you have earned. Optional v0.2 field; empty by default.',
+          kind: 'text',
+          compassPaths: ['points.lens.highlights', 'points.lens.web_closing'] },
+        // ── Field · radiance ─────────────────────────────────
+        { id: 'field-summary', section: 'field', label: 'Field · what I radiate',
+          prompt: 'What holds you, what you radiate, the frequency you transmit.',
+          desc: 'The qualities people most often feel in your presence; what your work transmits before words.',
+          compassPaths: ['points.field.summary', 'points.field.web_intro', 'points.field.raw'] },
+        { id: 'thriving-field', section: 'field', label: 'Thriving · good living',
+          prompt: 'What does good living look like for you? Top tips you actually practise.',
+          desc: 'The practices, rhythms, and tips for good living you would share with someone you trust. Optional v0.2 field.',
+          aliases: ['good-living-tips', 'community-exchange'],
+          kind: 'text',
+          compassPaths: ['profile.practices', 'points.field.highlights'] },
+        // ── Call · essence ───────────────────────────────────
+        { id: 'call-summary',  section: 'call',  label: 'Call · what is asking',
+          prompt: 'The current calling. What is asking to emerge through you.',
+          desc: 'What is calling you right now that you have not yet given permission to.',
+          compassPaths: ['points.call.summary', 'points.call.web_intro', 'points.call.raw'] },
+        { id: 'mission-support', section: 'call', label: 'Mission · how to support',
+          prompt: 'How can others contribute to or support what is asking to emerge through you?',
+          desc: 'The innermost ask — where collaboration, support, or contribution would actually move the work. Optional v0.2 field.',
+          aliases: ['call-support'],
+          kind: 'text',
+          compassPaths: ['points.call.web_closing', 'points.call.highlights'] },
+        { id: 'contact',       section: 'call',  label: 'Contact & invitation',
+          prompt: 'How and on what terms you welcome people in.',
+          desc: 'The invitation that makes welcome real rather than performative.',
+          aliases: ['contact-invitation'],
+          compassPaths: ['profile.linkedin_url', 'profile.email', 'profile.website'] },
+        // ── Visual identity placeholders (v0.2, not generated yet) ──
+        { id: 'profile-image', section: 'work', label: 'Profile image · visual representation',
+          prompt: 'A profile image (or placeholder) that represents you honestly. Visual identity is not generated yet — this is a placeholder slot.',
+          desc: 'Placeholder for the visual representation of the digital self. Image upload + sigil generation arrive in a later pass.',
+          aliases: ['visual-representation'],
+          kind: 'visual' },
+        { id: 'digital-key-sigil', section: 'lens', label: 'Digital key · sigil',
+          prompt: 'A symbolic mark — sigil or key — that signs your digital self. Generation arrives in a later pass; placeholder for now.',
+          desc: 'The symbolic face of your digital self — a mark that travels with your presence. Placeholder only in v0.2.',
+          kind: 'visual' },
+        // ── Source-notes / boundary (optional) ───────────────
+        { id: 'source-notes',  section: 'lens',  label: 'Public / private boundary',
+          prompt: 'What stays public on the Living Profile, and what you would rather keep private or draft.',
+          desc: 'Optional boundary statement — informs which captures are surfaced publicly. Optional v0.2 field.',
+          aliases: ['privacy-public-boundary'],
+          kind: 'meta' }
       ]
     },
 
@@ -9164,17 +9266,65 @@ if (document.readyState === 'loading') {
       key: 'website',
       name: 'Personal Home',
       level: 2,
-      tagline: 'Level 2 · Your digital home — compass points you home',
-      lede: 'Your digital home, built around The Work, The Lens, The Field, and The Call. A four-room threshold you own — preview only, not published.',
+      tagline: 'Level 2 · Outward-facing bridge to the wider web',
+      lede: 'A four-room digital home around The Work, The Lens, The Field, and The Call — a relational plexus between this field and the wider internet. Preview only, not published.',
       fields: [
-        { id: 'threshold',     section: 'work',  label: 'Threshold',     prompt: 'What someone should feel, know, and do on arrival.' },
-        { id: 'site-work',     section: 'work',  label: 'Work section',  prompt: 'The public face of what you do — concise, honest, undefensive.' },
-        { id: 'site-lens',     section: 'lens',  label: 'Lens section',  prompt: 'How you see the field you work inside. Not credentials — orientation.' },
-        { id: 'site-field',    section: 'field', label: 'Field section', prompt: 'What people walk into when they meet your work. The room they enter.' },
-        { id: 'site-call',     section: 'call',  label: 'Call section',  prompt: 'What you are inviting people toward, right now.' },
-        { id: 'connect',       section: 'call',  label: 'Connect',       prompt: 'The contact path. What you welcome and what you do not.' },
-        { id: 'visual-tone',   section: 'field', label: 'Visual direction', prompt: 'Three words and one room that match the felt sense.' },
-        { id: 'public-review', section: 'lens',  label: 'Public / private review', prompt: 'What stays public, what stays private, what stays draft.' }
+        // ── Threshold ────────────────────────────────────────
+        { id: 'threshold',     section: 'work',  label: 'Threshold · heading',
+          prompt: 'What someone should feel, know, and do on arrival.',
+          desc: 'The first felt impression — the moment of crossing in.',
+          aliases: ['home-threshold-heading'],
+          compassPaths: ['points.lens.web_heading', 'points.work.web_heading'] },
+        { id: 'home-threshold-intro', section: 'work', label: 'Threshold · intro',
+          prompt: 'A short threshold introduction — the orienting paragraph that welcomes a visitor in.',
+          desc: 'Optional second-level threshold copy that goes beneath the heading. Falls back to lens/work web_intro.',
+          kind: 'text',
+          compassPaths: ['points.lens.web_intro', 'points.work.web_intro'] },
+        // ── Visual atmosphere / palette ──────────────────────
+        { id: 'visual-tone',   section: 'field', label: 'Visual atmosphere',
+          prompt: 'Three words and one room that match the felt sense.',
+          desc: 'Atmosphere words and one room that match the felt sense — Studio tunes palette toward them.',
+          aliases: ['home-visual-tone', 'palette', 'atmosphere'] },
+        { id: 'home-profile-image', section: 'work', label: 'Home · profile image',
+          prompt: 'Profile image for the Personal Home threshold. Placeholder slot — image upload arrives later.',
+          desc: 'Visual identity placeholder for the home threshold. Not generated yet.',
+          kind: 'visual' },
+        { id: 'home-sigil',    section: 'field', label: 'Home · sigil',
+          prompt: 'Symbolic sigil for the Personal Home — the mark that signs the threshold. Placeholder slot.',
+          desc: 'Visual identity placeholder. Sigil generation arrives later.',
+          kind: 'visual' },
+        // ── Rooms · Work / Lens / Field / Call ───────────────
+        { id: 'site-work',     section: 'work',  label: 'Room · The Work',
+          prompt: 'The public face of what you do — concise, honest, undefensive.',
+          desc: 'Room 1 · surface. Current projects, offers, services, building now.',
+          aliases: ['room-work-heading', 'room-work-intro', 'room-work-highlights', 'room-work-invitation'],
+          compassPaths: ['points.work.web_heading', 'points.work.web_intro', 'points.work.highlights', 'points.work.web_closing'] },
+        { id: 'site-lens',     section: 'lens',  label: 'Room · The Lens',
+          prompt: 'How you see the field you work inside. Not credentials — orientation.',
+          desc: 'Room 2 · interpretation. Learning, lessons, how you see.',
+          aliases: ['room-lens-heading', 'room-lens-intro', 'room-lens-highlights', 'room-lens-invitation'],
+          compassPaths: ['points.lens.web_heading', 'points.lens.web_intro', 'points.lens.highlights', 'points.lens.web_closing'] },
+        { id: 'site-field',    section: 'field', label: 'Room · The Field',
+          prompt: 'What people walk into when they meet your work. The room they enter.',
+          desc: 'Room 3 · radiance. Communities you thrive with, what you bring and receive.',
+          aliases: ['room-field-heading', 'room-field-intro', 'room-field-highlights', 'room-field-invitation'],
+          compassPaths: ['points.field.web_heading', 'points.field.web_intro', 'points.field.highlights', 'points.field.web_closing'] },
+        { id: 'site-call',     section: 'call',  label: 'Room · The Call',
+          prompt: 'What you are inviting people toward, right now.',
+          desc: 'Room 4 · essence. Mission, the innermost ask, how others can support.',
+          aliases: ['room-call-heading', 'room-call-intro', 'room-call-highlights', 'room-call-invitation'],
+          compassPaths: ['points.call.web_heading', 'points.call.web_intro', 'points.call.highlights', 'points.call.web_closing'] },
+        // ── Connect + boundary ───────────────────────────────
+        { id: 'connect',       section: 'call',  label: 'Contact · invitation',
+          prompt: 'The contact path. What you welcome and what you do not.',
+          desc: 'How visitors can begin a conversation; the line you want to hold.',
+          aliases: ['contact-invitation'],
+          compassPaths: ['profile.linkedin_url', 'profile.email', 'profile.website'] },
+        { id: 'public-review', section: 'lens',  label: 'Public / private boundary',
+          prompt: 'What stays public, what stays private, what stays draft.',
+          desc: 'Boundary statement for the home — informs what surfaces here vs. stays draft.',
+          aliases: ['public-private-boundary'],
+          kind: 'meta' }
       ]
     },
 
@@ -9182,14 +9332,36 @@ if (document.readyState === 'loading') {
       key: 'os',
       name: 'Personal OS',
       level: 3,
-      tagline: 'Level 3 · Your AI-integrated studio for becoming',
-      lede: 'Your workshop where real and digital selves co-emerge in unity — supporting products, services, skills, learnings, radiance, clearer purpose, capacity, and reach. Not productivity software; technology serving human emergence, not replacement. Unlocks when Living Profile and Personal Home are ready, a project is alive, Field Notes are flowing, and a review rhythm is chosen.',
+      tagline: 'Level 3 · Expanded home · inner studio for becoming',
+      lede: 'The inner studio where you create, learn, serve, and co-emerge with AI — supporting products, services, skills, radiance, clearer purpose, capacity, and reach. Technology serving human emergence, not replacement. Unlocks when Living Profile and Personal Home are ready, a project is alive, Field Notes are flowing, and a review rhythm is chosen.',
+      // Top-level OS criteria gate L3. The richer foundation fields
+      // below (`foundation`) describe the inner studio shape itself
+      // — they are surfaced as a roadmap in the readiness modal and
+      // map to future Sparks. None of them are required for L3 to
+      // unlock; the gate stays on the five canonical criteria so
+      // existing behaviour is preserved.
       criteria: [
         { id: 'profile-ready',  label: 'Profile ready for review',                 test: function (s) { return s.profile.status === 'Ready for review' || s.profile.status === 'Ready to publish' || s.profile.status === 'Published'; } },
         { id: 'website-ready',  label: 'Personal Home ready for review',           test: function (s) { return s.website.status === 'Ready for review' || s.website.status === 'Ready to publish' || s.website.status === 'Published'; } },
         { id: 'project-active', label: 'At least one active project or offering',  test: function (s) { return s.osMeta.projectActive; } },
         { id: 'notes-active',   label: 'Field Notes archive active',               test: function (s) { return s.osMeta.notesActive; } },
         { id: 'review-rhythm',  label: 'Review rhythm selected',                   test: function (s) { return !!s.osMeta.reviewRhythm; } }
+      ],
+      // Foundation fields describe the inner studio shape. Optional —
+      // not gated, not yet surfaced as required Sparks. Future passes
+      // will route Sparks against these and let the readiness modal
+      // render a roadmap card.
+      foundation: [
+        { id: 'os-active-projects',     section: 'work',  label: 'Active projects',                 prompt: 'What projects are alive right now? The honest list, not the wish list.' },
+        { id: 'os-practices-rhythms',   section: 'field', label: 'Practices & rhythms',             prompt: 'The practices and rhythms that hold your week — what you actually do, not what you intend.' },
+        { id: 'os-studio-hours',        section: 'work',  label: 'Studio hours · availability',     prompt: 'When are you available for studio-shaped work? When are you not?' },
+        { id: 'os-calls-for-help',      section: 'call',  label: 'Calls for help · collaboration',  prompt: 'Where do you actually need help, partnership, or collaboration?' },
+        { id: 'os-learning-edge',       section: 'lens',  label: 'Learning edge · skills building', prompt: 'What skill or capacity are you currently growing into?' },
+        { id: 'os-pipeline',            section: 'work',  label: 'Service / product pipeline',      prompt: 'What is in motion, what is being shaped, what is being released?' },
+        { id: 'os-review-rhythm',       section: 'field', label: 'Review rhythm',                   prompt: 'The honest review rhythm you can hold — weekly, fortnightly, monthly.' },
+        { id: 'os-ai-mode',             section: 'lens',  label: 'AI collaboration mode · Nexus',   prompt: 'How does Nexus / AI sit in your studio? Sparring partner, scribe, sense-maker, witness?' },
+        { id: 'os-community-contribution', section: 'field', label: 'Community contribution',       prompt: 'What you bring to your communities — and what they bring you.' },
+        { id: 'os-data-boundary',       section: 'lens',  label: 'Data · privacy boundaries',       prompt: 'What you allow to be remembered, surfaced, or shared — and what you do not.' }
       ]
     }
   };
@@ -9224,7 +9396,19 @@ if (document.readyState === 'loading') {
 
     // ── Personal OS seed prompts ───────────────────────────
     { id: 'sp-os-project',           movement: 'Focus',         arc: 'Shadow → Gift',  section: 'call',  builder: 'os', target: 'project-active', prompt: 'What is the smallest honest version of an active project right now? The one sentence that would make it real enough to begin.' },
-    { id: 'sp-os-rhythm',            movement: 'Breath',        arc: 'Shadow → Gift',  section: 'field', builder: 'os', target: 'review-rhythm',  prompt: 'What review rhythm could you actually hold — weekly, fortnightly, monthly? Choose what is honest, not aspirational.' }
+    { id: 'sp-os-rhythm',            movement: 'Breath',        arc: 'Shadow → Gift',  section: 'field', builder: 'os', target: 'review-rhythm',  prompt: 'What review rhythm could you actually hold — weekly, fortnightly, monthly? Choose what is honest, not aspirational.' },
+
+    // ── v0.2 additions — gap-aware Sparks for the new Living
+    //    Profile fields. Kept short and additive so the existing
+    //    pool/composition behaviour does not shift dramatically.
+    { id: 'sp-profile-offer',        movement: 'Focus',         arc: 'Shadow → Gift',  section: 'work',  builder: 'profile', target: 'offer-serve',           prompt: 'What is on offer right now that someone visiting could engage with — a service, a session, an invitation? Name it plainly.' },
+    { id: 'sp-profile-lesson',       movement: 'Contemplation', arc: 'Shadow → Gift',  section: 'lens',  builder: 'profile', target: 'learning-life-lesson',  prompt: 'What is the biggest lesson life has actually taught you — the one you live by, not the one you quote?' },
+    { id: 'sp-profile-thriving',     movement: 'Embodiment',    arc: 'Shadow → Gift',  section: 'field', builder: 'profile', target: 'thriving-field',        prompt: 'What does good living look like for you right now? Top tips you actually practise — three would be plenty.' },
+    { id: 'sp-profile-mission',      movement: 'Practice',      arc: 'Shadow → Gift',  section: 'call',  builder: 'profile', target: 'mission-support',       prompt: 'How could others actually support or contribute to what is asking to emerge through you? Be concrete.' },
+
+    // Personal Home v0.2 additions — threshold intro is the most
+    // immediately useful for the preview; the rest stay future-facing.
+    { id: 'sp-site-threshold-intro', movement: 'Attention',     arc: 'Shadow → Gift',  section: 'work',  builder: 'website', target: 'home-threshold-intro',  prompt: 'After the threshold heading, the orienting paragraph. Two or three sentences that welcome a visitor in.' }
   ];
 
   function go() {
@@ -9269,11 +9453,38 @@ if (document.readyState === 'loading') {
       return window.state.builder;
     }
 
-    function isFieldSeeded(fieldId) {
+    // v0.2: also look up captures stored under any of the field's
+    // legacy aliases. We accept either a field-id string (then we
+    // resolve its aliases by searching the standard) or a full field
+    // object (used by trackProgress/renderTracks for a fast path).
+    function fieldHasCapture(b, id) {
+      var arr = b.captures[id];
+      return !!(arr && arr.length);
+    }
+    function findFieldSpec(fieldId) {
+      var tracks = ['profile', 'website'];
+      for (var i = 0; i < tracks.length; i++) {
+        var spec = BUILDER_STANDARD[tracks[i]];
+        if (!spec || !spec.fields) continue;
+        var f = spec.fields.find(function (x) { return x.id === fieldId; });
+        if (f) return f;
+      }
+      return null;
+    }
+    function isFieldSeeded(fieldOrId) {
       var b = ensureBuilderState();
       if (!b) return false;
-      var arr = b.captures[fieldId];
-      return !!(arr && arr.length);
+      var field = (typeof fieldOrId === 'object' && fieldOrId)
+        ? fieldOrId
+        : findFieldSpec(fieldOrId);
+      var id = field ? field.id : fieldOrId;
+      if (fieldHasCapture(b, id)) return true;
+      if (field && Array.isArray(field.aliases)) {
+        for (var i = 0; i < field.aliases.length; i++) {
+          if (fieldHasCapture(b, field.aliases[i])) return true;
+        }
+      }
+      return false;
     }
 
     function totalEntryCount() {
@@ -9287,8 +9498,14 @@ if (document.readyState === 'loading') {
     function trackStatus(trackKey) {
       var spec = BUILDER_STANDARD[trackKey];
       if (!spec || !spec.fields) return 'Seeded';
-      var seeded = spec.fields.filter(function (f) { return isFieldSeeded(f.id); }).length;
-      var total  = spec.fields.length;
+      // v0.2: only "primary" fields gate readiness. Visual-identity and
+      // meta placeholders (profile-image, sigil, public/private boundary)
+      // are surfaced in the modal but do not block "Ready to publish"
+      // — visual generation is a future pass, and the boundary statement
+      // is optional. This keeps backwards readiness behaviour intact.
+      var primary = spec.fields.filter(function (f) { return f.kind !== 'visual' && f.kind !== 'meta'; });
+      var seeded = primary.filter(function (f) { return isFieldSeeded(f); }).length;
+      var total  = primary.length;
       if (seeded === 0) return 'Seeded';
       if (seeded < Math.ceil(total / 2)) return 'Drafting';
       if (seeded < total)                 return 'Ready for review';
@@ -9567,8 +9784,12 @@ if (document.readyState === 'loading') {
     function trackProgress(trackKey) {
       var spec = BUILDER_STANDARD[trackKey];
       if (!spec || !spec.fields) return { seeded: 0, total: 0, pct: 0 };
-      var seeded = spec.fields.filter(function (f) { return isFieldSeeded(f.id); }).length;
-      return { seeded: seeded, total: spec.fields.length, pct: Math.round(seeded / spec.fields.length * 100) };
+      // Mirrors trackStatus: count primary fields only, so the progress
+      // bar matches the status pill.
+      var primary = spec.fields.filter(function (f) { return f.kind !== 'visual' && f.kind !== 'meta'; });
+      var seeded = primary.filter(function (f) { return isFieldSeeded(f); }).length;
+      var total  = primary.length || 1;
+      return { seeded: seeded, total: total, pct: Math.round(seeded / total * 100) };
     }
 
     function renderTracks() {
@@ -9608,7 +9829,17 @@ if (document.readyState === 'loading') {
           html += '<p class="builder-section-desc">' + FOURFOLD[sec].short + '</p>';
           html += '<ul class="builder-section-fields">';
           inSec.forEach(function (f) {
-            html += '<li' + (isFieldSeeded(f.id) ? ' class="is-seeded"' : '') + '>' + f.label + '</li>';
+            var cls = [];
+            if (isFieldSeeded(f)) cls.push('is-seeded');
+            // v0.2: mark visual/meta fields as optional so the modal
+            // signals they do not gate readiness. Plain text class
+            // hook — styling is intentionally a future pass.
+            if (f.kind === 'visual' || f.kind === 'meta') cls.push('is-optional');
+            var attr = cls.length ? ' class="' + cls.join(' ') + '"' : '';
+            var suffix = (f.kind === 'visual')
+              ? ' <span class="bs-mark">visual · placeholder</span>'
+              : (f.kind === 'meta' ? ' <span class="bs-mark">optional</span>' : '');
+            html += '<li' + attr + '>' + f.label + suffix + '</li>';
           });
           html += '</ul></div>';
         });
@@ -9715,6 +9946,18 @@ if (document.readyState === 'loading') {
       try {
         var caps = (window.state && window.state.builder && window.state.builder.captures) || {};
         var arr = caps[fieldId];
+        // v0.2: also check aliases registered against this field. A
+        // capture stored under any historical/alternate ID is still a
+        // valid source for the live preview.
+        if (!arr || !arr.length) {
+          var spec = (typeof findFieldSpec === 'function') ? findFieldSpec(fieldId) : null;
+          if (spec && Array.isArray(spec.aliases)) {
+            for (var i = 0; i < spec.aliases.length; i++) {
+              var alt = caps[spec.aliases[i]];
+              if (alt && alt.length) { arr = alt; break; }
+            }
+          }
+        }
         if (!arr || !arr.length) return '';
         // Most recent capture wins; older ones surface as supporting tags.
         return String(arr[arr.length - 1].excerpt || '').trim();
@@ -11027,9 +11270,12 @@ if (document.readyState === 'loading') {
     window.CommonUnity = window.CommonUnity || {};
     var prev = window.CommonUnity.builder || {};
     window.CommonUnity.builder = {
+      version:  BUILDER_STANDARD.version || '0.2',
       STANDARD: BUILDER_STANDARD,
       SPARKS:   SPARK_LIBRARY,
       FOURFOLD: FOURFOLD,
+      // QA helper: resolve a field by id OR by alias.
+      findField: findFieldSpec,
       readiness: function () {
         return {
           profile: trackStatus('profile'),
