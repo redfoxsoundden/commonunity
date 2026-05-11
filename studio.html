@@ -3409,7 +3409,7 @@ input, textarea { font: inherit; color: inherit; }
 /* ============================================================
    STUDIO PATH — readiness affordance
    A lightweight review surface that shows where the three
-   levels stand: L1 Living Profile, L2 Personal Website,
+   levels stand: L1 Living Profile, L2 Personal Home,
    L3 Personal OS. Opened from the room header, the entrance
    trail, or the Oṁ widget — opens as a modal sheet so it
    never obstructs the room workspace. Reuses Studio's dark palette.
@@ -4570,7 +4570,7 @@ input, textarea { font: inherit; color: inherit; }
     </button>
     <input type="file" id="studio-load-file" accept=".json" style="display:none">
     <button type="button" class="studio-path-btn" id="studio-path-open-header"
-            title="Profile · Website · Personal OS — your three Studio levels">
+            title="Living Profile · Personal Home · Personal OS — your three Studio levels">
       <span class="spb-dot" aria-hidden="true"></span>
       Studio Path
       <span class="spb-levels">L1·L2·L3</span>
@@ -4815,7 +4815,7 @@ input, textarea { font: inherit; color: inherit; }
         <textarea class="notepad-textarea" id="workbench-input"
           placeholder="Write freely. Reflections, questions, fragments, intentions. This space is yours.&#10;&#10;Or — Save to Field Notes is the Save button above. Saved Field Notes become available to Nexus."></textarea>
         <p class="notepad-nexus-hint" id="notepad-nexus-hint" role="status" aria-live="polite">
-          <strong>Saved.</strong> This Field Note is now available to Nexus for reflection, profile, website, and personal-OS shaping.
+          <strong>Saved.</strong> This Field Note is now available to Nexus for reflection, and for shaping your Living Profile, Personal Home, and Personal OS.
         </p>
         <div class="notepad-entries">
           <div class="workbench-entries" id="workbench-entries"></div>
@@ -8297,7 +8297,7 @@ if (document.readyState === 'loading') {
 /* ============================================================
    STUDIO — The Oṁ Field + Fourfold Builder (v0.1)
    Single source of truth for:
-     - BUILDER_STANDARD : Profile / Website / Personal OS spec
+     - BUILDER_STANDARD : Living Profile / Personal Home / Personal OS spec
      - SPARK_LIBRARY    : prompts mapped to required builder fields
      - readiness logic  : computes status from saved Field Notes
      - widget behaviour : draws Sparks, opens the readiness modal,
@@ -8369,10 +8369,10 @@ if (document.readyState === 'loading') {
       name: 'Personal OS',
       level: 3,
       tagline: 'Level 3 · Your AI-integrated studio for becoming',
-      lede: 'Your workshop where real and digital selves co-emerge in unity — supporting products, services, skills, learnings, radiance, clearer purpose, capacity, and reach. Not productivity software; technology serving human emergence, not replacement. Unlocks when Profile and Website are ready, a project is alive, Field Notes are flowing, and a review rhythm is chosen.',
+      lede: 'Your workshop where real and digital selves co-emerge in unity — supporting products, services, skills, learnings, radiance, clearer purpose, capacity, and reach. Not productivity software; technology serving human emergence, not replacement. Unlocks when Living Profile and Personal Home are ready, a project is alive, Field Notes are flowing, and a review rhythm is chosen.',
       criteria: [
         { id: 'profile-ready',  label: 'Profile ready for review',                 test: function (s) { return s.profile.status === 'Ready for review' || s.profile.status === 'Ready to publish' || s.profile.status === 'Published'; } },
-        { id: 'website-ready',  label: 'Website ready for review',                 test: function (s) { return s.website.status === 'Ready for review' || s.website.status === 'Ready to publish' || s.website.status === 'Published'; } },
+        { id: 'website-ready',  label: 'Personal Home ready for review',           test: function (s) { return s.website.status === 'Ready for review' || s.website.status === 'Ready to publish' || s.website.status === 'Published'; } },
         { id: 'project-active', label: 'At least one active project or offering',  test: function (s) { return s.osMeta.projectActive; } },
         { id: 'notes-active',   label: 'Field Notes archive active',               test: function (s) { return s.osMeta.notesActive; } },
         { id: 'review-rhythm',  label: 'Review rhythm selected',                   test: function (s) { return !!s.osMeta.reviewRhythm; } }
