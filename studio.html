@@ -3407,11 +3407,12 @@ input, textarea { font: inherit; color: inherit; }
 }
 
 /* ============================================================
-   FOURFOLD BUILDER — readiness affordance
-   A lightweight review surface that shows where Profile, Website,
-   and Personal OS stand. Lives behind a "Review readiness" link
-   inside the Oṁ widget; opens as a modal sheet so it never
-   obstructs the room workspace. Reuses Studio's dark palette.
+   STUDIO PATH — readiness affordance
+   A lightweight review surface that shows where the three
+   levels stand: L1 Living Profile, L2 Personal Website,
+   L3 Personal OS. Opened from the room header, the entrance
+   trail, or the Oṁ widget — opens as a modal sheet so it
+   never obstructs the room workspace. Reuses Studio's dark palette.
    ============================================================ */
 .builder-review-link {
   appearance: none;
@@ -3432,6 +3433,96 @@ input, textarea { font: inherit; color: inherit; }
   color: var(--text);
   text-decoration-color: var(--text);
   outline: none;
+}
+
+/* ── Studio Path access points ───────────────────────────────
+   A primary, always-visible affordance — used both in the
+   room header (next to Save/Load) and on the entrance screen.
+   ─────────────────────────────────────────────────────────── */
+.studio-path-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 40%, var(--border));
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+.studio-path-btn:hover,
+.studio-path-btn:focus-visible {
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 18%, transparent);
+  border-color: var(--rose-color, #c4b5fd);
+  outline: none;
+}
+.studio-path-btn .spb-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rose-color, #c4b5fd);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
+  flex-shrink: 0;
+}
+.studio-path-btn .spb-levels {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 75%, var(--text-muted));
+  text-transform: uppercase;
+}
+
+/* ── Entrance Studio Path trail — a quiet 3-level preview ── */
+.studio-path-trail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 24%, var(--border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 4%, transparent);
+}
+.studio-path-trail-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-faint));
+  font-weight: 700;
+}
+.studio-path-trail-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.studio-path-trail-level {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.studio-path-trail-level .spl-num {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: var(--text-sm);
+  color: var(--rose-color, #c4b5fd);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  min-width: 1.4em;
+}
+.studio-path-trail-level .spl-name {
+  color: var(--text);
+  font-weight: 600;
+}
+.studio-path-trail-cta {
+  margin-top: 6px;
+  align-self: flex-start;
 }
 
 .builder-modal {
@@ -3527,6 +3618,14 @@ input, textarea { font: inherit; color: inherit; }
   font-weight: 500;
   color: var(--text);
   letter-spacing: -0.005em;
+}
+.builder-track-tagline {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 70%, var(--text-faint));
+  margin-top: 4px;
 }
 .builder-track-status {
   font-size: 10px;
@@ -3761,6 +3860,29 @@ input, textarea { font: inherit; color: inherit; }
     <p class="entrance-subtitle">Studio is where your <em>Compass</em> becomes form.</p>
     <div class="entrance-name" id="entrance-name"></div>
 
+    <!-- Studio Path — the three levels of authentic digital self -->
+    <div class="studio-path-trail" id="entrance-studio-path">
+      <span class="studio-path-trail-eyebrow">Studio Path · three levels</span>
+      <div class="studio-path-trail-levels">
+        <div class="studio-path-trail-level">
+          <span class="spl-num">L1</span>
+          <span><span class="spl-name">Living Profile</span> — your minimum viable digital self.</span>
+        </div>
+        <div class="studio-path-trail-level">
+          <span class="spl-num">L2</span>
+          <span><span class="spl-name">Personal Website</span> — your authentic digital self in motion.</span>
+        </div>
+        <div class="studio-path-trail-level">
+          <span class="spl-num">L3</span>
+          <span><span class="spl-name">Personal OS</span> — your AI-integrated studio for becoming.</span>
+        </div>
+      </div>
+      <button type="button" class="studio-path-btn studio-path-trail-cta" id="studio-path-open-entrance">
+        <span class="spb-dot" aria-hidden="true"></span>
+        Open Studio Path
+      </button>
+    </div>
+
     <!-- Seed prompt — tap to expand name + calculator -->
     <button class="entrance-seed-btn" id="entrance-seed-btn">
       <span id="entrance-seed-label">Studio Setup ↓</span>
@@ -3909,6 +4031,12 @@ input, textarea { font: inherit; color: inherit; }
       Load
     </button>
     <input type="file" id="studio-load-file" accept=".json" style="display:none">
+    <button type="button" class="studio-path-btn" id="studio-path-open-header"
+            title="Profile · Website · Personal OS — your three Studio levels">
+      <span class="spb-dot" aria-hidden="true"></span>
+      Studio Path
+      <span class="spb-levels">L1·L2·L3</span>
+    </button>
     </div>
 
     <!-- ON AIR timer pill -->
@@ -4303,7 +4431,7 @@ input, textarea { font: inherit; color: inherit; }
   </div>
   <p class="om-widget-foot">
     Answer in Field Notes. Saved Field Notes become available to Nexus.
-    <button type="button" class="builder-review-link" id="builder-review-open">Review builder readiness</button>
+    <button type="button" class="builder-review-link" id="builder-review-open">Open Studio Path</button>
   </p>
 </aside>
 
@@ -4311,30 +4439,31 @@ input, textarea { font: inherit; color: inherit; }
 <div id="concept-toast" class="concept-toast" role="status" aria-live="polite"></div>
 
 <!-- ============================================================
-     Fourfold Builder — readiness review modal
-     Shows the live status of Profile, Website, and Personal OS
-     against the v0.1 fourfold builder standard. Driven by the
-     BUILDER_STANDARD and BUILDER_STATE objects in the second
-     script block — open the modal, see what's seeded vs missing
-     across The Work / The Lens / The Field / The Call.
+     Studio Path — readiness review modal
+     Three levels of authentic self-representation, built from four
+     streams of attention. Driven by BUILDER_STANDARD in the second
+     script block — open the modal, see where each level stands.
      ============================================================ -->
 <div id="builder-modal" class="builder-modal" role="dialog" aria-labelledby="builder-modal-title" aria-modal="true">
   <div class="builder-modal-card" id="builder-modal-card">
     <div class="builder-modal-head">
       <div>
-        <div class="builder-modal-eyebrow">Fourfold Builder · v0.1</div>
-        <h2 class="builder-modal-title" id="builder-modal-title">Where the <em>building stands.</em></h2>
+        <div class="builder-modal-eyebrow">Studio Path · v0.1</div>
+        <h2 class="builder-modal-title" id="builder-modal-title">Three levels of <em>your authentic digital self.</em></h2>
         <p class="builder-modal-lede">
-          Three quiet tracks unfold in parallel. Each Spark you answer in
-          Field Notes seeds a field on one of the tracks. Profile and
-          Website fill at your pace; the Personal OS unlocks when both are
-          ready and a project is alive.
+          Studio builds three things, in order — <strong>Living Profile</strong>,
+          then <strong>Personal Website</strong>, then <strong>Personal OS</strong>.
+          You feed them by working in the four rooms: <em>The Work</em>,
+          <em>The Lens</em>, <em>The Field</em>, <em>The Call</em>. Imported
+          Compass material is reviewed first; Sparks fill the gaps in your
+          own voice. Honesty over performance — this is the trust architecture.
         </p>
       </div>
       <button type="button" class="builder-modal-close" id="builder-modal-close" aria-label="Close">×</button>
     </div>
     <div id="builder-tracks"></div>
     <p class="builder-footnote">
+      Four streams feed three levels.
       <em>The Work</em> · what you do, build, offer, serve. &nbsp;
       <em>The Lens</em> · how you see, learn, interpret. &nbsp;
       <em>The Field</em> · what supports you, what you radiate. &nbsp;
@@ -7604,7 +7733,9 @@ if (document.readyState === 'loading') {
     profile: {
       key: 'profile',
       name: 'Living Profile',
-      lede: 'A richer picture of you than any normal social profile can hold. Built from your own words, not a form.',
+      level: 1,
+      tagline: 'Level 1 · Your minimum viable digital self',
+      lede: 'A clear, honest profile built from who you actually are — not platform templates, performance, or fragments. The first level of authentic self-representation.',
       fields: [
         { id: 'name-context',  section: 'work',  label: 'Name & context',     prompt: 'Who you are, what you go by, and the wider context you stand in.' },
         { id: 'roles',         section: 'work',  label: 'Role constellation', prompt: 'The roles you actually hold — not titles, the working shapes of your life.' },
@@ -7620,7 +7751,9 @@ if (document.readyState === 'loading') {
     website: {
       key: 'website',
       name: 'Personal Website',
-      lede: 'A public threshold into your field — a window you own, not another profile inside someone else’s system.',
+      level: 2,
+      tagline: 'Level 2 · Your authentic digital self in motion',
+      lede: 'A living public threshold that shows where you are now — through The Work, The Lens, The Field, and The Call. A window you own, not another profile inside someone else’s system.',
       fields: [
         { id: 'threshold',     section: 'work',  label: 'Threshold',     prompt: 'What someone should feel, know, and do on arrival.' },
         { id: 'site-work',     section: 'work',  label: 'Work section',  prompt: 'The public face of what you do — concise, honest, undefensive.' },
@@ -7636,7 +7769,9 @@ if (document.readyState === 'loading') {
     os: {
       key: 'os',
       name: 'Personal OS',
-      lede: 'Unlocks when Profile and Website are ready, a project is alive, Field Notes are flowing, and a review rhythm is chosen.',
+      level: 3,
+      tagline: 'Level 3 · Your AI-integrated studio for becoming',
+      lede: 'Your workshop where real and digital selves co-emerge in unity — supporting products, services, skills, learnings, radiance, clearer purpose, capacity, and reach. Not productivity software; technology serving human emergence, not replacement. Unlocks when Profile and Website are ready, a project is alive, Field Notes are flowing, and a review rhythm is chosen.',
       criteria: [
         { id: 'profile-ready',  label: 'Profile ready for review',                 test: function (s) { return s.profile.status === 'Ready for review' || s.profile.status === 'Ready to publish' || s.profile.status === 'Published'; } },
         { id: 'website-ready',  label: 'Website ready for review',                 test: function (s) { return s.website.status === 'Ready for review' || s.website.status === 'Ready to publish' || s.website.status === 'Published'; } },
@@ -8018,7 +8153,8 @@ if (document.readyState === 'loading') {
         var spec = BUILDER_STANDARD[key];
         var status = trackStatus(key);
         var prog = trackProgress(key);
-        html += '<section class="builder-track"><div class="builder-track-head"><div class="builder-track-name">' + spec.name + '</div>' +
+        var tagline = spec.tagline ? '<div class="builder-track-tagline">' + spec.tagline + '</div>' : '';
+        html += '<section class="builder-track"><div class="builder-track-head"><div class="builder-track-name">' + spec.name + tagline + '</div>' +
           '<span class="builder-track-status ' + statusClass(status) + '">' + status + '</span></div>' +
           '<p class="builder-track-lede">' + spec.lede + '</p>' +
           '<div class="builder-progress"><div class="builder-progress-bar" style="width:' + prog.pct + '%"></div></div>' +
@@ -8050,7 +8186,8 @@ if (document.readyState === 'loading') {
         osMeta:  b ? b.osMeta : { projectActive: false, notesActive: false, reviewRhythm: '' }
       };
       var osSpec = BUILDER_STANDARD.os;
-      html += '<section class="builder-track"><div class="builder-track-head"><div class="builder-track-name">' + osSpec.name + '</div>' +
+      var osTagline = osSpec.tagline ? '<div class="builder-track-tagline">' + osSpec.tagline + '</div>' : '';
+      html += '<section class="builder-track"><div class="builder-track-head"><div class="builder-track-name">' + osSpec.name + osTagline + '</div>' +
         '<span class="builder-track-status ' + statusClass(osLevel) + '">' + osLevel + '</span></div>' +
         '<p class="builder-track-lede">' + osSpec.lede + '</p>' +
         '<ul class="builder-os-criteria">';
@@ -8079,6 +8216,15 @@ if (document.readyState === 'loading') {
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && modal && modal.classList.contains('is-open')) closeModal();
     });
+
+    // Expose Studio Path opener so other UI entry points (room header
+    // button, entrance trail CTA) can trigger the same modal without
+    // depending on the Oṁ widget being expanded.
+    window.openStudioPath = openModal;
+    var headerPathBtn   = document.getElementById('studio-path-open-header');
+    var entrancePathBtn = document.getElementById('studio-path-open-entrance');
+    if (headerPathBtn)   headerPathBtn.addEventListener('click', openModal);
+    if (entrancePathBtn) entrancePathBtn.addEventListener('click', openModal);
 
     // ── Wire up Spark controls ────────────────────────────
     disc.addEventListener('click', drawSpark);
