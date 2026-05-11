@@ -4039,6 +4039,274 @@ input, textarea { font: inherit; color: inherit; }
   color: var(--text-muted);
 }
 
+/* ============================================================
+   LIVING PROFILE v0.2 — visual identity band + threshold cards
+   Adds:
+   - lp-identity (profile image slot + sigil slot + name/essence)
+   - lp-fourfold-nav (mini fourfold cards under identity)
+   - lp-source-toggle (collapse/expand provenance details)
+   These are static architecture cards for v0.2 — no upload yet.
+   ============================================================ */
+.lp-identity {
+  display: grid;
+  grid-template-columns: 96px 1fr 96px;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--rose-color, #c4b5fd) 14%, transparent), transparent 55%),
+    color-mix(in srgb, var(--rose-color, #c4b5fd) 5%, transparent);
+}
+@media (max-width: 560px) {
+  .lp-identity { grid-template-columns: 1fr; text-align: center; }
+}
+.lp-id-slot {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, var(--border));
+  background: color-mix(in srgb, var(--input-bg) 60%, transparent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+}
+.lp-id-slot.is-sigil {
+  border-radius: 16px;
+  background:
+    conic-gradient(from 210deg at 50% 50%,
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 25%, transparent),
+      color-mix(in srgb, var(--work) 18%, transparent),
+      color-mix(in srgb, var(--lens) 18%, transparent),
+      color-mix(in srgb, var(--field) 18%, transparent),
+      color-mix(in srgb, var(--call) 18%, transparent),
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 25%, transparent));
+}
+.lp-id-slot-glyph {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 28px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 85%, var(--text));
+  margin-bottom: 2px;
+}
+.lp-id-slot-label {
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  opacity: 0.85;
+}
+.lp-id-center { text-align: left; }
+@media (max-width: 560px) { .lp-id-center { text-align: center; } }
+.lp-id-name {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0;
+}
+.lp-id-essence {
+  margin: 4px 0 0;
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(14px, 1.5vw, 17px);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--text) 85%, var(--rose-color, #c4b5fd));
+}
+.lp-id-roles {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.lp-fourfold-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: var(--space-3) 0 0;
+}
+@media (max-width: 560px) { .lp-fourfold-nav { grid-template-columns: repeat(2, 1fr); } }
+.lp-fourfold-card {
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--input-bg) 40%, transparent);
+}
+.lp-fourfold-card.s-work  { border-left: 3px solid var(--work,  #c4b5fd); }
+.lp-fourfold-card.s-lens  { border-left: 3px solid var(--lens,  #c4b5fd); }
+.lp-fourfold-card.s-field { border-left: 3px solid var(--field, #c4b5fd); }
+.lp-fourfold-card.s-call  { border-left: 3px solid var(--call,  #c4b5fd); }
+.lp-fourfold-card-label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+.lp-fourfold-card-name {
+  font-size: 13px;
+  color: var(--text);
+  margin-top: 2px;
+}
+.lp-fourfold-card-tag {
+  display: block;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.lp-source-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  appearance: none;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+.lp-source-toggle:hover,
+.lp-source-toggle:focus-visible {
+  border-color: var(--rose-color, #c4b5fd);
+  color: var(--text);
+  outline: none;
+}
+.lp-source-toggle-caret {
+  display: inline-block;
+  font-size: 9px;
+  transform: translateY(-1px);
+}
+.lp-source-detail { margin-top: 6px; }
+.lp-source-detail[hidden] { display: none; }
+
+/* ============================================================
+   PERSONAL HOME v0.2 — four-room threshold
+   Adds:
+   - ph-threshold (large hero with identity slots)
+   - ph-rooms-nav (tabs for Work / Lens / Field / Call)
+   - ph-room-view (room content area with side atmosphere slot)
+   ============================================================ */
+.ph-modal-card { max-width: 880px; }
+.ph-threshold {
+  display: grid;
+  grid-template-columns: 96px 1fr 96px;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-5);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--rose-color, #c4b5fd) 12%, transparent), transparent 55%),
+    color-mix(in srgb, var(--rose-color, #c4b5fd) 5%, transparent);
+  margin-bottom: var(--space-3);
+}
+@media (max-width: 560px) { .ph-threshold { grid-template-columns: 1fr; text-align: center; } }
+.ph-threshold-text { text-align: left; }
+@media (max-width: 560px) { .ph-threshold-text { text-align: center; } }
+.ph-threshold-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 75%, var(--text-muted));
+  margin: 0 0 4px;
+}
+.ph-threshold-heading {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(22px, 2.6vw, 30px);
+  font-weight: 500;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--text);
+}
+.ph-threshold-intro {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.ph-rooms-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 0 0 var(--space-3);
+}
+@media (max-width: 560px) { .ph-rooms-nav { grid-template-columns: repeat(2, 1fr); } }
+.ph-room-tab {
+  appearance: none;
+  background: color-mix(in srgb, var(--input-bg) 50%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+.ph-room-tab:hover,
+.ph-room-tab:focus-visible {
+  color: var(--text);
+  outline: none;
+}
+.ph-room-tab .ph-room-tab-label {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 2px;
+}
+.ph-room-tab.is-active { color: var(--text); }
+.ph-room-tab.s-work.is-active  { border-color: var(--work,  #c4b5fd); background: color-mix(in srgb, var(--work,  #c4b5fd) 10%, transparent); }
+.ph-room-tab.s-lens.is-active  { border-color: var(--lens,  #c4b5fd); background: color-mix(in srgb, var(--lens,  #c4b5fd) 10%, transparent); }
+.ph-room-tab.s-field.is-active { border-color: var(--field, #c4b5fd); background: color-mix(in srgb, var(--field, #c4b5fd) 10%, transparent); }
+.ph-room-tab.s-call.is-active  { border-color: var(--call,  #c4b5fd); background: color-mix(in srgb, var(--call,  #c4b5fd) 10%, transparent); }
+
+.ph-room-view {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: var(--space-4);
+  align-items: start;
+}
+@media (max-width: 640px) { .ph-room-view { grid-template-columns: 1fr; } }
+.ph-room-main { min-width: 0; }
+.ph-room-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+.ph-room-aside .lp-id-slot { width: 88px; height: 88px; }
+.ph-room-aside-note {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: center;
+  line-height: 1.45;
+}
+
 </style>
 </head>
 <body>
@@ -4132,7 +4400,7 @@ input, textarea { font: inherit; color: inherit; }
         </div>
         <div class="studio-path-trail-level">
           <span class="spl-num">L2</span>
-          <span><span class="spl-name">Personal Website</span> — your authentic digital self in motion.</span>
+          <span><span class="spl-name">Personal Home</span> — your digital home, four rooms around The Work, Lens, Field, Call.</span>
         </div>
         <div class="studio-path-trail-level">
           <span class="spl-num">L3</span>
@@ -4149,7 +4417,7 @@ input, textarea { font: inherit; color: inherit; }
       </button>
       <button type="button" class="lp-preview-cta" id="website-preview-open-entrance" style="margin-top:6px;align-self:flex-start;">
         <span class="spb-dot" aria-hidden="true"></span>
-        Preview Personal Website
+        Preview Personal Home
       </button>
     </div>
 
@@ -4722,7 +4990,7 @@ input, textarea { font: inherit; color: inherit; }
         <h2 class="builder-modal-title" id="builder-modal-title">Three levels of <em>your authentic digital self.</em></h2>
         <p class="builder-modal-lede">
           Studio builds three things, in order — <strong>Living Profile</strong>,
-          then <strong>Personal Website</strong>, then <strong>Personal OS</strong>.
+          then <strong>Personal Home</strong>, then <strong>Personal OS</strong>.
           You feed them by working in the four rooms: <em>The Work</em>,
           <em>The Lens</em>, <em>The Field</em>, <em>The Call</em>. Imported
           Compass material is reviewed first; Sparks fill the gaps in your
@@ -4752,12 +5020,12 @@ input, textarea { font: inherit; color: inherit; }
   <div class="builder-modal-card lp-modal-card" id="living-profile-card">
     <div class="builder-modal-head">
       <div>
-        <div class="builder-modal-eyebrow">Living Profile · v0.1 · Level 1</div>
-        <h2 class="builder-modal-title" id="living-profile-title">Your <em>minimum viable digital self.</em></h2>
+        <div class="builder-modal-eyebrow">Living Profile · v0.2 · Level 1 · Threshold</div>
+        <h2 class="builder-modal-title" id="living-profile-title">Your <em>doorway into the CommonUnity field.</em></h2>
         <p class="builder-modal-lede" id="living-profile-lede">
-          A first draft, assembled locally from your Compass material and any
-          Field Notes you have captured. Honesty over performance — this is
-          what Studio sees so far. Keep, refine, or rewrite comes next.
+          A minimum viable digital self — the threshold card others meet
+          you through. Drafted locally from your Compass material and any
+          Field Notes you have captured. Honesty over performance.
         </p>
       </div>
       <button type="button" class="builder-modal-close" id="living-profile-close" aria-label="Close">×</button>
@@ -4765,28 +5033,31 @@ input, textarea { font: inherit; color: inherit; }
     <div id="living-profile-body"></div>
     <p class="builder-footnote" id="living-profile-foot">
       Drafted locally from Compass import + Field Notes captures.
-      Not a public website — that is Level 2.
+      The doorway into your wider Personal Home — that is Level 2.
     </p>
   </div>
 </div>
 
 <!-- ============================================================
-     Personal Website Preview v0.1 — modal
-     Renders a one-page public threshold preview from compassData
-     points (web_heading / web_intro / highlights / web_closing)
-     plus profile + builder captures. Reuses Living Profile modal
-     styling. Deterministic, local, no LLM, not published.
+     Personal Home Preview v0.2 — modal
+     Four-room navigable preview of the digital home. Reads
+     compassData points (web_heading / web_intro / highlights /
+     web_closing) plus builder captures. Threshold view +
+     room tabs for The Work / Lens / Field / Call.
+     Reuses Living Profile modal styling. Deterministic, local,
+     no LLM, not published. Backwards-compatible globals:
+     window.openWebsitePreview / buildWebsitePreview retained,
+     plus window.openPersonalHome / buildPersonalHomePreview.
      ============================================================ -->
 <div id="website-preview-modal" class="builder-modal" role="dialog" aria-labelledby="website-preview-title" aria-modal="true">
-  <div class="builder-modal-card lp-modal-card" id="website-preview-card">
+  <div class="builder-modal-card lp-modal-card ph-modal-card" id="website-preview-card">
     <div class="builder-modal-head">
       <div>
-        <div class="builder-modal-eyebrow">Personal Website · v0.1 · Level 2 · Not published</div>
-        <h2 class="builder-modal-title" id="website-preview-title">Your <em>authentic digital self in motion.</em></h2>
+        <div class="builder-modal-eyebrow">Personal Home · v0.2 · Level 2 · Preview only, not published</div>
+        <h2 class="builder-modal-title" id="website-preview-title">Compass points you <em>home.</em></h2>
         <p class="builder-modal-lede" id="website-preview-lede">
-          A living public threshold showing where you are now through
-          The Work, The Lens, The Field, and The Call. Drafted locally
-          from your Compass material — preview only, nothing published.
+          Your digital home, built around The Work, The Lens, The Field,
+          and The Call. Step across the threshold; choose a room to enter.
         </p>
       </div>
       <button type="button" class="builder-modal-close" id="website-preview-close" aria-label="Close">×</button>
@@ -4794,7 +5065,7 @@ input, textarea { font: inherit; color: inherit; }
     <div id="website-preview-body"></div>
     <p class="builder-footnote" id="website-preview-foot">
       Drafted locally from Compass import + Field Notes captures.
-      Publishing is not part of v0.1 — this is a preview.
+      Preview only — nothing published.
     </p>
   </div>
 </div>
@@ -8077,10 +8348,10 @@ if (document.readyState === 'loading') {
 
     website: {
       key: 'website',
-      name: 'Personal Website',
+      name: 'Personal Home',
       level: 2,
-      tagline: 'Level 2 · Your authentic digital self in motion',
-      lede: 'A living public threshold that shows where you are now — through The Work, The Lens, The Field, and The Call. A window you own, not another profile inside someone else’s system.',
+      tagline: 'Level 2 · Your digital home — compass points you home',
+      lede: 'Your digital home, built around The Work, The Lens, The Field, and The Call. A four-room threshold you own — preview only, not published.',
       fields: [
         { id: 'threshold',     section: 'work',  label: 'Threshold',     prompt: 'What someone should feel, know, and do on arrival.' },
         { id: 'site-work',     section: 'work',  label: 'Work section',  prompt: 'The public face of what you do — concise, honest, undefensive.' },
@@ -8507,10 +8778,10 @@ if (document.readyState === 'loading') {
           html += '<button type="button" class="lp-preview-cta" data-action="open-living-profile">' +
             '<span class="spb-dot" aria-hidden="true"></span>Preview Living Profile</button>';
         }
-        // Level 2 — Personal Website preview CTA. Not published.
+        // Level 2 — Personal Home preview CTA. Not published.
         if (key === 'website') {
           html += '<button type="button" class="lp-preview-cta" data-action="open-website-preview">' +
-            '<span class="spb-dot" aria-hidden="true"></span>Preview Personal Website</button>';
+            '<span class="spb-dot" aria-hidden="true"></span>Preview Personal Home</button>';
         }
         // Render four section cards, each listing its fields.
         html += '<div class="builder-sections">';
@@ -9047,7 +9318,49 @@ if (document.readyState === 'loading') {
       var s = model.sections;
       var html = '';
 
-      // ── Coverage / source note ─────────────────────────────
+      // ── Visual identity band (v0.2) ────────────────────────
+      // Profile image slot + sigil slot bracket the name/essence.
+      // Slots are intentional architecture cards — no upload yet.
+      var idName = s.nameContext.name || '';
+      var idEssence = s.essence.value || '';
+      var rolePreview = (s.roles.roles || []).slice(0, 3).join(' · ');
+      html += '<section class="lp-identity" aria-label="Threshold identity">' +
+        '<div class="lp-id-slot" title="Profile image — visual representation slot">' +
+          '<span class="lp-id-slot-glyph" aria-hidden="true">◯</span>' +
+          '<span class="lp-id-slot-label">Profile<br>image</span>' +
+        '</div>' +
+        '<div class="lp-id-center">' +
+          (idName ? '<h3 class="lp-id-name">' + lpEscape(idName) + '</h3>'
+                  : '<p class="lp-empty" style="margin:0;">Name will appear here.</p>') +
+          (idEssence ? '<p class="lp-id-essence">' + lpEscape(idEssence) + '</p>' : '') +
+          (rolePreview ? '<p class="lp-id-roles">' + lpEscape(rolePreview) + '</p>' : '') +
+        '</div>' +
+        '<div class="lp-id-slot is-sigil" title="Digital key / sigil — symbolic face of the digital self">' +
+          '<span class="lp-id-slot-glyph" aria-hidden="true">ॐ</span>' +
+          '<span class="lp-id-slot-label">Digital key<br>· sigil</span>' +
+        '</div>' +
+      '</section>';
+
+      // ── Fourfold mini-navigation cards ─────────────────────
+      var fourfoldMap = [
+        { sec: 'work',  label: 'The Work',  src: s.workSummary,  gk: model.gk.work },
+        { sec: 'lens',  label: 'The Lens',  src: s.lensSummary,  gk: model.gk.lens },
+        { sec: 'field', label: 'The Field', src: s.fieldSummary, gk: model.gk.field },
+        { sec: 'call',  label: 'The Call',  src: s.callSummary,  gk: model.gk.call }
+      ];
+      html += '<nav class="lp-fourfold-nav" aria-label="Fourfold preview">';
+      fourfoldMap.forEach(function (f) {
+        var tag = (f.src && f.src.tags && f.src.tags[0]) ? f.src.tags[0]
+                : (f.src && f.src.value ? lpTrim(f.src.value, 80) : 'Awaiting');
+        html += '<div class="lp-fourfold-card s-' + f.sec + '">' +
+          '<span class="lp-fourfold-card-label">' + (f.gk ? 'GK ' + lpEscape(f.gk) : '·') + '</span>' +
+          '<span class="lp-fourfold-card-name">' + lpEscape(f.label) + '</span>' +
+          '<span class="lp-fourfold-card-tag">' + lpEscape(tag) + '</span>' +
+        '</div>';
+      });
+      html += '</nav>';
+
+      // ── Coverage / source note (collapsible) ───────────────
       var c = model.counts;
       var coverageChips =
         '<span class="lp-coverage-chip is-compass">From Compass · ' + (c.compass + c.mixed) + ' / ' + c.total + '</span>' +
@@ -9058,9 +9371,14 @@ if (document.readyState === 'loading') {
         (model.transcripts.count ? ' · ' + model.transcripts.count + ' transcript' + (model.transcripts.count === 1 ? '' : 's') : '') +
         '.';
       html += '<section class="lp-section s-meta">' +
-        '<p class="lp-source-note"><span class="lp-source-tag">Source</span>' + lpEscape(sourceLine) + '</p>' +
-        '<div class="lp-coverage">' + coverageChips + '</div>' +
-        '</section>';
+        '<button type="button" class="lp-source-toggle" id="lp-source-toggle-btn" aria-expanded="false" aria-controls="lp-source-detail">' +
+          'Source notes <span class="lp-source-toggle-caret" aria-hidden="true">▾</span>' +
+        '</button>' +
+        '<div class="lp-source-detail" id="lp-source-detail" hidden>' +
+          '<p class="lp-source-note" style="margin-top:8px;"><span class="lp-source-tag">Source</span>' + lpEscape(sourceLine) + '</p>' +
+          '<div class="lp-coverage">' + coverageChips + '</div>' +
+        '</div>' +
+      '</section>';
 
       // ── Name & context ─────────────────────────────────────
       html += '<section class="lp-section s-work">' +
@@ -9144,6 +9462,22 @@ if (document.readyState === 'loading') {
       html += contactBody + '</section>';
 
       lpBody.innerHTML = html;
+
+      // Wire collapsible source notes toggle.
+      var srcBtn    = document.getElementById('lp-source-toggle-btn');
+      var srcDetail = document.getElementById('lp-source-detail');
+      if (srcBtn && srcDetail) {
+        srcBtn.addEventListener('click', function () {
+          var expanded = srcBtn.getAttribute('aria-expanded') === 'true';
+          if (expanded) {
+            srcDetail.setAttribute('hidden', '');
+            srcBtn.setAttribute('aria-expanded', 'false');
+          } else {
+            srcDetail.removeAttribute('hidden');
+            srcBtn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      }
     }
 
     function openLivingProfile() {
@@ -9306,48 +9640,100 @@ if (document.readyState === 'loading') {
       return html;
     }
 
-    function renderWebsitePreview() {
-      if (!wpBody) return;
-      var model = buildWebsitePreview();
-      var s = model.sections;
-      var c = model.counts;
-      var html = '';
-
-      // Coverage / source banner
-      var coverageChips =
-        '<span class="lp-coverage-chip is-compass">From Compass · ' + (c.compass + c.mixed) + ' / ' + c.total + '</span>' +
-        '<span class="lp-coverage-chip is-captured">From Field Notes · ' + (c.captured + c.mixed) + ' / ' + c.total + '</span>' +
-        '<span class="lp-coverage-chip is-empty">Awaiting · ' + c.empty + ' / ' + c.total + '</span>';
-      var sourceLine = 'Drafted from Compass points (Work / Lens / Field / Call) + Field Notes captures' +
-        (model.transcripts.count ? ' · ' + model.transcripts.count + ' transcript' +
-          (model.transcripts.count === 1 ? '' : 's') : '') + '.';
-      html += '<section class="lp-section s-meta">' +
-        '<p class="lp-source-note"><span class="lp-source-tag">Preview</span>' +
-        lpEscape(sourceLine) + '</p>' +
-        '<div class="lp-coverage">' + coverageChips + '</div>' +
-        '</section>';
-
-      // Hero / threshold
-      var hero = s.hero;
-      html += '<section class="lp-section s-work">' +
-        '<div class="lp-section-head"><span class="lp-section-label">Threshold</span>' +
-        lpSourceTag(hero.source) + '</div>' +
-        '<div class="wp-hero">';
-      if (hero.heading) html += '<h3 class="wp-hero-heading">' + lpEscape(hero.heading) + '</h3>';
-      if (hero.intro)   html += '<p class="wp-hero-intro">' + lpEscape(hero.intro) + '</p>';
-      if (!hero.heading && !hero.intro) {
-        html += '<p class="lp-empty">Not enough source material yet — your threshold copy will appear here.</p>';
+    // v0.2: Personal Home becomes a four-room navigable preview.
+    // Threshold view sits above; each room (Work / Lens / Field /
+    // Call) loads on demand into the same panel. State is local —
+    // no routing, no publishing.
+    var phActiveRoom = 'home';
+    function phRoomFullName(key) {
+      return { work: 'The Work', lens: 'The Lens', field: 'The Field', call: 'The Call' }[key] || '';
+    }
+    function phRenderRoom(model, key) {
+      var sec = model.sections[key];
+      var label = phRoomFullName(key);
+      var html = '<div class="ph-room-view"><div class="ph-room-main">' +
+        '<section class="lp-section s-' + key + '">' +
+        '<div class="lp-section-head"><span class="lp-section-label">' +
+          lpEscape(label) + '</span>' + lpSourceTag(sec.source) + '</div>';
+      if (sec.heading) {
+        html += '<h3 class="lp-name" style="font-size:clamp(20px,2.2vw,26px);">' +
+          lpEscape(sec.heading) + '</h3>';
       }
-      html += '</div></section>';
+      if (sec.intro) {
+        html += '<p class="lp-body">' + lpEscape(sec.intro) + '</p>';
+      }
+      if (sec.highlights && sec.highlights.length) {
+        html += '<ul class="wp-highlights">' + sec.highlights.map(function (h) {
+          return '<li>' + lpEscape(h) + '</li>';
+        }).join('') + '</ul>';
+      }
+      if (sec.closing) {
+        html += '<p class="wp-closing" style="margin-top:8px;">' + lpEscape(sec.closing) + '</p>';
+      }
+      if (!sec.heading && !sec.intro && !(sec.highlights && sec.highlights.length) && !sec.closing) {
+        html += lpEmpty('Not enough source material yet — ' + label + ' content will surface here as you fill it in.');
+      }
+      html += '</section></div>' +
+        '<aside class="ph-room-aside" aria-label="Atmosphere">' +
+          '<div class="lp-id-slot is-sigil" title="Atmosphere / sigil — symbolic room face">' +
+            '<span class="lp-id-slot-glyph" aria-hidden="true">ॐ</span>' +
+            '<span class="lp-id-slot-label">Atmosphere</span>' +
+          '</div>' +
+          '<div class="lp-id-slot" title="Room image slot">' +
+            '<span class="lp-id-slot-glyph" aria-hidden="true">◯</span>' +
+            '<span class="lp-id-slot-label">Room<br>image</span>' +
+          '</div>' +
+          '<p class="ph-room-aside-note">' + lpEscape(label) + '<br>visual<br>(soon)</p>' +
+        '</aside></div>';
+      return html;
+    }
 
-      // Four sections
-      html += wpRenderSection('Work section',  s.work,  'work');
-      html += wpRenderSection('Lens section',  s.lens,  'lens');
-      html += wpRenderSection('Field section', s.field, 'field');
-      html += wpRenderSection('Call section',  s.call,  'call');
+    function phRenderThreshold(model) {
+      var hero = model.sections.hero;
+      var heading = hero.heading || model.name || 'Welcome home';
+      var intro   = hero.intro   || 'Compass points you home. Step across the threshold and choose a room to enter.';
+      var html = '<section class="ph-threshold" aria-label="Home threshold">' +
+        '<div class="lp-id-slot" title="Profile image slot">' +
+          '<span class="lp-id-slot-glyph" aria-hidden="true">◯</span>' +
+          '<span class="lp-id-slot-label">Profile<br>image</span>' +
+        '</div>' +
+        '<div class="ph-threshold-text">' +
+          '<p class="ph-threshold-eyebrow">Compass points you home</p>' +
+          '<h3 class="ph-threshold-heading">' + lpEscape(heading) + '</h3>' +
+          '<p class="ph-threshold-intro">' + lpEscape(intro) + '</p>' +
+        '</div>' +
+        '<div class="lp-id-slot is-sigil" title="Digital key / sigil — symbolic face of the digital self">' +
+          '<span class="lp-id-slot-glyph" aria-hidden="true">ॐ</span>' +
+          '<span class="lp-id-slot-label">Digital key<br>· sigil</span>' +
+        '</div>' +
+      '</section>';
 
-      // Invitation / contact
-      var inv = s.invitation;
+      // Brief invitation paragraph + four-room intro card grid.
+      var fourMap = ['work','lens','field','call'];
+      html += '<div class="ph-room-view"><div class="ph-room-main">' +
+        '<section class="lp-section s-meta">' +
+        '<div class="lp-section-head"><span class="lp-section-label">Enter a room</span></div>' +
+        '<p class="lp-body" style="margin-bottom:8px;">Your digital home is built around four rooms. Each is a compass point of your world — open one to enter.</p>' +
+        '<div class="lp-fourfold-nav">';
+      fourMap.forEach(function (k) {
+        var sec = model.sections[k];
+        var blurb = sec.heading || (sec.intro ? lpTrim(sec.intro, 80) : 'Awaiting source');
+        html += '<div class="lp-fourfold-card s-' + k + '">' +
+          '<span class="lp-fourfold-card-label">' + lpEscape(phRoomFullName(k)) + '</span>' +
+          '<span class="lp-fourfold-card-tag">' + lpEscape(blurb) + '</span>' +
+        '</div>';
+      });
+      html += '</div></section></div>' +
+        '<aside class="ph-room-aside" aria-label="Home sigil">' +
+          '<div class="lp-id-slot is-sigil" title="Home sigil — placeholder">' +
+            '<span class="lp-id-slot-glyph" aria-hidden="true">✦</span>' +
+            '<span class="lp-id-slot-label">Home<br>sigil</span>' +
+          '</div>' +
+          '<p class="ph-room-aside-note">Symbolic<br>face of<br>the home</p>' +
+        '</aside></div>';
+
+      // Invitation / contact stays available on the threshold view.
+      var inv = model.sections.invitation;
       html += '<section class="lp-section s-call">' +
         '<div class="lp-section-head"><span class="lp-section-label">Invitation &amp; contact</span>' +
         lpSourceTag(inv.source) + '</div>';
@@ -9364,12 +9750,94 @@ if (document.readyState === 'loading') {
         html += lpEmpty('Not enough source material yet — how people meet you and where to find you.');
       }
       html += '</section>';
+      return html;
+    }
+
+    function renderWebsitePreview() {
+      if (!wpBody) return;
+      var model = buildWebsitePreview();
+      var c = model.counts;
+      var html = '';
+
+      // Coverage / source banner — collapsible.
+      var coverageChips =
+        '<span class="lp-coverage-chip is-compass">From Compass · ' + (c.compass + c.mixed) + ' / ' + c.total + '</span>' +
+        '<span class="lp-coverage-chip is-captured">From Field Notes · ' + (c.captured + c.mixed) + ' / ' + c.total + '</span>' +
+        '<span class="lp-coverage-chip is-empty">Awaiting · ' + c.empty + ' / ' + c.total + '</span>';
+      var sourceLine = 'Preview only, not published · drafted from Compass points (Work / Lens / Field / Call) + Field Notes captures' +
+        (model.transcripts.count ? ' · ' + model.transcripts.count + ' transcript' +
+          (model.transcripts.count === 1 ? '' : 's') : '') + '.';
+      html += '<section class="lp-section s-meta">' +
+        '<button type="button" class="lp-source-toggle" id="ph-source-toggle-btn" aria-expanded="false" aria-controls="ph-source-detail">' +
+          'Source notes <span class="lp-source-toggle-caret" aria-hidden="true">▾</span>' +
+        '</button>' +
+        '<div class="lp-source-detail" id="ph-source-detail" hidden>' +
+          '<p class="lp-source-note" style="margin-top:8px;"><span class="lp-source-tag">Preview</span>' + lpEscape(sourceLine) + '</p>' +
+          '<div class="lp-coverage">' + coverageChips + '</div>' +
+        '</div>' +
+      '</section>';
+
+      // Room navigation tabs.
+      var tabs = [
+        { key: 'home',  label: 'Home',       eye: 'Threshold' },
+        { key: 'work',  label: 'The Work',   eye: 'Room' },
+        { key: 'lens',  label: 'The Lens',   eye: 'Room' },
+        { key: 'field', label: 'The Field',  eye: 'Room' },
+        { key: 'call',  label: 'The Call',   eye: 'Room' }
+      ];
+      html += '<nav class="ph-rooms-nav" aria-label="Personal Home rooms" style="grid-template-columns:repeat(5,1fr);">';
+      tabs.forEach(function (t) {
+        var active = (t.key === phActiveRoom) ? ' is-active' : '';
+        var sec = t.key === 'home' ? '' : ' s-' + t.key;
+        html += '<button type="button" class="ph-room-tab' + sec + active + '" data-ph-room="' + t.key + '">' +
+          '<span class="ph-room-tab-label">' + lpEscape(t.eye) + '</span>' +
+          lpEscape(t.label) +
+        '</button>';
+      });
+      html += '</nav>';
+
+      // Active room body.
+      html += '<div id="ph-room-body">';
+      if (phActiveRoom === 'home') {
+        html += phRenderThreshold(model);
+      } else {
+        html += phRenderRoom(model, phActiveRoom);
+      }
+      html += '</div>';
 
       wpBody.innerHTML = html;
+
+      // Wire source toggle.
+      var srcBtn    = document.getElementById('ph-source-toggle-btn');
+      var srcDetail = document.getElementById('ph-source-detail');
+      if (srcBtn && srcDetail) {
+        srcBtn.addEventListener('click', function () {
+          var expanded = srcBtn.getAttribute('aria-expanded') === 'true';
+          if (expanded) {
+            srcDetail.setAttribute('hidden', '');
+            srcBtn.setAttribute('aria-expanded', 'false');
+          } else {
+            srcDetail.removeAttribute('hidden');
+            srcBtn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      }
+
+      // Wire room tabs.
+      Array.prototype.forEach.call(
+        wpBody.querySelectorAll('[data-ph-room]'),
+        function (btn) {
+          btn.addEventListener('click', function () {
+            phActiveRoom = btn.getAttribute('data-ph-room') || 'home';
+            renderWebsitePreview();
+          });
+        }
+      );
     }
 
     function openWebsitePreview() {
       if (!wpModal) return;
+      phActiveRoom = 'home';
       renderWebsitePreview();
       if (modal && modal.classList.contains('is-open')) modal.classList.remove('is-open');
       wpModal.classList.add('is-open');
@@ -9389,6 +9857,10 @@ if (document.readyState === 'loading') {
     });
     window.openWebsitePreview = openWebsitePreview;
     window.buildWebsitePreview = buildWebsitePreview;
+    // v0.2 reframing: Personal Home aliases (compass points home).
+    // Existing globals preserved for backward compatibility.
+    window.openPersonalHome        = openWebsitePreview;
+    window.buildPersonalHomePreview = buildWebsitePreview;
 
     function openModal() {
       renderTracks();
