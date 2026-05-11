@@ -7969,6 +7969,15 @@ if (document.readyState === 'loading') {
       }
     }
 
+    // Gap-aware: a Spark's target builder field is "already seeded"
+    // if state.builder.captures[target] has at least one capture.
+    // Sparks without a target (or with missing metadata) are treated
+    // as never-seeded so they always remain eligible.
+    function isBuilderFieldSeeded(target) {
+      if (!target) return false;
+      return isFieldSeeded(target);
+    }
+
     function drawSpark() {
       if (SPARK_LIBRARY.length <= 1) return;
       // Soft preference: if a room is active, prefer Sparks whose
@@ -7980,6 +7989,12 @@ if (document.readyState === 'loading') {
         var filtered = SPARK_LIBRARY.filter(function (s) { return s.section === key; });
         if (filtered.length >= 2) pool = filtered;
       }
+      // Gap preference: within the current pool, prefer Sparks whose
+      // builder target is not yet seeded. Only narrow when at least
+      // two unseeded sparks remain — otherwise the avoid-repeat loop
+      // below would deadlock against currentSpark.
+      var unseeded = pool.filter(function (s) { return !isBuilderFieldSeeded(s.target); });
+      if (unseeded.length >= 2) pool = unseeded;
       var idx;
       do { idx = Math.floor(Math.random() * pool.length); }
       while (pool.length > 1 && pool[idx] === currentSpark);
