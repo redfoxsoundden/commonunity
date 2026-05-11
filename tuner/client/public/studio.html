@@ -7783,7 +7783,58 @@ if (document.readyState === 'loading') {
     // ── Compose: drop Spark into Field Notes ──────────────
     // Tag the next save with the active Spark's builder target so
     // the readiness model knows which field this Field Note seeds.
+    // We keep the target in three places to survive any timing /
+    // scope edge case the live Studio code can throw at us:
+    //   1. a closure var (fast path)
+    //   2. data-* attributes on the textarea (DOM-durable)
+    //   3. window.CommonUnity.builder._pending (debuggable from the
+    //      browser console; never read by user-facing code)
     var pendingTarget = null;
+    var DEBUG = (function () {
+      try { return /[?&]debug=1\b/.test(window.location.search); }
+      catch (_) { return false; }
+    })();
+    function dbg(/* ...args */) {
+      if (!DEBUG) return;
+      try { console.log.apply(console, ['[builder]'].concat([].slice.call(arguments))); } catch (_) {}
+    }
+
+    function setPendingTarget(spark) {
+      pendingTarget = spark
+        ? { builder: spark.builder, fieldId: spark.target, prompt: spark.prompt }
+        : null;
+      if (workbench) {
+        if (spark) {
+          workbench.setAttribute('data-builder-target',  spark.target);
+          workbench.setAttribute('data-builder-builder', spark.builder);
+          workbench.setAttribute('data-builder-prompt',  spark.prompt);
+        } else {
+          workbench.removeAttribute('data-builder-target');
+          workbench.removeAttribute('data-builder-builder');
+          workbench.removeAttribute('data-builder-prompt');
+        }
+      }
+      // Expose for live debugging — read-only by convention.
+      try {
+        window.CommonUnity = window.CommonUnity || {};
+        window.CommonUnity.builder = window.CommonUnity.builder || {};
+        window.CommonUnity.builder._pending = pendingTarget;
+      } catch (_) {}
+      dbg('pendingTarget set:', pendingTarget);
+    }
+
+    function readPendingTarget() {
+      if (pendingTarget) return pendingTarget;
+      // DOM-durable fallback — survives any closure / scope hiccup.
+      if (workbench && workbench.getAttribute('data-builder-target')) {
+        return {
+          builder: workbench.getAttribute('data-builder-builder') || 'profile',
+          fieldId: workbench.getAttribute('data-builder-target'),
+          prompt:  workbench.getAttribute('data-builder-prompt')  || ''
+        };
+      }
+      return null;
+    }
 
     function composeInFieldNotes() {
       if (!currentSpark) return;
@@ -7795,9 +7846,7 @@ if (document.readyState === 'loading') {
         workbench.focus();
         var pos = prefix.length;
         try { workbench.setSelectionRange(pos, pos); } catch (_) {}
-        // Remember which builder field this answer is meant for —
-        // the next save will register it.
-        pendingTarget = { builder: currentSpark.builder, fieldId: currentSpark.target, prompt: currentSpark.prompt };
+        setPendingTarget(currentSpark);
         setCollapsed(true);
         showLocalToast('Spark dropped into Field Notes — for ' + builderFieldLabel(currentSpark) + '.');
       } else {
@@ -7806,22 +7855,54 @@ if (document.readyState === 'loading') {
     }
 
     // ── Capture saved note → builder field ────────────────
+    // We read the saved entry directly from state.rooms[room].entries
+    // (the newest one) so we don't depend on whether the textarea
+    // has been cleared yet by the existing save handler.
+    // (getActiveRoomKey is defined above.)
+    function lastSavedEntryText() {
+      try {
+        var room = getActiveRoomKey();
+        if (!room || !window.state || !window.state.rooms || !window.state.rooms[room]) return '';
+        var entries = window.state.rooms[room].entries || [];
+        var last = entries[entries.length - 1];
+        return (last && last.text) ? String(last.text) : '';
+      } catch (_) { return ''; }
+    }
+
     function captureFromSave() {
-      if (!pendingTarget) return;
-      var text = (workbench && workbench.value) || '';
-      // The existing handler clears the textarea before this runs
-      // in some paths, so we sample text before save in the keyup
-      // pre-listener too (below). Best-effort.
+      var target = readPendingTarget();
+      if (!target) {
+        dbg('captureFromSave: no pending target — skipping');
+        return;
+      }
       var b = ensureBuilderState();
-      if (!b) return;
-      if (!b.captures[pendingTarget.fieldId]) b.captures[pendingTarget.fieldId] = [];
-      b.captures[pendingTarget.fieldId].push({
+      if (!b) {
+        dbg('captureFromSave: ensureBuilderState returned null (window.state missing)');
+        return;
+      }
+      // Prefer the newly-saved entry text; fall back to whatever we
+      // sampled pre-save; finally fall back to the live textarea.
+      var excerpt = lastSavedEntryText() || lastSampleBeforeSave || (workbench && workbench.value) || '';
+      if (!b.captures[target.fieldId]) b.captures[target.fieldId] = [];
+      b.captures[target.fieldId].push({
         at: new Date().toISOString(),
-        prompt: pendingTarget.prompt,
-        excerpt: (lastSampleBeforeSave || text).slice(0, 280)
+        prompt: target.prompt,
+        excerpt: String(excerpt).slice(0, 280)
       });
+      // Also tag the underlying entry so the archive can show which
+      // builder field a note seeded (UI for this is a future pass).
+      try {
+        var room = getActiveRoomKey();
+        var entries = (window.state.rooms[room] || {}).entries || [];
+        var last = entries[entries.length - 1];
+        if (last && !last.builderTarget) {
+          last.builderTarget = target.fieldId;
+          last.builderBuilder = target.builder;
+        }
+      } catch (_) {}
       try { if (typeof window.saveState === 'function') window.saveState(); } catch (_) {}
-      pendingTarget = null;
+      dbg('captureFromSave: wrote', target.fieldId, '→', b.captures[target.fieldId].length, 'capture(s)');
+      setPendingTarget(null);
       lastSampleBeforeSave = '';
       renderTracks(); // keep the modal fresh if it's open
     }
@@ -7944,19 +8025,32 @@ if (document.readyState === 'loading') {
     refreshRoomLabel();
 
     // ── Notepad save: sample text + register capture ──────
-    // Sample the text before the existing handler clears it.
+    // We listen on the same Save button (click) and the textarea
+    // (⌘↵). Our listener fires in addition to the existing
+    // saveWorkbenchEntry handler — addEventListener doesn't
+    // override. We sample text BEFORE save runs (so we have the
+    // raw answer even if the existing handler clears the
+    // textarea), then schedule the capture for the next tick so
+    // the entry has been appended to state.rooms[room].entries.
     function sampleAndScheduleCapture() {
       if (!workbench) return;
       var hadText = workbench.value && workbench.value.trim().length > 0;
-      if (!hadText) return;
+      if (!hadText) {
+        dbg('sampleAndScheduleCapture: empty textarea — skipping');
+        return;
+      }
       lastSampleBeforeSave = workbench.value;
+      dbg('sampleAndScheduleCapture: pending=', readPendingTarget(), 'sample len=', lastSampleBeforeSave.length);
+      // Schedule on the next macrotask so the existing handler
+      // (which is also synchronous) has finished mutating state
+      // and clearing the textarea.
       setTimeout(function () {
         if (nexusHint) {
           nexusHint.classList.add('is-visible');
           setTimeout(function () { nexusHint.classList.remove('is-visible'); }, 5000);
         }
         captureFromSave();
-      }, 60);
+      }, 0);
     }
     if (saveBtn) saveBtn.addEventListener('click', sampleAndScheduleCapture);
     if (workbench) {
@@ -8017,9 +8111,11 @@ if (document.readyState === 'loading') {
     })();
 
     // Expose the standard so future passes (or the console for
-    // demos) can read the model without touching DOM. Read-only
-    // by convention; do not write to it from outside.
+    // demos and QA) can read the model and exercise the capture
+    // path without DOM. Read-only by convention; do not write to
+    // STANDARD/SPARKS/FOURFOLD from outside.
     window.CommonUnity = window.CommonUnity || {};
+    var prev = window.CommonUnity.builder || {};
     window.CommonUnity.builder = {
       STANDARD: BUILDER_STANDARD,
       SPARKS:   SPARK_LIBRARY,
@@ -8030,6 +8126,74 @@ if (document.readyState === 'loading') {
           website: trackStatus('website'),
           os:      osStatus()
         };
+      },
+      // QA / debug helpers — non-destructive
+      get pending() { return readPendingTarget(); },
+      _pending: prev._pending || null,
+      captureNow: function (fieldId, builder, excerpt) {
+        // Manually register a capture under a builder field. Used
+        // by QA to verify the readiness chain end-to-end without
+        // walking the UI flow.
+        var b = ensureBuilderState();
+        if (!b) return null;
+        if (!b.captures[fieldId]) b.captures[fieldId] = [];
+        b.captures[fieldId].push({
+          at: new Date().toISOString(),
+          prompt: '(manual capture)',
+          excerpt: String(excerpt || '').slice(0, 280),
+          builder: builder || 'profile'
+        });
+        try { if (typeof window.saveState === 'function') window.saveState(); } catch (_) {}
+        renderTracks();
+        return {
+          fieldId: fieldId,
+          count: b.captures[fieldId].length,
+          readiness: window.CommonUnity.builder.readiness()
+        };
+      },
+      // Simulates the full Compose → Save flow programmatically.
+      // Useful for Playwright QA: instead of clicking compose +
+      // typing + clicking Save, just call this to verify the
+      // capture chain end-to-end.
+      simulateComposeAndSave: function (sparkSelector, answerText) {
+        var spark;
+        if (typeof sparkSelector === 'object' && sparkSelector) {
+          spark = sparkSelector;
+        } else if (typeof sparkSelector === 'string') {
+          // "builder.target" e.g. "website.threshold"
+          var parts = sparkSelector.split('.');
+          spark = SPARK_LIBRARY.find(function (s) { return s.builder === parts[0] && s.target === parts[1]; });
+        }
+        if (!spark) return { error: 'spark not found', input: sparkSelector };
+        currentSpark = spark;
+        setPendingTarget(spark);
+        // Simulate the existing save handler: append entry to room.
+        var room = getActiveRoomKey() || 'work';
+        if (window.state && window.state.rooms && window.state.rooms[room]) {
+          window.state.rooms[room].entries = window.state.rooms[room].entries || [];
+          window.state.rooms[room].entries.push({
+            text: String(answerText || ''),
+            date: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+          });
+        }
+        lastSampleBeforeSave = String(answerText || '');
+        captureFromSave();
+        return {
+          spark: { builder: spark.builder, target: spark.target },
+          captures: (window.state.builder && window.state.builder.captures[spark.target]) || [],
+          readiness: window.CommonUnity.builder.readiness()
+        };
+      },
+      reset: function () {
+        // Wipe builder captures only (does not touch Field Notes
+        // entries). For QA reruns.
+        if (window.state && window.state.builder) {
+          window.state.builder.captures = {};
+          window.state.builder.osMeta = { projectActive: false, notesActive: false, reviewRhythm: '' };
+          try { if (typeof window.saveState === 'function') window.saveState(); } catch (_) {}
+          renderTracks();
+        }
+        return window.CommonUnity.builder.readiness();
       }
     };
   }
