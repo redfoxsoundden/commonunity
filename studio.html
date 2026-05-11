@@ -4828,6 +4828,299 @@ input, textarea { font: inherit; color: inherit; }
   color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-muted));
 }
 
+/* ============================================================
+   v0.3 visual polish — depth, hover/focus, reduced motion
+   ============================================================ */
+
+/* Subtle ambient glow on the sigil slot — gives the threshold
+   a living quality. Disabled under prefers-reduced-motion. */
+@keyframes lp-sigil-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, transparent),
+                         0 6px 18px -10px color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent); }
+  50%      { box-shadow: 0 0 22px 2px color-mix(in srgb, var(--rose-color, #c4b5fd) 25%, transparent),
+                         0 8px 28px -10px color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent); }
+}
+.lp-hero-slot.is-sigil {
+  animation: lp-sigil-pulse 6.5s ease-in-out infinite;
+}
+.lp-hero-slot {
+  transition: transform 360ms ease, box-shadow 360ms ease,
+              border-color 360ms ease;
+}
+.lp-hero:hover .lp-hero-slot {
+  transform: scale(1.015);
+}
+
+/* Compass entry cards: clearer hover/focus affordance. */
+.lp-compass-card {
+  cursor: default;
+}
+.lp-compass-card:hover,
+.lp-compass-card:focus-visible {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 45%, var(--border));
+  outline: none;
+}
+
+/* Personal Home doorway depth: hover lifts and tints the border
+   with the room's hue. */
+.ph-doorway {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 5%, transparent),
+    0 1px 0 color-mix(in srgb, #000 25%, transparent);
+}
+.ph-doorway:hover,
+.ph-doorway:focus-visible {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 7%, transparent),
+    0 6px 24px -12px color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
+}
+.ph-doorway.s-work:hover  { border-color: color-mix(in srgb, var(--work,  #fbbf77) 55%, var(--border)); }
+.ph-doorway.s-lens:hover  { border-color: color-mix(in srgb, var(--lens,  #a5b4fc) 55%, var(--border)); }
+.ph-doorway.s-field:hover { border-color: color-mix(in srgb, var(--field, #86d4b1) 55%, var(--border)); }
+.ph-doorway.s-call:hover  { border-color: color-mix(in srgb, var(--call,  #f6a3b6) 55%, var(--border)); }
+
+/* ── At the Door / Ways to Engage band ────────────────────── */
+.lp-door {
+  position: relative;
+  margin-top: var(--space-5);
+  padding: clamp(var(--space-4), 2.5vw, var(--space-6));
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 30%, var(--border));
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--work,  #fbbf77) 8%, transparent), transparent 55%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--lens, #a5b4fc) 8%, transparent), transparent 55%),
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--field,#86d4b1) 8%, transparent), transparent 55%),
+    radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--call, #f6a3b6) 8%, transparent), transparent 55%),
+    color-mix(in srgb, var(--input-bg) 35%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
+    0 10px 40px -22px color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
+}
+.lp-door-head { margin: 0 0 14px; }
+.lp-door-eye {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-muted));
+  margin-bottom: 6px;
+}
+.lp-door-title {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+.lp-door-title em {
+  font-style: italic;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 85%, var(--text));
+}
+.lp-door-lede {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 64ch;
+  line-height: 1.55;
+}
+.lp-door-rows {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+}
+@media (max-width: 720px) { .lp-door-rows { grid-template-columns: 1fr; } }
+.lp-door-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 50%, transparent);
+  transition: transform var(--transition), border-color var(--transition);
+}
+.lp-door-row:hover { transform: translateY(-1px); }
+.lp-door-row.s-work  { border-left: 3px solid var(--work,  #fbbf77); }
+.lp-door-row.s-lens  { border-left: 3px solid var(--lens,  #a5b4fc); }
+.lp-door-row.s-field { border-left: 3px solid var(--field, #86d4b1); }
+.lp-door-row.s-call  { border-left: 3px solid var(--call,  #f6a3b6); }
+.lp-door-row-glyph {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 22px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 75%, var(--text));
+  align-self: center;
+  text-align: center;
+}
+.lp-door-row.s-work  .lp-door-row-glyph { color: var(--work,  #fbbf77); }
+.lp-door-row.s-lens  .lp-door-row-glyph { color: var(--lens,  #a5b4fc); }
+.lp-door-row.s-field .lp-door-row-glyph { color: var(--field, #86d4b1); }
+.lp-door-row.s-call  .lp-door-row-glyph { color: var(--call,  #f6a3b6); }
+.lp-door-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.lp-door-row-label {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+.lp-door-row-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.lp-door-foot {
+  margin: 14px 0 0;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-style: italic;
+  line-height: 1.55;
+}
+
+/* ── Go deeper CTA (Living Profile → Personal Home) ───────── */
+.lp-go-deeper {
+  position: relative;
+  margin-top: var(--space-5);
+  padding: clamp(var(--space-4), 2.5vw, var(--space-6));
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
+  background:
+    radial-gradient(circle at 0% 50%, color-mix(in srgb, var(--rose-color, #c4b5fd) 18%, transparent), transparent 55%),
+    radial-gradient(circle at 100% 50%, color-mix(in srgb, var(--lens, #a5b4fc) 12%, transparent), transparent 55%),
+    color-mix(in srgb, var(--input-bg) 35%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
+    0 10px 40px -22px color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, transparent);
+}
+@media (max-width: 640px) {
+  .lp-go-deeper { grid-template-columns: 1fr; text-align: left; }
+}
+.lp-go-deeper-text { min-width: 0; }
+.lp-go-deeper-eye {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 80%, var(--text-muted));
+  margin-bottom: 6px;
+}
+.lp-go-deeper-title {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+.lp-go-deeper-title em {
+  font-style: italic;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 85%, var(--text));
+}
+.lp-go-deeper-lede {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  max-width: 56ch;
+  line-height: 1.55;
+}
+.lp-go-deeper-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 22%, transparent),
+      color-mix(in srgb, var(--rose-color, #c4b5fd) 14%, transparent));
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, var(--border));
+  color: var(--text);
+  transition: transform var(--transition), box-shadow var(--transition),
+              border-color var(--transition);
+  white-space: nowrap;
+}
+.lp-go-deeper-cta:hover,
+.lp-go-deeper-cta:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 75%, var(--border));
+  box-shadow: 0 8px 28px -12px color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
+}
+.lp-go-deeper-cta-arrow {
+  display: inline-block;
+  transition: transform var(--transition);
+}
+.lp-go-deeper-cta:hover .lp-go-deeper-cta-arrow,
+.lp-go-deeper-cta:focus-visible .lp-go-deeper-cta-arrow {
+  transform: translateX(3px);
+}
+
+/* ── Personal Home room: a touch more depth + deepening eyebrow ── */
+.ph-room.is-v3 {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
+    0 10px 40px -22px color-mix(in srgb, var(--rose-color, #c4b5fd) 40%, transparent);
+}
+.ph-room-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background: currentColor;
+  vertical-align: middle;
+  margin-right: 10px;
+  opacity: 0.7;
+}
+.ph-room.s-work  .ph-room-eyebrow { color: color-mix(in srgb, var(--work,  #fbbf77) 80%, var(--text-faint)); }
+.ph-room.s-lens  .ph-room-eyebrow { color: color-mix(in srgb, var(--lens,  #a5b4fc) 80%, var(--text-faint)); }
+.ph-room.s-field .ph-room-eyebrow { color: color-mix(in srgb, var(--field, #86d4b1) 80%, var(--text-faint)); }
+.ph-room.s-call  .ph-room-eyebrow { color: color-mix(in srgb, var(--call,  #f6a3b6) 80%, var(--text-faint)); }
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .lp-hero-slot.is-sigil { animation: none; }
+  .lp-hero:hover .lp-hero-slot,
+  .lp-compass-card:hover,
+  .lp-compass-card:focus-visible,
+  .ph-doorway:hover,
+  .ph-doorway:focus-visible,
+  .lp-door-row:hover,
+  .lp-go-deeper-cta:hover,
+  .lp-go-deeper-cta:focus-visible {
+    transform: none;
+  }
+  .lp-go-deeper-cta:hover .lp-go-deeper-cta-arrow,
+  .lp-go-deeper-cta:focus-visible .lp-go-deeper-cta-arrow {
+    transform: none;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -9614,6 +9907,42 @@ if (document.readyState === 'loading') {
       return found;
     }
 
+    // Derive gentle "Ways to engage" snippets from the four point
+    // summaries + practices. Returns at most 5 rows of the shape
+    // { label, text, tone, glyph }. No promises about features that
+    // do not yet exist — language is suggestive ("Working on now",
+    // "Offering / serving") and the text is a deterministic trim of
+    // material already shown elsewhere in the profile.
+    function lpWaysToEngage(sections, profile) {
+      function pick(sec) {
+        if (!sec) return '';
+        if (sec.tags && sec.tags.length) return String(sec.tags[0]);
+        if (sec.value) return lpTrim(sec.value, 140);
+        return '';
+      }
+      var rows = [];
+      var working  = pick(sections.workSummary);
+      var offering = '';
+      // Prefer practices for offering; otherwise mine a second highlight from work.
+      if (profile && Array.isArray(profile.practices) && profile.practices.length) {
+        offering = profile.practices.slice(0, 3).map(function (p) {
+          return typeof p === 'string' ? p : (p && (p.name || p.label || p.title)) || '';
+        }).filter(Boolean).join(' · ');
+      }
+      if (!offering && sections.workSummary && sections.workSummary.tags && sections.workSummary.tags.length > 1) {
+        offering = sections.workSummary.tags[1];
+      }
+      var learning = pick(sections.lensSummary);
+      var thriving = pick(sections.fieldSummary);
+      var mission  = pick(sections.callSummary);
+      if (working)  rows.push({ label: 'Working on now',     text: working,  tone: 'work',  glyph: '◐' });
+      if (offering) rows.push({ label: 'Offering / serving', text: offering, tone: 'work',  glyph: '✦' });
+      if (learning) rows.push({ label: 'Learning',           text: learning, tone: 'lens',  glyph: '◑' });
+      if (thriving) rows.push({ label: 'Thriving with',      text: thriving, tone: 'field', glyph: '◓' });
+      if (mission)  rows.push({ label: 'Mission · support',  text: mission,  tone: 'call',  glyph: '◒' });
+      return rows.slice(0, 5);
+    }
+
     // Build the structured Living Profile model from current state.
     // Each section returns { value, source, tags } where source is
     // 'compass' | 'captured' | 'mixed' | 'empty' so the UI can show
@@ -9964,6 +10293,35 @@ if (document.readyState === 'loading') {
       });
       html += '</nav>';
 
+      // ── At the Door / Ways to Engage band ─────────────────
+      // Gentle, non-promising snippets derived from the four
+      // point summaries + practices. These suggest how a visitor
+      // could begin to engage without committing to any feature
+      // we have not yet built (no live messaging, no calendar).
+      var doorProfile = ((window.state && window.state.compassData) || {}).profile || {};
+      var doorRows = lpWaysToEngage(s, doorProfile);
+      if (doorRows.length) {
+        html += '<section class="lp-door" aria-label="At the door — ways to engage">' +
+          '<header class="lp-door-head">' +
+            '<span class="lp-door-eye">At the door</span>' +
+            '<h3 class="lp-door-title">Ways to <em>engage</em></h3>' +
+            '<p class="lp-door-lede">Each visit is meant to be useful. Here is what is alive right now, what is on offer, and the threads worth pulling.</p>' +
+          '</header>' +
+          '<ul class="lp-door-rows">' +
+            doorRows.map(function (r) {
+              return '<li class="lp-door-row s-' + r.tone + '">' +
+                '<span class="lp-door-row-glyph" aria-hidden="true">' + r.glyph + '</span>' +
+                '<div class="lp-door-row-body">' +
+                  '<span class="lp-door-row-label">' + lpEscape(r.label) + '</span>' +
+                  '<span class="lp-door-row-text">' + lpEscape(r.text) + '</span>' +
+                '</div>' +
+              '</li>';
+            }).join('') +
+          '</ul>' +
+          '<p class="lp-door-foot">Scaffolding — knock on the door, leave a note, studio hours, and a calendar come later. For now, the doorway is open.</p>' +
+        '</section>';
+      }
+
       // ── Source-notes toggle row (right-aligned, subtle) ────
       var c = model.counts;
       var coverageChips =
@@ -10067,7 +10425,36 @@ if (document.readyState === 'loading') {
       }
       html += renderSection('Contact &amp; invitation', 'call', s.contact, contactBody);
 
+      // ── Go deeper CTA: bridge from Living Profile to Personal Home.
+      // Same fourfold architecture, deeper depth. Non-destructive: only
+      // shows the button if Personal Home is wired in this build.
+      html += '<section class="lp-go-deeper" aria-label="Go deeper">' +
+        '<div class="lp-go-deeper-text">' +
+          '<span class="lp-go-deeper-eye">Living Profile · doorway</span>' +
+          '<h3 class="lp-go-deeper-title">Cross the threshold · <em>enter your Personal Home</em></h3>' +
+          '<p class="lp-go-deeper-lede">The Living Profile is the calling card. Personal Home is the bridge: a relational plexus between this field and the wider web, in four rooms.</p>' +
+        '</div>' +
+        '<button type="button" class="lp-go-deeper-cta" id="lp-go-deeper-btn">' +
+          '<span class="lp-go-deeper-cta-label">Open Personal Home</span>' +
+          '<span class="lp-go-deeper-cta-arrow" aria-hidden="true">→</span>' +
+        '</button>' +
+      '</section>';
+
       lpBody.innerHTML = html;
+
+      // Wire go-deeper CTA — opens Personal Home preview.
+      var goDeeperBtn = document.getElementById('lp-go-deeper-btn');
+      if (goDeeperBtn) {
+        goDeeperBtn.addEventListener('click', function () {
+          if (typeof window.openPersonalHome === 'function') {
+            closeLivingProfile();
+            window.openPersonalHome();
+          } else if (typeof window.openWebsitePreview === 'function') {
+            closeLivingProfile();
+            window.openWebsitePreview();
+          }
+        });
+      }
 
       // Wire collapsible source notes toggle — toggles a CSS class
       // on the card so per-section provenance chips show too.
@@ -10259,11 +10646,16 @@ if (document.readyState === 'loading') {
     }
     // Room-specific atmosphere copy (eyebrow + closing invitation
     // fallback). Subtle, restrained — sets tone without overstating.
+    // Eyebrows are intentionally ordered as a deepening sequence:
+    // Work (surface · what & how) → Lens (interpretation · how I see)
+    // → Field (radiance · communities · thriving) → Call (essence ·
+    // what is asking · what wants to be supported). Same fractal as
+    // the Living Profile compass, with a touch more depth in copy.
     var PH_ROOM_ATMOS = {
-      work:  { eye: 'The Work · craft & contribution',     fallback: 'What you make, build, or carry forward.' },
-      lens:  { eye: 'The Lens · how you see',              fallback: 'The way you read the world; the angle of your seeing.' },
-      field: { eye: 'The Field · who you move with',       fallback: 'The people, places, and communities you belong to.' },
-      call:  { eye: 'The Call · what is asking',           fallback: 'The signal beneath the work — what is calling now.' }
+      work:  { eye: 'Room 1 · The Work · the outer layer',      fallback: 'What you do, build, offer, serve — the surface that others can meet first.' },
+      lens:  { eye: 'Room 2 · The Lens · how you see',          fallback: 'The way you read the world; the lessons you carry; the angle of your seeing.' },
+      field: { eye: 'Room 3 · The Field · who you thrive with', fallback: 'The communities, practices, and tips for good living — what you radiate and receive.' },
+      call:  { eye: 'Room 4 · The Call · the innermost ask',    fallback: 'Mission, what is asking to emerge, and how others might support, contribute, or walk with you.' }
     };
     var PH_ROOM_SIGIL = { work: '◐', lens: '◑', field: '◓', call: '◒' };
 
@@ -10318,7 +10710,7 @@ if (document.readyState === 'loading') {
     function phRenderThreshold(model) {
       var hero = model.sections.hero;
       var heading = hero.heading || model.name || 'Welcome home';
-      var intro   = hero.intro   || 'Compass points you home. Step across the threshold and choose a room to enter.';
+      var intro   = hero.intro   || 'Personal Home is a relational plexus — a bridge between this field and the wider web. Compass points you here. Step across the threshold and choose a room to enter.';
 
       // Hero composition: profile slot + heading/intro + sigil slot.
       var html = '<section class="ph-hero" aria-label="Home threshold">' +
