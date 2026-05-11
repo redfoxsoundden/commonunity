@@ -8642,12 +8642,54 @@ if (document.readyState === 'loading') {
       'see website', 'see profile', 'message me', 'inquire', 'enquire',
       'dm for details', 'message for details', 'open to opportunities',
       'open to work', '#opentowork', 'currently available', 'currently unavailable',
-      'services', 'offerings', 'work with me', 'book a call',
+      'services', 'services provided', 'offerings', 'work with me', 'book a call',
       'about', 'about me', 'summary', 'overview', 'experience',
       'education', 'skills', 'certifications', 'languages',
       'role', 'roles', 'title', 'titles', 'position', 'positions',
-      'present', 'current', 'former', 'previous', 'n/a', 'tbd'
+      'present', 'current', 'former', 'previous', 'n/a', 'tbd',
+      // LinkedIn export labels and location tokens that surface as
+      // pseudo-roles when the export is a single doubled-text blob.
+      'remote or in person', 'remote', 'on-site', 'on site', 'hybrid',
+      'top skills', 'specialties', 'specialities', 'industry', 'industries',
+      'full-time', 'full time', 'part-time', 'part time', 'self-employed',
+      'self employed', 'freelance', 'contract'
     ];
+    // Skill-shaped LinkedIn entries that are not roles. We strip these
+    // from the role constellation because Vesna-style exports list
+    // them as line-per-line items right after "Services provided".
+    var LP_SKILL_BLOCKLIST = [
+      'executive coaching', 'brand marketing', 'content strategy',
+      'corporate training', 'change management', 'leadership development',
+      'public speaking', 'brand consulting', 'business consulting',
+      'management consulting', 'corporate communications', 'crisis and issues management',
+      'pr and media relations', 'business development', 'brand development',
+      'corporate branding', 'reputation management', 'investor relations',
+      'mergers and acquisitions'
+    ];
+    // Collapse PDF/LinkedIn copy-paste artefacts where labels arrive
+    // doubled with no separator: "AvailabilityAvailability" → "Availability",
+    // "Services providedServices provided" → "Services provided",
+    // "Remote or in personRemote or in person" → "Remote or in person".
+    // Conservative: only collapses when the second half exactly matches
+    // the first (case-insensitive) and the seam is between letters.
+    function lpCollapseDoubled(raw) {
+      if (!raw) return raw;
+      var s = String(raw);
+      // Multi-word doubled forms: "Foo BarFoo Bar" → "Foo Bar"
+      var n = s.length;
+      if (n >= 4 && n % 2 === 0) {
+        var halfA = s.slice(0, n / 2);
+        var halfB = s.slice(n / 2);
+        if (halfA && halfA.toLowerCase() === halfB.toLowerCase()) return halfA;
+      }
+      // Single-word doubled forms found by regex (e.g. inline within
+      // a longer line): "AvailabilityAvailability".
+      s = s.replace(/\b([A-Z][a-z]{2,})\1\b/g, '$1');
+      // Multi-word repeated like "Services providedServices provided"
+      // inline: look for "(<phrase>)\1" where phrase is up to 4 words.
+      s = s.replace(/\b((?:[A-Z][a-z]+(?:\s+[a-z]+){0,3}))\1\b/g, '$1');
+      return s.trim();
+    }
     function lpCleanRoles(roles) {
       if (!Array.isArray(roles)) return [];
       var out = [];
@@ -8655,19 +8697,31 @@ if (document.readyState === 'loading') {
       for (var i = 0; i < roles.length; i++) {
         var raw = String(roles[i] || '').trim();
         if (!raw) continue;
+        // normalise internal whitespace + drop multi-line entries
+        // (a real role pill is a single phrase).
+        if (/[\r\n]/.test(raw)) continue;
+        raw = raw.replace(/\s+/g, ' ').trim();
         // strip leading list bullets/markers
         raw = raw.replace(/^[-•*·–—]+\s*/, '').trim();
+        // collapse "FooFoo" / "Foo barFoo bar" artefacts FIRST so the
+        // blocklist actually matches them.
+        raw = lpCollapseDoubled(raw);
         // strip URL fragments
         if (/^https?:\/\//i.test(raw)) continue;
+        if (/^www\./i.test(raw)) continue;
         // strip very long lines (service paragraphs)
         if (raw.length < 2 || raw.length > 80) continue;
         // require some letters
         if (!/[a-zA-Z]/.test(raw)) continue;
+        // drop lines that look like a parenthesised location, e.g.
+        // "(Greater Stockholm Metropolitan Area)".
+        if (/^\(.+\)$/.test(raw)) continue;
         // drop emoji/symbol-heavy lines
         if (raw.replace(/[a-zA-Z0-9\s\-—–·,&/().'"]/g, '').length > 2) continue;
         // drop section-label / boilerplate lines
         var lower = raw.toLowerCase().replace(/[:.]$/, '').trim();
         if (LP_ROLE_BLOCKLIST.indexOf(lower) !== -1) continue;
+        if (LP_SKILL_BLOCKLIST.indexOf(lower) !== -1) continue;
         // drop "Contact for X" style boilerplate
         if (/^(contact|message|dm|email|reach)\b.*\b(for|to)\b/i.test(raw)) continue;
         // drop lines that are mostly punctuation/repeat
@@ -8676,6 +8730,11 @@ if (document.readyState === 'loading') {
         var tokens = lower.split(/\s+/);
         if (tokens.length >= 2 && tokens.length <= 4 &&
             tokens.every(function (t) { return t === tokens[0]; })) continue;
+        // drop lines that are time/duration fragments ("Jan 2016 - Present")
+        if (/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b.*\b(yrs?|mos?)\b/i.test(lower)) continue;
+        if (/^\d{4}\s*-\s*(\d{4}|present)/i.test(lower)) continue;
+        // drop lines that are clearly location strings.
+        if (/\b(greater|metropolitan area|sweden|stockholm|boston|milan|lombardy|italy|united states|usa|uk|england|france|germany)\b/i.test(lower) && !/\b(founder|advisor|strategist|director|coach|consultant|partner|head|chief|cto|ceo|cmo|cfo)\b/i.test(lower)) continue;
         // de-dupe case/punct-insensitive
         var key = lower.replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
         if (!key || seen[key]) continue;
@@ -8753,9 +8812,15 @@ if (document.readyState === 'loading') {
 
       // ── Role constellation ─────────────────────────────────
       // Roles often arrive messy from LinkedIn/PDF imports: section
-      // labels ("Availability", "Pricing"), service boilerplate, and
+      // labels ("AvailabilityAvailability"), service lists, and
       // duplicates with case/punctuation drift. We dedupe and filter
       // heuristically — no LLM. See lpCleanRoles below.
+      //
+      // Strategy: prefer real role-shaped phrases mined from the bio
+      // text (work_background string, transcripts, points), then fall
+      // back to raw splits. EVERYTHING flows through lpCleanRoles so
+      // garbage like "AvailabilityAvailability" / "PricingPricing" /
+      // "Services providedServices provided" cannot reach the modal.
       var roles = [];
       var capRoles = lpCaptureText('roles');
       if (capRoles) {
@@ -8764,8 +8829,28 @@ if (document.readyState === 'loading') {
           if (t) roles.push(t);
         });
       }
+
+      // Build the text pool to mine for role-shaped phrases.
+      var miningText = '';
+      if (typeof profile.work_background === 'string') {
+        miningText += profile.work_background + '\n';
+      }
+      miningText += transcriptsRawText(cd);
+      ['work', 'lens', 'field', 'call'].forEach(function (sec) {
+        var p = points[sec] || {};
+        if (typeof p.raw === 'string')        miningText += '\n' + p.raw;
+        if (typeof p.summary === 'string')    miningText += '\n' + p.summary;
+        if (typeof p.web_intro === 'string')  miningText += '\n' + p.web_intro;
+      });
+      if (miningText) {
+        // lpCollapseDoubled also fixes inline doublings so the regex
+        // mining doesn't trip on "AvailabilityAvailability"-style noise.
+        var collapsed = lpCollapseDoubled(miningText);
+        roles = roles.concat(lpExtractRoleLikePhrases(collapsed));
+      }
+
+      // work_background fallback split (array form, or string split).
       if (profile.work_background) {
-        // work_background can be a string or array of role objects.
         if (Array.isArray(profile.work_background)) {
           profile.work_background.forEach(function (wb) {
             if (!wb) return;
@@ -8796,12 +8881,7 @@ if (document.readyState === 'loading') {
           }
         });
       }
-      // Mine transcripts for role-like phrases when nothing else surfaces.
-      if (!roles.length) {
-        var rawText = transcriptsRawText(cd);
-        if (rawText) roles = roles.concat(lpExtractRoleLikePhrases(rawText));
-      }
-      // Mine points.work highlights / web copy for role-shaped labels.
+      // Mine points highlights for role-shaped labels.
       ['work', 'lens', 'field', 'call'].forEach(function (sec) {
         var p = points[sec] || {};
         if (Array.isArray(p.highlights)) {
