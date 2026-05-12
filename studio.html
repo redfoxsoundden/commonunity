@@ -5401,6 +5401,24 @@ input, textarea { font: inherit; color: inherit; }
 /* Generous internal stacking — give the modal more breathing room
    between hero / compass / foundation / door / editorial sections.  */
 .lp-modal-card.is-v3 .builder-modal-head { margin-bottom: var(--space-5); }
+/* Branded modal frame: CU lockup pinned left, Living Profile title in
+   the middle, close (×) on the right. A faint underline separates the
+   branded frame from the person's identity hero below. */
+.lp-modal-head {
+  align-items: center;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 18%, var(--border));
+}
+.lp-modal-head .lp-brand { opacity: 0.92; flex-shrink: 0; }
+.lp-modal-head .lp-title-row {
+  margin-left: auto;
+  margin-right: auto;
+}
+.lp-modal-head .lp-title-row .builder-modal-title { margin: 0; }
+@media (max-width: 640px) {
+  .lp-modal-head .lp-title-row { margin-left: 0; margin-right: auto; }
+}
 .lp-modal-card.is-v3 .lp-hero { margin-bottom: 4px; }
 .lp-modal-card.is-v3 .lp-compass { margin-top: var(--space-6); }
 .lp-modal-card.is-v3 .lp-foundation { margin-top: var(--space-6); }
@@ -6313,7 +6331,11 @@ input, textarea { font: inherit; color: inherit; }
      ============================================================ -->
 <div id="living-profile-modal" class="builder-modal" role="dialog" aria-labelledby="living-profile-title" aria-modal="true">
   <div class="builder-modal-card lp-modal-card is-v3" id="living-profile-card">
-    <div class="builder-modal-head">
+    <div class="builder-modal-head lp-modal-head">
+      <span class="lp-brand cu-wordmark cu-wordmark-sm" aria-label="CommonUnity">
+        <svg class="cu-lockup" viewBox="-30 0 760 132" aria-hidden="true"><use href="#cu-logo-lockup"/></svg>
+        <span class="visually-hidden">CommonUnity</span>
+      </span>
       <div class="lp-title-row">
         <h2 class="builder-modal-title" id="living-profile-title">Living <em>Profile</em></h2>
         <button type="button" class="studio-info-btn" data-info="info-living-profile-overlay" title="About the Living Profile" aria-label="About the Living Profile"><i>i</i></button>
