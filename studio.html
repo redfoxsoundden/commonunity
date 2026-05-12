@@ -4992,6 +4992,183 @@ input, textarea { font: inherit; color: inherit; }
   line-height: 1.55;
 }
 
+/* ── Studio Window v0.1 ─────────────────────────────────────
+   Shopfront image roll. Used inside the Studio Window modal
+   (editor) and inside the Living Profile preview (display).
+*/
+.sw-window {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 6px 0 0;
+}
+@media (max-width: 720px) { .sw-window { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sw-tile {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sw-tile img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.sw-tile-empty {
+  font-size: 11px;
+  color: var(--text-faint);
+  text-align: center;
+  padding: 8px;
+  line-height: 1.4;
+}
+.sw-tile-tag {
+  position: absolute;
+  left: 6px; bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.sw-tile.s-work   .sw-tile-tag { background: rgba(120,80,200,0.85); }
+.sw-tile.s-lens   .sw-tile-tag { background: rgba(60,140,200,0.85); }
+.sw-tile.s-field  .sw-tile-tag { background: rgba(60,160,120,0.85); }
+.sw-tile.s-call   .sw-tile-tag { background: rgba(200,120,80,0.85); }
+
+/* Editor-only chrome inside the modal */
+.sw-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 8px 0 0;
+}
+@media (min-width: 900px) { .sw-edit-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.sw-slot {
+  border-radius: 10px;
+  border: 1px dashed rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.02);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sw-slot.is-filled { border-style: solid; border-color: rgba(255,255,255,0.18); }
+.sw-slot-img {
+  aspect-ratio: 1 / 1;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.sw-slot-img img { width: 100%; height: 100%; object-fit: cover; }
+.sw-slot-empty-glyph {
+  font-size: 28px; color: var(--text-faint); opacity: 0.7;
+}
+.sw-slot-controls {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.sw-slot-row {
+  display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+}
+.sw-room-select {
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.sw-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  cursor: pointer;
+}
+.sw-btn:hover { background: rgba(255,255,255,0.08); }
+.sw-btn-danger { color: #f0a08c; }
+.sw-file-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.sw-file-label input[type="file"] { display: none; }
+.sw-help {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+.sw-empty-state {
+  font-size: 12px;
+  color: var(--text-faint);
+  font-style: italic;
+  padding: 12px 0 0;
+}
+
+/* Living Profile section — sits near At the Door */
+.lp-studio-window {
+  margin-top: var(--space-3);
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.lp-studio-window-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; margin: 0 0 10px; flex-wrap: wrap;
+}
+.lp-studio-window-eye {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.lp-studio-window-title {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+.lp-studio-window-title em { font-style: italic; color: var(--setup-accent, #c6a25b); }
+.lp-studio-window-edit {
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  cursor: pointer;
+}
+.lp-studio-window-edit:hover { background: rgba(255,255,255,0.08); }
+
+/* Personal Home room: image strip inside the aside */
+.ph-room-window {
+  margin-top: 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.ph-room-window-eye {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.ph-room-window-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+.ph-room-window-strip .sw-tile { aspect-ratio: 1 / 1; }
+
 /* ── Go deeper CTA (Living Profile → Personal Home) ───────── */
 .lp-go-deeper {
   position: relative;
@@ -5232,6 +5409,10 @@ input, textarea { font: inherit; color: inherit; }
       <button type="button" class="lp-preview-cta" id="website-preview-open-entrance" style="margin-top:6px;align-self:flex-start;">
         <span class="spb-dot" aria-hidden="true"></span>
         Preview Personal Home
+      </button>
+      <button type="button" class="lp-preview-cta" id="studio-window-open-entrance" style="margin-top:6px;align-self:flex-start;">
+        <span class="spb-dot" aria-hidden="true"></span>
+        Edit Studio Window
       </button>
     </div>
 
@@ -5888,6 +6069,34 @@ input, textarea { font: inherit; color: inherit; }
 
 
 <!-- ============================================================
+     Studio Window v0.1 — shopfront image roll
+     Up to STUDIO_WINDOW_MAX still images, each tagged to one of
+     the four rooms. Managed from inside Studio; rendered into
+     the Living Profile preview and Personal Home rooms.
+     ============================================================ -->
+<div id="studio-window-modal" class="builder-modal" role="dialog" aria-labelledby="studio-window-title" aria-modal="true">
+  <div class="builder-modal-card lp-modal-card is-v3" id="studio-window-card">
+    <div class="builder-modal-head">
+      <div>
+        <div class="builder-modal-eyebrow">Studio Window · v0.1 · shopfront</div>
+        <h2 class="builder-modal-title" id="studio-window-title">A glimpse <em>through the studio window.</em></h2>
+        <p class="builder-modal-lede">
+          Up to four still images, each tagged to one of your four rooms.
+          If this picture were hanging on the wall of a real home — which
+          room does it belong in?
+        </p>
+      </div>
+      <button type="button" class="builder-modal-close" id="studio-window-close" aria-label="Close">×</button>
+    </div>
+    <div id="studio-window-body"></div>
+    <p class="builder-footnote">
+      Images are compressed locally and saved with your session — they live
+      in this browser. Hosted image URLs arrive once the bridge layer is defined.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
      IMPORT MODAL
      ============================================================ -->
 <div id="import-modal">
@@ -6043,8 +6252,112 @@ let state = {
     call:  { entries: [], mirrorHistory: [] },
   },
   sessionLog: [],        // appended on every session close
-  nexusMemory: ''        // compressed profile updated each session
+  nexusMemory: '',       // compressed profile updated each session
+  studioWindow: []       // shopfront image roll — up to STUDIO_WINDOW_MAX
 };
+
+// ── Studio Window ────────────────────────────────────────────
+// A small shopfront/window managed from inside Studio. Each slot
+// is a single still image tagged to one of the four rooms — Work,
+// Lens, Field, Call. v0.1 beta: client-side resize/compress to a
+// data URL stored in state (and persisted via saveState). Future
+// migration path: swap src for a hosted URL once bridge-layer
+// hosting is defined.
+const STUDIO_WINDOW_MAX = 4;
+const STUDIO_WINDOW_ROOMS = ['work', 'lens', 'field', 'call'];
+const STUDIO_WINDOW_ROOM_LABEL = {
+  work:  'The Work',
+  lens:  'The Lens',
+  field: 'The Field',
+  call:  'The Call'
+};
+const STUDIO_WINDOW_ROOM_GLYPH = { work: '◐', lens: '◑', field: '◓', call: '◒' };
+
+function ensureStudioWindow() {
+  if (!Array.isArray(state.studioWindow)) state.studioWindow = [];
+  return state.studioWindow;
+}
+
+function studioWindowItems() {
+  return ensureStudioWindow().slice(0, STUDIO_WINDOW_MAX);
+}
+
+function studioWindowItemsForRoom(room) {
+  return studioWindowItems().filter(function (it) { return it && it.room === room; });
+}
+
+// Client-side resize/compress. Reads a File, draws into a canvas
+// scaled so the largest dimension is <= maxDim, exports as JPEG
+// data URL. Keeps the session light.
+function compressImageFile(file, maxDim, quality) {
+  maxDim = maxDim || 1100;
+  quality = typeof quality === 'number' ? quality : 0.78;
+  return new Promise(function (resolve, reject) {
+    if (!file || !/^image\//.test(file.type || '')) {
+      reject(new Error('Not an image file')); return;
+    }
+    var reader = new FileReader();
+    reader.onerror = function () { reject(new Error('Could not read file')); };
+    reader.onload = function () {
+      var img = new Image();
+      img.onerror = function () { reject(new Error('Could not decode image')); };
+      img.onload = function () {
+        try {
+          var w = img.naturalWidth || img.width;
+          var h = img.naturalHeight || img.height;
+          if (!w || !h) { reject(new Error('Empty image')); return; }
+          var scale = Math.min(1, maxDim / Math.max(w, h));
+          var tw = Math.max(1, Math.round(w * scale));
+          var th = Math.max(1, Math.round(h * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = tw; canvas.height = th;
+          var ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#000';
+          ctx.fillRect(0, 0, tw, th);
+          ctx.drawImage(img, 0, 0, tw, th);
+          var out = canvas.toDataURL('image/jpeg', quality);
+          resolve({ src: out, width: tw, height: th });
+        } catch (err) { reject(err); }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function studioWindowAdd(item) {
+  var list = ensureStudioWindow();
+  if (list.length >= STUDIO_WINDOW_MAX) return null;
+  var entry = {
+    id: 'sw-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
+    type: 'image',
+    room: STUDIO_WINDOW_ROOMS.indexOf(item && item.room) >= 0 ? item.room : 'work',
+    src: item && item.src ? item.src : '',
+    createdAt: new Date().toISOString()
+  };
+  list.push(entry);
+  try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+  return entry;
+}
+
+function studioWindowRemove(id) {
+  var list = ensureStudioWindow();
+  var idx = list.findIndex(function (it) { return it && it.id === id; });
+  if (idx < 0) return false;
+  list.splice(idx, 1);
+  try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+  return true;
+}
+
+function studioWindowSetRoom(id, room) {
+  if (STUDIO_WINDOW_ROOMS.indexOf(room) < 0) return false;
+  var list = ensureStudioWindow();
+  var it = list.find(function (x) { return x && x.id === id; });
+  if (!it) return false;
+  it.room = room;
+  try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+  return true;
+}
 
 // ============================================================
 // NEXUS CONTEXT HELPERS
@@ -10565,6 +10878,24 @@ if (document.readyState === 'loading') {
         '</section>';
       }
 
+      // ── Studio Window — shopfront image roll (v0.1) ───────
+      // Sits just after At the Door so the visual reads as
+      // "glance through the window" right next to "knock on the
+      // door". Display-only here; edit happens in its own modal.
+      var swHtml = (typeof window.renderStudioWindow === 'function')
+        ? window.renderStudioWindow('all')
+        : '<p class="sw-empty-state">Studio Window will appear here.</p>';
+      html += '<section class="lp-studio-window" aria-label="Studio Window">' +
+        '<div class="lp-studio-window-head">' +
+          '<div>' +
+            '<span class="lp-studio-window-eye">Studio Window</span>' +
+            '<h3 class="lp-studio-window-title">A glimpse through the <em>studio window.</em></h3>' +
+          '</div>' +
+          '<button type="button" class="lp-studio-window-edit" id="lp-studio-window-edit-btn" aria-label="Edit Studio Window">Edit Studio Window</button>' +
+        '</div>' +
+        swHtml +
+      '</section>';
+
       // ── Source-notes toggle row (right-aligned, subtle) ────
       var c = model.counts;
       var coverageChips =
@@ -10696,6 +11027,14 @@ if (document.readyState === 'loading') {
             closeLivingProfile();
             window.openWebsitePreview();
           }
+        });
+      }
+
+      // Wire Studio Window edit button — opens its modal.
+      var swEditBtn = document.getElementById('lp-studio-window-edit-btn');
+      if (swEditBtn) {
+        swEditBtn.addEventListener('click', function () {
+          if (typeof window.openStudioWindow === 'function') window.openStudioWindow();
         });
       }
 
@@ -10934,6 +11273,21 @@ if (document.readyState === 'loading') {
         html += '<p class="ph-room-closing">' + lpEscape(atmos.fallback || '') + '</p>';
       }
       html += '<div style="margin-top:14px;">' + lpSourceTag(sec.source) + '</div>';
+      // Studio Window strip filtered to this room — shows up to
+      // 2-4 of the user's Studio Window images tagged for the room.
+      var roomWindowHtml = '';
+      if (typeof window.renderStudioWindow === 'function') {
+        var hasAny = (typeof window.studioWindowItems === 'function')
+          ? window.studioWindowItems().some(function (it) { return it && it.room === key; })
+          : false;
+        if (hasAny) {
+          roomWindowHtml = '<div class="ph-room-window">' +
+            '<span class="ph-room-window-eye">From the Studio Window · ' + lpEscape(label) + '</span>' +
+            '<div class="ph-room-window-strip">' + window.renderStudioWindow(key) + '</div>' +
+          '</div>';
+        }
+      }
+
       html += '</div>' +
         '<aside class="ph-room-aside-v3" aria-label="Room atmosphere">' +
           '<div class="lp-hero-slot is-sigil" title="Room sigil — atmospheric face">' +
@@ -10945,6 +11299,7 @@ if (document.readyState === 'loading') {
             '<span class="lp-hero-slot-label">Room<br>image</span>' +
           '</div>' +
           '<p class="ph-room-aside-label">' + lpEscape(label) + '<br>visual slot<br>(coming)</p>' +
+          roomWindowHtml +
         '</aside>' +
       '</article>';
       return html;
@@ -11120,6 +11475,205 @@ if (document.readyState === 'loading') {
     window.openPersonalHome        = openWebsitePreview;
     window.buildPersonalHomePreview = buildWebsitePreview;
 
+    // ============================================================
+    // STUDIO WINDOW v0.1 — shopfront image roll editor
+    // Local-only data URLs persisted via saveState. Renders a 4-slot
+    // editor inside the Studio Window modal. Other surfaces (Living
+    // Profile, Personal Home) display via window.renderStudioWindow.
+    // ============================================================
+    var swModal    = document.getElementById('studio-window-modal');
+    var swBody     = document.getElementById('studio-window-body');
+    var swCloseBtn = document.getElementById('studio-window-close');
+
+    function swRoomOptions(selected) {
+      return STUDIO_WINDOW_ROOMS.map(function (r) {
+        var sel = r === selected ? ' selected' : '';
+        return '<option value="' + r + '"' + sel + '>' + STUDIO_WINDOW_ROOM_LABEL[r] + '</option>';
+      }).join('');
+    }
+
+    function renderStudioWindowEditor() {
+      if (!swBody) return;
+      var items = studioWindowItems();
+      var slots = [];
+      for (var i = 0; i < STUDIO_WINDOW_MAX; i++) slots.push(items[i] || null);
+
+      var html = '<div class="sw-edit-grid" id="sw-edit-grid">';
+      slots.forEach(function (item, idx) {
+        var slotNum = idx + 1;
+        if (item) {
+          var alt = 'Studio Window image for ' + (STUDIO_WINDOW_ROOM_LABEL[item.room] || 'a room');
+          html += '<div class="sw-slot is-filled" data-sw-slot="' + idx + '">' +
+            '<div class="sw-slot-img"><img alt="' + lpEscape(alt) + '" src="' + lpEscape(item.src) + '"></div>' +
+            '<div class="sw-slot-controls">' +
+              '<div class="sw-slot-row">' +
+                '<label class="sw-room-label" for="sw-room-' + item.id + '" style="font-size:10px;color:var(--text-faint);">Room</label>' +
+                '<select class="sw-room-select" id="sw-room-' + item.id + '" data-sw-room-id="' + item.id + '" aria-label="Which room does this image belong in?">' +
+                  swRoomOptions(item.room) +
+                '</select>' +
+              '</div>' +
+              '<div class="sw-slot-row">' +
+                '<label class="sw-file-label">Replace<input type="file" accept="image/*" data-sw-replace-id="' + item.id + '"></label>' +
+                '<button type="button" class="sw-btn sw-btn-danger" data-sw-remove-id="' + item.id + '">Remove</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        } else {
+          html += '<div class="sw-slot" data-sw-slot="' + idx + '">' +
+            '<div class="sw-slot-img"><span class="sw-slot-empty-glyph" aria-hidden="true">◯</span></div>' +
+            '<div class="sw-slot-controls">' +
+              '<div class="sw-slot-row">' +
+                '<label class="sw-file-label">Choose image for slot ' + slotNum +
+                  '<input type="file" accept="image/*" data-sw-add-slot="' + idx + '">' +
+                '</label>' +
+              '</div>' +
+              '<div class="sw-slot-row" style="font-size:10px;color:var(--text-faint);">Pick a room after upload.</div>' +
+            '</div>' +
+          '</div>';
+        }
+      });
+      html += '</div>';
+      html += '<p class="sw-help">Which room does this image belong in? Pick Work, Lens, Field, or Call. Images are resized client-side (max ~1100px, jpeg quality 0.78) and saved with your session.</p>';
+
+      swBody.innerHTML = html;
+
+      // ── Wire file pickers (add) ─────────────────────────────
+      Array.prototype.forEach.call(
+        swBody.querySelectorAll('input[data-sw-add-slot]'),
+        function (inp) {
+          inp.addEventListener('change', function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (!file) return;
+            compressImageFile(file).then(function (res) {
+              studioWindowAdd({ src: res.src, room: 'work' });
+              renderStudioWindowEditor();
+              try { if (typeof window.refreshStudioWindowSurfaces === 'function') window.refreshStudioWindowSurfaces(); } catch (_) {}
+            }).catch(function (err) {
+              if (typeof showToast === 'function') showToast('Could not load image: ' + (err && err.message ? err.message : 'unknown error'));
+            });
+          });
+        }
+      );
+      // ── Wire file pickers (replace) ─────────────────────────
+      Array.prototype.forEach.call(
+        swBody.querySelectorAll('input[data-sw-replace-id]'),
+        function (inp) {
+          inp.addEventListener('change', function (e) {
+            var id = inp.getAttribute('data-sw-replace-id');
+            var file = e.target.files && e.target.files[0];
+            if (!file || !id) return;
+            compressImageFile(file).then(function (res) {
+              var list = ensureStudioWindow();
+              var it = list.find(function (x) { return x && x.id === id; });
+              if (it) {
+                it.src = res.src;
+                try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+              }
+              renderStudioWindowEditor();
+              try { if (typeof window.refreshStudioWindowSurfaces === 'function') window.refreshStudioWindowSurfaces(); } catch (_) {}
+            }).catch(function (err) {
+              if (typeof showToast === 'function') showToast('Could not load image: ' + (err && err.message ? err.message : 'unknown error'));
+            });
+          });
+        }
+      );
+      // ── Wire room selects ───────────────────────────────────
+      Array.prototype.forEach.call(
+        swBody.querySelectorAll('select[data-sw-room-id]'),
+        function (sel) {
+          sel.addEventListener('change', function () {
+            var id = sel.getAttribute('data-sw-room-id');
+            studioWindowSetRoom(id, sel.value);
+            try { if (typeof window.refreshStudioWindowSurfaces === 'function') window.refreshStudioWindowSurfaces(); } catch (_) {}
+          });
+        }
+      );
+      // ── Wire remove buttons ─────────────────────────────────
+      Array.prototype.forEach.call(
+        swBody.querySelectorAll('button[data-sw-remove-id]'),
+        function (btn) {
+          btn.addEventListener('click', function () {
+            var id = btn.getAttribute('data-sw-remove-id');
+            studioWindowRemove(id);
+            renderStudioWindowEditor();
+            try { if (typeof window.refreshStudioWindowSurfaces === 'function') window.refreshStudioWindowSurfaces(); } catch (_) {}
+          });
+        }
+      );
+    }
+
+    function openStudioWindow() {
+      if (!swModal) return;
+      renderStudioWindowEditor();
+      if (modal && modal.classList.contains('is-open')) modal.classList.remove('is-open');
+      swModal.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeStudioWindow() {
+      if (!swModal) return;
+      swModal.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+    if (swCloseBtn) swCloseBtn.addEventListener('click', closeStudioWindow);
+    if (swModal) swModal.addEventListener('click', function (e) {
+      if (e.target === swModal) closeStudioWindow();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && swModal && swModal.classList.contains('is-open')) closeStudioWindow();
+    });
+
+    // Display helper used by Living Profile + Personal Home rooms.
+    // mode: 'all' (default) or a room key.
+    function renderStudioWindow(mode) {
+      var items = (typeof mode === 'string' && STUDIO_WINDOW_ROOMS.indexOf(mode) >= 0)
+        ? studioWindowItemsForRoom(mode)
+        : studioWindowItems();
+      if (!items.length) {
+        return '<p class="sw-empty-state">The window is bare for now — open Edit Studio Window to hang something here.</p>';
+      }
+      var html = '<div class="sw-window" role="list">';
+      items.forEach(function (it) {
+        var label = STUDIO_WINDOW_ROOM_LABEL[it.room] || '';
+        var glyph = STUDIO_WINDOW_ROOM_GLYPH[it.room] || '';
+        var alt = 'Studio Window image for ' + label;
+        html += '<figure class="sw-tile s-' + lpEscape(it.room) + '" role="listitem">' +
+          '<img alt="' + lpEscape(alt) + '" src="' + lpEscape(it.src) + '">' +
+          '<figcaption class="sw-tile-tag" aria-label="Room tag · ' + lpEscape(label) + '">' +
+            (glyph ? '<span aria-hidden="true">' + glyph + '</span> ' : '') + lpEscape(label) +
+          '</figcaption>' +
+        '</figure>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    // Refresh open Living Profile / Personal Home previews after an edit
+    // so the gallery stays in sync without re-opening the modal.
+    function refreshStudioWindowSurfaces() {
+      try {
+        if (typeof renderLivingProfile === 'function' &&
+            document.getElementById('living-profile-modal') &&
+            document.getElementById('living-profile-modal').classList.contains('is-open')) {
+          renderLivingProfile();
+        }
+      } catch (_) {}
+      try {
+        if (typeof renderWebsitePreview === 'function' &&
+            document.getElementById('website-preview-modal') &&
+            document.getElementById('website-preview-modal').classList.contains('is-open')) {
+          renderWebsitePreview();
+        }
+      } catch (_) {}
+    }
+
+    window.openStudioWindow            = openStudioWindow;
+    window.renderStudioWindow          = renderStudioWindow;
+    window.refreshStudioWindowSurfaces = refreshStudioWindowSurfaces;
+    window.studioWindowAdd             = studioWindowAdd;
+    window.studioWindowRemove          = studioWindowRemove;
+    window.studioWindowSetRoom         = studioWindowSetRoom;
+    window.studioWindowItems           = studioWindowItems;
+
     function openModal() {
       renderTracks();
       modal.classList.add('is-open');
@@ -11150,6 +11704,10 @@ if (document.readyState === 'loading') {
     var wpEntranceBtn = document.getElementById('website-preview-open-entrance');
     if (wpEntranceBtn) wpEntranceBtn.addEventListener('click', function () {
       if (typeof window.openWebsitePreview === 'function') window.openWebsitePreview();
+    });
+    var swEntranceBtn = document.getElementById('studio-window-open-entrance');
+    if (swEntranceBtn) swEntranceBtn.addEventListener('click', function () {
+      if (typeof window.openStudioWindow === 'function') window.openStudioWindow();
     });
 
     // ── Wire up Spark controls ────────────────────────────
@@ -11361,6 +11919,36 @@ if (document.readyState === 'loading') {
     try {
       window.captureNow             = window.CommonUnity.builder.captureNow;
       window.simulateComposeAndSave = window.CommonUnity.builder.simulateComposeAndSave;
+    } catch (_) {}
+
+    // ── Studio Window namespace (v0.1 beta) ─────────────────
+    // Read-only by convention; mutate via the exposed helpers so
+    // saveState fires and any open previews refresh.
+    try {
+      window.CommonUnity = window.CommonUnity || {};
+      window.CommonUnity.studioWindow = {
+        version: '0.1',
+        MAX:     STUDIO_WINDOW_MAX,
+        ROOMS:   STUDIO_WINDOW_ROOMS.slice(),
+        items:   function () { return studioWindowItems(); },
+        add:     function (entry) {
+          var added = studioWindowAdd(entry || {});
+          if (typeof window.refreshStudioWindowSurfaces === 'function') window.refreshStudioWindowSurfaces();
+          return added;
+        },
+        remove:  function (id) {
+          var ok = studioWindowRemove(id);
+          if (ok && typeof window.refreshStudioWindowSurfaces === 'function') window.refreshStudioWindowSurfaces();
+          return ok;
+        },
+        setRoom: function (id, room) {
+          var ok = studioWindowSetRoom(id, room);
+          if (ok && typeof window.refreshStudioWindowSurfaces === 'function') window.refreshStudioWindowSurfaces();
+          return ok;
+        },
+        open:    function () { if (typeof window.openStudioWindow === 'function') window.openStudioWindow(); },
+        render:  function (mode) { return (typeof window.renderStudioWindow === 'function') ? window.renderStudioWindow(mode) : ''; }
+      };
     } catch (_) {}
   }
 
