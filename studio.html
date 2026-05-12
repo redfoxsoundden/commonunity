@@ -4403,6 +4403,55 @@ input, textarea { font: inherit; color: inherit; }
   letter-spacing: 0.22em;
   opacity: 0.85;
 }
+/* Profile image filling the round hero slot. Cover-cropped so any
+   image renders cleanly; controls live below the slot in a tiny
+   stack so the preview reads quietly. */
+.lp-hero-slot.has-image { border-style: solid; }
+.lp-hero-slot.has-image .lp-hero-slot-glyph,
+.lp-hero-slot.has-image .lp-hero-slot-label { display: none; }
+.lp-hero-slot-img {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.lp-hero-slot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.lp-id-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.lp-id-controls .lp-id-btn,
+.lp-id-controls .lp-id-file-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 40%, var(--border));
+  background: color-mix(in srgb, var(--input-bg) 65%, transparent);
+  color: var(--text);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.lp-id-controls .lp-id-btn:hover,
+.lp-id-controls .lp-id-file-label:hover {
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 14%, var(--input-bg));
+}
+.lp-id-controls input[type="file"] { display: none; }
+.lp-id-controls .lp-id-btn-danger {
+  border-color: color-mix(in srgb, #f6a3b6 50%, var(--border));
+  color: color-mix(in srgb, #f6a3b6 80%, var(--text));
+}
 .lp-hero-text { text-align: left; min-width: 0; }
 @media (max-width: 720px) { .lp-hero-text { text-align: center; } }
 .lp-hero-eyebrow {
@@ -6253,7 +6302,10 @@ let state = {
   },
   sessionLog: [],        // appended on every session close
   nexusMemory: '',       // compressed profile updated each session
-  studioWindow: []       // shopfront image roll — up to STUDIO_WINDOW_MAX
+  studioWindow: [],      // shopfront image roll — up to STUDIO_WINDOW_MAX
+  identityMedia: {       // visual identity slots — Living Profile + Personal Home
+    profileImage: null   // { src: dataURL, createdAt: ISO } | null
+  }
 };
 
 // ── Studio Window ────────────────────────────────────────────
@@ -6357,6 +6409,41 @@ function studioWindowSetRoom(id, room) {
   it.room = room;
   try { if (typeof saveState === 'function') saveState(); } catch (_) {}
   return true;
+}
+
+// ── Identity media (v0.1) ───────────────────────────────────
+// Profile image slot for the Living Profile + Personal Home
+// threshold. Same client-side resize/compress path as the Studio
+// Window. Stored as a data URL in state.identityMedia.profileImage
+// so it round-trips through saveState/loadState. The `src` field
+// is opaque: a future migration can swap to a hosted URL with no
+// caller changes.
+function ensureIdentityMedia() {
+  if (!state.identityMedia || typeof state.identityMedia !== 'object') {
+    state.identityMedia = { profileImage: null };
+  } else if (typeof state.identityMedia.profileImage === 'undefined') {
+    state.identityMedia.profileImage = null;
+  }
+  return state.identityMedia;
+}
+
+function getProfileImage() {
+  var im = ensureIdentityMedia();
+  return im.profileImage || null;
+}
+
+function setProfileImage(src) {
+  var im = ensureIdentityMedia();
+  if (!src) { im.profileImage = null; }
+  else {
+    im.profileImage = { src: src, createdAt: new Date().toISOString() };
+  }
+  try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+  return im.profileImage;
+}
+
+function removeProfileImage() {
+  return setProfileImage(null);
 }
 
 // ============================================================
@@ -10809,11 +10896,36 @@ if (document.readyState === 'loading') {
           }).join('') + '</ul>'
         : '';
       var contextBits = s.nameContext.context ? lpEscape(s.nameContext.context) : '';
+      var pImg = (typeof getProfileImage === 'function') ? getProfileImage() : null;
+      var pAlt = 'Profile image' + (idName && idName !== 'Living Profile' ? ' for ' + idName : '');
+      var slotHtml;
+      if (pImg && pImg.src) {
+        slotHtml = '<div class="lp-hero-slot-wrap">' +
+          '<div class="lp-hero-slot has-image" title="Profile image">' +
+            '<img class="lp-hero-slot-img" alt="' + lpEscape(pAlt) + '" src="' + lpEscape(pImg.src) + '">' +
+          '</div>' +
+          '<div class="lp-id-controls" aria-label="Profile image controls">' +
+            '<label class="lp-id-file-label" title="Replace profile image">Change' +
+              '<input type="file" accept="image/*" id="lp-profile-image-input">' +
+            '</label>' +
+            '<button type="button" class="lp-id-btn lp-id-btn-danger" id="lp-profile-image-remove">Remove</button>' +
+          '</div>' +
+        '</div>';
+      } else {
+        slotHtml = '<div class="lp-hero-slot-wrap">' +
+          '<div class="lp-hero-slot" title="Profile image — visual representation slot">' +
+            '<span class="lp-hero-slot-glyph" aria-hidden="true">◯</span>' +
+            '<span class="lp-hero-slot-label">Profile<br>image</span>' +
+          '</div>' +
+          '<div class="lp-id-controls" aria-label="Profile image controls">' +
+            '<label class="lp-id-file-label" title="Upload profile image">Upload profile image' +
+              '<input type="file" accept="image/*" id="lp-profile-image-input">' +
+            '</label>' +
+          '</div>' +
+        '</div>';
+      }
       html += '<section class="lp-hero" aria-label="Threshold identity">' +
-        '<div class="lp-hero-slot" title="Profile image — visual representation slot">' +
-          '<span class="lp-hero-slot-glyph" aria-hidden="true">◯</span>' +
-          '<span class="lp-hero-slot-label">Profile<br>image</span>' +
-        '</div>' +
+        slotHtml +
         '<div class="lp-hero-text">' +
           '<p class="lp-hero-eyebrow">Doorway · into the CommonUnity field</p>' +
           '<h3 class="lp-hero-name">' + lpEscape(idName) + '</h3>' +
@@ -11037,6 +11149,11 @@ if (document.readyState === 'loading') {
           if (typeof window.openStudioWindow === 'function') window.openStudioWindow();
         });
       }
+
+      // Wire profile image upload + remove controls. Images are
+      // compressed client-side (max ~1100px, jpeg ~0.78) and saved
+      // with the session — hosted media arrives later.
+      wireProfileImageControls('lp-profile-image-input', 'lp-profile-image-remove');
 
       // Wire collapsible source notes toggle — toggles a CSS class
       // on the card so per-section provenance chips show too.
@@ -11311,11 +11428,36 @@ if (document.readyState === 'loading') {
       var intro   = hero.intro   || 'Personal Home is a relational plexus — a bridge between this field and the wider web. Compass points you here. Step across the threshold and choose a room to enter.';
 
       // Hero composition: profile slot + heading/intro + sigil slot.
+      var phImg = (typeof getProfileImage === 'function') ? getProfileImage() : null;
+      var phAlt = 'Profile image' + (heading ? ' for ' + heading : '');
+      var phSlotHtml;
+      if (phImg && phImg.src) {
+        phSlotHtml = '<div class="lp-hero-slot-wrap">' +
+          '<div class="lp-hero-slot has-image" title="Profile image">' +
+            '<img class="lp-hero-slot-img" alt="' + lpEscape(phAlt) + '" src="' + lpEscape(phImg.src) + '">' +
+          '</div>' +
+          '<div class="lp-id-controls" aria-label="Profile image controls">' +
+            '<label class="lp-id-file-label" title="Replace profile image">Change' +
+              '<input type="file" accept="image/*" id="ph-profile-image-input">' +
+            '</label>' +
+            '<button type="button" class="lp-id-btn lp-id-btn-danger" id="ph-profile-image-remove">Remove</button>' +
+          '</div>' +
+        '</div>';
+      } else {
+        phSlotHtml = '<div class="lp-hero-slot-wrap">' +
+          '<div class="lp-hero-slot" title="Profile image slot">' +
+            '<span class="lp-hero-slot-glyph" aria-hidden="true">◯</span>' +
+            '<span class="lp-hero-slot-label">Profile<br>image</span>' +
+          '</div>' +
+          '<div class="lp-id-controls" aria-label="Profile image controls">' +
+            '<label class="lp-id-file-label" title="Upload profile image">Upload profile image' +
+              '<input type="file" accept="image/*" id="ph-profile-image-input">' +
+            '</label>' +
+          '</div>' +
+        '</div>';
+      }
       var html = '<section class="ph-hero" aria-label="Home threshold">' +
-        '<div class="lp-hero-slot" title="Profile image slot">' +
-          '<span class="lp-hero-slot-glyph" aria-hidden="true">◯</span>' +
-          '<span class="lp-hero-slot-label">Profile<br>image</span>' +
-        '</div>' +
+        phSlotHtml +
         '<div class="ph-hero-text">' +
           '<p class="ph-hero-eyebrow">Personal Home · threshold</p>' +
           '<h3 class="ph-hero-name">' + lpEscape(heading) + '</h3>' +
@@ -11446,6 +11588,11 @@ if (document.readyState === 'loading') {
           });
         }
       );
+
+      // Wire profile image upload + remove controls on the threshold.
+      if (typeof window.wireProfileImageControls === 'function') {
+        window.wireProfileImageControls('ph-profile-image-input', 'ph-profile-image-remove');
+      }
     }
 
     function openWebsitePreview() {
@@ -11646,6 +11793,66 @@ if (document.readyState === 'loading') {
       html += '</div>';
       return html;
     }
+
+    // Shared wiring for the profile image upload/remove controls used
+    // by both the Living Profile and Personal Home threshold previews.
+    // Re-renders both surfaces on change so the slot updates everywhere.
+    function wireProfileImageControls(inputId, removeBtnId) {
+      var inp = document.getElementById(inputId);
+      if (inp) {
+        inp.addEventListener('change', function (e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          compressImageFile(file).then(function (res) {
+            setProfileImage(res.src);
+            try { if (typeof window.refreshIdentityMediaSurfaces === 'function') window.refreshIdentityMediaSurfaces(); } catch (_) {}
+          }).catch(function (err) {
+            if (typeof showToast === 'function') showToast('Could not load image: ' + (err && err.message ? err.message : 'unknown error'));
+          });
+        });
+      }
+      var rm = document.getElementById(removeBtnId);
+      if (rm) {
+        rm.addEventListener('click', function () {
+          removeProfileImage();
+          try { if (typeof window.refreshIdentityMediaSurfaces === 'function') window.refreshIdentityMediaSurfaces(); } catch (_) {}
+        });
+      }
+    }
+    function refreshIdentityMediaSurfaces() {
+      try {
+        if (typeof renderLivingProfile === 'function' &&
+            document.getElementById('living-profile-modal') &&
+            document.getElementById('living-profile-modal').classList.contains('is-open')) {
+          renderLivingProfile();
+        }
+      } catch (_) {}
+      try {
+        if (typeof renderWebsitePreview === 'function' &&
+            document.getElementById('website-preview-modal') &&
+            document.getElementById('website-preview-modal').classList.contains('is-open')) {
+          renderWebsitePreview();
+        }
+      } catch (_) {}
+    }
+    window.wireProfileImageControls     = wireProfileImageControls;
+    window.refreshIdentityMediaSurfaces  = refreshIdentityMediaSurfaces;
+    // Testing helpers — wrap the bare setters so direct console use
+    // also re-renders any open previews. Capture local refs first to
+    // avoid recursion (top-level fns become window props).
+    var _setProfileImage    = setProfileImage;
+    var _removeProfileImage = removeProfileImage;
+    window.setProfileImage = function (src) {
+      var out = _setProfileImage(src);
+      try { refreshIdentityMediaSurfaces(); } catch (_) {}
+      return out;
+    };
+    window.removeProfileImage = function () {
+      var out = _removeProfileImage();
+      try { refreshIdentityMediaSurfaces(); } catch (_) {}
+      return out;
+    };
+    window.getProfileImage              = getProfileImage;
 
     // Refresh open Living Profile / Personal Home previews after an edit
     // so the gallery stays in sync without re-opening the modal.
@@ -11948,6 +12155,24 @@ if (document.readyState === 'loading') {
         },
         open:    function () { if (typeof window.openStudioWindow === 'function') window.openStudioWindow(); },
         render:  function (mode) { return (typeof window.renderStudioWindow === 'function') ? window.renderStudioWindow(mode) : ''; }
+      };
+      // Identity media namespace — profile image upload slot used by
+      // Living Profile + Personal Home threshold. v0.1 stores a
+      // compressed data URL with the session; src is opaque so a
+      // future hosted URL can drop in without caller changes.
+      window.CommonUnity.identityMedia = {
+        version: '0.1',
+        get:     function () { return getProfileImage(); },
+        set:     function (src) {
+          var out = setProfileImage(src);
+          if (typeof window.refreshIdentityMediaSurfaces === 'function') window.refreshIdentityMediaSurfaces();
+          return out;
+        },
+        remove:  function () {
+          var out = removeProfileImage();
+          if (typeof window.refreshIdentityMediaSurfaces === 'function') window.refreshIdentityMediaSurfaces();
+          return out;
+        }
       };
     } catch (_) {}
   }
