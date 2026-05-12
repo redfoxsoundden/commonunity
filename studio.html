@@ -4414,7 +4414,48 @@ input, textarea { font: inherit; color: inherit; }
   inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
+  object-position: var(--lp-hero-img-x, 50%) var(--lp-hero-img-y, 50%);
+  transform: scale(var(--lp-hero-img-zoom, 1));
+  transform-origin: var(--lp-hero-img-x, 50%) var(--lp-hero-img-y, 50%);
   display: block;
+}
+/* Profile fit (crop/reposition) panel. Sits below Change/Remove and
+   tweaks object-position + a CSS scale via custom properties on the
+   slot. Non-destructive — original data URL is preserved. */
+.lp-id-fit {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  width: min(220px, 80vw);
+  padding: 8px 10px;
+  margin-top: 4px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 40%, var(--border));
+  background: color-mix(in srgb, var(--input-bg) 75%, transparent);
+}
+.lp-id-fit.is-open { display: flex; }
+.lp-id-fit-row {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.lp-id-fit-row input[type="range"] { width: 100%; }
+.lp-id-fit-row .lp-id-fit-val {
+  font-variant-numeric: tabular-nums;
+  font-size: 9px;
+  min-width: 2.5em;
+  text-align: right;
+  opacity: 0.8;
+}
+.lp-id-fit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 2px;
 }
 .lp-hero-slot-wrap {
   display: flex;
@@ -6424,7 +6465,29 @@ function ensureIdentityMedia() {
   } else if (typeof state.identityMedia.profileImage === 'undefined') {
     state.identityMedia.profileImage = null;
   }
+  // Back-fill fit on legacy entries so callers can rely on shape.
+  if (state.identityMedia.profileImage && !state.identityMedia.profileImage.fit) {
+    state.identityMedia.profileImage.fit = defaultProfileImageFit();
+  }
   return state.identityMedia;
+}
+
+// Defaults for non-destructive crop/reposition. x/y are percentages
+// (0–100) passed through to CSS `object-position`; zoom is a unit
+// scale (1 = fit, >1 = zoom in) applied as a CSS transform on the
+// <img>. Stored on the profile image so future surfaces can reuse.
+function defaultProfileImageFit() { return { x: 50, y: 50, zoom: 1 }; }
+
+function clampProfileImageFit(fit) {
+  var d = defaultProfileImageFit();
+  var src = (fit && typeof fit === 'object') ? fit : {};
+  var x = typeof src.x === 'number' && isFinite(src.x) ? src.x : d.x;
+  var y = typeof src.y === 'number' && isFinite(src.y) ? src.y : d.y;
+  var z = typeof src.zoom === 'number' && isFinite(src.zoom) ? src.zoom : d.zoom;
+  if (x < 0) x = 0; else if (x > 100) x = 100;
+  if (y < 0) y = 0; else if (y > 100) y = 100;
+  if (z < 1) z = 1; else if (z > 3) z = 3;
+  return { x: x, y: y, zoom: z };
 }
 
 function getProfileImage() {
@@ -6436,7 +6499,12 @@ function setProfileImage(src) {
   var im = ensureIdentityMedia();
   if (!src) { im.profileImage = null; }
   else {
-    im.profileImage = { src: src, createdAt: new Date().toISOString() };
+    var prevFit = im.profileImage && im.profileImage.fit;
+    im.profileImage = {
+      src: src,
+      createdAt: new Date().toISOString(),
+      fit: clampProfileImageFit(prevFit || defaultProfileImageFit())
+    };
   }
   try { if (typeof saveState === 'function') saveState(); } catch (_) {}
   return im.profileImage;
@@ -6444,6 +6512,20 @@ function setProfileImage(src) {
 
 function removeProfileImage() {
   return setProfileImage(null);
+}
+
+function getProfileImageFit() {
+  var im = ensureIdentityMedia();
+  if (!im.profileImage) return null;
+  return clampProfileImageFit(im.profileImage.fit || defaultProfileImageFit());
+}
+
+function setProfileImageFit(fit) {
+  var im = ensureIdentityMedia();
+  if (!im.profileImage) return null;
+  im.profileImage.fit = clampProfileImageFit(fit || defaultProfileImageFit());
+  try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+  return im.profileImage.fit;
 }
 
 // ============================================================
@@ -10901,15 +10983,15 @@ if (document.readyState === 'loading') {
       var slotHtml;
       if (pImg && pImg.src) {
         slotHtml = '<div class="lp-hero-slot-wrap">' +
-          '<div class="lp-hero-slot has-image" title="Profile image">' +
-            '<img class="lp-hero-slot-img" alt="' + lpEscape(pAlt) + '" src="' + lpEscape(pImg.src) + '">' +
-          '</div>' +
+          renderProfileImageSlot(pImg, pAlt) +
           '<div class="lp-id-controls" aria-label="Profile image controls">' +
             '<label class="lp-id-file-label" title="Replace profile image">Change' +
               '<input type="file" accept="image/*" id="lp-profile-image-input">' +
             '</label>' +
+            '<button type="button" class="lp-id-btn" id="lp-profile-image-adjust" aria-expanded="false" aria-controls="lp-profile-image-fit">Adjust</button>' +
             '<button type="button" class="lp-id-btn lp-id-btn-danger" id="lp-profile-image-remove">Remove</button>' +
           '</div>' +
+          renderProfileImageFitPanel('lp', pImg.fit || defaultProfileImageFit()) +
         '</div>';
       } else {
         slotHtml = '<div class="lp-hero-slot-wrap">' +
@@ -11154,6 +11236,9 @@ if (document.readyState === 'loading') {
       // compressed client-side (max ~1100px, jpeg ~0.78) and saved
       // with the session — hosted media arrives later.
       wireProfileImageControls('lp-profile-image-input', 'lp-profile-image-remove');
+      if (typeof wireProfileImageFitControls === 'function') {
+        wireProfileImageFitControls('lp');
+      }
 
       // Wire collapsible source notes toggle — toggles a CSS class
       // on the card so per-section provenance chips show too.
@@ -11433,15 +11518,15 @@ if (document.readyState === 'loading') {
       var phSlotHtml;
       if (phImg && phImg.src) {
         phSlotHtml = '<div class="lp-hero-slot-wrap">' +
-          '<div class="lp-hero-slot has-image" title="Profile image">' +
-            '<img class="lp-hero-slot-img" alt="' + lpEscape(phAlt) + '" src="' + lpEscape(phImg.src) + '">' +
-          '</div>' +
+          renderProfileImageSlot(phImg, phAlt) +
           '<div class="lp-id-controls" aria-label="Profile image controls">' +
             '<label class="lp-id-file-label" title="Replace profile image">Change' +
               '<input type="file" accept="image/*" id="ph-profile-image-input">' +
             '</label>' +
+            '<button type="button" class="lp-id-btn" id="ph-profile-image-adjust" aria-expanded="false" aria-controls="ph-profile-image-fit">Adjust</button>' +
             '<button type="button" class="lp-id-btn lp-id-btn-danger" id="ph-profile-image-remove">Remove</button>' +
           '</div>' +
+          renderProfileImageFitPanel('ph', phImg.fit || defaultProfileImageFit()) +
         '</div>';
       } else {
         phSlotHtml = '<div class="lp-hero-slot-wrap">' +
@@ -11592,6 +11677,9 @@ if (document.readyState === 'loading') {
       // Wire profile image upload + remove controls on the threshold.
       if (typeof window.wireProfileImageControls === 'function') {
         window.wireProfileImageControls('ph-profile-image-input', 'ph-profile-image-remove');
+      }
+      if (typeof window.wireProfileImageFitControls === 'function') {
+        window.wireProfileImageFitControls('ph');
       }
     }
 
@@ -11794,6 +11882,115 @@ if (document.readyState === 'loading') {
       return html;
     }
 
+    // Renders the round profile slot with the image, applying any
+    // stored fit (object-position + scale) via CSS custom properties
+    // on the slot itself. Non-destructive: original data URL is kept.
+    function renderProfileImageSlot(img, alt) {
+      var fit = clampProfileImageFit((img && img.fit) || defaultProfileImageFit());
+      var style = '--lp-hero-img-x:' + fit.x + '%;' +
+                  '--lp-hero-img-y:' + fit.y + '%;' +
+                  '--lp-hero-img-zoom:' + fit.zoom + ';';
+      return '<div class="lp-hero-slot has-image" title="Profile image" style="' + style + '">' +
+        '<img class="lp-hero-slot-img" alt="' + lpEscape(alt || 'Profile image') + '" src="' + lpEscape((img && img.src) || '') + '">' +
+      '</div>';
+    }
+
+    // Inline fit panel — two sliders (x/y), one zoom, reset + done.
+    // Hidden until the user opens it via the Adjust button. Re-uses
+    // the slot's CSS variables so the preview updates live without a
+    // full re-render of the surrounding card.
+    function renderProfileImageFitPanel(prefix, fit) {
+      var f = clampProfileImageFit(fit || defaultProfileImageFit());
+      return '<div class="lp-id-fit" id="' + prefix + '-profile-image-fit" role="group" aria-label="Adjust profile image position">' +
+        '<div class="lp-id-fit-row">' +
+          '<label for="' + prefix + '-profile-image-fit-x">Left ↔ Right</label>' +
+          '<input type="range" id="' + prefix + '-profile-image-fit-x" min="0" max="100" step="1" value="' + f.x + '" aria-label="Horizontal position">' +
+          '<span class="lp-id-fit-val" data-fit-val="x">' + Math.round(f.x) + '%</span>' +
+        '</div>' +
+        '<div class="lp-id-fit-row">' +
+          '<label for="' + prefix + '-profile-image-fit-y">Up ↕ Down</label>' +
+          '<input type="range" id="' + prefix + '-profile-image-fit-y" min="0" max="100" step="1" value="' + f.y + '" aria-label="Vertical position">' +
+          '<span class="lp-id-fit-val" data-fit-val="y">' + Math.round(f.y) + '%</span>' +
+        '</div>' +
+        '<div class="lp-id-fit-row">' +
+          '<label for="' + prefix + '-profile-image-fit-zoom">Zoom</label>' +
+          '<input type="range" id="' + prefix + '-profile-image-fit-zoom" min="1" max="3" step="0.05" value="' + f.zoom + '" aria-label="Zoom level">' +
+          '<span class="lp-id-fit-val" data-fit-val="zoom">' + f.zoom.toFixed(2) + '×</span>' +
+        '</div>' +
+        '<div class="lp-id-fit-actions">' +
+          '<button type="button" class="lp-id-btn" id="' + prefix + '-profile-image-fit-reset">Reset</button>' +
+          '<button type="button" class="lp-id-btn" id="' + prefix + '-profile-image-fit-done">Done</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // Wires the Adjust toggle, sliders, reset, and done controls for
+    // a given prefix ('lp' or 'ph'). Live updates the slot's CSS vars
+    // and persists via setProfileImageFit on each change. No re-render
+    // of the host surface is needed during dragging.
+    function wireProfileImageFitControls(prefix) {
+      var adjustBtn = document.getElementById(prefix + '-profile-image-adjust');
+      var panel     = document.getElementById(prefix + '-profile-image-fit');
+      if (!adjustBtn || !panel) return;
+      var slot = panel.parentNode && panel.parentNode.querySelector
+        ? panel.parentNode.querySelector('.lp-hero-slot.has-image')
+        : null;
+      function findSlot() {
+        if (slot) return slot;
+        slot = panel.parentNode && panel.parentNode.querySelector
+          ? panel.parentNode.querySelector('.lp-hero-slot.has-image')
+          : null;
+        return slot;
+      }
+      adjustBtn.addEventListener('click', function () {
+        var open = panel.classList.toggle('is-open');
+        adjustBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      var xIn   = document.getElementById(prefix + '-profile-image-fit-x');
+      var yIn   = document.getElementById(prefix + '-profile-image-fit-y');
+      var zIn   = document.getElementById(prefix + '-profile-image-fit-zoom');
+      var xVal  = panel.querySelector('[data-fit-val="x"]');
+      var yVal  = panel.querySelector('[data-fit-val="y"]');
+      var zVal  = panel.querySelector('[data-fit-val="zoom"]');
+      function apply() {
+        var fit = clampProfileImageFit({
+          x: xIn ? parseFloat(xIn.value) : 50,
+          y: yIn ? parseFloat(yIn.value) : 50,
+          zoom: zIn ? parseFloat(zIn.value) : 1
+        });
+        var host = findSlot();
+        if (host) {
+          host.style.setProperty('--lp-hero-img-x', fit.x + '%');
+          host.style.setProperty('--lp-hero-img-y', fit.y + '%');
+          host.style.setProperty('--lp-hero-img-zoom', String(fit.zoom));
+        }
+        if (xVal) xVal.textContent = Math.round(fit.x) + '%';
+        if (yVal) yVal.textContent = Math.round(fit.y) + '%';
+        if (zVal) zVal.textContent = fit.zoom.toFixed(2) + '×';
+        try { setProfileImageFit(fit); } catch (_) {}
+      }
+      if (xIn) xIn.addEventListener('input', apply);
+      if (yIn) yIn.addEventListener('input', apply);
+      if (zIn) zIn.addEventListener('input', apply);
+      var resetBtn = document.getElementById(prefix + '-profile-image-fit-reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+          var d = defaultProfileImageFit();
+          if (xIn) xIn.value = String(d.x);
+          if (yIn) yIn.value = String(d.y);
+          if (zIn) zIn.value = String(d.zoom);
+          apply();
+        });
+      }
+      var doneBtn = document.getElementById(prefix + '-profile-image-fit-done');
+      if (doneBtn) {
+        doneBtn.addEventListener('click', function () {
+          panel.classList.remove('is-open');
+          adjustBtn.setAttribute('aria-expanded', 'false');
+        });
+      }
+    }
+
     // Shared wiring for the profile image upload/remove controls used
     // by both the Living Profile and Personal Home threshold previews.
     // Re-renders both surfaces on change so the slot updates everywhere.
@@ -11836,6 +12033,7 @@ if (document.readyState === 'loading') {
       } catch (_) {}
     }
     window.wireProfileImageControls     = wireProfileImageControls;
+    window.wireProfileImageFitControls   = wireProfileImageFitControls;
     window.refreshIdentityMediaSurfaces  = refreshIdentityMediaSurfaces;
     // Testing helpers — wrap the bare setters so direct console use
     // also re-renders any open previews. Capture local refs first to
@@ -11853,6 +12051,13 @@ if (document.readyState === 'loading') {
       return out;
     };
     window.getProfileImage              = getProfileImage;
+    var _setProfileImageFit = setProfileImageFit;
+    window.setProfileImageFit = function (fit) {
+      var out = _setProfileImageFit(fit);
+      try { refreshIdentityMediaSurfaces(); } catch (_) {}
+      return out;
+    };
+    window.getProfileImageFit           = getProfileImageFit;
 
     // Refresh open Living Profile / Personal Home previews after an edit
     // so the gallery stays in sync without re-opening the modal.
@@ -12170,6 +12375,12 @@ if (document.readyState === 'loading') {
         },
         remove:  function () {
           var out = removeProfileImage();
+          if (typeof window.refreshIdentityMediaSurfaces === 'function') window.refreshIdentityMediaSurfaces();
+          return out;
+        },
+        getFit:  function () { return getProfileImageFit(); },
+        setFit:  function (fit) {
+          var out = setProfileImageFit(fit);
           if (typeof window.refreshIdentityMediaSurfaces === 'function') window.refreshIdentityMediaSurfaces();
           return out;
         }
