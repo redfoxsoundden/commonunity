@@ -4350,9 +4350,9 @@ input, textarea { font: inherit; color: inherit; }
   position: relative;
   display: grid;
   grid-template-columns: 132px 1fr 132px;
-  gap: clamp(var(--space-4), 3vw, var(--space-6));
+  gap: clamp(var(--space-5), 4vw, var(--space-7));
   align-items: center;
-  padding: clamp(var(--space-5), 3vw, var(--space-7)) clamp(var(--space-5), 3vw, var(--space-6));
+  padding: clamp(var(--space-5), 3vw, var(--space-7)) clamp(var(--space-6), 4vw, var(--space-8));
   border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
   border-radius: 18px;
   background:
@@ -5401,26 +5401,59 @@ input, textarea { font: inherit; color: inherit; }
 /* Generous internal stacking — give the modal more breathing room
    between hero / compass / foundation / door / editorial sections.  */
 .lp-modal-card.is-v3 .builder-modal-head { margin-bottom: var(--space-5); }
-/* Branded modal frame: CU lockup pinned left, Living Profile title in
-   the middle, close (×) on the right. A faint underline separates the
-   branded frame from the person's identity hero below. */
+/* Branded modal frame: CU lockup pinned left, Living Profile title
+   fully right-justified. Close (×) sits above/outside the brand row
+   so it does not crowd the info (i) glyph next to the title. */
 .lp-modal-head {
   align-items: center;
   gap: var(--space-4);
+  padding-top: var(--space-5);
   padding-bottom: var(--space-3);
   border-bottom: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 18%, var(--border));
+  position: relative;
 }
-.lp-modal-head .lp-brand { opacity: 0.92; flex-shrink: 0; }
+/* CommonUnity lockup ~20% larger than the standard small wordmark. */
+.lp-modal-head .lp-brand { opacity: 0.95; flex-shrink: 0; }
+.lp-modal-head .lp-brand.cu-wordmark-sm .cu-lockup { height: 20px; }
 .lp-modal-head .lp-title-row {
   margin-left: auto;
-  margin-right: auto;
+  margin-right: 0;
+  justify-content: flex-end;
 }
 .lp-modal-head .lp-title-row .builder-modal-title { margin: 0; }
+/* Pull the close (×) up out of the brand row so it no longer competes
+   with the glowing info (i) sitting beside the title. */
+.lp-modal-head .builder-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+}
 @media (max-width: 640px) {
-  .lp-modal-head .lp-title-row { margin-left: 0; margin-right: auto; }
+  .lp-modal-head .lp-title-row { margin-left: auto; margin-right: 0; }
 }
 .lp-modal-card.is-v3 .lp-hero { margin-bottom: 4px; }
+.lp-modal-card.is-v3 .lp-top-cta { margin-top: var(--space-4); }
 .lp-modal-card.is-v3 .lp-compass { margin-top: var(--space-6); }
+
+/* Primary engagement band, just under the hero. Same chip styling
+   as the doorway actions, but pulled up so visitors can find the
+   Book a meeting / Knock affordances immediately. */
+.lp-top-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Quiet eyebrow that demotes the expanded fourfold summaries so they
+   read as supporting depth, not a second profile body. */
+.lp-expanded-eyebrow {
+  margin: var(--space-6) 0 var(--space-2);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
 .lp-modal-card.is-v3 .lp-foundation { margin-top: var(--space-6); }
 .lp-modal-card.is-v3 .lp-door { margin-top: var(--space-6); }
 .lp-modal-card.is-v3 .lp-studio-window { margin-top: var(--space-6); }
@@ -10685,13 +10718,21 @@ if (document.readyState === 'loading') {
       );
       if (f && l) return f + ' ' + l;
 
+      // 1b) Companion (first-name anchor) + explicit last name on profile —
+      // common shape for sessions that carry only `companion: "Vesna"` plus
+      // a separate `profile.last_name: "Lucca"`.
+      var companionTrim = String(companion || '').trim();
+      if (companionTrim && l && !/\s/.test(companionTrim)) {
+        return companionTrim + ' ' + l;
+      }
+
       // 2) Full / display / name fields on the profile.
       var full = cleanName(p.full_name || p.fullName || p.display_name || p.displayName || p.name);
       if (full && /\s/.test(full)) return full;
       // Single-word full_name still wins over companion when companion is empty.
       if (full && !companion) return full;
       // If we have just a first from explicit field, treat it as our companion seed.
-      var first = String(companion || '').trim() || f || full || '';
+      var first = companionTrim || f || full || '';
       if (!first) return '';
 
       // 3) Mine transcripts/source text for "First Last(s)" right after first name.
@@ -10988,9 +11029,16 @@ if (document.readyState === 'loading') {
       profile = profile || {};
       points  = points  || {};
       var p   = profile;
-      var hd  = p.human_design || p.humanDesign || {};
-      var astro = p.astrology || p.astro || {};
-      var gk  = p.gene_keys || p.geneKeys || {};
+      // Allow nested cosmic blocks under profile OR top-level on
+      // compassData so older intake/export shapes still feed the
+      // foundation layer. State-level birthData (Studio calculator
+      // output) is also a valid source for dob/pob.
+      var cd  = (window.state && window.state.compassData) || {};
+      var bd  = (window.state && window.state.birthData) || {};
+      var foundationBlock = p.foundation || cd.foundation || {};
+      var hd  = p.human_design || p.humanDesign || foundationBlock.human_design || foundationBlock.humanDesign || {};
+      var astro = p.astrology || p.astro || foundationBlock.astrology || foundationBlock.astro || {};
+      var gk  = p.gene_keys || p.geneKeys || foundationBlock.gene_keys || foundationBlock.geneKeys || {};
 
       function strOrEmpty(v) {
         if (v == null) return '';
@@ -11021,12 +11069,33 @@ if (document.readyState === 'loading') {
       var hdProfile = strOrEmpty(hd.profile);
       var hdLine    = joinNonEmpty([hdType, hdProfile ? hdProfile + ' profile' : '']);
 
+      // Each row falls back through: profile field → nested foundation
+      // block → top-level compassData → state.birthData. This means a
+      // session imported with bare top-level fields (`dob`, `pob`) or
+      // only the Studio calculator output still fills the foundation.
+      var birthday = strOrEmpty(
+        p.birthdate || p.birthday || p.date_of_birth || p.dateOfBirth || p.dob ||
+        foundationBlock.birthdate || foundationBlock.birthday || foundationBlock.date_of_birth || foundationBlock.dob ||
+        cd.birthdate || cd.birthday || cd.date_of_birth || cd.dob ||
+        bd.dob
+      );
+      var birthplace = strOrEmpty(
+        p.birthplace || p.place_of_birth || p.placeOfBirth || p.pob ||
+        foundationBlock.birthplace || foundationBlock.place_of_birth || foundationBlock.pob ||
+        cd.birthplace || cd.place_of_birth || cd.pob ||
+        bd.pob
+      );
+      var currentLocation = strOrEmpty(
+        p.current_location || p.currentLocation || p.location || p.city ||
+        foundationBlock.current_location || foundationBlock.location || foundationBlock.city ||
+        cd.current_location || cd.location || cd.city
+      );
       var items = [
-        { key: 'Birthday',         val: strOrEmpty(p.birthdate || p.birthday || p.date_of_birth || p.dateOfBirth || p.dob) },
-        { key: 'Birthplace',       val: strOrEmpty(p.birthplace || p.place_of_birth || p.placeOfBirth || p.pob) },
-        { key: 'Currently in',     val: strOrEmpty(p.current_location || p.currentLocation || p.location || p.city) },
-        { key: 'Human Design',     val: hdLine },
-        { key: 'Gene Keys',        val: gkLifeWork },
+        { key: 'Birthday',            val: birthday },
+        { key: 'Birthplace',          val: birthplace },
+        { key: 'Currently in',        val: currentLocation },
+        { key: 'Human Design',        val: hdLine },
+        { key: 'Gene Keys',           val: gkLifeWork },
         { key: 'Sun · Moon · Rising', val: joinNonEmpty([astro.sun, astro.moon, astro.rising]) }
       ];
       return items;
@@ -11057,10 +11126,35 @@ if (document.readyState === 'loading') {
       if (profile.communities && profile.communities.length) {
         contextBits.push('Communities: ' + lpJoin(profile.communities));
       }
+      // Strip prompt-hangover from captured name-context. Captures
+      // sometimes land with the prompt itself embedded ("> Beyond your
+      // name: what wider context do you stand in?…"). Drop any leading
+      // quote-marker, then drop a leading sentence that ends in '?' —
+      // that is almost always the prompt question, not the answer.
+      function cleanNameContext(s) {
+        s = String(s || '').trim();
+        if (!s) return '';
+        s = s.replace(/^[>›»\-•*\s]+/, '').trim();
+        // If it still opens with a question, drop everything up to the '?'.
+        var qIdx = s.indexOf('?');
+        if (qIdx > -1 && qIdx < s.length - 1) {
+          var head = s.slice(0, qIdx + 1);
+          // Heuristic: a leading sentence with "what|who|where|how|why"
+          // followed by '?' is prompt residue, not user content.
+          if (/^[^.!]*\b(what|who|where|how|why|when|which)\b[^.!?]*\?$/i.test(head)) {
+            s = s.slice(qIdx + 1).trim();
+          }
+        }
+        // Drop residue starting with the known prompt phrasing even if
+        // the user typed a long answer afterwards.
+        s = s.replace(/^Beyond your name[^.!?]*[?.!]\s*/i, '').trim();
+        return s;
+      }
+      var cleanedCapName = cleanNameContext(capName);
       var nameSection = {
         name: personName || '',
-        context: lpFirst(capName, contextBits.length ? contextBits.join(' · ') : ''),
-        source: capName ? (contextBits.length ? 'mixed' : 'captured')
+        context: lpFirst(cleanedCapName, contextBits.length ? contextBits.join(' · ') : ''),
+        source: cleanedCapName ? (contextBits.length ? 'mixed' : 'captured')
                         : (contextBits.length ? 'compass' : 'empty')
       };
 
@@ -11375,7 +11469,6 @@ if (document.readyState === 'loading') {
       html += '<section class="lp-hero" aria-label="Threshold identity">' +
         slotHtml +
         '<div class="lp-hero-text">' +
-          '<p class="lp-hero-eyebrow">Doorway · into the CommonUnity field</p>' +
           '<h3 class="lp-hero-name">' + lpEscape(idName) + '</h3>' +
           (idEssence ? '<p class="lp-hero-essence">' + lpEscape(idEssence) + '</p>' : '') +
           rolesHtml +
@@ -11385,6 +11478,28 @@ if (document.readyState === 'loading') {
           '<span class="lp-hero-slot-glyph" aria-hidden="true">ॐ</span>' +
           '<span class="lp-hero-slot-label">Digital key<br>· sigil</span>' +
         '</div>' +
+      '</section>';
+
+      // ── Primary engagement CTAs — placed directly after the
+      // identity hero so visitors can find them immediately. The
+      // fuller "At the door" content remains lower for context.
+      var topProfile = ((window.state && window.state.compassData) || {}).profile || {};
+      var topCalendar = String(topProfile.calendar_url || topProfile.calendly_url || topProfile.scheduling_url || '').trim();
+      var topEmail = String(topProfile.email || topProfile.contact_email || '').trim();
+      var topCalHref = /^https?:\/\//i.test(topCalendar) ? topCalendar : '';
+      var topMeetingHref = topCalHref
+        || (topEmail ? ('mailto:' + topEmail + '?subject=' + encodeURIComponent('Book a meeting — ' + idName)) : '');
+      html += '<section class="lp-top-cta" aria-label="Primary engagement">' +
+        (topMeetingHref
+          ? '<a class="lp-door-action" href="' + lpEscape(topMeetingHref) + '" target="_blank" rel="noopener">' +
+              '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
+            '</a>'
+          : '<button type="button" class="lp-door-action" id="lp-door-meeting-top">' +
+              '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
+            '</button>') +
+        '<button type="button" class="lp-door-action" id="lp-door-knock-top">' +
+          '<span class="lp-door-action-glyph" aria-hidden="true">☍</span>Knock' +
+        '</button>' +
       '</section>';
 
       // ── Foundational / cosmic identity layer ───────────────
@@ -11448,7 +11563,7 @@ if (document.readyState === 'loading') {
         ? 'mailto:' + lpEscape(doorEmail) + '?subject=' + encodeURIComponent('Knock — ' + (s.nameContext.name || 'CommonUnity'))
         : '';
       var calHref = /^https?:\/\//i.test(doorCalendar) ? doorCalendar : '';
-      var meetingHref = calHref || (knockHref ? knockHref + '%20%E2%80%94%20studio%20hours' : '');
+      var meetingHref = calHref || (knockHref ? knockHref + '%20%E2%80%94%20book%20a%20meeting' : '');
       var contactHref = /^https?:\/\//i.test(doorContactUrl) ? doorContactUrl : '';
       if (doorRows.length || true) {
         html += '<section class="lp-door" aria-label="At the door — ways to engage">' +
@@ -11486,7 +11601,7 @@ if (document.readyState === 'loading') {
                   '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
                 '</a>'
               : '<button type="button" class="lp-door-action" id="lp-door-meeting" aria-controls="lp-door-knock-state">' +
-                  '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Request studio hours' +
+                  '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
                 '</button>') +
             (calHref
               ? '<a class="lp-door-action" href="' + lpEscape(calHref) + '" target="_blank" rel="noopener">' +
@@ -11549,9 +11664,12 @@ if (document.readyState === 'loading') {
         '<div class="lp-coverage" style="margin-top:8px;">' + coverageChips + '</div>' +
       '</section>';
 
-      // ── Editorial body: two-column. Left = Name & context +
-      //    Essence, right = Role constellation. Below: work/lens
-      //    and field/call summaries pair editorially.
+      // ── Editorial body: expanded compass summaries only.
+      //    Name / context / essence / roles already live in the hero
+      //    above, so they are NOT repeated here. The fourfold
+      //    summaries are demoted under a single "Expanded summaries"
+      //    eyebrow so they read as supporting depth, not a second
+      //    profile.
       function renderSection(label, sec, sectionData, body) {
         var gkBadge = sectionData && sectionData._gk
           ? ' <span class="lp-section-source is-compass">GK ' + lpEscape(sectionData._gk) + '</span>'
@@ -11562,32 +11680,7 @@ if (document.readyState === 'loading') {
           body + '</section>';
       }
 
-      // Name & context (left), Essence line (right)
-      var nameBody = '';
-      if (s.nameContext.name || s.nameContext.context) {
-        if (s.nameContext.name)    nameBody += '<h3 class="lp-name">' + lpEscape(s.nameContext.name) + '</h3>';
-        if (s.nameContext.context) nameBody += '<p class="lp-context">' + lpEscape(s.nameContext.context) + '</p>';
-      } else {
-        nameBody = '<p class="lp-empty">Not enough source material yet — your name and the wider context you stand in will appear here.</p>';
-      }
-      var essenceBody = s.essence.value
-        ? '<p class="lp-essence">' + lpEscape(s.essence.value) + '</p>'
-        : '<p class="lp-empty">Not enough source material yet — one sentence a normal profile cannot hold.</p>';
-      html += '<div class="lp-editorial">' +
-        renderSection('Name &amp; context', 'work', s.nameContext, nameBody) +
-        renderSection('Essence line',        'lens', s.essence,     essenceBody) +
-      '</div>';
-
-      // Role constellation (full-width row)
-      var rolesBody;
-      if (s.roles.roles && s.roles.roles.length) {
-        rolesBody = '<ul class="lp-roles">' + s.roles.roles.map(function (r) {
-          return '<li>' + lpEscape(r) + '</li>';
-        }).join('') + '</ul>';
-      } else {
-        rolesBody = '<p class="lp-empty">Not enough source material yet — the roles you actually hold will appear here.</p>';
-      }
-      html += renderSection('Role constellation', 'work', s.roles, rolesBody);
+      html += '<div class="lp-expanded-eyebrow">Expanded summaries</div>';
 
       // Work / Lens and Field / Call paired editorially.
       function summaryBody(section, sec) {
@@ -11679,10 +11772,10 @@ if (document.readyState === 'loading') {
         wireProfileImageFitControls('lp');
       }
 
-      // Wire doorway action controls — Knock / Leave a note / Request
-      // studio hours. These are local-first prototypes: they do not
-      // pretend to send anything to a backend. Notes are kept in the
-      // browser session under localStorage so they survive reloads.
+      // Wire doorway action controls — Knock / Leave a note / Book a
+      // meeting. These are local-first prototypes: they do not pretend
+      // to send anything to a backend. Notes are kept in the browser
+      // session under localStorage so they survive reloads.
       var knockBtn       = document.getElementById('lp-door-knock');
       var meetingProtoBtn = document.getElementById('lp-door-meeting');
       var knockState     = document.getElementById('lp-door-knock-state');
@@ -11698,7 +11791,23 @@ if (document.readyState === 'loading') {
       }
       if (meetingProtoBtn && knockState) {
         meetingProtoBtn.addEventListener('click', function () {
-          setKnockState('Studio hours requested · this is a local prototype, no message is sent yet.');
+          setKnockState('Meeting requested · this is a local prototype, no message is sent yet.');
+        });
+      }
+      // Wire the primary engagement (top) CTAs — Book a meeting + Knock
+      // mirror the doorway buttons. The "Book a meeting" anchor is fully
+      // wired by href; the local-prototype fallback button shares the
+      // knock state with the doorway band so the state surfaces once.
+      var meetingTopBtn = document.getElementById('lp-door-meeting-top');
+      var knockTopBtn   = document.getElementById('lp-door-knock-top');
+      if (meetingTopBtn && knockState) {
+        meetingTopBtn.addEventListener('click', function () {
+          setKnockState('Meeting requested · this is a local prototype, no message is sent yet.');
+        });
+      }
+      if (knockTopBtn && knockState) {
+        knockTopBtn.addEventListener('click', function () {
+          setKnockState('You knocked. The studio noticed — this is a local prototype, no message is sent yet.');
         });
       }
       var noteToggle = document.getElementById('lp-door-note-toggle');
