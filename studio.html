@@ -3582,6 +3582,21 @@ input, textarea { font: inherit; color: inherit; }
   line-height: 1.6;
   max-width: 60ch;
 }
+.builder-modal-about { margin-top: 6px; }
+.builder-modal-about > summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 2px 0;
+}
+.builder-modal-about > summary::-webkit-details-marker { display: none; }
+.builder-modal-about > summary::after { content: ' ▾'; font-size: 9px; }
+.builder-modal-about[open] > summary::after { content: ' ▴'; }
+.builder-modal-about[open] > .builder-modal-lede { margin-top: 6px; }
 .builder-modal-close {
   appearance: none;
   background: transparent;
@@ -6107,13 +6122,15 @@ input, textarea { font: inherit; color: inherit; }
   <div class="builder-modal-card lp-modal-card is-v3" id="living-profile-card">
     <div class="builder-modal-head">
       <div>
-        <div class="builder-modal-eyebrow">Living Profile · v0.3 · Level 1 · Threshold</div>
-        <h2 class="builder-modal-title" id="living-profile-title">Your <em>doorway into the CommonUnity field.</em></h2>
-        <p class="builder-modal-lede" id="living-profile-lede">
-          A minimum viable digital self — the threshold card others meet
-          you through. Drafted locally from your Compass material and any
-          Field Notes you have captured. Honesty over performance.
-        </p>
+        <h2 class="builder-modal-title" id="living-profile-title">Living <em>Profile</em></h2>
+        <details class="builder-modal-about" id="living-profile-about">
+          <summary>About</summary>
+          <p class="builder-modal-lede" id="living-profile-lede">
+            Level 1 · Threshold (v0.3). A minimum viable digital self —
+            the threshold card others meet you through. Drafted locally
+            from your Compass material and Field Notes.
+          </p>
+        </details>
       </div>
       <button type="button" class="builder-modal-close" id="living-profile-close" aria-label="Close">×</button>
     </div>
@@ -10413,6 +10430,37 @@ if (document.readyState === 'loading') {
       return arr.map(function (x) { return String(x || '').trim(); })
                 .filter(Boolean).join(sep || ', ');
     }
+    // Resolve a full display name from companion + Compass source data.
+    // Companion (e.g. "Vesna") gives us a first-name anchor; we then
+    // look in transcripts/source text for "<companion> <Surname>", and
+    // fall back to the LinkedIn /in/<handle> slug. Returns the original
+    // companion string if no richer name can be inferred.
+    function lpResolveDisplayName(companion, profile, sourceText) {
+      var first = String(companion || '').trim();
+      if (!first) return '';
+      var firstEsc = first.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      var txt = String(sourceText || '');
+      if (txt) {
+        var rx = new RegExp('\\b' + firstEsc + '\\s+([A-Z][\\w\\-\']{1,})(?:\\s+([A-Z][\\w\\-\']{1,}))?\\b');
+        var m = txt.match(rx);
+        if (m) {
+          return [first, m[1], m[2]].filter(Boolean).join(' ');
+        }
+      }
+      var url = (profile && profile.linkedin_url) ? String(profile.linkedin_url) : '';
+      var hm = url.match(/linkedin\.com\/in\/([^/?#]+)/i);
+      if (hm) {
+        var parts = decodeURIComponent(hm[1]).split(/[-_]+/).filter(Boolean);
+        var firstLow = first.toLowerCase();
+        if (parts.length && parts[0].toLowerCase() === firstLow) {
+          var rest = parts.slice(1)
+            .filter(function (p) { return /^[a-z][a-z\-']*$/i.test(p) && p.length > 1; })
+            .map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); });
+          if (rest.length) return [first].concat(rest).join(' ');
+        }
+      }
+      return first;
+    }
     // Repair URLs that arrive whitespace-broken (e.g. "https: //foo")
     // and html-escape for safe display.
     function lpNormUrl(u) {
@@ -10681,7 +10729,8 @@ if (document.readyState === 'loading') {
       var pf = points.field || {};
       var pc = points.call  || {};
 
-      var personName = (window.state && window.state.person) || cd.companion || '';
+      var rawName = (window.state && window.state.person) || cd.companion || '';
+      var personName = lpResolveDisplayName(rawName, profile, transcriptsRawText(cd));
       var capName    = lpCaptureText('name-context');
 
       // ── Name & context ──────────────────────────────────────
@@ -11055,7 +11104,7 @@ if (document.readyState === 'loading') {
           '<header class="lp-door-head">' +
             '<span class="lp-door-eye">At the door</span>' +
             '<h3 class="lp-door-title">Ways to <em>engage</em></h3>' +
-            '<p class="lp-door-lede">Each visit is meant to be useful. Here is what is alive right now, what is on offer, and the threads worth pulling.</p>' +
+            '<p class="lp-door-lede">What is alive, what is on offer, and threads worth pulling.</p>' +
           '</header>' +
           '<ul class="lp-door-rows">' +
             doorRows.map(function (r) {
@@ -11068,7 +11117,7 @@ if (document.readyState === 'loading') {
               '</li>';
             }).join('') +
           '</ul>' +
-          '<p class="lp-door-foot">Scaffolding — knock on the door, leave a note, studio hours, and a calendar come later. For now, the doorway is open.</p>' +
+          '<p class="lp-door-foot">The doorway is open. Knock, notes, studio hours, and calendar come later.</p>' +
         '</section>';
       }
 
@@ -11328,7 +11377,8 @@ if (document.readyState === 'loading') {
       var pf = points.field || {};
       var pc = points.call  || {};
 
-      var personName = (window.state && window.state.person) || cd.companion || '';
+      var rawName = (window.state && window.state.person) || cd.companion || '';
+      var personName = lpResolveDisplayName(rawName, profile, transcriptsRawText(cd));
 
       // ── Threshold / hero ───────────────────────────────────
       // Prefer captured "threshold" + lens web heading; fall back to
