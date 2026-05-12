@@ -4349,10 +4349,10 @@ input, textarea { font: inherit; color: inherit; }
 .lp-hero {
   position: relative;
   display: grid;
-  grid-template-columns: 132px 1fr 132px;
+  grid-template-columns: 1fr minmax(160px, 200px);
   gap: clamp(var(--space-5), 4vw, var(--space-7));
   align-items: center;
-  padding: clamp(var(--space-5), 3vw, var(--space-7)) clamp(var(--space-6), 4vw, var(--space-8));
+  padding: clamp(var(--space-6), 3.5vw, var(--space-8)) clamp(var(--space-6), 4vw, var(--space-8));
   border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
   border-radius: 18px;
   background:
@@ -4378,7 +4378,7 @@ input, textarea { font: inherit; color: inherit; }
   .lp-hero { grid-template-columns: 1fr; text-align: center; }
 }
 .lp-hero-slot {
-  width: 132px; height: 132px;
+  width: 160px; height: 160px;
   border-radius: 50%;
   border: 1px dashed color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, var(--border));
   background: color-mix(in srgb, var(--input-bg) 55%, transparent);
@@ -5536,6 +5536,234 @@ input, textarea { font: inherit; color: inherit; }
   color: var(--text-faint);
   font-style: italic;
 }
+.lp-foundation-item[data-lp-edit] {
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.lp-foundation-item[data-lp-edit]:hover,
+.lp-foundation-item[data-lp-edit]:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, var(--border));
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 8%, var(--input-bg));
+}
+
+/* Field Imprints layout — sigil on the left, foundation grid on the right. */
+.lp-field-imprints-body {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: clamp(var(--space-4), 3vw, var(--space-6));
+  align-items: start;
+}
+@media (max-width: 720px) {
+  .lp-field-imprints-body { grid-template-columns: 1fr; justify-items: center; }
+}
+.lp-field-imprints-sigil { display: flex; justify-content: center; }
+.lp-field-imprints-sigil .lp-hero-slot.is-sigil {
+  width: 132px; height: 132px;
+}
+
+/* Hero edit row — small affordances under the hero text. */
+.lp-hero-edit-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0 0;
+}
+.lp-edit-btn {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 999px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+.lp-edit-btn:hover, .lp-edit-btn:focus-visible {
+  outline: none;
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, var(--border));
+}
+.lp-hero-essence[data-lp-edit] { cursor: pointer; }
+.lp-hero-essence.is-empty {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* Fourfold cards become clickable doorways into a detail popup. */
+.lp-compass-card[data-lp-fourfold] {
+  cursor: pointer;
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+.lp-compass-card[data-lp-fourfold]:hover,
+.lp-compass-card[data-lp-fourfold]:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 55%, var(--border));
+  box-shadow: 0 6px 22px -16px color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent);
+}
+
+/* Fourfold detail popup — lightweight overlay over the Living Profile modal. */
+.lp-fourfold-popup {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, #000 55%, transparent);
+  z-index: 1200;
+  padding: var(--space-4);
+}
+.lp-fourfold-popup.is-open { display: flex; }
+.lp-fourfold-popup-card {
+  position: relative;
+  max-width: 560px;
+  width: 100%;
+  max-height: 86vh;
+  overflow-y: auto;
+  padding: clamp(var(--space-5), 3vw, var(--space-7));
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
+  background: var(--bg, #1a1a22);
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.55);
+}
+.lp-fourfold-popup-card.s-work  { border-left: 4px solid var(--work,  #fbbf77); }
+.lp-fourfold-popup-card.s-lens  { border-left: 4px solid var(--lens,  #a5b4fc); }
+.lp-fourfold-popup-card.s-field { border-left: 4px solid var(--field, #86d4b1); }
+.lp-fourfold-popup-card.s-call  { border-left: 4px solid var(--call,  #f6a3b6); }
+.lp-fourfold-popup-eye {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  display: block;
+  margin-bottom: 6px;
+}
+.lp-fourfold-popup-title {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-3);
+  color: var(--text);
+}
+.lp-fourfold-popup-body { font-size: 14px; line-height: 1.6; color: var(--text); }
+.lp-fourfold-popup-body p { margin: 0 0 var(--space-2); }
+.lp-fourfold-popup-empty {
+  font-style: italic;
+  color: var(--text-faint);
+}
+.lp-fourfold-popup-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--space-3);
+  padding: 0; list-style: none;
+}
+.lp-fourfold-popup-tags li {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 28%, var(--border));
+  color: var(--text);
+}
+.lp-fourfold-popup-gk {
+  display: inline-block;
+  margin-top: var(--space-3);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 85%, var(--text-muted));
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, transparent);
+}
+.lp-fourfold-popup-close {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 60%, transparent);
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.lp-fourfold-popup-close:hover { color: var(--text); border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent); }
+
+/* Inline edit popover for foundation / hero fields. */
+.lp-edit-popover {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, #000 50%, transparent);
+  z-index: 1250;
+  padding: var(--space-4);
+}
+.lp-edit-popover.is-open { display: flex; }
+.lp-edit-popover-card {
+  background: var(--bg, #1a1a22);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
+  padding: var(--space-5);
+  width: min(420px, 92vw);
+  box-shadow: 0 20px 60px -16px rgba(0,0,0,0.55);
+}
+.lp-edit-popover-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 8px;
+}
+.lp-edit-popover-input,
+.lp-edit-popover-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 70%, transparent);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.lp-edit-popover-textarea { min-height: 80px; resize: vertical; }
+.lp-edit-popover-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-faint);
+  line-height: 1.45;
+}
+.lp-edit-popover-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+.lp-edit-popover-actions button {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 65%, transparent);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+.lp-edit-popover-actions .lp-edit-save {
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, var(--border));
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 14%, var(--input-bg));
+}
 
 /* ── Doorway action controls ───────────────────────────────── */
 .lp-door-actions {
@@ -5918,6 +6146,12 @@ input, textarea { font: inherit; color: inherit; }
       <span class="spb-dot" aria-hidden="true"></span>
       Studio Path
       <span class="spb-levels">L1·L2·L3</span>
+    </button>
+    <button type="button" class="studio-path-btn studio-path-lp-btn" id="studio-path-living-profile-header"
+            title="Open the Living Profile builder (Level 1)">
+      <span class="spb-dot" aria-hidden="true"></span>
+      Living Profile
+      <span class="spb-levels">L1</span>
     </button>
     </div>
 
@@ -6380,6 +6614,42 @@ input, textarea { font: inherit; color: inherit; }
       Drafted locally from Compass import + Field Notes captures.
       The doorway into your wider Personal Home — that is Level 2.
     </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     Living Profile · fourfold-card detail popup
+     Lightweight overlay that opens when a visitor clicks one of
+     the four compass cards (The Work / Lens / Field / Call).
+     Renders the expanded summary + tags + Gene Key, rather than
+     having a duplicate large block lower in the profile.
+     ============================================================ -->
+<div class="lp-fourfold-popup" id="lp-fourfold-popup" role="dialog" aria-modal="true" aria-labelledby="lp-fourfold-popup-title">
+  <div class="lp-fourfold-popup-card" id="lp-fourfold-popup-card">
+    <button type="button" class="lp-fourfold-popup-close" id="lp-fourfold-popup-close" aria-label="Close">×</button>
+    <span class="lp-fourfold-popup-eye" id="lp-fourfold-popup-eye">Compass</span>
+    <h3 class="lp-fourfold-popup-title" id="lp-fourfold-popup-title">The Work</h3>
+    <div class="lp-fourfold-popup-body" id="lp-fourfold-popup-body"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     Living Profile · inline edit popover
+     Small modal for editing a single Living Profile field
+     (foundation, hero essence, display name). Local-only — saves
+     into window.state.compassData.profile and persists via
+     saveState() to localStorage with the session.
+     ============================================================ -->
+<div class="lp-edit-popover" id="lp-edit-popover" role="dialog" aria-modal="true" aria-labelledby="lp-edit-popover-label">
+  <div class="lp-edit-popover-card">
+    <span class="lp-edit-popover-label" id="lp-edit-popover-label">Edit</span>
+    <input type="text" class="lp-edit-popover-input" id="lp-edit-popover-input" placeholder="Enter a value…">
+    <textarea class="lp-edit-popover-textarea" id="lp-edit-popover-textarea" placeholder="Enter a one-sentence essence…"></textarea>
+    <span class="lp-edit-popover-hint" id="lp-edit-popover-hint"></span>
+    <div class="lp-edit-popover-actions">
+      <button type="button" id="lp-edit-popover-cancel">Cancel</button>
+      <button type="button" class="lp-edit-save" id="lp-edit-popover-save">Save</button>
+    </div>
   </div>
 </div>
 
@@ -11091,12 +11361,12 @@ if (document.readyState === 'loading') {
         cd.current_location || cd.location || cd.city
       );
       var items = [
-        { key: 'Birthday',            val: birthday },
-        { key: 'Birthplace',          val: birthplace },
-        { key: 'Currently in',        val: currentLocation },
-        { key: 'Human Design',        val: hdLine },
-        { key: 'Gene Keys',           val: gkLifeWork },
-        { key: 'Sun · Moon · Rising', val: joinNonEmpty([astro.sun, astro.moon, astro.rising]) }
+        { key: 'Birthday',            val: birthday,        field: 'birthdate' },
+        { key: 'Birthplace',          val: birthplace,      field: 'birthplace' },
+        { key: 'Currently in',        val: currentLocation, field: 'current_location' },
+        { key: 'Human Design',        val: hdLine,          field: 'human_design' },
+        { key: 'Gene Keys',           val: gkLifeWork,      field: 'gene_keys' },
+        { key: 'Sun · Moon · Rising', val: joinNonEmpty([astro.sun, astro.moon, astro.rising]), field: 'astrology' }
       ];
       return items;
     }
@@ -11249,11 +11519,15 @@ if (document.readyState === 'loading') {
       };
 
       // ── Essence line ───────────────────────────────────────
+      // Manual override (profile.essence_manual) wins over both
+      // Field Notes captures and compass-derived headings so the
+      // profile owner can edit the hero one-sentence directly.
+      var manualEssence = String((profile && (profile.essence_manual || profile.essence)) || '').trim();
       var capEssence = lpCaptureText('essence-line');
       var essenceFromCompass = lpFirst(pl.web_heading, pl.theme, pw.web_heading);
       var essenceSection = {
-        value: capEssence || (essenceFromCompass ? lpTrim(essenceFromCompass, 200) : ''),
-        source: capEssence ? 'captured' : (essenceFromCompass ? 'compass' : 'empty')
+        value: manualEssence || capEssence || (essenceFromCompass ? lpTrim(essenceFromCompass, 200) : ''),
+        source: manualEssence ? 'captured' : (capEssence ? 'captured' : (essenceFromCompass ? 'compass' : 'empty'))
       };
 
       // ── Work / Lens / Field / Call summaries ───────────────
@@ -11466,18 +11740,23 @@ if (document.readyState === 'loading') {
           '</div>' +
         '</div>';
       }
+      // Hero composition: name + essence + roles + one-sentence
+      // statement on the LEFT, profile image slot on the RIGHT.
+      // The sigil has moved out of the hero into Field Imprints.
       html += '<section class="lp-hero" aria-label="Threshold identity">' +
-        slotHtml +
         '<div class="lp-hero-text">' +
-          '<h3 class="lp-hero-name">' + lpEscape(idName) + '</h3>' +
-          (idEssence ? '<p class="lp-hero-essence">' + lpEscape(idEssence) + '</p>' : '') +
+          '<h3 class="lp-hero-name" id="lp-hero-name-text">' + lpEscape(idName) + '</h3>' +
+          (idEssence
+            ? '<p class="lp-hero-essence" id="lp-hero-essence-text" data-lp-edit="essence" title="Click to edit">' + lpEscape(idEssence) + '</p>'
+            : '<p class="lp-hero-essence is-empty" id="lp-hero-essence-text" data-lp-edit="essence" title="Click to add a one-sentence essence">Add a one-sentence essence…</p>') +
           rolesHtml +
           (contextBits ? '<p class="lp-hero-context">' + contextBits + '</p>' : '') +
+          '<div class="lp-hero-edit-row">' +
+            '<button type="button" class="lp-edit-btn" id="lp-hero-edit-name" title="Edit name">Edit name</button>' +
+            '<button type="button" class="lp-edit-btn" id="lp-hero-edit-essence" title="Edit essence">Edit essence</button>' +
+          '</div>' +
         '</div>' +
-        '<div class="lp-hero-slot is-sigil" title="Digital key / sigil — symbolic face of the digital self">' +
-          '<span class="lp-hero-slot-glyph" aria-hidden="true">ॐ</span>' +
-          '<span class="lp-hero-slot-label">Digital key<br>· sigil</span>' +
-        '</div>' +
+        slotHtml +
       '</section>';
 
       // ── Primary engagement CTAs — placed directly after the
@@ -11502,26 +11781,39 @@ if (document.readyState === 'loading') {
         '</button>' +
       '</section>';
 
-      // ── Foundational / cosmic identity layer ───────────────
-      // The ground a profile stands on — birth, place, design,
-      // gene keys, astrology. Items missing data render as
-      // "Not set yet" so the layer reads as an invitation.
+      // ── Field Imprints (sigil + foundation fields) ────────
+      // The ground a profile stands on — sigil/avatar PLUS birth,
+      // place, design, gene keys, astrology. Items missing data
+      // render as "Not set yet" and are click-to-edit so the owner
+      // can fill them in directly from the profile view. Edits are
+      // persisted via saveState() into compassData.profile.foundation.
       var foundationItems = model.foundation || [];
       if (foundationItems.length) {
-        html += '<section class="lp-foundation" aria-label="Foundational identity">' +
+        html += '<section class="lp-foundation lp-field-imprints" aria-label="Field Imprints">' +
           '<header class="lp-foundation-head">' +
-            '<span class="lp-foundation-eye">Foundation · the ground beneath</span>' +
-            '<h3 class="lp-foundation-title">Cosmic <em>identity</em></h3>' +
+            '<span class="lp-foundation-eye">Field Imprints · the ground beneath</span>' +
+            '<h3 class="lp-foundation-title">Field <em>Imprints</em></h3>' +
           '</header>' +
-          '<dl class="lp-foundation-grid">' +
-            foundationItems.map(function (it) {
-              var has = !!it.val;
-              return '<div class="lp-foundation-item' + (has ? '' : ' is-empty') + '">' +
-                '<dt class="lp-foundation-key">' + lpEscape(it.key) + '</dt>' +
-                '<dd class="lp-foundation-val">' + lpEscape(has ? it.val : 'Not set yet') + '</dd>' +
-              '</div>';
-            }).join('') +
-          '</dl>' +
+          '<div class="lp-field-imprints-body">' +
+            '<div class="lp-field-imprints-sigil" aria-label="Digital key · sigil">' +
+              '<div class="lp-hero-slot is-sigil" title="Digital key / sigil — symbolic face of the digital self">' +
+                '<span class="lp-hero-slot-glyph" aria-hidden="true">ॐ</span>' +
+                '<span class="lp-hero-slot-label">Digital key<br>· sigil</span>' +
+              '</div>' +
+            '</div>' +
+            '<dl class="lp-foundation-grid">' +
+              foundationItems.map(function (it) {
+                var has = !!it.val;
+                var fkey = it.field || '';
+                return '<div class="lp-foundation-item' + (has ? '' : ' is-empty') + '"' +
+                  (fkey ? ' data-lp-edit="foundation" data-lp-field="' + lpEscape(fkey) + '"' : '') +
+                  (fkey ? ' tabindex="0" role="button" title="Click to edit"' : '') + '>' +
+                  '<dt class="lp-foundation-key">' + lpEscape(it.key) + '</dt>' +
+                  '<dd class="lp-foundation-val">' + lpEscape(has ? it.val : 'Not set yet') + '</dd>' +
+                '</div>';
+              }).join('') +
+            '</dl>' +
+          '</div>' +
         '</section>';
       }
 
@@ -11538,7 +11830,7 @@ if (document.readyState === 'loading') {
       fourfoldMap.forEach(function (f) {
         var tag = (f.src && f.src.tags && f.src.tags[0]) ? f.src.tags[0]
                 : (f.src && f.src.value ? lpTrim(f.src.value, 90) : 'Awaiting');
-        html += '<div class="lp-compass-card s-' + f.sec + '">' +
+        html += '<div class="lp-compass-card s-' + f.sec + '" data-lp-fourfold="' + f.sec + '" tabindex="0" role="button" aria-label="Open ' + lpEscape(f.label) + ' details">' +
           '<div class="lp-compass-eye">' + lpEscape(f.eye) + '</div>' +
           '<div class="lp-compass-name">' + lpEscape(f.label) + '</div>' +
           '<span class="lp-compass-tag">' + lpEscape(tag) + '</span>' +
@@ -11680,31 +11972,21 @@ if (document.readyState === 'loading') {
           body + '</section>';
       }
 
-      html += '<div class="lp-expanded-eyebrow">Expanded summaries</div>';
-
-      // Work / Lens and Field / Call paired editorially.
-      function summaryBody(section, sec) {
-        if (section.value) {
-          var h = '<p class="lp-body">' + lpEscape(section.value) + '</p>';
-          h += lpTagsList(section.tags || []);
-          return h;
-        }
-        return '<p class="lp-empty">Not enough source material yet — work in The ' +
-          (sec.charAt(0).toUpperCase() + sec.slice(1)) +
-          ' will surface here as you fill it in.</p>';
-      }
+      // Expanded fourfold summaries are no longer rendered inline.
+      // Clicking a card in .lp-compass opens .lp-fourfold-popup with
+      // the full text + tags + Gene Key. See wireFourfoldPopup below.
       s.workSummary._gk  = model.gk.work;
       s.lensSummary._gk  = model.gk.lens;
       s.fieldSummary._gk = model.gk.field;
       s.callSummary._gk  = model.gk.call;
-      html += '<div class="lp-editorial">' +
-        renderSection('Work summary', 'work',  s.workSummary,  summaryBody(s.workSummary,  'work')) +
-        renderSection('Lens summary', 'lens',  s.lensSummary,  summaryBody(s.lensSummary,  'lens')) +
-      '</div>';
-      html += '<div class="lp-editorial">' +
-        renderSection('Field summary', 'field', s.fieldSummary, summaryBody(s.fieldSummary, 'field')) +
-        renderSection('Call summary',  'call',  s.callSummary,  summaryBody(s.callSummary,  'call')) +
-      '</div>';
+      // Cache the per-section detail so the popup can pull without
+      // rebuilding the whole model.
+      window.__lpFourfoldDetail = {
+        work:  { label: 'The Work',  eye: 'Compass · North', src: s.workSummary,  gk: model.gk.work },
+        lens:  { label: 'The Lens',  eye: 'Compass · East',  src: s.lensSummary,  gk: model.gk.lens },
+        field: { label: 'The Field', eye: 'Compass · South', src: s.fieldSummary, gk: model.gk.field },
+        call:  { label: 'The Call',  eye: 'Compass · West',  src: s.callSummary,  gk: model.gk.call }
+      };
 
       // Contact & invitation
       var contactBody = '';
@@ -11868,7 +12150,232 @@ if (document.readyState === 'loading') {
           }
         });
       }
+
+      // ── Wire fourfold-card popups ───────────────────────────
+      // Clicking a card in .lp-compass opens an expanded detail
+      // popover with the full summary text, tags, and Gene Key.
+      lpBody.querySelectorAll('.lp-compass-card[data-lp-fourfold]').forEach(function (card) {
+        function open() { openFourfoldPopup(card.getAttribute('data-lp-fourfold')); }
+        card.addEventListener('click', open);
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+        });
+      });
+
+      // ── Wire inline edit affordances ────────────────────────
+      // Foundation items and hero essence can be clicked to open
+      // a small popover. Saves persist via saveState() into
+      // window.state.compassData.profile.foundation.*.
+      lpBody.querySelectorAll('[data-lp-edit="foundation"]').forEach(function (item) {
+        function open() { openLpEditPopover('foundation', item.getAttribute('data-lp-field'), item); }
+        item.addEventListener('click', open);
+        item.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+        });
+      });
+      var essenceEl = document.getElementById('lp-hero-essence-text');
+      if (essenceEl) {
+        essenceEl.addEventListener('click', function () {
+          openLpEditPopover('essence', '', essenceEl);
+        });
+      }
+      var editEssenceBtn = document.getElementById('lp-hero-edit-essence');
+      if (editEssenceBtn) {
+        editEssenceBtn.addEventListener('click', function () {
+          openLpEditPopover('essence', '', essenceEl);
+        });
+      }
+      var editNameBtn = document.getElementById('lp-hero-edit-name');
+      if (editNameBtn) {
+        editNameBtn.addEventListener('click', function () {
+          openLpEditPopover('name', '', document.getElementById('lp-hero-name-text'));
+        });
+      }
     }
+
+    // ── Fourfold popup helpers ────────────────────────────────
+    function openFourfoldPopup(sec) {
+      var detail = (window.__lpFourfoldDetail || {})[sec];
+      if (!detail) return;
+      var pop = document.getElementById('lp-fourfold-popup');
+      var card = document.getElementById('lp-fourfold-popup-card');
+      var eye = document.getElementById('lp-fourfold-popup-eye');
+      var title = document.getElementById('lp-fourfold-popup-title');
+      var body = document.getElementById('lp-fourfold-popup-body');
+      if (!pop || !card || !title || !body) return;
+      card.classList.remove('s-work','s-lens','s-field','s-call');
+      card.classList.add('s-' + sec);
+      if (eye) eye.textContent = detail.eye;
+      title.textContent = detail.label;
+      var src = detail.src || {};
+      var inner = '';
+      if (src.value) {
+        inner += '<p>' + lpEscape(src.value) + '</p>';
+        if (src.tags && src.tags.length) {
+          inner += '<ul class="lp-fourfold-popup-tags">' +
+            src.tags.map(function (t) { return '<li>' + lpEscape(t) + '</li>'; }).join('') +
+          '</ul>';
+        }
+      } else {
+        inner += '<p class="lp-fourfold-popup-empty">Not enough source material yet — work in ' +
+          lpEscape(detail.label) + ' will surface here as you fill it in.</p>';
+      }
+      if (detail.gk) {
+        inner += '<span class="lp-fourfold-popup-gk">GK ' + lpEscape(detail.gk) + '</span>';
+      }
+      body.innerHTML = inner;
+      pop.classList.add('is-open');
+    }
+    function closeFourfoldPopup() {
+      var pop = document.getElementById('lp-fourfold-popup');
+      if (pop) pop.classList.remove('is-open');
+    }
+
+    // ── Editable foundation / hero fields ─────────────────────
+    // Small modal popover used to edit a single field. On save we
+    // mutate window.state.compassData.profile.foundation[field] (or
+    // .profile.full_name / .essence_manual depending on what type)
+    // and call saveState() so changes persist across reloads. We
+    // then re-render the Living Profile so the change shows.
+    function openLpEditPopover(type, field, anchorEl) {
+      var pop = document.getElementById('lp-edit-popover');
+      var label = document.getElementById('lp-edit-popover-label');
+      var input = document.getElementById('lp-edit-popover-input');
+      var textarea = document.getElementById('lp-edit-popover-textarea');
+      var hint = document.getElementById('lp-edit-popover-hint');
+      var saveBtn = document.getElementById('lp-edit-popover-save');
+      if (!pop || !input || !textarea || !saveBtn) return;
+
+      // Reset.
+      input.style.display = 'block';
+      textarea.style.display = 'none';
+      input.value = '';
+      textarea.value = '';
+      if (hint) hint.textContent = '';
+
+      // Read current value off the displayed element where possible.
+      var current = '';
+      if (anchorEl) {
+        var hasValueClass = anchorEl.querySelector ? anchorEl.querySelector('.lp-foundation-val') : null;
+        if (hasValueClass && !anchorEl.classList.contains('is-empty')) {
+          current = hasValueClass.textContent.trim();
+        } else if (!anchorEl.querySelector && anchorEl.textContent && !anchorEl.classList.contains('is-empty')) {
+          current = anchorEl.textContent.trim();
+        }
+      }
+
+      var cd = (window.state && window.state.compassData) || {};
+      var profile = cd.profile || {};
+
+      if (type === 'foundation') {
+        var labelMap = {
+          birthdate: 'Birthday',
+          birthplace: 'Birthplace',
+          current_location: 'Currently in',
+          human_design: 'Human Design',
+          gene_keys: 'Gene Keys',
+          astrology: 'Sun · Moon · Rising'
+        };
+        if (label) label.textContent = labelMap[field] || field;
+        if (hint) hint.textContent = (field === 'human_design' || field === 'astrology' || field === 'gene_keys')
+          ? 'No automatic chart calculation yet — enter manually. Saved locally with your session.'
+          : 'Saved locally with your session.';
+        // Read current from underlying state for accuracy.
+        var fnd = profile.foundation || {};
+        if (field === 'human_design') {
+          var hd = profile.human_design || fnd.human_design || {};
+          current = [hd.type || '', hd.profile ? hd.profile + ' profile' : ''].filter(Boolean).join(' · ');
+        } else if (field === 'astrology') {
+          var a = profile.astrology || fnd.astrology || {};
+          current = [a.sun, a.moon, a.rising].filter(Boolean).join(' · ');
+        } else if (field === 'gene_keys') {
+          var gk = profile.gene_keys || fnd.gene_keys || {};
+          current = gk.life_work || gk.lifeWork || current;
+        } else {
+          current = profile[field] || fnd[field] || current;
+        }
+        input.value = String(current || '');
+      } else if (type === 'essence') {
+        if (label) label.textContent = 'One-sentence essence';
+        input.style.display = 'none';
+        textarea.style.display = 'block';
+        textarea.value = (profile.essence_manual || profile.essence || current || '').toString();
+        if (hint) hint.textContent = 'A short statement describing what you offer or stand for.';
+      } else if (type === 'name') {
+        if (label) label.textContent = 'Display name';
+        // Prefer full_name if present, otherwise current label.
+        input.value = (profile.full_name || current || '').toString();
+        if (hint) hint.textContent = 'Saved locally with your session.';
+      }
+
+      // Save handler — replace prior listener.
+      saveBtn.onclick = function () {
+        var val = textarea.style.display === 'block' ? textarea.value : input.value;
+        val = String(val || '').trim();
+        if (!window.state.compassData) window.state.compassData = {};
+        if (!window.state.compassData.profile) window.state.compassData.profile = {};
+        var p = window.state.compassData.profile;
+        if (!p.foundation) p.foundation = {};
+        if (type === 'foundation') {
+          if (field === 'human_design') {
+            // Stored as a free-text string under foundation.human_design.label
+            p.foundation.human_design = { label: val };
+            p.human_design = { label: val };
+          } else if (field === 'astrology') {
+            // Free-text "Sun · Moon · Rising" combined.
+            p.foundation.astrology = { label: val };
+            p.astrology = { label: val };
+          } else if (field === 'gene_keys') {
+            p.foundation.gene_keys = { life_work: val };
+            p.gene_keys = { life_work: val };
+          } else {
+            p.foundation[field] = val;
+            p[field] = val;
+          }
+        } else if (type === 'essence') {
+          p.essence_manual = val;
+        } else if (type === 'name') {
+          p.full_name = val;
+        }
+        try { if (typeof saveState === 'function') saveState(); } catch(_) {}
+        pop.classList.remove('is-open');
+        renderLivingProfile();
+      };
+
+      pop.classList.add('is-open');
+      // Focus the active control.
+      setTimeout(function () {
+        if (textarea.style.display === 'block') textarea.focus();
+        else input.focus();
+      }, 30);
+    }
+    function closeLpEditPopover() {
+      var pop = document.getElementById('lp-edit-popover');
+      if (pop) pop.classList.remove('is-open');
+    }
+    // Wire global popup close handlers (idempotent).
+    (function () {
+      var pop = document.getElementById('lp-fourfold-popup');
+      if (pop && !pop.__wired) {
+        pop.__wired = true;
+        pop.addEventListener('click', function (e) { if (e.target === pop) closeFourfoldPopup(); });
+        var closeBtn = document.getElementById('lp-fourfold-popup-close');
+        if (closeBtn) closeBtn.addEventListener('click', closeFourfoldPopup);
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && pop.classList.contains('is-open')) closeFourfoldPopup();
+        });
+      }
+      var ePop = document.getElementById('lp-edit-popover');
+      if (ePop && !ePop.__wired) {
+        ePop.__wired = true;
+        ePop.addEventListener('click', function (e) { if (e.target === ePop) closeLpEditPopover(); });
+        var cancelBtn = document.getElementById('lp-edit-popover-cancel');
+        if (cancelBtn) cancelBtn.addEventListener('click', closeLpEditPopover);
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && ePop.classList.contains('is-open')) closeLpEditPopover();
+        });
+      }
+    })();
 
     function openLivingProfile() {
       if (!lpModal) return;
@@ -12734,6 +13241,11 @@ if (document.readyState === 'loading') {
     var entrancePathBtn = document.getElementById('studio-path-open-entrance');
     if (headerPathBtn)   headerPathBtn.addEventListener('click', openModal);
     if (entrancePathBtn) entrancePathBtn.addEventListener('click', openModal);
+    // Direct Living Profile entry from the Studio toolbar — gives the
+    // owner a single-click path into Level 1 without crossing the
+    // Studio Path modal first.
+    var headerLpBtn = document.getElementById('studio-path-living-profile-header');
+    if (headerLpBtn) headerLpBtn.addEventListener('click', openLivingProfile);
     var lpEntranceBtn = document.getElementById('living-profile-open-entrance');
     if (lpEntranceBtn) lpEntranceBtn.addEventListener('click', openLivingProfile);
     var wpEntranceBtn = document.getElementById('website-preview-open-entrance');
