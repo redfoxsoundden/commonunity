@@ -33,7 +33,7 @@ html {
 
   --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem;
   --space-4: 1rem;    --space-5: 1.25rem; --space-6: 1.5rem;
-  --space-8: 2rem;    --space-10: 2.5rem; --space-12: 3rem;
+  --space-7: 1.75rem; --space-8: 2rem;    --space-10: 2.5rem; --space-12: 3rem;
 
   --radius-sm: 0.375rem; --radius-md: 0.5rem;
   --radius-lg: 0.75rem;  --radius-xl: 1rem;
@@ -4560,6 +4560,19 @@ input, textarea { font: inherit; color: inherit; }
   letter-spacing: 0.06em;
   color: var(--text-faint);
 }
+.lp-hero-statement {
+  margin: 14px 0 0;
+  font-size: clamp(14px, 1.6vw, 16px);
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--text) 90%, transparent);
+  max-width: 62ch;
+  cursor: pointer;
+}
+.lp-hero-statement.is-empty {
+  font-style: italic;
+  color: var(--text-faint);
+}
+@media (max-width: 720px) { .lp-hero-statement { margin-left: auto; margin-right: auto; } }
 
 /* Fourfold compass entry-points (v0.3) — feel like doorways. */
 .lp-compass {
@@ -5031,6 +5044,25 @@ input, textarea { font: inherit; color: inherit; }
   color: var(--text-muted);
   max-width: 64ch;
   line-height: 1.55;
+}
+/* My Studio · On Air banner — quiet, sits above the door rows.
+   Re-uses the Studio's .onair-pill glow so the visual reads as the
+   same indicator the owner sees while recording inside a room. */
+.lp-my-studio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: var(--space-2) 0 var(--space-3);
+}
+.lp-my-studio-label {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+.lp-my-studio-pill {
+  padding: 3px 10px 3px 9px;
 }
 .lp-door-rows {
   list-style: none;
@@ -11149,6 +11181,34 @@ if (document.readyState === 'loading') {
       return arr.map(function (x) { return String(x || '').trim(); })
                 .filter(Boolean).join(sep || ', ');
     }
+    // Strip prompt/source residue from any text destined for public
+    // rendering in the Living Profile (hero, statement, name-context,
+    // door rows). Drops blockquote/list markers, removes any leading
+    // question-shaped sentence, and excises known prompt phrasings
+    // even when they sit mid-string.
+    function stripPromptResidue(s) {
+      s = String(s == null ? '' : s).trim();
+      if (!s) return '';
+      // Leading blockquote / bullet markers.
+      s = s.replace(/^[>›»\-•*\s]+/, '').trim();
+      // Known prompt phrasings that leak from the Studio Path source.
+      var known = [
+        /Beyond your name[^.!?]*[?.!]\s*/i,
+        /Lineages,\s*places,\s*communities[^.!?]*[.!?]\s*/i,
+        /what wider context do you stand in[^.!?]*[?.!]\s*/i,
+        /what is alive in you today[^.!?]*[?.!]\s*/i
+      ];
+      known.forEach(function (rx) { s = s.replace(rx, '').trim(); });
+      // Drop leading question (what/who/where/how/why/when/which …?).
+      var qIdx = s.indexOf('?');
+      if (qIdx > -1 && qIdx < s.length - 1) {
+        var head = s.slice(0, qIdx + 1);
+        if (/^[^.!]*\b(what|who|where|how|why|when|which)\b[^.!?]*\?$/i.test(head)) {
+          s = s.slice(qIdx + 1).trim();
+        }
+      }
+      return s;
+    }
     // Resolve a full display name from companion + Compass source data.
     // Companion (e.g. "Vesna") gives us a first-name anchor; we then
     // look in transcripts/source text for "<companion> <Surname>", and
@@ -11534,11 +11594,11 @@ if (document.readyState === 'loading') {
       var learning = pick(sections.lensSummary);
       var thriving = pick(sections.fieldSummary);
       var mission  = pick(sections.callSummary);
-      if (working)  rows.push({ label: 'Working on now',     text: working,  tone: 'work',  glyph: '◐' });
-      if (offering) rows.push({ label: 'Offering / serving', text: offering, tone: 'work',  glyph: '✦' });
-      if (learning) rows.push({ label: 'Learning',           text: learning, tone: 'lens',  glyph: '◑' });
-      if (thriving) rows.push({ label: 'Thriving with',      text: thriving, tone: 'field', glyph: '◓' });
-      if (mission)  rows.push({ label: 'Mission · support',  text: mission,  tone: 'call',  glyph: '◒' });
+      if (working)  rows.push({ label: 'Building now',          text: working,  tone: 'work',  glyph: '◐' });
+      if (offering) rows.push({ label: 'Offering',              text: offering, tone: 'work',  glyph: '✦' });
+      if (learning) rows.push({ label: 'Learning',              text: learning, tone: 'lens',  glyph: '◑' });
+      if (thriving) rows.push({ label: 'Looking for · thriving with', text: thriving, tone: 'field', glyph: '◓' });
+      if (mission)  rows.push({ label: 'Sharing · open to',     text: mission,  tone: 'call',  glyph: '◒' });
       return rows.slice(0, 5);
     }
 
@@ -11656,23 +11716,7 @@ if (document.readyState === 'loading') {
       // quote-marker, then drop a leading sentence that ends in '?' —
       // that is almost always the prompt question, not the answer.
       function cleanNameContext(s) {
-        s = String(s || '').trim();
-        if (!s) return '';
-        s = s.replace(/^[>›»\-•*\s]+/, '').trim();
-        // If it still opens with a question, drop everything up to the '?'.
-        var qIdx = s.indexOf('?');
-        if (qIdx > -1 && qIdx < s.length - 1) {
-          var head = s.slice(0, qIdx + 1);
-          // Heuristic: a leading sentence with "what|who|where|how|why"
-          // followed by '?' is prompt residue, not user content.
-          if (/^[^.!]*\b(what|who|where|how|why|when|which)\b[^.!?]*\?$/i.test(head)) {
-            s = s.slice(qIdx + 1).trim();
-          }
-        }
-        // Drop residue starting with the known prompt phrasing even if
-        // the user typed a long answer afterwards.
-        s = s.replace(/^Beyond your name[^.!?]*[?.!]\s*/i, '').trim();
-        return s;
+        return stripPromptResidue(s);
       }
       var cleanedCapName = cleanNameContext(capName);
       var nameSection = {
@@ -11784,6 +11828,19 @@ if (document.readyState === 'loading') {
         source: manualEssence ? 'captured' : (capEssence ? 'captured' : (essenceFromCompass ? 'compass' : 'empty'))
       };
 
+      // ── Profile statement ──────────────────────────────────
+      // A short personal paragraph (separate from name + essence).
+      // Only the owner-edited profile.statement_manual is ever
+      // rendered — captured prompt fragments are explicitly NOT
+      // surfaced here so visitors never see "Lineages, places,
+      // communities that locate you…" -style prompt residue.
+      var manualStatement = String((profile && (profile.statement_manual || profile.statement)) || '').trim();
+      manualStatement = stripPromptResidue(manualStatement);
+      var statementSection = {
+        value: manualStatement,
+        source: manualStatement ? 'captured' : 'empty'
+      };
+
       // ── Work / Lens / Field / Call summaries ───────────────
       function summarySection(point, fieldId) {
         var cap = lpCaptureText(fieldId);
@@ -11867,6 +11924,7 @@ if (document.readyState === 'loading') {
         nameContext:  nameSection,
         roles:        rolesSection,
         essence:      essenceSection,
+        statement:    statementSection,
         workSummary:  workSummary,
         lensSummary:  lensSummary,
         fieldSummary: fieldSummary,
@@ -11958,14 +12016,16 @@ if (document.readyState === 'loading') {
       // role constellation + sigil slot. Designed to feel like a
       // shareable artifact rather than a form summary.
       var idName    = s.nameContext.name || 'Living Profile';
-      var idEssence = s.essence.value || '';
+      var idEssence = stripPromptResidue(s.essence.value || '');
+      var idStatement = stripPromptResidue((s.statement && s.statement.value) || '');
       var roles     = (s.roles.roles || []).slice(0, 5);
       var rolesHtml = roles.length
         ? '<ul class="lp-hero-roles">' + roles.map(function (r) {
             return '<li>' + lpEscape(r) + '</li>';
           }).join('') + '</ul>'
         : '';
-      var contextBits = s.nameContext.context ? lpEscape(s.nameContext.context) : '';
+      var cleanedContext = stripPromptResidue(s.nameContext.context || '');
+      var contextBits = cleanedContext ? lpEscape(cleanedContext) : '';
       var pImg = (typeof getProfileImage === 'function') ? getProfileImage() : null;
       var pAlt = 'Profile image' + (idName && idName !== 'Living Profile' ? ' for ' + idName : '');
       var slotHtml;
@@ -12004,10 +12064,14 @@ if (document.readyState === 'loading') {
             ? '<p class="lp-hero-essence" id="lp-hero-essence-text" data-lp-edit="essence" title="Click to edit">' + lpEscape(idEssence) + '</p>'
             : '<p class="lp-hero-essence is-empty" id="lp-hero-essence-text" data-lp-edit="essence" title="Click to add a one-sentence essence">Add a one-sentence essence…</p>') +
           rolesHtml +
+          (idStatement
+            ? '<p class="lp-hero-statement" id="lp-hero-statement-text" data-lp-edit="statement" title="Click to edit your profile statement">' + lpEscape(idStatement) + '</p>'
+            : '<p class="lp-hero-statement is-empty" id="lp-hero-statement-text" data-lp-edit="statement" title="Click to add a short profile statement">Add a short profile statement…</p>') +
           (contextBits ? '<p class="lp-hero-context">' + contextBits + '</p>' : '') +
           '<div class="lp-hero-edit-row">' +
             '<button type="button" class="lp-edit-btn" id="lp-hero-edit-name" title="Edit name">Edit name</button>' +
             '<button type="button" class="lp-edit-btn" id="lp-hero-edit-essence" title="Edit essence">Edit essence</button>' +
+            '<button type="button" class="lp-edit-btn" id="lp-hero-edit-statement" title="Edit profile statement">Edit statement</button>' +
           '</div>' +
         '</div>' +
         slotHtml +
@@ -12119,12 +12183,23 @@ if (document.readyState === 'loading') {
       var doorProfile = ((window.state && window.state.compassData) || {}).profile || {};
       var doorRows = lpWaysToEngage(s, doorProfile);
       if (doorRows.length || true) {
-        html += '<section class="lp-door" aria-label="At the door — ways to engage">' +
+        html += '<section class="lp-door" aria-label="Studio Door — what is open now">' +
           '<header class="lp-door-head">' +
-            '<span class="lp-door-eye">At the door</span>' +
-            '<h3 class="lp-door-title">Ways to <em>engage</em></h3>' +
-            '<p class="lp-door-lede">What is alive, what is on offer, and threads worth pulling.</p>' +
+            '<span class="lp-door-eye">Studio Door</span>' +
+            '<h3 class="lp-door-title">What’s <em>open now</em></h3>' +
+            '<p class="lp-door-lede">Current invitations, offerings, projects, and ways to connect.</p>' +
           '</header>' +
+          // My Studio · On Air state indicator. Visible prototype only —
+          // not wired to live presence yet. Re-uses the in-Studio
+          // onair-pill styling so the glow matches the recording pill
+          // inside an active session.
+          '<div class="lp-my-studio" aria-label="My Studio status">' +
+            '<span class="lp-my-studio-label">My Studio</span>' +
+            '<span class="onair-pill lp-my-studio-pill" id="lp-my-studio-onair" aria-label="Studio is on air">' +
+              '<span class="onair-dot" aria-hidden="true"></span>' +
+              '<span class="onair-label">ON AIR</span>' +
+            '</span>' +
+          '</div>' +
           (doorRows.length
             ? '<ul class="lp-door-rows">' +
                 doorRows.map(function (r) {
@@ -12132,13 +12207,13 @@ if (document.readyState === 'loading') {
                     '<span class="lp-door-row-glyph" aria-hidden="true">' + r.glyph + '</span>' +
                     '<div class="lp-door-row-body">' +
                       '<span class="lp-door-row-label">' + lpEscape(r.label) + '</span>' +
-                      '<span class="lp-door-row-text">' + lpEscape(r.text) + '</span>' +
+                      '<span class="lp-door-row-text">' + lpEscape(stripPromptResidue(r.text)) + '</span>' +
                     '</div>' +
                   '</li>';
                 }).join('') +
               '</ul>'
             : '') +
-          // Ways to engage is content-only: describes what's on offer.
+          // Studio Door is content-only: describes what's on offer.
           // The Knock / Leave a note / Book a meeting CTAs live in the
           // single hero-under toolbar (lp-top-cta) above. Visit/contact
           // and Calendar match also relocate there via Get in touch.
@@ -12470,6 +12545,18 @@ if (document.readyState === 'loading') {
           openLpEditPopover('name', '', document.getElementById('lp-hero-name-text'));
         });
       }
+      var statementEl = document.getElementById('lp-hero-statement-text');
+      if (statementEl) {
+        statementEl.addEventListener('click', function () {
+          openLpEditPopover('statement', '', statementEl);
+        });
+      }
+      var editStatementBtn = document.getElementById('lp-hero-edit-statement');
+      if (editStatementBtn) {
+        editStatementBtn.addEventListener('click', function () {
+          openLpEditPopover('statement', '', statementEl);
+        });
+      }
     }
 
     // ── Fourfold popup helpers ────────────────────────────────
@@ -12580,6 +12667,12 @@ if (document.readyState === 'loading') {
         textarea.style.display = 'block';
         textarea.value = (profile.essence_manual || profile.essence || current || '').toString();
         if (hint) hint.textContent = 'A short statement describing what you offer or stand for.';
+      } else if (type === 'statement') {
+        if (label) label.textContent = 'Profile statement';
+        input.style.display = 'none';
+        textarea.style.display = 'block';
+        textarea.value = (profile.statement_manual || profile.statement || current || '').toString();
+        if (hint) hint.textContent = 'A short personal paragraph — separate from name and essence. Saved locally with your session.';
       } else if (type === 'name') {
         if (label) label.textContent = 'Display name';
         // Prefer full_name if present, otherwise current label.
@@ -12637,6 +12730,8 @@ if (document.readyState === 'loading') {
           }
         } else if (type === 'essence') {
           p.essence_manual = val;
+        } else if (type === 'statement') {
+          p.statement_manual = val;
         } else if (type === 'contact') {
           if (!p.contact || typeof p.contact !== 'object') p.contact = {};
           if (val) {
