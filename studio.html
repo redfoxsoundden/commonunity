@@ -12024,8 +12024,10 @@ if (document.readyState === 'loading') {
             return '<li>' + lpEscape(r) + '</li>';
           }).join('') + '</ul>'
         : '';
-      var cleanedContext = stripPromptResidue(s.nameContext.context || '');
-      var contextBits = cleanedContext ? lpEscape(cleanedContext) : '';
+      // Note: a secondary "source" context line used to render below the
+      // statement (lp-hero-context), but it duplicated/contradicted the
+      // owner-edited profile statement. The profile statement is now the
+      // single source of truth for that paragraph in the hero.
       var pImg = (typeof getProfileImage === 'function') ? getProfileImage() : null;
       var pAlt = 'Profile image' + (idName && idName !== 'Living Profile' ? ' for ' + idName : '');
       var slotHtml;
@@ -12067,7 +12069,6 @@ if (document.readyState === 'loading') {
           (idStatement
             ? '<p class="lp-hero-statement" id="lp-hero-statement-text" data-lp-edit="statement" title="Click to edit your profile statement">' + lpEscape(idStatement) + '</p>'
             : '<p class="lp-hero-statement is-empty" id="lp-hero-statement-text" data-lp-edit="statement" title="Click to add a short profile statement">Add a short profile statement…</p>') +
-          (contextBits ? '<p class="lp-hero-context">' + contextBits + '</p>' : '') +
           '<div class="lp-hero-edit-row">' +
             '<button type="button" class="lp-edit-btn" id="lp-hero-edit-name" title="Edit name">Edit name</button>' +
             '<button type="button" class="lp-edit-btn" id="lp-hero-edit-essence" title="Edit essence">Edit essence</button>' +
