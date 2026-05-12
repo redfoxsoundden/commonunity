@@ -5473,10 +5473,16 @@ input, textarea { font: inherit; color: inherit; }
 .lp-modal-card.is-v3 .lp-top-cta { margin-top: var(--space-4); }
 .lp-modal-card.is-v3 .lp-compass { margin-top: var(--space-6); }
 
-/* Primary engagement band, just under the hero. Same chip styling
-   as the doorway actions, but pulled up so visitors can find the
-   Book a meeting / Knock affordances immediately. */
+/* Primary engagement band, just under the hero. The single home for
+   Book a meeting / Knock / Leave a note — the lower "Ways to engage"
+   section is content-only. The button row sits on top; the knock-state
+   and the note panel (revealed on Leave a note) sit underneath. */
 .lp-top-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lp-top-cta-row {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -12016,17 +12022,36 @@ if (document.readyState === 'loading') {
       var topCalHref = /^https?:\/\//i.test(topCalendar) ? topCalendar : '';
       var topMeetingHref = topCalHref
         || (topEmail ? ('mailto:' + topEmail + '?subject=' + encodeURIComponent('Book a meeting — ' + idName)) : '');
+      // Primary engagement toolbar — the ONLY place these three CTAs
+      // live. The lower "Ways to engage" section is now content-only
+      // (door rows describing what's on offer) so visitors aren't
+      // looking at two competing toolbars. Knock state + the note
+      // panel sit inside this section so the controls own their UI.
       html += '<section class="lp-top-cta" aria-label="Primary engagement">' +
-        (topMeetingHref
-          ? '<a class="lp-door-action" href="' + lpEscape(topMeetingHref) + '" target="_blank" rel="noopener">' +
-              '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
-            '</a>'
-          : '<button type="button" class="lp-door-action" id="lp-door-meeting-top">' +
-              '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
-            '</button>') +
-        '<button type="button" class="lp-door-action" id="lp-door-knock-top">' +
-          '<span class="lp-door-action-glyph" aria-hidden="true">☍</span>Knock' +
-        '</button>' +
+        '<div class="lp-top-cta-row">' +
+          (topMeetingHref
+            ? '<a class="lp-door-action" href="' + lpEscape(topMeetingHref) + '" target="_blank" rel="noopener">' +
+                '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
+              '</a>'
+            : '<button type="button" class="lp-door-action" id="lp-door-meeting-top">' +
+                '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
+              '</button>') +
+          '<button type="button" class="lp-door-action" id="lp-door-knock-top" aria-controls="lp-door-knock-state">' +
+            '<span class="lp-door-action-glyph" aria-hidden="true">☍</span>Knock' +
+          '</button>' +
+          '<button type="button" class="lp-door-action" id="lp-door-note-toggle" aria-controls="lp-door-note-panel" aria-expanded="false">' +
+            '<span class="lp-door-action-glyph" aria-hidden="true">✎</span>Leave a note' +
+          '</button>' +
+        '</div>' +
+        '<div class="lp-door-knock-state" id="lp-door-knock-state" role="status" aria-live="polite"></div>' +
+        '<div class="lp-door-note-panel" id="lp-door-note-panel">' +
+          '<label class="lp-door-note-label" for="lp-door-note-textarea" style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-faint);display:block;margin-bottom:6px;">Your note</label>' +
+          '<textarea id="lp-door-note-textarea" placeholder="A short note across the threshold — kept locally for now."></textarea>' +
+          '<div class="lp-door-note-actions">' +
+            '<button type="button" class="lp-door-note-cancel" id="lp-door-note-cancel">Cancel</button>' +
+            '<button type="button" class="lp-door-note-save" id="lp-door-note-save">Save locally</button>' +
+          '</div>' +
+        '</div>' +
       '</section>';
 
       // ── Field Imprints (sigil + foundation fields) ────────
@@ -12089,22 +12114,10 @@ if (document.readyState === 'loading') {
 
       // ── At the Door / Ways to Engage band ─────────────────
       // Gentle, non-promising snippets derived from the four
-      // point summaries + practices. These suggest how a visitor
-      // could begin to engage without committing to any feature
-      // we have not yet built (no live messaging, no calendar).
+      // point summaries + practices. Content-only — the CTAs live
+      // in the single hero-under toolbar (lp-top-cta) above.
       var doorProfile = ((window.state && window.state.compassData) || {}).profile || {};
       var doorRows = lpWaysToEngage(s, doorProfile);
-      // Email / calendar / contact hooks pulled from compass profile —
-      // optional: if absent, the action prototypes still work locally.
-      var doorEmail    = String(doorProfile.email || doorProfile.contact_email || '').trim();
-      var doorCalendar = String(doorProfile.calendar_url || doorProfile.calendly_url || doorProfile.scheduling_url || '').trim();
-      var doorContactUrl = String(doorProfile.contact_url || doorProfile.website || '').trim();
-      var knockHref = doorEmail
-        ? 'mailto:' + lpEscape(doorEmail) + '?subject=' + encodeURIComponent('Knock — ' + (s.nameContext.name || 'CommonUnity'))
-        : '';
-      var calHref = /^https?:\/\//i.test(doorCalendar) ? doorCalendar : '';
-      var meetingHref = calHref || (knockHref ? knockHref + '%20%E2%80%94%20book%20a%20meeting' : '');
-      var contactHref = /^https?:\/\//i.test(doorContactUrl) ? doorContactUrl : '';
       if (doorRows.length || true) {
         html += '<section class="lp-door" aria-label="At the door — ways to engage">' +
           '<header class="lp-door-head">' +
@@ -12125,44 +12138,10 @@ if (document.readyState === 'loading') {
                 }).join('') +
               '</ul>'
             : '') +
-          // Visible action controls — prototype, local-first. Knock toggles
-          // a small acknowledgement; Leave a note opens a textarea; Book a
-          // meeting / Calendar match link out if a calendar URL exists,
-          // otherwise compose an email with a "studio hours" subject.
-          '<div class="lp-door-actions" role="group" aria-label="Studio doorway actions">' +
-            '<button type="button" class="lp-door-action" id="lp-door-knock" aria-controls="lp-door-knock-state">' +
-              '<span class="lp-door-action-glyph" aria-hidden="true">☍</span>Knock' +
-            '</button>' +
-            '<button type="button" class="lp-door-action" id="lp-door-note-toggle" aria-controls="lp-door-note-panel" aria-expanded="false">' +
-              '<span class="lp-door-action-glyph" aria-hidden="true">✎</span>Leave a note' +
-            '</button>' +
-            (meetingHref
-              ? '<a class="lp-door-action" href="' + lpEscape(meetingHref) + '" target="_blank" rel="noopener">' +
-                  '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
-                '</a>'
-              : '<button type="button" class="lp-door-action" id="lp-door-meeting" aria-controls="lp-door-knock-state">' +
-                  '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
-                '</button>') +
-            (calHref
-              ? '<a class="lp-door-action" href="' + lpEscape(calHref) + '" target="_blank" rel="noopener">' +
-                  '<span class="lp-door-action-glyph" aria-hidden="true">◇</span>Calendar match' +
-                '</a>'
-              : '') +
-            (contactHref
-              ? '<a class="lp-door-action" href="' + lpEscape(contactHref) + '" target="_blank" rel="noopener">' +
-                  '<span class="lp-door-action-glyph" aria-hidden="true">↗</span>Visit · contact' +
-                '</a>'
-              : '') +
-          '</div>' +
-          '<div class="lp-door-knock-state" id="lp-door-knock-state" role="status" aria-live="polite"></div>' +
-          '<div class="lp-door-note-panel" id="lp-door-note-panel">' +
-            '<label class="lp-door-note-label" for="lp-door-note-textarea" style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-faint);display:block;margin-bottom:6px;">Your note</label>' +
-            '<textarea id="lp-door-note-textarea" placeholder="A short note across the threshold — kept locally for now."></textarea>' +
-            '<div class="lp-door-note-actions">' +
-              '<button type="button" class="lp-door-note-cancel" id="lp-door-note-cancel">Cancel</button>' +
-              '<button type="button" class="lp-door-note-save" id="lp-door-note-save">Save locally</button>' +
-            '</div>' +
-          '</div>' +
+          // Ways to engage is content-only: describes what's on offer.
+          // The Knock / Leave a note / Book a meeting CTAs live in the
+          // single hero-under toolbar (lp-top-cta) above. Visit/contact
+          // and Calendar match also relocate there via Get in touch.
         '</section>';
       }
 
@@ -12357,29 +12336,15 @@ if (document.readyState === 'loading') {
       // Wire doorway action controls — Knock / Leave a note / Book a
       // meeting. These are local-first prototypes: they do not pretend
       // to send anything to a backend. Notes are kept in the browser
-      // session under localStorage so they survive reloads.
-      var knockBtn       = document.getElementById('lp-door-knock');
-      var meetingProtoBtn = document.getElementById('lp-door-meeting');
-      var knockState     = document.getElementById('lp-door-knock-state');
+      // session under localStorage so they survive reloads. All three
+      // CTAs live in the hero-under toolbar (lp-top-cta) — the lower
+      // "Ways to engage" section is content-only.
+      var knockState = document.getElementById('lp-door-knock-state');
       function setKnockState(msg) {
         if (!knockState) return;
         knockState.textContent = msg;
         knockState.classList.add('is-visible');
       }
-      if (knockBtn && knockState) {
-        knockBtn.addEventListener('click', function () {
-          setKnockState('You knocked. The studio noticed — this is a local prototype, no message is sent yet.');
-        });
-      }
-      if (meetingProtoBtn && knockState) {
-        meetingProtoBtn.addEventListener('click', function () {
-          setKnockState('Meeting requested · this is a local prototype, no message is sent yet.');
-        });
-      }
-      // Wire the primary engagement (top) CTAs — Book a meeting + Knock
-      // mirror the doorway buttons. The "Book a meeting" anchor is fully
-      // wired by href; the local-prototype fallback button shares the
-      // knock state with the doorway band so the state surfaces once.
       var meetingTopBtn = document.getElementById('lp-door-meeting-top');
       var knockTopBtn   = document.getElementById('lp-door-knock-top');
       if (meetingTopBtn && knockState) {
