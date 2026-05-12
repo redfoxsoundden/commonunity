@@ -4468,8 +4468,103 @@ function backToSetup() {
 // ============================================================
 // SAVE JSON
 // ============================================================
+// Build the Compass export shape. Top-level state stays unchanged for
+// backwards compatibility; we add a normalized `profile.*` block plus a
+// nested `foundation` block so Studio's Living Profile can read the
+// identity ground via the aliases it already supports
+// (first_name/last_name, birthdate/date_of_birth, birth_time,
+// birthplace/place_of_birth, current_location, human_design.{type,profile},
+// astrology.{sun,moon,rising}). Derived values do not overwrite an
+// explicit value already on state.profile.
+function buildCompassExport(s) {
+  // Defensive copy of the existing profile (CV fields, communities, etc.).
+  const profile = Object.assign({}, s.profile || {});
+
+  // Name split — companion is often "First Last"; honour any explicit
+  // first/last already in profile.
+  const companion = (s.companion || '').trim();
+  const spaceIdx  = companion.indexOf(' ');
+  const derivedFirst = profile.first_name ||
+    (spaceIdx > 0 ? companion.slice(0, spaceIdx) : companion);
+  const derivedLast  = profile.last_name ||
+    (spaceIdx > 0 ? companion.slice(spaceIdx + 1).trim() : '');
+  if (derivedFirst) profile.first_name = derivedFirst;
+  if (derivedLast)  profile.last_name  = derivedLast;
+  // full_name kept in sync (single source of truth for Studio).
+  if (!profile.full_name) {
+    profile.full_name = [derivedFirst, derivedLast].filter(Boolean).join(' ').trim() || companion;
+  }
+
+  // Birth + location aliases — derive from existing dob/tob/pob inputs.
+  if (s.dob && !profile.birthdate)       profile.birthdate       = s.dob;
+  if (s.dob && !profile.date_of_birth)   profile.date_of_birth   = s.dob;
+  if (s.tob && !profile.birth_time)      profile.birth_time      = s.tob;
+  if (s.pob && !profile.birthplace)      profile.birthplace      = s.pob;
+  if (s.pob && !profile.place_of_birth)  profile.place_of_birth  = s.pob;
+
+  // Nested human_design / astrology / gene_keys blocks from flat inputs.
+  const hdType    = (profile.human_design_type    || '').trim();
+  const hdProfile = (profile.human_design_profile || '').trim();
+  if (hdType || hdProfile) {
+    profile.human_design = Object.assign(
+      { type: hdType || undefined, profile: hdProfile || undefined },
+      profile.human_design || {}
+    );
+  }
+  const astroSun    = (profile.astrology_sun    || '').trim();
+  const astroMoon   = (profile.astrology_moon   || '').trim();
+  const astroRising = (profile.astrology_rising || '').trim();
+  if (astroSun || astroMoon || astroRising) {
+    profile.astrology = Object.assign(
+      {
+        sun:    astroSun    || undefined,
+        moon:   astroMoon   || undefined,
+        rising: astroRising || undefined
+      },
+      profile.astrology || {}
+    );
+  }
+  // Gene Keys: surface the work-stream activation as life_work so the
+  // foundation row has a value even without a custom title.
+  const gkWorkNum  = s.points && s.points.work && s.points.work.gk_num;
+  const gkWorkLine = s.points && s.points.work && s.points.work.gk_line;
+  if (gkWorkNum) {
+    profile.gene_keys = Object.assign(
+      { life_work: 'GK ' + gkWorkNum + (gkWorkLine ? '.' + gkWorkLine : '') },
+      profile.gene_keys || {}
+    );
+  }
+
+  // Nested foundation block — older importers look for this shape.
+  profile.foundation = Object.assign({
+    first_name:       profile.first_name,
+    last_name:        profile.last_name,
+    full_name:        profile.full_name,
+    birthdate:        profile.birthdate,
+    date_of_birth:    profile.date_of_birth,
+    birth_time:       profile.birth_time,
+    birthplace:       profile.birthplace,
+    place_of_birth:   profile.place_of_birth,
+    current_location: profile.current_location,
+    human_design:     profile.human_design,
+    astrology:        profile.astrology,
+    gene_keys:        profile.gene_keys
+  }, profile.foundation || {});
+
+  // Top-level aliases used by Studio's fallback chain.
+  const out = Object.assign({}, s, { profile });
+  if (s.dob && !out.date_of_birth)   out.date_of_birth   = s.dob;
+  if (s.tob && !out.birth_time)      out.birth_time      = s.tob;
+  if (s.pob && !out.place_of_birth)  out.place_of_birth  = s.pob;
+  if (profile.current_location && !out.current_location) {
+    out.current_location = profile.current_location;
+  }
+  return out;
+}
+
 function saveJSON() {
-  const data = JSON.stringify(state, null, 2);
+  const exportObj = buildCompassExport(state);
+  const data = JSON.stringify(exportObj, null, 2);
   const name = (state.companion || 'session').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9\-]/g,'');
   const date = new Date().toISOString().slice(0,10);
   const filename = `${name}-compass-${date}.json`;
@@ -4503,6 +4598,38 @@ function loadJSON(file) {
           }
         });
       }
+
+      // Foundation round-trip: accept profile.* / foundation.* / top-level
+      // aliases written by recent exports and hydrate legacy state fields.
+      const inProfile = (data.profile && typeof data.profile === 'object') ? data.profile : {};
+      const inFound   = (inProfile.foundation && typeof inProfile.foundation === 'object')
+        ? inProfile.foundation : (data.foundation || {});
+      if (!state.profile) state.profile = {};
+      Object.assign(state.profile, inProfile);
+      // If only a foundation block was supplied, promote its keys onto profile.
+      Object.keys(inFound || {}).forEach(k => {
+        if (state.profile[k] === undefined) state.profile[k] = inFound[k];
+      });
+      // Flatten nested human_design/astrology back to the input-bound keys.
+      const hd = state.profile.human_design || {};
+      if (hd.type    && !state.profile.human_design_type)    state.profile.human_design_type    = hd.type;
+      if (hd.profile && !state.profile.human_design_profile) state.profile.human_design_profile = hd.profile;
+      const astro = state.profile.astrology || {};
+      if (astro.sun    && !state.profile.astrology_sun)    state.profile.astrology_sun    = astro.sun;
+      if (astro.moon   && !state.profile.astrology_moon)   state.profile.astrology_moon   = astro.moon;
+      if (astro.rising && !state.profile.astrology_rising) state.profile.astrology_rising = astro.rising;
+      // Companion fallback from first/last name when missing.
+      if (!state.companion) {
+        const fn = (state.profile.first_name || '').trim();
+        const ln = (state.profile.last_name  || '').trim();
+        const composed = [fn, ln].filter(Boolean).join(' ');
+        if (composed) state.companion = composed;
+        else if (state.profile.full_name) state.companion = String(state.profile.full_name).trim();
+      }
+      // Birth/location top-level fallbacks.
+      if (!state.dob) state.dob = data.dob || data.date_of_birth || state.profile.birthdate || state.profile.date_of_birth || '';
+      if (!state.tob) state.tob = data.tob || data.birth_time     || state.profile.birth_time || '';
+      if (!state.pob) state.pob = data.pob || data.place_of_birth || state.profile.birthplace || state.profile.place_of_birth || '';
 
       // Re-apply
       applyTheme(state.theme);
@@ -6373,6 +6500,31 @@ function initProfileModal() {
     <div class="field-group">
       <label class="field-label">Communities &amp; Belonging <span style="color:var(--text-faint);font-size:var(--text-xs);">— The Field</span></label>
       <textarea class="field-input" id="profile-communities" data-profile="communities" placeholder="Groups, networks, tribes, places of belonging…" rows="2" style="resize:vertical;"></textarea>
+    </div>
+
+    <!-- Foundation / Identity (optional — feeds Studio Living Profile) -->
+    <div class="field-group">
+      <label class="field-label">Family name / Surname <span style="color:var(--text-faint);font-size:var(--text-xs);">— optional</span></label>
+      <input class="field-input" id="profile-last-name" type="text" placeholder="Family name…" data-profile="last_name" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Currently in <span style="color:var(--text-faint);font-size:var(--text-xs);">— optional</span></label>
+      <input class="field-input" id="profile-current-location" type="text" placeholder="City, Country…" data-profile="current_location" autocomplete="off">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Human Design <span style="color:var(--text-faint);font-size:var(--text-xs);">— optional</span></label>
+      <div class="calc-row">
+        <input class="field-input" id="profile-hd-type" type="text" placeholder="Type (e.g. Generator)" data-profile="human_design_type" autocomplete="off">
+        <input class="field-input" id="profile-hd-profile" type="text" placeholder="Profile (e.g. 2/4)" data-profile="human_design_profile" autocomplete="off">
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Astrology — Sun · Moon · Rising <span style="color:var(--text-faint);font-size:var(--text-xs);">— optional</span></label>
+      <div class="calc-row">
+        <input class="field-input" id="profile-astro-sun" type="text" placeholder="Sun" data-profile="astrology_sun" autocomplete="off">
+        <input class="field-input" id="profile-astro-moon" type="text" placeholder="Moon" data-profile="astrology_moon" autocomplete="off">
+        <input class="field-input" id="profile-astro-rising" type="text" placeholder="Rising" data-profile="astrology_rising" autocomplete="off">
+      </div>
     </div>
 
     <!-- Purpose projects -->
