@@ -5384,6 +5384,197 @@ input, textarea { font: inherit; color: inherit; }
 .ph-room.s-field .ph-room-eyebrow { color: color-mix(in srgb, var(--field, #86d4b1) 80%, var(--text-faint)); }
 .ph-room.s-call  .ph-room-eyebrow { color: color-mix(in srgb, var(--call,  #f6a3b6) 80%, var(--text-faint)); }
 
+/* ── Living Profile v0.3.2 — spacing + new sections ────────── */
+/* Title row: tighter layout with inline info (i) button next to the
+   Living Profile heading — replaces the prior visible "About" toggle. */
+.lp-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.lp-title-row .studio-info-btn {
+  position: relative;
+  top: -2px;
+}
+
+/* Generous internal stacking — give the modal more breathing room
+   between hero / compass / foundation / door / editorial sections.  */
+.lp-modal-card.is-v3 .builder-modal-head { margin-bottom: var(--space-5); }
+.lp-modal-card.is-v3 .lp-hero { margin-bottom: 4px; }
+.lp-modal-card.is-v3 .lp-compass { margin-top: var(--space-6); }
+.lp-modal-card.is-v3 .lp-foundation { margin-top: var(--space-6); }
+.lp-modal-card.is-v3 .lp-door { margin-top: var(--space-6); }
+.lp-modal-card.is-v3 .lp-studio-window { margin-top: var(--space-6); }
+.lp-modal-card.is-v3 .lp-editorial { margin-top: var(--space-5); }
+
+/* Compass cards: a touch more inner padding, taller cards so the
+   four tags do not feel cramped. */
+.lp-modal-card.is-v3 .lp-compass { gap: 14px; }
+.lp-modal-card.is-v3 .lp-compass-card {
+  padding: 18px 16px 20px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lp-modal-card.is-v3 .lp-compass-card .lp-compass-tag {
+  margin-top: 2px;
+}
+
+/* ── Foundation / cosmic identity layer ────────────────────── */
+.lp-foundation {
+  position: relative;
+  padding: clamp(var(--space-4), 2.5vw, var(--space-5));
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--lens, #a5b4fc) 28%, var(--border));
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--lens, #a5b4fc) 10%, transparent), transparent 55%),
+    color-mix(in srgb, var(--input-bg) 35%, transparent);
+}
+.lp-foundation-head { margin: 0 0 12px; }
+.lp-foundation-eye {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--lens, #a5b4fc) 80%, var(--text-muted));
+  margin-bottom: 4px;
+}
+.lp-foundation-title {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(18px, 2.1vw, 22px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--text);
+}
+.lp-foundation-title em {
+  font-style: italic;
+  color: color-mix(in srgb, var(--lens, #a5b4fc) 85%, var(--text));
+}
+.lp-foundation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.lp-foundation-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 45%, transparent);
+}
+.lp-foundation-item .lp-foundation-key {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.lp-foundation-item .lp-foundation-val {
+  display: block;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.lp-foundation-item.is-empty .lp-foundation-val {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/* ── Doorway action controls ───────────────────────────────── */
+.lp-door-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: var(--space-3) 0 0;
+}
+.lp-door-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  cursor: pointer;
+  background: color-mix(in srgb, var(--input-bg) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 35%, var(--border));
+  transition: transform var(--transition), border-color var(--transition), background var(--transition);
+}
+.lp-door-action:hover,
+.lp-door-action:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 65%, var(--border));
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 10%, var(--input-bg));
+}
+.lp-door-action-glyph {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 16px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--rose-color, #c4b5fd) 85%, var(--text));
+}
+.lp-door-knock-state {
+  display: none;
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--field, #86d4b1) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--field, #86d4b1) 40%, var(--border));
+  color: color-mix(in srgb, var(--field, #86d4b1) 75%, var(--text));
+  font-size: 12px;
+  line-height: 1.5;
+}
+.lp-door-knock-state.is-visible { display: block; }
+.lp-door-note-panel {
+  display: none;
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 60%, transparent);
+}
+.lp-door-note-panel.is-open { display: block; }
+.lp-door-note-panel textarea {
+  width: 100%;
+  min-height: 64px;
+  resize: vertical;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 70%, transparent);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.lp-door-note-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+.lp-door-note-actions button {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 65%, transparent);
+  color: var(--text);
+  font-size: 11px;
+  cursor: pointer;
+}
+.lp-door-note-actions .lp-door-note-save {
+  border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, var(--border));
+  background: color-mix(in srgb, var(--rose-color, #c4b5fd) 14%, var(--input-bg));
+}
+
 /* Respect users who prefer reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   .lp-hero-slot.is-sigil { animation: none; }
@@ -5393,6 +5584,8 @@ input, textarea { font: inherit; color: inherit; }
   .ph-doorway:hover,
   .ph-doorway:focus-visible,
   .lp-door-row:hover,
+  .lp-door-action:hover,
+  .lp-door-action:focus-visible,
   .lp-go-deeper-cta:hover,
   .lp-go-deeper-cta:focus-visible {
     transform: none;
@@ -6121,16 +6314,9 @@ input, textarea { font: inherit; color: inherit; }
 <div id="living-profile-modal" class="builder-modal" role="dialog" aria-labelledby="living-profile-title" aria-modal="true">
   <div class="builder-modal-card lp-modal-card is-v3" id="living-profile-card">
     <div class="builder-modal-head">
-      <div>
+      <div class="lp-title-row">
         <h2 class="builder-modal-title" id="living-profile-title">Living <em>Profile</em></h2>
-        <details class="builder-modal-about" id="living-profile-about">
-          <summary>About</summary>
-          <p class="builder-modal-lede" id="living-profile-lede">
-            Level 1 · Threshold (v0.3). A minimum viable digital self —
-            the threshold card others meet you through. Drafted locally
-            from your Compass material and Field Notes.
-          </p>
-        </details>
+        <button type="button" class="studio-info-btn" data-info="info-living-profile-overlay" title="About the Living Profile" aria-label="About the Living Profile"><i>i</i></button>
       </div>
       <button type="button" class="builder-modal-close" id="living-profile-close" aria-label="Close">×</button>
     </div>
@@ -9340,6 +9526,20 @@ window.saveState = saveState;
   </div>
 </div>
 
+<div class="studio-info-overlay" id="info-living-profile-overlay">
+  <div class="studio-info-popup">
+    <div class="studio-info-popup-header">
+      <span class="studio-info-popup-title">Living Profile</span>
+      <button class="studio-info-popup-close" data-close="info-living-profile-overlay">✕</button>
+    </div>
+    <div class="studio-info-popup-body">
+      <p>Level 1 · Threshold. A minimum viable digital self — the threshold card others meet you through. Drafted locally from your Compass material and Field Notes.</p>
+      <p>The Living Profile holds three layers: a <strong>foundation</strong> (the cosmic ground you stand on — birth, place, design), a <strong>compass</strong> (The Work, Lens, Field, Call), and a <strong>doorway</strong> (how others might engage).</p>
+      <p>Nothing here is published. Honesty over performance — this is the trust architecture.</p>
+    </div>
+  </div>
+</div>
+
 <div class="studio-info-overlay" id="info-archive-overlay">
   <div class="studio-info-popup">
     <div class="studio-info-popup-header">
@@ -10435,9 +10635,44 @@ if (document.readyState === 'loading') {
     // look in transcripts/source text for "<companion> <Surname>", and
     // fall back to the LinkedIn /in/<handle> slug. Returns the original
     // companion string if no richer name can be inferred.
+    // Name resolution prefers, in order:
+    //   1. profile.first_name + profile.last_name / surname / family_name
+    //   2. profile.full_name / profile.display_name / profile.name
+    //   3. inference from transcripts / source text using the companion first name
+    //   4. inference from linkedin_url slug
+    //   5. companion (first-name only) as last fallback
+    // Backwards-compatible: imports carrying only `companion` continue working.
     function lpResolveDisplayName(companion, profile, sourceText) {
-      var first = String(companion || '').trim();
+      profile = profile || {};
+      var p = profile;
+      function cleanName(s) {
+        s = String(s || '').trim();
+        if (!s) return '';
+        // Collapse whitespace and strip stray punctuation/quotes.
+        s = s.replace(/\s+/g, ' ').replace(/^["'`\s]+|["'`\s]+$/g, '');
+        // Drop emails / URLs that occasionally land in name fields.
+        if (/@/.test(s) || /^https?:\/\//i.test(s)) return '';
+        return s;
+      }
+
+      // 1) Explicit first + last name on the profile.
+      var f = cleanName(p.first_name || p.firstName || p.given_name || p.givenName);
+      var l = cleanName(
+        p.last_name || p.lastName ||
+        p.surname || p.family_name || p.familyName
+      );
+      if (f && l) return f + ' ' + l;
+
+      // 2) Full / display / name fields on the profile.
+      var full = cleanName(p.full_name || p.fullName || p.display_name || p.displayName || p.name);
+      if (full && /\s/.test(full)) return full;
+      // Single-word full_name still wins over companion when companion is empty.
+      if (full && !companion) return full;
+      // If we have just a first from explicit field, treat it as our companion seed.
+      var first = String(companion || '').trim() || f || full || '';
       if (!first) return '';
+
+      // 3) Mine transcripts/source text for "First Last(s)" right after first name.
       var firstEsc = first.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       var txt = String(sourceText || '');
       if (txt) {
@@ -10447,18 +10682,22 @@ if (document.readyState === 'loading') {
           return [first, m[1], m[2]].filter(Boolean).join(' ');
         }
       }
-      var url = (profile && profile.linkedin_url) ? String(profile.linkedin_url) : '';
+
+      // 4) LinkedIn slug inference.
+      var url = p.linkedin_url ? String(p.linkedin_url) : '';
       var hm = url.match(/linkedin\.com\/in\/([^/?#]+)/i);
       if (hm) {
         var parts = decodeURIComponent(hm[1]).split(/[-_]+/).filter(Boolean);
         var firstLow = first.toLowerCase();
         if (parts.length && parts[0].toLowerCase() === firstLow) {
           var rest = parts.slice(1)
-            .filter(function (p) { return /^[a-z][a-z\-']*$/i.test(p) && p.length > 1; })
-            .map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(); });
+            .filter(function (q) { return /^[a-z][a-z\-']*$/i.test(q) && q.length > 1; })
+            .map(function (q) { return q.charAt(0).toUpperCase() + q.slice(1).toLowerCase(); });
           if (rest.length) return [first].concat(rest).join(' ');
         }
       }
+
+      // 5) Last-resort fallback — first name only.
       return first;
     }
     // Repair URLs that arrive whitespace-broken (e.g. "https: //foo")
@@ -10716,6 +10955,61 @@ if (document.readyState === 'loading') {
       return rows.slice(0, 5);
     }
 
+    // Build the Foundational layer for the Living Profile — the
+    // cosmic / identity ground a profile stands on. Reads common
+    // aliases from compassData.profile so multiple import shapes work
+    // (birthdate|date_of_birth, place_of_birth|birthplace,
+    // current_location|location, human_design.{type,profile,authority},
+    // astrology.{sun,moon,rising}, gene_keys{life_work,...}). We do
+    // not compute charts here — only display values that are present.
+    function buildFoundationItems(profile, points) {
+      profile = profile || {};
+      points  = points  || {};
+      var p   = profile;
+      var hd  = p.human_design || p.humanDesign || {};
+      var astro = p.astrology || p.astro || {};
+      var gk  = p.gene_keys || p.geneKeys || {};
+
+      function strOrEmpty(v) {
+        if (v == null) return '';
+        if (typeof v === 'string') return v.trim();
+        if (typeof v === 'number') return String(v);
+        if (typeof v === 'object') {
+          // Common nested shapes: { value }, { name }, { sign }.
+          return strOrEmpty(v.value || v.name || v.sign || v.label || v.text || '');
+        }
+        return '';
+      }
+      function joinNonEmpty(arr, sep) {
+        return arr.map(strOrEmpty).filter(Boolean).join(sep || ' · ');
+      }
+
+      // Gene Keys: prefer an explicit "life work" line; otherwise fall
+      // back to the work-stream gene key already shown in the compass.
+      var gkLifeWork = strOrEmpty(
+        gk.life_work || gk.lifeWork || gk.lifeWorkTitle || gk.life_work_title
+      );
+      if (!gkLifeWork && points.work && points.work.gk_num) {
+        gkLifeWork = 'GK ' + points.work.gk_num +
+          (points.work.gk_line ? '.' + points.work.gk_line : '');
+      }
+
+      // Human Design: type + profile.
+      var hdType    = strOrEmpty(hd.type || hd.energy_type);
+      var hdProfile = strOrEmpty(hd.profile);
+      var hdLine    = joinNonEmpty([hdType, hdProfile ? hdProfile + ' profile' : '']);
+
+      var items = [
+        { key: 'Birthday',         val: strOrEmpty(p.birthdate || p.birthday || p.date_of_birth || p.dateOfBirth || p.dob) },
+        { key: 'Birthplace',       val: strOrEmpty(p.birthplace || p.place_of_birth || p.placeOfBirth || p.pob) },
+        { key: 'Currently in',     val: strOrEmpty(p.current_location || p.currentLocation || p.location || p.city) },
+        { key: 'Human Design',     val: hdLine },
+        { key: 'Gene Keys',        val: gkLifeWork },
+        { key: 'Sun · Moon · Rising', val: joinNonEmpty([astro.sun, astro.moon, astro.rising]) }
+      ];
+      return items;
+    }
+
     // Build the structured Living Profile model from current state.
     // Each section returns { value, source, tags } where source is
     // 'compass' | 'captured' | 'mixed' | 'empty' so the UI can show
@@ -10947,6 +11241,7 @@ if (document.readyState === 'loading') {
         sections: sections,
         counts: counts,
         transcripts: { count: transcriptCount, summaries: transcriptSummary },
+        foundation: buildFoundationItems(profile, points),
         gk: {
           work:  pw.gk_num  ? (pw.gk_num  + (pw.gk_line  ? '.' + pw.gk_line  : '')) : '',
           lens:  pl.gk_num  ? (pl.gk_num  + (pl.gk_line  ? '.' + pl.gk_line  : '')) : '',
@@ -11070,6 +11365,29 @@ if (document.readyState === 'loading') {
         '</div>' +
       '</section>';
 
+      // ── Foundational / cosmic identity layer ───────────────
+      // The ground a profile stands on — birth, place, design,
+      // gene keys, astrology. Items missing data render as
+      // "Not set yet" so the layer reads as an invitation.
+      var foundationItems = model.foundation || [];
+      if (foundationItems.length) {
+        html += '<section class="lp-foundation" aria-label="Foundational identity">' +
+          '<header class="lp-foundation-head">' +
+            '<span class="lp-foundation-eye">Foundation · the ground beneath</span>' +
+            '<h3 class="lp-foundation-title">Cosmic <em>identity</em></h3>' +
+          '</header>' +
+          '<dl class="lp-foundation-grid">' +
+            foundationItems.map(function (it) {
+              var has = !!it.val;
+              return '<div class="lp-foundation-item' + (has ? '' : ' is-empty') + '">' +
+                '<dt class="lp-foundation-key">' + lpEscape(it.key) + '</dt>' +
+                '<dd class="lp-foundation-val">' + lpEscape(has ? it.val : 'Not set yet') + '</dd>' +
+              '</div>';
+            }).join('') +
+          '</dl>' +
+        '</section>';
+      }
+
       // ── Fourfold compass entry-points ──────────────────────
       // Doorway-like cards for The Work / Lens / Field / Call —
       // these point into the Personal Home (Level 2).
@@ -11099,25 +11417,75 @@ if (document.readyState === 'loading') {
       // we have not yet built (no live messaging, no calendar).
       var doorProfile = ((window.state && window.state.compassData) || {}).profile || {};
       var doorRows = lpWaysToEngage(s, doorProfile);
-      if (doorRows.length) {
+      // Email / calendar / contact hooks pulled from compass profile —
+      // optional: if absent, the action prototypes still work locally.
+      var doorEmail    = String(doorProfile.email || doorProfile.contact_email || '').trim();
+      var doorCalendar = String(doorProfile.calendar_url || doorProfile.calendly_url || doorProfile.scheduling_url || '').trim();
+      var doorContactUrl = String(doorProfile.contact_url || doorProfile.website || '').trim();
+      var knockHref = doorEmail
+        ? 'mailto:' + lpEscape(doorEmail) + '?subject=' + encodeURIComponent('Knock — ' + (s.nameContext.name || 'CommonUnity'))
+        : '';
+      var calHref = /^https?:\/\//i.test(doorCalendar) ? doorCalendar : '';
+      var meetingHref = calHref || (knockHref ? knockHref + '%20%E2%80%94%20studio%20hours' : '');
+      var contactHref = /^https?:\/\//i.test(doorContactUrl) ? doorContactUrl : '';
+      if (doorRows.length || true) {
         html += '<section class="lp-door" aria-label="At the door — ways to engage">' +
           '<header class="lp-door-head">' +
             '<span class="lp-door-eye">At the door</span>' +
             '<h3 class="lp-door-title">Ways to <em>engage</em></h3>' +
             '<p class="lp-door-lede">What is alive, what is on offer, and threads worth pulling.</p>' +
           '</header>' +
-          '<ul class="lp-door-rows">' +
-            doorRows.map(function (r) {
-              return '<li class="lp-door-row s-' + r.tone + '">' +
-                '<span class="lp-door-row-glyph" aria-hidden="true">' + r.glyph + '</span>' +
-                '<div class="lp-door-row-body">' +
-                  '<span class="lp-door-row-label">' + lpEscape(r.label) + '</span>' +
-                  '<span class="lp-door-row-text">' + lpEscape(r.text) + '</span>' +
-                '</div>' +
-              '</li>';
-            }).join('') +
-          '</ul>' +
-          '<p class="lp-door-foot">The doorway is open. Knock, notes, studio hours, and calendar come later.</p>' +
+          (doorRows.length
+            ? '<ul class="lp-door-rows">' +
+                doorRows.map(function (r) {
+                  return '<li class="lp-door-row s-' + r.tone + '">' +
+                    '<span class="lp-door-row-glyph" aria-hidden="true">' + r.glyph + '</span>' +
+                    '<div class="lp-door-row-body">' +
+                      '<span class="lp-door-row-label">' + lpEscape(r.label) + '</span>' +
+                      '<span class="lp-door-row-text">' + lpEscape(r.text) + '</span>' +
+                    '</div>' +
+                  '</li>';
+                }).join('') +
+              '</ul>'
+            : '') +
+          // Visible action controls — prototype, local-first. Knock toggles
+          // a small acknowledgement; Leave a note opens a textarea; Book a
+          // meeting / Calendar match link out if a calendar URL exists,
+          // otherwise compose an email with a "studio hours" subject.
+          '<div class="lp-door-actions" role="group" aria-label="Studio doorway actions">' +
+            '<button type="button" class="lp-door-action" id="lp-door-knock" aria-controls="lp-door-knock-state">' +
+              '<span class="lp-door-action-glyph" aria-hidden="true">☍</span>Knock' +
+            '</button>' +
+            '<button type="button" class="lp-door-action" id="lp-door-note-toggle" aria-controls="lp-door-note-panel" aria-expanded="false">' +
+              '<span class="lp-door-action-glyph" aria-hidden="true">✎</span>Leave a note' +
+            '</button>' +
+            (meetingHref
+              ? '<a class="lp-door-action" href="' + lpEscape(meetingHref) + '" target="_blank" rel="noopener">' +
+                  '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Book a meeting' +
+                '</a>'
+              : '<button type="button" class="lp-door-action" id="lp-door-meeting" aria-controls="lp-door-knock-state">' +
+                  '<span class="lp-door-action-glyph" aria-hidden="true">◐</span>Request studio hours' +
+                '</button>') +
+            (calHref
+              ? '<a class="lp-door-action" href="' + lpEscape(calHref) + '" target="_blank" rel="noopener">' +
+                  '<span class="lp-door-action-glyph" aria-hidden="true">◇</span>Calendar match' +
+                '</a>'
+              : '') +
+            (contactHref
+              ? '<a class="lp-door-action" href="' + lpEscape(contactHref) + '" target="_blank" rel="noopener">' +
+                  '<span class="lp-door-action-glyph" aria-hidden="true">↗</span>Visit · contact' +
+                '</a>'
+              : '') +
+          '</div>' +
+          '<div class="lp-door-knock-state" id="lp-door-knock-state" role="status" aria-live="polite"></div>' +
+          '<div class="lp-door-note-panel" id="lp-door-note-panel">' +
+            '<label class="lp-door-note-label" for="lp-door-note-textarea" style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-faint);display:block;margin-bottom:6px;">Your note</label>' +
+            '<textarea id="lp-door-note-textarea" placeholder="A short note across the threshold — kept locally for now."></textarea>' +
+            '<div class="lp-door-note-actions">' +
+              '<button type="button" class="lp-door-note-cancel" id="lp-door-note-cancel">Cancel</button>' +
+              '<button type="button" class="lp-door-note-save" id="lp-door-note-save">Save locally</button>' +
+            '</div>' +
+          '</div>' +
         '</section>';
       }
 
@@ -11287,6 +11655,68 @@ if (document.readyState === 'loading') {
       wireProfileImageControls('lp-profile-image-input', 'lp-profile-image-remove');
       if (typeof wireProfileImageFitControls === 'function') {
         wireProfileImageFitControls('lp');
+      }
+
+      // Wire doorway action controls — Knock / Leave a note / Request
+      // studio hours. These are local-first prototypes: they do not
+      // pretend to send anything to a backend. Notes are kept in the
+      // browser session under localStorage so they survive reloads.
+      var knockBtn       = document.getElementById('lp-door-knock');
+      var meetingProtoBtn = document.getElementById('lp-door-meeting');
+      var knockState     = document.getElementById('lp-door-knock-state');
+      function setKnockState(msg) {
+        if (!knockState) return;
+        knockState.textContent = msg;
+        knockState.classList.add('is-visible');
+      }
+      if (knockBtn && knockState) {
+        knockBtn.addEventListener('click', function () {
+          setKnockState('You knocked. The studio noticed — this is a local prototype, no message is sent yet.');
+        });
+      }
+      if (meetingProtoBtn && knockState) {
+        meetingProtoBtn.addEventListener('click', function () {
+          setKnockState('Studio hours requested · this is a local prototype, no message is sent yet.');
+        });
+      }
+      var noteToggle = document.getElementById('lp-door-note-toggle');
+      var notePanel  = document.getElementById('lp-door-note-panel');
+      var noteArea   = document.getElementById('lp-door-note-textarea');
+      var noteSave   = document.getElementById('lp-door-note-save');
+      var noteCancel = document.getElementById('lp-door-note-cancel');
+      var NOTE_STORAGE_KEY = 'cu.lp.doorNotes.v1';
+      if (noteToggle && notePanel) {
+        noteToggle.addEventListener('click', function () {
+          var open = notePanel.classList.toggle('is-open');
+          noteToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          if (open && noteArea) noteArea.focus();
+        });
+      }
+      if (noteCancel && notePanel) {
+        noteCancel.addEventListener('click', function () {
+          notePanel.classList.remove('is-open');
+          if (noteToggle) noteToggle.setAttribute('aria-expanded', 'false');
+          if (noteArea) noteArea.value = '';
+        });
+      }
+      if (noteSave && noteArea && notePanel) {
+        noteSave.addEventListener('click', function () {
+          var text = String(noteArea.value || '').trim();
+          if (!text) {
+            setKnockState('A note needs a few words first.');
+            return;
+          }
+          try {
+            var prev = JSON.parse(localStorage.getItem(NOTE_STORAGE_KEY) || '[]');
+            if (!Array.isArray(prev)) prev = [];
+            prev.push({ at: Date.now(), text: text });
+            localStorage.setItem(NOTE_STORAGE_KEY, JSON.stringify(prev.slice(-20)));
+          } catch (_) { /* private mode / quota — non-fatal */ }
+          noteArea.value = '';
+          notePanel.classList.remove('is-open');
+          if (noteToggle) noteToggle.setAttribute('aria-expanded', 'false');
+          setKnockState('Note saved locally — kept in this browser until a backend is wired.');
+        });
       }
 
       // Wire collapsible source notes toggle — toggles a CSS class
