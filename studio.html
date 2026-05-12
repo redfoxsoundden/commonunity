@@ -11926,8 +11926,10 @@ if (document.readyState === 'loading') {
 
     // Wires the Adjust toggle, sliders, reset, and done controls for
     // a given prefix ('lp' or 'ph'). Live updates the slot's CSS vars
-    // and persists via setProfileImageFit on each change. No re-render
-    // of the host surface is needed during dragging.
+    // and persists via the raw setProfileImageFit on each change. We
+    // deliberately avoid window.setProfileImageFit here because it is
+    // wrapped to call refreshIdentityMediaSurfaces() — which would
+    // re-render the host surface mid-drag and destroy the panel DOM.
     function wireProfileImageFitControls(prefix) {
       var adjustBtn = document.getElementById(prefix + '-profile-image-adjust');
       var panel     = document.getElementById(prefix + '-profile-image-fit');
@@ -11942,10 +11944,18 @@ if (document.readyState === 'loading') {
           : null;
         return slot;
       }
-      adjustBtn.addEventListener('click', function () {
+      adjustBtn.addEventListener('click', function (e) {
+        if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
         var open = panel.classList.toggle('is-open');
         adjustBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
+      // Stop pointer/click events inside the panel from bubbling to any
+      // ancestor outside-click/close handlers (modal overlays, accordions).
+      function swallow(e) { if (e && typeof e.stopPropagation === 'function') e.stopPropagation(); }
+      panel.addEventListener('mousedown', swallow);
+      panel.addEventListener('pointerdown', swallow);
+      panel.addEventListener('touchstart', swallow, { passive: true });
+      panel.addEventListener('click', swallow);
       var xIn   = document.getElementById(prefix + '-profile-image-fit-x');
       var yIn   = document.getElementById(prefix + '-profile-image-fit-y');
       var zIn   = document.getElementById(prefix + '-profile-image-fit-zoom');
@@ -11967,7 +11977,9 @@ if (document.readyState === 'loading') {
         if (xVal) xVal.textContent = Math.round(fit.x) + '%';
         if (yVal) yVal.textContent = Math.round(fit.y) + '%';
         if (zVal) zVal.textContent = fit.zoom.toFixed(2) + '×';
-        try { setProfileImageFit(fit); } catch (_) {}
+        // Use the raw setter so we persist without triggering a host
+        // surface re-render that would tear down this panel mid-drag.
+        try { _setProfileImageFit(fit); } catch (_) {}
       }
       if (xIn) xIn.addEventListener('input', apply);
       if (yIn) yIn.addEventListener('input', apply);
