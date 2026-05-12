@@ -5964,6 +5964,17 @@ input, textarea { font: inherit; color: inherit; }
   border-color: color-mix(in srgb, var(--rose-color, #c4b5fd) 50%, var(--border));
   background: color-mix(in srgb, var(--rose-color, #c4b5fd) 14%, var(--input-bg));
 }
+/* Restore auto draft sits at the left, away from Save / Cancel so an
+   accidental click never reads as commit. Disabled state for "no
+   auto draft yet". */
+.lp-edit-popover-actions #lp-edit-popover-restore {
+  margin-right: auto;
+  opacity: 0.85;
+}
+.lp-edit-popover-actions #lp-edit-popover-restore:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 /* ── Doorway action controls ───────────────────────────────── */
 .lp-door-actions {
@@ -6847,6 +6858,7 @@ input, textarea { font: inherit; color: inherit; }
     <textarea class="lp-edit-popover-textarea" id="lp-edit-popover-textarea" placeholder="Enter a one-sentence essence…"></textarea>
     <span class="lp-edit-popover-hint" id="lp-edit-popover-hint"></span>
     <div class="lp-edit-popover-actions">
+      <button type="button" id="lp-edit-popover-restore" title="Replace with the last auto draft">Restore auto draft</button>
       <button type="button" id="lp-edit-popover-cancel">Cancel</button>
       <button type="button" class="lp-edit-save" id="lp-edit-popover-save">Save</button>
     </div>
@@ -7074,7 +7086,19 @@ let state = {
   studioWindow: [],      // shopfront image roll — up to STUDIO_WINDOW_MAX
   identityMedia: {       // visual identity slots — Living Profile + Personal Home
     profileImage: null   // { src: dataURL, createdAt: ISO } | null
-  }
+  },
+  // Living Profile v0.1 manual-edit safeguard.
+  //   auto[key] — last value the deterministic builder produced for
+  //               an editable field, captured BEFORE any *_manual
+  //               override is layered in. Updated on every build so
+  //               a Restore action can bring back the auto draft even
+  //               if the underlying source (capture / compass) later
+  //               disappears. Keys mirror the popover types:
+  //               'essence', 'statement', 'name', plus 'contact.<id>'
+  //               and 'foundation.<id>'. Manual values continue to
+  //               live on profile.<field>_manual / profile.contact.* /
+  //               profile.foundation.* — those are untouched here.
+  livingProfile: { auto: {} }
 };
 
 // ── Studio Window ────────────────────────────────────────────
@@ -11151,6 +11175,47 @@ if (document.readyState === 'loading') {
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
     }
+
+    // ── Living Profile v0.1 manual-edit safeguard helpers ──
+    // The auto draft is the last value the deterministic builder
+    // produced for a field, captured BEFORE any owner *_manual
+    // override is layered in. The manual override continues to live
+    // on profile.<field>_manual (or profile.contact.* / foundation.*)
+    // — we never write to those here. We only track the auto value
+    // so Restore can bring it back when captures or compass material
+    // later disappear. Key shape mirrors the popover (type, field):
+    //   'essence', 'statement', 'name',
+    //   'contact.<id>', 'foundation.<id>'.
+    function lpEnsureSafeguardState() {
+      if (!window.state) return null;
+      if (!window.state.livingProfile || typeof window.state.livingProfile !== 'object') {
+        window.state.livingProfile = { auto: {} };
+      }
+      if (!window.state.livingProfile.auto || typeof window.state.livingProfile.auto !== 'object') {
+        window.state.livingProfile.auto = {};
+      }
+      return window.state.livingProfile;
+    }
+    function lpSetAutoDraft(key, value) {
+      var lp = lpEnsureSafeguardState();
+      if (!lp || !key) return;
+      var v = (typeof value === 'string') ? value : '';
+      // Only remember a non-empty auto draft. An empty auto value
+      // means "no auto draft yet" — the popover renders the disabled
+      // affordance for that state.
+      if (v.trim()) lp.auto[key] = v;
+    }
+    function lpGetAutoDraft(key) {
+      var lp = lpEnsureSafeguardState();
+      if (!lp || !key) return '';
+      var v = lp.auto[key];
+      return (typeof v === 'string' && v.trim()) ? v : '';
+    }
+    function lpAutoDraftKey(type, field) {
+      if (type === 'contact')    return 'contact.'    + (field || '');
+      if (type === 'foundation') return 'foundation.' + (field || '');
+      return type || '';
+    }
     function lpTrim(str, max) {
       if (!str) return '';
       var s = String(str).trim();
@@ -11700,6 +11765,19 @@ if (document.readyState === 'loading') {
 
       var rawName = (window.state && window.state.person) || cd.companion || '';
       var personName = lpResolveDisplayName(rawName, profile, transcriptsRawText(cd));
+      // v0.1 safeguard: record the name auto draft — what the resolver
+      // returns when the owner-edited full_name / display_name overrides
+      // are stripped out. Restore clears full_name and the resolver
+      // naturally falls back to this auto-derived name on re-render.
+      var autoNameProfile = {};
+      Object.keys(profile || {}).forEach(function (k) { autoNameProfile[k] = profile[k]; });
+      delete autoNameProfile.full_name;
+      delete autoNameProfile.fullName;
+      delete autoNameProfile.display_name;
+      delete autoNameProfile.displayName;
+      delete autoNameProfile.name;
+      var autoName = lpResolveDisplayName(rawName, autoNameProfile, transcriptsRawText(cd));
+      lpSetAutoDraft('name', autoName);
       var capName    = lpCaptureText('name-context');
 
       // ── Name & context ──────────────────────────────────────
@@ -11823,8 +11901,13 @@ if (document.readyState === 'loading') {
       var manualEssence = String((profile && (profile.essence_manual || profile.essence)) || '').trim();
       var capEssence = lpCaptureText('essence-line');
       var essenceFromCompass = lpFirst(pl.web_heading, pl.theme, pw.web_heading);
+      // v0.1 safeguard: snapshot the auto draft BEFORE the manual
+      // override wins. The auto value is the cleaned excerpt-or-
+      // compass essence — no prompt fragments leak here.
+      var autoEssence = capEssence || (essenceFromCompass ? lpTrim(essenceFromCompass, 200) : '');
+      lpSetAutoDraft('essence', autoEssence);
       var essenceSection = {
-        value: manualEssence || capEssence || (essenceFromCompass ? lpTrim(essenceFromCompass, 200) : ''),
+        value: manualEssence || autoEssence,
         source: manualEssence ? 'captured' : (capEssence ? 'captured' : (essenceFromCompass ? 'compass' : 'empty'))
       };
 
@@ -11836,6 +11919,12 @@ if (document.readyState === 'loading') {
       // communities that locate you…" -style prompt residue.
       var manualStatement = String((profile && (profile.statement_manual || profile.statement)) || '').trim();
       manualStatement = stripPromptResidue(manualStatement);
+      // v0.1 safeguard: statement has no deterministic auto source
+      // chain (it is owner-authored only). We still record an auto
+      // draft when one exists — the most recently saved manual value
+      // BEFORE the current edit becomes the auto draft so a user can
+      // undo a single subsequent edit. This is intentionally narrow:
+      // the storage happens in the popover Save handler, not here.
       var statementSection = {
         value: manualStatement,
         source: manualStatement ? 'captured' : 'empty'
@@ -12536,6 +12625,7 @@ if (document.readyState === 'loading') {
       var textarea = document.getElementById('lp-edit-popover-textarea');
       var hint = document.getElementById('lp-edit-popover-hint');
       var saveBtn = document.getElementById('lp-edit-popover-save');
+      var restoreBtn = document.getElementById('lp-edit-popover-restore');
       if (!pop || !input || !textarea || !saveBtn) return;
 
       // Reset.
@@ -12631,6 +12721,13 @@ if (document.readyState === 'loading') {
       }
 
       // Save handler — replace prior listener.
+      // v0.1 safeguard: capture the auto draft for this key (the
+      // pre-edit value currently on screen) on the FIRST manual save
+      // — so we always retain at least one previous value to restore
+      // to. We use whichever is non-empty: the displayed `current`
+      // string, or the auto value the builder already snapshotted.
+      var autoDraftKey = lpAutoDraftKey(type, field);
+
       saveBtn.onclick = function () {
         var val = textarea.style.display === 'block' ? textarea.value : input.value;
         val = String(val || '').trim();
@@ -12638,6 +12735,12 @@ if (document.readyState === 'loading') {
         if (!window.state.compassData.profile) window.state.compassData.profile = {};
         var p = window.state.compassData.profile;
         if (!p.foundation) p.foundation = {};
+        // Snapshot the previous value as the auto draft if we don't
+        // already have one. Only snapshots non-empty values — empty
+        // first edits remain "no auto draft yet".
+        if (autoDraftKey && !lpGetAutoDraft(autoDraftKey) && current) {
+          lpSetAutoDraft(autoDraftKey, String(current).trim());
+        }
         if (type === 'foundation') {
           if (field === 'human_design') {
             // Stored as a free-text string under foundation.human_design.label
@@ -12677,6 +12780,70 @@ if (document.readyState === 'loading') {
         pop.classList.remove('is-open');
         renderLivingProfile();
       };
+
+      // ── v0.1 safeguard: Restore auto draft ────────────────
+      // Enabled when an auto draft exists for this key. Click
+      // clears the manual override and re-renders so the auto
+      // value wins. For statement (owner-authored only) we restore
+      // the previous saved value held in state.livingProfile.auto.
+      if (restoreBtn) {
+        var auto = lpGetAutoDraft(autoDraftKey);
+        if (auto) {
+          restoreBtn.disabled = false;
+          restoreBtn.textContent = 'Restore auto draft';
+          restoreBtn.title = 'Replace with: ' + (auto.length > 80 ? auto.slice(0, 77) + '…' : auto);
+        } else {
+          restoreBtn.disabled = true;
+          restoreBtn.textContent = 'No auto draft yet';
+          restoreBtn.title = 'No auto draft has been recorded for this field yet.';
+        }
+        restoreBtn.onclick = function () {
+          if (restoreBtn.disabled) return;
+          var autoVal = lpGetAutoDraft(autoDraftKey);
+          if (!autoVal) return;
+          if (!window.state.compassData) window.state.compassData = {};
+          if (!window.state.compassData.profile) window.state.compassData.profile = {};
+          var p2 = window.state.compassData.profile;
+          if (!p2.foundation) p2.foundation = {};
+          if (type === 'essence') {
+            // Clearing the manual lets the auto chain (capture /
+            // compass / stored auto draft) win on re-render.
+            delete p2.essence_manual;
+            delete p2.essence;
+          } else if (type === 'statement') {
+            // Statement has no live auto chain — restore by writing
+            // the auto draft back to statement_manual.
+            p2.statement_manual = autoVal;
+          } else if (type === 'name') {
+            delete p2.full_name;
+          } else if (type === 'contact') {
+            if (p2.contact && typeof p2.contact === 'object') {
+              p2.contact[field] = autoVal;
+            } else {
+              p2.contact = {};
+              p2.contact[field] = autoVal;
+            }
+            p2[field] = autoVal;
+          } else if (type === 'foundation') {
+            if (field === 'human_design') {
+              p2.foundation.human_design = { label: autoVal };
+              p2.human_design = { label: autoVal };
+            } else if (field === 'astrology') {
+              p2.foundation.astrology = { label: autoVal };
+              p2.astrology = { label: autoVal };
+            } else if (field === 'gene_keys') {
+              p2.foundation.gene_keys = { life_work: autoVal };
+              p2.gene_keys = { life_work: autoVal };
+            } else {
+              p2.foundation[field] = autoVal;
+              p2[field] = autoVal;
+            }
+          }
+          try { if (typeof saveState === 'function') saveState(); } catch(_) {}
+          pop.classList.remove('is-open');
+          renderLivingProfile();
+        };
+      }
 
       pop.classList.add('is-open');
       // Focus the active control.
