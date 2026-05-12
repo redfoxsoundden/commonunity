@@ -12158,10 +12158,10 @@ if (document.readyState === 'loading') {
       // Doorway-like cards for The Work / Lens / Field / Call —
       // these point into the Personal Home (Level 2).
       var fourfoldMap = [
-        { sec: 'work',  label: 'The Work',  eye: 'Compass · North', src: s.workSummary,  gk: model.gk.work },
-        { sec: 'lens',  label: 'The Lens',  eye: 'Compass · East',  src: s.lensSummary,  gk: model.gk.lens },
-        { sec: 'field', label: 'The Field', eye: 'Compass · South', src: s.fieldSummary, gk: model.gk.field },
-        { sec: 'call',  label: 'The Call',  eye: 'Compass · West',  src: s.callSummary,  gk: model.gk.call }
+        { sec: 'work',  label: 'The Work',  eye: 'Compass', src: s.workSummary,  gk: model.gk.work },
+        { sec: 'lens',  label: 'The Lens',  eye: 'Compass', src: s.lensSummary,  gk: model.gk.lens },
+        { sec: 'field', label: 'The Field', eye: 'Compass', src: s.fieldSummary, gk: model.gk.field },
+        { sec: 'call',  label: 'The Call',  eye: 'Compass', src: s.callSummary,  gk: model.gk.call }
       ];
       html += '<nav class="lp-compass" aria-label="Fourfold compass">';
       fourfoldMap.forEach(function (f) {
@@ -12248,10 +12248,10 @@ if (document.readyState === 'loading') {
       // Cache the per-section detail so the popup can pull without
       // rebuilding the whole model.
       window.__lpFourfoldDetail = {
-        work:  { label: 'The Work',  eye: 'Compass · North', src: s.workSummary,  gk: model.gk.work },
-        lens:  { label: 'The Lens',  eye: 'Compass · East',  src: s.lensSummary,  gk: model.gk.lens },
-        field: { label: 'The Field', eye: 'Compass · South', src: s.fieldSummary, gk: model.gk.field },
-        call:  { label: 'The Call',  eye: 'Compass · West',  src: s.callSummary,  gk: model.gk.call }
+        work:  { label: 'The Work',  eye: 'Compass', src: s.workSummary,  gk: model.gk.work },
+        lens:  { label: 'The Lens',  eye: 'Compass', src: s.lensSummary,  gk: model.gk.lens },
+        field: { label: 'The Field', eye: 'Compass', src: s.fieldSummary, gk: model.gk.field },
+        call:  { label: 'The Call',  eye: 'Compass', src: s.callSummary,  gk: model.gk.call }
       };
 
       // ── Get in touch · prominent bottom contact section ────
