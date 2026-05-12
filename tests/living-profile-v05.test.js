@@ -40,7 +40,7 @@ assert(!/lp-hero[\s\S]{0,800}lp-hero-slot is-sigil/.test(src.slice(heroOpen, her
 
 console.log('\nField Imprints');
 assert(/lp-field-imprints/.test(src), 'lp-field-imprints class exists');
-assert(/Field Imprints · the ground beneath/.test(src), 'Field Imprints eyebrow present');
+assert(!/Field Imprints · the ground beneath/.test(src), 'Field Imprints eyebrow removed');
 assert(/Field <em>Imprints<\/em>/.test(src), 'Field Imprints title present');
 assert(/lp-field-imprints-sigil/.test(src), 'sigil placeholder lives inside Field Imprints');
 assert(/Cosmic <em>identity<\/em>/.test(src) === false,
