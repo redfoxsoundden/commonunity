@@ -12238,42 +12238,6 @@ if (document.readyState === 'loading') {
         swHtml +
       '</section>';
 
-      // ── Source-notes toggle row (right-aligned, subtle) ────
-      var c = model.counts;
-      var coverageChips =
-        '<span class="lp-coverage-chip is-compass">From Compass · ' + (c.compass + c.mixed) + ' / ' + c.total + '</span>' +
-        '<span class="lp-coverage-chip is-captured">From Field Notes · ' + (c.captured + c.mixed) + ' / ' + c.total + '</span>' +
-        '<span class="lp-coverage-chip is-empty">Awaiting · ' + c.empty + ' / ' + c.total + '</span>';
-      var sourceLine =
-        'Drafted from Compass import + Field Notes captures' +
-        (model.transcripts.count ? ' · ' + model.transcripts.count + ' transcript' + (model.transcripts.count === 1 ? '' : 's') : '') +
-        '.';
-      html += '<div class="lp-source-row">' +
-        '<button type="button" class="lp-source-toggle" id="lp-source-toggle-btn" aria-expanded="false" aria-controls="lp-source-detail">' +
-          'Source notes <span class="lp-source-toggle-caret" aria-hidden="true">▾</span>' +
-        '</button>' +
-      '</div>' +
-      '<section class="lp-section s-meta lp-source-detail" id="lp-source-detail" hidden>' +
-        '<p class="lp-source-note"><span class="lp-source-tag">Source</span>' + lpEscape(sourceLine) + '</p>' +
-        '<div class="lp-coverage" style="margin-top:8px;">' + coverageChips + '</div>' +
-      '</section>';
-
-      // ── Editorial body: expanded compass summaries only.
-      //    Name / context / essence / roles already live in the hero
-      //    above, so they are NOT repeated here. The fourfold
-      //    summaries are demoted under a single "Expanded summaries"
-      //    eyebrow so they read as supporting depth, not a second
-      //    profile.
-      function renderSection(label, sec, sectionData, body) {
-        var gkBadge = sectionData && sectionData._gk
-          ? ' <span class="lp-section-source is-compass">GK ' + lpEscape(sectionData._gk) + '</span>'
-          : '';
-        return '<section class="lp-section s-' + sec + '">' +
-          '<div class="lp-section-head"><span class="lp-section-label">' + label + gkBadge + '</span>' +
-          lpSourceTag((sectionData && sectionData.source) || 'empty') + '</div>' +
-          body + '</section>';
-      }
-
       // Expanded fourfold summaries are no longer rendered inline.
       // Clicking a card in .lp-compass opens .lp-fourfold-popup with
       // the full text + tags + Gene Key. See wireFourfoldPopup below.
@@ -12289,25 +12253,6 @@ if (document.readyState === 'loading') {
         field: { label: 'The Field', eye: 'Compass · South', src: s.fieldSummary, gk: model.gk.field },
         call:  { label: 'The Call',  eye: 'Compass · West',  src: s.callSummary,  gk: model.gk.call }
       };
-
-      // Contact & invitation
-      var contactBody = '';
-      if (s.contact.invitation) {
-        contactBody += '<p class="lp-body">' + lpEscape(s.contact.invitation) + '</p>';
-      }
-      if (s.contact.practices && s.contact.practices.length) {
-        contactBody += '<dl class="lp-meta-grid"><dt>Practices</dt><dd>' +
-          lpEscape(s.contact.practices.join(' · ')) + '</dd></dl>';
-      }
-      if (s.contact.meta && s.contact.meta.length) {
-        contactBody += '<dl class="lp-meta-grid">' +
-          s.contact.meta.map(lpRenderContactRow).join('') +
-          '</dl>';
-      }
-      if (!contactBody) {
-        contactBody = '<p class="lp-empty">Not enough source material yet — how and on what terms you welcome people in.</p>';
-      }
-      html += renderSection('Contact &amp; invitation', 'call', s.contact, contactBody);
 
       // ── Get in touch · prominent bottom contact section ────
       // Reads structured contact data straight from compassData.profile
@@ -12469,25 +12414,6 @@ if (document.readyState === 'loading') {
           notePanel.classList.remove('is-open');
           if (noteToggle) noteToggle.setAttribute('aria-expanded', 'false');
           setKnockState('Note saved locally — kept in this browser until a backend is wired.');
-        });
-      }
-
-      // Wire collapsible source notes toggle — toggles a CSS class
-      // on the card so per-section provenance chips show too.
-      var srcBtn    = document.getElementById('lp-source-toggle-btn');
-      var srcDetail = document.getElementById('lp-source-detail');
-      if (srcBtn && srcDetail) {
-        srcBtn.addEventListener('click', function () {
-          var expanded = srcBtn.getAttribute('aria-expanded') === 'true';
-          if (expanded) {
-            srcDetail.setAttribute('hidden', '');
-            srcBtn.setAttribute('aria-expanded', 'false');
-            if (card) card.classList.remove('show-sources');
-          } else {
-            srcDetail.removeAttribute('hidden');
-            srcBtn.setAttribute('aria-expanded', 'true');
-            if (card) card.classList.add('show-sources');
-          }
         });
       }
 
