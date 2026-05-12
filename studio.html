@@ -5146,6 +5146,23 @@ input, textarea { font: inherit; color: inherit; }
 .sw-tile.s-lens   .sw-tile-tag { background: rgba(60,140,200,0.85); }
 .sw-tile.s-field  .sw-tile-tag { background: rgba(60,160,120,0.85); }
 .sw-tile.s-call   .sw-tile-tag { background: rgba(200,120,80,0.85); }
+/* Wrapper anchor for an image with an optional link. Keeps the
+   figure flush inside the gallery grid; only marks the image as
+   interactive via a subtle hover/focus halo. */
+.sw-tile-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+  outline: none;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.sw-tile-link:hover,
+.sw-tile-link:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -10px rgba(0,0,0,0.55);
+}
+.sw-tile.has-link { cursor: pointer; }
 
 /* Editor-only chrome inside the modal */
 .sw-edit-grid {
@@ -5220,6 +5237,27 @@ input, textarea { font: inherit; color: inherit; }
   font-style: italic;
   padding: 12px 0 0;
 }
+/* Optional link input row inside each filled gallery slot. */
+.sw-slot-link-row { align-items: stretch; }
+.sw-link-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  align-self: center;
+}
+.sw-link-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-family: inherit;
+}
+.sw-link-input:focus { outline: 1px solid color-mix(in srgb, var(--rose-color, #c4b5fd) 60%, transparent); }
 
 /* Living Profile section — sits near At the Door */
 .lp-studio-window {
@@ -5536,6 +5574,130 @@ input, textarea { font: inherit; color: inherit; }
   color: var(--text-faint);
   font-style: italic;
 }
+/* ── Get in touch · prominent bottom contact section ──────── */
+.lp-git {
+  position: relative;
+  margin-top: var(--space-6);
+  padding: clamp(var(--space-5), 3vw, var(--space-7));
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--call, #f6a3b6) 35%, var(--border));
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--call, #f6a3b6) 14%, transparent), transparent 55%),
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--rose-color, #c4b5fd) 12%, transparent), transparent 60%),
+    color-mix(in srgb, var(--input-bg) 30%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent),
+    0 12px 40px -24px color-mix(in srgb, var(--call, #f6a3b6) 55%, transparent);
+}
+.lp-git-head { margin: 0 0 var(--space-4); }
+.lp-git-eye {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--call, #f6a3b6) 80%, var(--text-muted));
+  margin-bottom: 6px;
+}
+.lp-git-title {
+  font-family: 'Cormorant Garamond', 'Plus Jakarta Sans', Georgia, serif;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+  color: var(--text);
+}
+.lp-git-title em {
+  font-style: italic;
+  color: color-mix(in srgb, var(--call, #f6a3b6) 85%, var(--text));
+}
+.lp-git-lede {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 60ch;
+}
+.lp-git-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+.lp-git-item {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  background: color-mix(in srgb, var(--input-bg) 55%, transparent);
+  cursor: pointer;
+  transition: transform var(--transition), border-color var(--transition), background var(--transition);
+}
+.lp-git-item:hover,
+.lp-git-item:focus-visible {
+  outline: none;
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--call, #f6a3b6) 55%, var(--border));
+  background: color-mix(in srgb, var(--call, #f6a3b6) 8%, var(--input-bg));
+}
+.lp-git-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--call, #f6a3b6) 18%, var(--input-bg));
+  color: color-mix(in srgb, var(--call, #f6a3b6) 90%, var(--text));
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 16px;
+  line-height: 1;
+}
+.lp-git-body { display: flex; flex-direction: column; min-width: 0; }
+.lp-git-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.lp-git-value {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lp-git-item.is-empty .lp-git-value {
+  color: var(--text-faint);
+  font-style: italic;
+}
+.lp-git-open {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--call, #f6a3b6) 45%, var(--border));
+  background: color-mix(in srgb, var(--call, #f6a3b6) 12%, var(--input-bg));
+  transition: background var(--transition), border-color var(--transition);
+}
+.lp-git-open:hover,
+.lp-git-open:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--call, #f6a3b6) 22%, var(--input-bg));
+  border-color: color-mix(in srgb, var(--call, #f6a3b6) 70%, var(--border));
+}
+
 .lp-foundation-item[data-lp-edit] {
   cursor: pointer;
   transition: border-color var(--transition), background var(--transition);
@@ -6946,6 +7108,20 @@ function compressImageFile(file, maxDim, quality) {
   });
 }
 
+// Normalize a user-entered link. Returns a safe http(s)/mailto URL or
+// '' if empty/unsafe. http(s)-less inputs like "example.com/x" are
+// prefixed with https://. javascript:/data: schemes are rejected so a
+// crafted link can't smuggle script into the gallery output.
+function normalizeStudioWindowLink(raw) {
+  var s = String(raw == null ? '' : raw).trim();
+  if (!s) return '';
+  if (/^javascript:/i.test(s) || /^data:/i.test(s) || /^vbscript:/i.test(s)) return '';
+  if (/^mailto:/i.test(s)) return s;
+  if (/^https?:\/\//i.test(s)) return s;
+  if (/^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(s)) return 'https://' + s;
+  return '';
+}
+
 function studioWindowAdd(item) {
   var list = ensureStudioWindow();
   if (list.length >= STUDIO_WINDOW_MAX) return null;
@@ -6954,11 +7130,23 @@ function studioWindowAdd(item) {
     type: 'image',
     room: STUDIO_WINDOW_ROOMS.indexOf(item && item.room) >= 0 ? item.room : 'work',
     src: item && item.src ? item.src : '',
+    link: normalizeStudioWindowLink(item && item.link),
     createdAt: new Date().toISOString()
   };
   list.push(entry);
   try { if (typeof saveState === 'function') saveState(); } catch (_) {}
   return entry;
+}
+
+// Set/clear the link on an existing Studio Window item. Returns true
+// if the entry was found. Empty input clears the link.
+function studioWindowSetLink(id, raw) {
+  var list = ensureStudioWindow();
+  var it = list.find(function (x) { return x && x.id === id; });
+  if (!it) return false;
+  it.link = normalizeStudioWindowLink(raw);
+  try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+  return true;
 }
 
 function studioWindowRemove(id) {
@@ -11229,6 +11417,66 @@ if (document.readyState === 'loading') {
       });
       return parts.join('\n').slice(0, 20000);
     }
+
+    // Build a structured "Get in touch" model from compassData.profile.
+    // Reads both the canonical profile.contact block written by
+    // buildCompassExport AND the legacy flat aliases so older sessions
+    // / imports keep working. Returns an array of rows, each with a
+    // tag (kind), label, href, displayText, and optional glyph. Empty
+    // values are dropped — the caller decides what to do when the
+    // list is empty.
+    function lpBuildContactRows(profile) {
+      profile = profile || {};
+      var c = (profile.contact && typeof profile.contact === 'object') ? profile.contact : {};
+      function val(k) {
+        var v = String((c[k] || profile[k] || '') ).trim();
+        return v;
+      }
+      function rawHref(kind, v) {
+        if (!v) return '';
+        if (kind === 'email')    return /^mailto:/i.test(v) ? v : ('mailto:' + v);
+        if (kind === 'phone')    return /^tel:/i.test(v)    ? v : ('tel:'    + v.replace(/\s+/g,''));
+        if (kind === 'whatsapp') {
+          if (/^https?:\/\//i.test(v)) return v;
+          var digits = v.replace(/[^0-9+]/g, '');
+          if (!digits) return '';
+          return 'https://wa.me/' + digits.replace(/^\+/, '');
+        }
+        // URLs (calendar / website / linkedin / contact / socials).
+        var u = lpNormUrl(v);
+        if (/^https?:\/\//i.test(u)) return u;
+        // bare domain → prepend https://
+        if (/^[a-z0-9.-]+\.[a-z]{2,}/i.test(u)) return 'https://' + u;
+        return '';
+      }
+      var defs = [
+        { kind: 'email',        key: 'email',        label: 'Email',    glyph: '✉' },
+        { kind: 'phone',        key: 'phone',        label: 'Phone',    glyph: '☏' },
+        { kind: 'whatsapp',     key: 'whatsapp',     label: 'WhatsApp', glyph: '◑' },
+        { kind: 'calendar_url', key: 'calendar_url', label: 'Book a meeting', glyph: '◐' },
+        { kind: 'website',      key: 'website',      label: 'Website',  glyph: '↗' },
+        { kind: 'contact_url',  key: 'contact_url',  label: 'Contact',  glyph: '↗' },
+        { kind: 'linkedin_url', key: 'linkedin_url', label: 'LinkedIn', glyph: 'in' },
+        { kind: 'instagram',    key: 'instagram',    label: 'Instagram',glyph: '◉' },
+        { kind: 'twitter',      key: 'twitter',      label: 'X · Twitter', glyph: '✕' },
+        { kind: 'youtube',      key: 'youtube',      label: 'YouTube',  glyph: '▶' }
+      ];
+      var rows = [];
+      defs.forEach(function (d) {
+        var raw = val(d.key);
+        if (!raw) return;
+        var href = rawHref(d.kind === 'calendar_url' || d.kind === 'website' ||
+                            d.kind === 'contact_url' || d.kind === 'linkedin_url' ||
+                            d.kind === 'instagram' || d.kind === 'twitter' || d.kind === 'youtube'
+                              ? 'url' : d.kind, raw);
+        if (!href) return;
+        rows.push({
+          kind: d.kind, key: d.key, label: d.label, glyph: d.glyph,
+          href: href, display: raw
+        });
+      });
+      return rows;
+    }
     // Pull role-like phrases out of free text: "Conscious Business
     // Strategist", "creator of Corporate Unplugged", "Advisor to ...".
     // Conservative — only matches strong patterns.
@@ -12007,6 +12255,58 @@ if (document.readyState === 'loading') {
       }
       html += renderSection('Contact &amp; invitation', 'call', s.contact, contactBody);
 
+      // ── Get in touch · prominent bottom contact section ────
+      // Reads structured contact data straight from compassData.profile
+      // (and the new profile.contact block written by buildCompassExport).
+      // Falls back to "no contact details yet" if nothing is set; in
+      // that case the section still renders so the owner can click in
+      // and add fields via the edit popover.
+      var contactProfile = ((window.state && window.state.compassData) || {}).profile || {};
+      var contactRows = lpBuildContactRows(contactProfile);
+      var gitHeading = 'Get in <em>touch</em>';
+      var gitLede = contactRows.length
+        ? 'Pick the channel that fits — every link opens in a new tab.'
+        : 'No contact details yet. Tap a row below to add an email, phone, WhatsApp, calendar, or website.';
+      var gitFields = [
+        { key: 'email',        label: 'Email',     placeholder: 'you@domain.com' },
+        { key: 'phone',        label: 'Phone',     placeholder: '+1 555 123 4567' },
+        { key: 'whatsapp',     label: 'WhatsApp',  placeholder: '+1 555 123 4567 or wa.me/…' },
+        { key: 'calendar_url', label: 'Calendar',  placeholder: 'https://cal.com/you' },
+        { key: 'website',      label: 'Website',   placeholder: 'https://your.site' },
+        { key: 'linkedin_url', label: 'LinkedIn',  placeholder: 'https://linkedin.com/in/you' },
+        { key: 'instagram',    label: 'Instagram', placeholder: 'https://instagram.com/you' },
+        { key: 'twitter',      label: 'X · Twitter', placeholder: 'https://x.com/you' }
+      ];
+      var rowsByKey = {};
+      contactRows.forEach(function (r) { rowsByKey[r.key] = r; });
+      var gitItemsHtml = gitFields.map(function (f) {
+        var r = rowsByKey[f.key];
+        var has = !!r;
+        var disp = has ? r.display : 'Not set yet';
+        var glyph = has ? (r.glyph || '↗') : '+';
+        return '<li class="lp-git-item' + (has ? ' has-value' : ' is-empty') + '"' +
+          ' data-lp-edit="contact" data-lp-field="' + lpEscape(f.key) + '"' +
+          ' data-lp-placeholder="' + lpEscape(f.placeholder) + '"' +
+          ' tabindex="0" role="button" title="' + (has ? 'Edit ' : 'Add ') + lpEscape(f.label) + '">' +
+            '<span class="lp-git-glyph" aria-hidden="true">' + lpEscape(glyph) + '</span>' +
+            '<span class="lp-git-body">' +
+              '<span class="lp-git-label">' + lpEscape(f.label) + '</span>' +
+              '<span class="lp-git-value">' + lpEscape(disp) + '</span>' +
+            '</span>' +
+            (has
+              ? '<a class="lp-git-open" href="' + lpEscape(r.href) + '" target="_blank" rel="noopener noreferrer" aria-label="Open ' + lpEscape(f.label) + '" data-lp-no-edit="1" onclick="event.stopPropagation();">Open</a>'
+              : '') +
+        '</li>';
+      }).join('');
+      html += '<section class="lp-git" aria-label="Get in touch">' +
+        '<header class="lp-git-head">' +
+          '<span class="lp-git-eye">Contact me · across the threshold</span>' +
+          '<h3 class="lp-git-title">' + gitHeading + '</h3>' +
+          '<p class="lp-git-lede">' + lpEscape(gitLede) + '</p>' +
+        '</header>' +
+        '<ul class="lp-git-grid">' + gitItemsHtml + '</ul>' +
+      '</section>';
+
       // ── Go deeper CTA: bridge from Living Profile to Personal Home.
       // Same fourfold architecture, deeper depth. Non-destructive: only
       // shows the button if Personal Home is wired in this build.
@@ -12173,6 +12473,20 @@ if (document.readyState === 'loading') {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
         });
       });
+      // Get-in-touch contact rows reuse the same popover. The "Open"
+      // anchor inside a populated row carries data-lp-no-edit so a
+      // click on it (after stopPropagation in onclick) doesn't open
+      // the editor.
+      lpBody.querySelectorAll('[data-lp-edit="contact"]').forEach(function (item) {
+        function open(e) {
+          if (e && e.target && e.target.closest && e.target.closest('[data-lp-no-edit]')) return;
+          openLpEditPopover('contact', item.getAttribute('data-lp-field'), item);
+        }
+        item.addEventListener('click', open);
+        item.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); }
+        });
+      });
       var essenceEl = document.getElementById('lp-hero-essence-text');
       if (essenceEl) {
         essenceEl.addEventListener('click', function () {
@@ -12306,6 +12620,30 @@ if (document.readyState === 'loading') {
         // Prefer full_name if present, otherwise current label.
         input.value = (profile.full_name || current || '').toString();
         if (hint) hint.textContent = 'Saved locally with your session.';
+      } else if (type === 'contact') {
+        var contactLabels = {
+          email:        'Email address',
+          phone:        'Phone number',
+          whatsapp:     'WhatsApp (phone number or wa.me link)',
+          calendar_url: 'Calendar / booking link',
+          website:      'Website URL',
+          contact_url:  'Contact page URL',
+          linkedin_url: 'LinkedIn URL',
+          instagram:    'Instagram URL',
+          twitter:      'X · Twitter URL',
+          youtube:      'YouTube URL',
+          other:        'Other link'
+        };
+        if (label) label.textContent = contactLabels[field] || ('Contact · ' + field);
+        var placeholder = anchorEl && anchorEl.getAttribute
+          ? (anchorEl.getAttribute('data-lp-placeholder') || '')
+          : '';
+        if (placeholder) input.setAttribute('placeholder', placeholder);
+        // Read current straight from profile.contact (canonical) with
+        // a fallback to the flat alias.
+        var existing = (profile.contact && profile.contact[field]) || profile[field] || '';
+        input.value = String(existing || '');
+        if (hint) hint.textContent = 'Saved locally with your session. Leave blank to remove this contact channel.';
       }
 
       // Save handler — replace prior listener.
@@ -12334,6 +12672,18 @@ if (document.readyState === 'loading') {
           }
         } else if (type === 'essence') {
           p.essence_manual = val;
+        } else if (type === 'contact') {
+          if (!p.contact || typeof p.contact !== 'object') p.contact = {};
+          if (val) {
+            p.contact[field] = val;
+            // Mirror to the flat alias Studio's existing render paths
+            // already read so older code (top CTA, doorway, contact
+            // section) picks the value up without changes.
+            p[field] = val;
+          } else {
+            delete p.contact[field];
+            delete p[field];
+          }
         } else if (type === 'name') {
           p.full_name = val;
         }
@@ -12869,6 +13219,13 @@ if (document.readyState === 'loading') {
                 '<label class="sw-file-label">Replace<input type="file" accept="image/*" data-sw-replace-id="' + item.id + '"></label>' +
                 '<button type="button" class="sw-btn sw-btn-danger" data-sw-remove-id="' + item.id + '">Remove</button>' +
               '</div>' +
+              '<div class="sw-slot-row sw-slot-link-row">' +
+                '<label class="sw-link-label" for="sw-link-' + item.id + '">Link</label>' +
+                '<input type="url" class="sw-link-input" id="sw-link-' + item.id + '" data-sw-link-id="' + item.id + '"' +
+                  ' placeholder="https://… (optional)"' +
+                  ' value="' + lpEscape(item.link || '') + '"' +
+                  ' aria-label="Optional link for this image">' +
+              '</div>' +
             '</div>' +
           '</div>';
         } else {
@@ -12953,6 +13310,27 @@ if (document.readyState === 'loading') {
           });
         }
       );
+      // ── Wire optional link inputs ──────────────────────────
+      // The link is persisted on blur (and on Enter) so typing
+      // doesn't thrash localStorage. Empty input clears the link.
+      Array.prototype.forEach.call(
+        swBody.querySelectorAll('input[data-sw-link-id]'),
+        function (inp) {
+          function commit() {
+            var id = inp.getAttribute('data-sw-link-id');
+            var normalized = normalizeStudioWindowLink(inp.value);
+            studioWindowSetLink(id, inp.value);
+            // Reflect the normalized value back into the field so the
+            // owner sees what was actually saved (e.g., https:// prefix).
+            inp.value = normalized;
+            try { if (typeof window.refreshStudioWindowSurfaces === 'function') window.refreshStudioWindowSurfaces(); } catch (_) {}
+          }
+          inp.addEventListener('blur', commit);
+          inp.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+          });
+        }
+      );
     }
 
     function openStudioWindow() {
@@ -12989,12 +13367,26 @@ if (document.readyState === 'loading') {
         var label = STUDIO_WINDOW_ROOM_LABEL[it.room] || '';
         var glyph = STUDIO_WINDOW_ROOM_GLYPH[it.room] || '';
         var alt = 'Studio Window image for ' + label;
-        html += '<figure class="sw-tile s-' + lpEscape(it.room) + '" role="listitem">' +
-          '<img alt="' + lpEscape(alt) + '" src="' + lpEscape(it.src) + '">' +
-          '<figcaption class="sw-tile-tag" aria-label="Room tag · ' + lpEscape(label) + '">' +
-            (glyph ? '<span aria-hidden="true">' + glyph + '</span> ' : '') + lpEscape(label) +
-          '</figcaption>' +
-        '</figure>';
+        var safeLink = normalizeStudioWindowLink(it.link);
+        var imgHtml = '<img alt="' + lpEscape(alt) + '" src="' + lpEscape(it.src) + '">';
+        var caption = '<figcaption class="sw-tile-tag" aria-label="Room tag · ' + lpEscape(label) + '">' +
+          (glyph ? '<span aria-hidden="true">' + glyph + '</span> ' : '') + lpEscape(label) +
+        '</figcaption>';
+        if (safeLink) {
+          // Wrap the figure in a safe new-tab link. rel includes
+          // noopener + noreferrer so the linked page cannot reach
+          // window.opener / leak Referer.
+          html += '<a class="sw-tile-link" href="' + lpEscape(safeLink) + '" target="_blank" rel="noopener noreferrer"' +
+                  ' aria-label="Open external link for ' + lpEscape(label) + ' image">' +
+            '<figure class="sw-tile s-' + lpEscape(it.room) + ' has-link" role="listitem">' +
+              imgHtml + caption +
+            '</figure>' +
+          '</a>';
+        } else {
+          html += '<figure class="sw-tile s-' + lpEscape(it.room) + '" role="listitem">' +
+            imgHtml + caption +
+          '</figure>';
+        }
       });
       html += '</div>';
       return html;

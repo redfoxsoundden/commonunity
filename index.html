@@ -4551,6 +4551,49 @@ function buildCompassExport(s) {
     gene_keys:        profile.gene_keys
   }, profile.foundation || {});
 
+  // Structured contact block — collected so Studio's Living Profile
+  // can render a single "Get in touch" section without having to
+  // probe a dozen aliases. We preserve every alias we already accept
+  // (linkedin_url, calendly_url, scheduling_url, etc.) and add a
+  // nested profile.contact object as the canonical home. Existing
+  // shapes still win — profile.contact is filled IN if absent.
+  function pickStr() {
+    for (var i = 0; i < arguments.length; i++) {
+      var v = arguments[i];
+      if (typeof v === 'string' && v.trim()) return v.trim();
+    }
+    return '';
+  }
+  var existingContact = (profile.contact && typeof profile.contact === 'object') ? profile.contact : {};
+  var contactBlock = {
+    email:        pickStr(existingContact.email,        profile.email,        profile.contact_email),
+    phone:        pickStr(existingContact.phone,        profile.phone,        profile.telephone,    profile.tel),
+    whatsapp:     pickStr(existingContact.whatsapp,     profile.whatsapp,     profile.whats_app,    profile.wa),
+    website:      pickStr(existingContact.website,      profile.website,      profile.site_url,     profile.url),
+    calendar_url: pickStr(existingContact.calendar_url, profile.calendar_url, profile.calendly_url, profile.scheduling_url),
+    contact_url:  pickStr(existingContact.contact_url,  profile.contact_url),
+    linkedin_url: pickStr(existingContact.linkedin_url, profile.linkedin_url),
+    instagram:    pickStr(existingContact.instagram,    profile.instagram,    profile.instagram_url),
+    twitter:      pickStr(existingContact.twitter,      profile.twitter,      profile.twitter_url,  profile.x_url),
+    youtube:      pickStr(existingContact.youtube,      profile.youtube,      profile.youtube_url),
+    other:        pickStr(existingContact.other,        profile.other_url)
+  };
+  // Drop empty keys so the JSON stays clean, but always keep the
+  // canonical `contact` key on the profile so loaders can detect it.
+  Object.keys(contactBlock).forEach(function (k) {
+    if (!contactBlock[k]) delete contactBlock[k];
+  });
+  profile.contact = Object.assign({}, contactBlock, existingContact);
+  // Mirror back to the flat aliases Studio's earlier code already
+  // reads, so older render paths (calendar_url at profile root etc.)
+  // keep working without changes.
+  ['email','phone','whatsapp','website','calendar_url','contact_url','linkedin_url','instagram','twitter','youtube']
+    .forEach(function (k) {
+      if (!profile[k] && profile.contact && profile.contact[k]) {
+        profile[k] = profile.contact[k];
+      }
+    });
+
   // Top-level aliases used by Studio's fallback chain.
   const out = Object.assign({}, s, { profile });
   if (s.dob && !out.date_of_birth)   out.date_of_birth   = s.dob;
