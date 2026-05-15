@@ -23,6 +23,28 @@ function currentUser(req) {
   return db.getUserById(req.session.userId);
 }
 
+// Parse a boolean-ish env value. Accepts: true/false, 1/0, yes/no, on/off (case-insensitive).
+// Returns the fallback for undefined/empty/unrecognized values.
+function parseBoolEnv(raw, fallback) {
+  if (raw == null) return fallback;
+  const v = String(raw).trim().toLowerCase();
+  if (v === "") return fallback;
+  if (["true", "1", "yes", "on"].includes(v)) return true;
+  if (["false", "0", "no", "off"].includes(v)) return false;
+  return fallback;
+}
+
+// Parse a positive integer env value with a fallback.
+function parseIntEnv(raw, fallback) {
+  const n = parseInt(String(raw ?? "").trim(), 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+// Redact a magic token for log output: show first 6 chars + length, never the full token.
+function redactLink(link) {
+  return String(link || "").replace(/token=([^&\s]+)/, (_, t) => `token=${t.slice(0, 6)}…(${t.length})`);
+}
+
 async function deliverMagicLink({ email, link }) {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
@@ -31,15 +53,28 @@ async function deliverMagicLink({ email, link }) {
     console.log(`[field/auth] magic link for ${email}:\n  ${link}\n  (SMTP not configured — dev fallback)`);
     return { delivered: false, devLink: link };
   }
+  const port = parseIntEnv(process.env.SMTP_PORT, 587);
+  // SMTP_SECURE explicit value wins; otherwise infer from port 465.
+  const secure = parseBoolEnv(process.env.SMTP_SECURE, port === 465);
+  // Short, explicit timeouts so the HTTP request can never hang for 30+ seconds
+  // waiting on an unresponsive SMTP server. ~10s is well under typical proxy/edge timeouts.
+  const connectionTimeout = parseIntEnv(process.env.SMTP_CONNECTION_TIMEOUT_MS, 10000);
+  const greetingTimeout = parseIntEnv(process.env.SMTP_GREETING_TIMEOUT_MS, 10000);
+  const socketTimeout = parseIntEnv(process.env.SMTP_SOCKET_TIMEOUT_MS, 12000);
+
+  console.log(`[field/auth] mail attempt host=${host} port=${port} secure=${secure} to=${email}`);
+
   // Lazy require so nodemailer is optional.
   try {
     const nodemailer = require("nodemailer");
     const transporter = nodemailer.createTransport({
-      host, port: parseInt(process.env.SMTP_PORT || "587", 10),
-      secure: parseInt(process.env.SMTP_PORT || "587", 10) === 465,
+      host, port, secure,
       auth: { user, pass },
+      connectionTimeout,
+      greetingTimeout,
+      socketTimeout,
     });
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: process.env.SMTP_FROM || `"CommonUnity Field" <${user}>`,
       to: email,
       subject: "Your CommonUnity Field link",
@@ -52,11 +87,15 @@ async function deliverMagicLink({ email, link }) {
         "If you did not request this, you can ignore it — the link will expire on its own.",
       ].join("\n"),
     });
+    console.log(`[field/auth] mail delivered to=${email} messageId=${info && info.messageId ? info.messageId : "?"}`);
     return { delivered: true };
   } catch (e) {
-    console.warn("[field/auth] mail send failed, falling back to console:", e.message);
-    console.log(`[field/auth] magic link for ${email}:\n  ${link}`);
-    return { delivered: false, devLink: link, error: e.message };
+    // Structured failure log: include error code/message but NEVER the SMTP password or full token.
+    const code = e && (e.code || e.responseCode) ? (e.code || e.responseCode) : "ERR";
+    console.warn(`[field/auth] mail send failed host=${host} port=${port} secure=${secure} to=${email} code=${code} msg=${e.message}`);
+    // Dev fallback log uses a redacted link so the full token does not appear in shared logs.
+    console.log(`[field/auth] magic link (redacted) for ${email}: ${redactLink(link)}`);
+    return { delivered: false, devLink: link, error: e.message, code };
   }
 }
 
@@ -95,7 +134,13 @@ function registerAuthRoutes(app) {
     const base = publicBaseUrl(req);
     const link = `${base}/auth/callback?token=${token}`;
     const delivery = await deliverMagicLink({ email, link });
-    res.json({ ok: true, queued: true, dev: delivery.delivered ? undefined : { link } });
+    // Only expose the raw link to the client outside production, so a failed SMTP
+    // delivery in prod never leaks a usable token over HTTP. Always return ok:true
+    // so the response shape is identical for beta vs non-beta and success vs failure.
+    const isProd = process.env.NODE_ENV === "production";
+    const body = { ok: true, queued: true };
+    if (!isProd && !delivery.delivered) body.dev = { link };
+    res.json(body);
   });
 
   app.get("/auth/callback", (req, res) => {

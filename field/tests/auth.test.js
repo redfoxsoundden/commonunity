@@ -88,6 +88,185 @@ function test(name, fn) {
     assert.equal(typeof nodemailer.createTransport, "function");
   });
 
+  // ── SMTP transport config: timeouts + secure/port parsing ───────────────
+  // We intercept nodemailer.createTransport so no real socket is opened.
+  // The deliverMagicLink module was already required above, so monkey-patch
+  // the cached nodemailer module's createTransport.
+  const nodemailer = require("nodemailer");
+  const origCreateTransport = nodemailer.createTransport;
+
+  function withFakeTransport(captured, fn) {
+    nodemailer.createTransport = (opts) => {
+      captured.opts = opts;
+      return { sendMail: async () => ({ messageId: "<fake@test>" }) };
+    };
+    const SMTP_SAVED = {
+      SMTP_HOST: process.env.SMTP_HOST,
+      SMTP_USER: process.env.SMTP_USER,
+      SMTP_PASS: process.env.SMTP_PASS,
+      SMTP_PORT: process.env.SMTP_PORT,
+      SMTP_SECURE: process.env.SMTP_SECURE,
+      SMTP_CONNECTION_TIMEOUT_MS: process.env.SMTP_CONNECTION_TIMEOUT_MS,
+      SMTP_GREETING_TIMEOUT_MS: process.env.SMTP_GREETING_TIMEOUT_MS,
+      SMTP_SOCKET_TIMEOUT_MS: process.env.SMTP_SOCKET_TIMEOUT_MS,
+    };
+    return Promise.resolve(fn()).finally(() => {
+      nodemailer.createTransport = origCreateTransport;
+      for (const [k, v] of Object.entries(SMTP_SAVED)) {
+        if (v === undefined) delete process.env[k];
+        else process.env[k] = v;
+      }
+    });
+  }
+
+  await test("deliverMagicLink: applies explicit short timeouts by default (no 30s hangs)", async () => {
+    const captured = {};
+    await withFakeTransport(captured, async () => {
+      process.env.SMTP_HOST = "smtp.example.com";
+      process.env.SMTP_USER = "u";
+      process.env.SMTP_PASS = "p";
+      delete process.env.SMTP_CONNECTION_TIMEOUT_MS;
+      delete process.env.SMTP_GREETING_TIMEOUT_MS;
+      delete process.env.SMTP_SOCKET_TIMEOUT_MS;
+      const r = await deliverMagicLink({ email: "x@y.z", link: "https://x/y?token=abcdef123456" });
+      assert.equal(r.delivered, true);
+      assert.equal(captured.opts.connectionTimeout, 10000);
+      assert.equal(captured.opts.greetingTimeout, 10000);
+      assert.equal(captured.opts.socketTimeout, 12000);
+      // Sanity: each timeout is well under the 30s prod ceiling we hit before.
+      for (const k of ["connectionTimeout", "greetingTimeout", "socketTimeout"]) {
+        assert.ok(captured.opts[k] <= 15000, `${k} must be <=15s, got ${captured.opts[k]}`);
+      }
+    });
+  });
+
+  await test("deliverMagicLink: SMTP_*_TIMEOUT_MS env vars override defaults", async () => {
+    const captured = {};
+    await withFakeTransport(captured, async () => {
+      process.env.SMTP_HOST = "smtp.example.com";
+      process.env.SMTP_USER = "u";
+      process.env.SMTP_PASS = "p";
+      process.env.SMTP_CONNECTION_TIMEOUT_MS = "8000";
+      process.env.SMTP_GREETING_TIMEOUT_MS = "9000";
+      process.env.SMTP_SOCKET_TIMEOUT_MS = "11000";
+      await deliverMagicLink({ email: "x@y.z", link: "https://x/y?token=t" });
+      assert.equal(captured.opts.connectionTimeout, 8000);
+      assert.equal(captured.opts.greetingTimeout, 9000);
+      assert.equal(captured.opts.socketTimeout, 11000);
+    });
+  });
+
+  await test("deliverMagicLink: port=465 implies secure=true when SMTP_SECURE unset", async () => {
+    const captured = {};
+    await withFakeTransport(captured, async () => {
+      process.env.SMTP_HOST = "smtpout.secureserver.net";
+      process.env.SMTP_USER = "u";
+      process.env.SMTP_PASS = "p";
+      process.env.SMTP_PORT = "465";
+      delete process.env.SMTP_SECURE;
+      await deliverMagicLink({ email: "x@y.z", link: "https://x/y?token=t" });
+      assert.equal(captured.opts.port, 465);
+      assert.equal(captured.opts.secure, true);
+    });
+  });
+
+  await test("deliverMagicLink: port=587 implies secure=false when SMTP_SECURE unset", async () => {
+    const captured = {};
+    await withFakeTransport(captured, async () => {
+      process.env.SMTP_HOST = "smtp.example.com";
+      process.env.SMTP_USER = "u";
+      process.env.SMTP_PASS = "p";
+      process.env.SMTP_PORT = "587";
+      delete process.env.SMTP_SECURE;
+      await deliverMagicLink({ email: "x@y.z", link: "https://x/y?token=t" });
+      assert.equal(captured.opts.port, 587);
+      assert.equal(captured.opts.secure, false);
+    });
+  });
+
+  await test("deliverMagicLink: explicit SMTP_SECURE=false overrides port=465 implicit secure", async () => {
+    const captured = {};
+    await withFakeTransport(captured, async () => {
+      process.env.SMTP_HOST = "smtp.example.com";
+      process.env.SMTP_USER = "u";
+      process.env.SMTP_PASS = "p";
+      process.env.SMTP_PORT = "465";
+      process.env.SMTP_SECURE = "false";
+      await deliverMagicLink({ email: "x@y.z", link: "https://x/y?token=t" });
+      assert.equal(captured.opts.secure, false);
+    });
+  });
+
+  await test("deliverMagicLink: SMTP_SECURE accepts boolean-ish strings (true/1/yes/on)", async () => {
+    for (const v of ["true", "1", "yes", "on", "TRUE", " Yes "]) {
+      const captured = {};
+      await withFakeTransport(captured, async () => {
+        process.env.SMTP_HOST = "smtp.example.com";
+        process.env.SMTP_USER = "u";
+        process.env.SMTP_PASS = "p";
+        process.env.SMTP_PORT = "587";
+        process.env.SMTP_SECURE = v;
+        await deliverMagicLink({ email: "x@y.z", link: "https://x/y?token=t" });
+        assert.equal(captured.opts.secure, true, `expected true for SMTP_SECURE='${v}'`);
+      });
+    }
+  });
+
+  await test("deliverMagicLink: bogus SMTP_PORT falls back to default 587", async () => {
+    const captured = {};
+    await withFakeTransport(captured, async () => {
+      process.env.SMTP_HOST = "smtp.example.com";
+      process.env.SMTP_USER = "u";
+      process.env.SMTP_PASS = "p";
+      process.env.SMTP_PORT = "not-a-number";
+      delete process.env.SMTP_SECURE;
+      await deliverMagicLink({ email: "x@y.z", link: "https://x/y?token=t" });
+      assert.equal(captured.opts.port, 587);
+      assert.equal(captured.opts.secure, false);
+    });
+  });
+
+  await test("deliverMagicLink: send failure returns ok-shape with code, redacts token, never throws", async () => {
+    const captured = {};
+    // Custom fake that throws a timeout-like error from sendMail.
+    nodemailer.createTransport = (opts) => {
+      captured.opts = opts;
+      return {
+        sendMail: async () => {
+          const err = new Error("Connection timeout");
+          err.code = "ETIMEDOUT";
+          throw err;
+        },
+      };
+    };
+    const origLog = console.log;
+    const origWarn = console.warn;
+    let logged = "";
+    console.log = (...a) => { logged += a.join(" ") + "\n"; };
+    console.warn = (...a) => { logged += a.join(" ") + "\n"; };
+    try {
+      process.env.SMTP_HOST = "smtp.example.com";
+      process.env.SMTP_USER = "u";
+      process.env.SMTP_PASS = "supersecretpass";
+      const r = await deliverMagicLink({ email: "x@y.z", link: "https://x/y?token=abcdef0123456789" });
+      assert.equal(r.delivered, false);
+      assert.equal(r.code, "ETIMEDOUT");
+      // Full token must not appear in logs.
+      assert.ok(!logged.includes("abcdef0123456789"), "full token should not be logged");
+      // Password must not appear in logs.
+      assert.ok(!logged.includes("supersecretpass"), "SMTP_PASS must not be logged");
+      // Code should appear in the structured failure log.
+      assert.ok(/code=ETIMEDOUT/.test(logged), "expected code=ETIMEDOUT in failure log");
+    } finally {
+      console.log = origLog;
+      console.warn = origWarn;
+      nodemailer.createTransport = origCreateTransport;
+      delete process.env.SMTP_HOST;
+      delete process.env.SMTP_USER;
+      delete process.env.SMTP_PASS;
+    }
+  });
+
   // Restore env
   for (const [k, v] of Object.entries(SAVED)) {
     if (v === undefined) delete process.env[k];
