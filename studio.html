@@ -8655,6 +8655,22 @@ function processCompassImport(file) {
         if (chooser) chooser.classList.add('visible');
         // showRosePrompt() — removed, Nexus prompt not shown on entrance
       }
+
+      // If a profile preview is already open at the moment of import,
+      // re-render it so the deterministic sigil refreshes against the
+      // newly-loaded Compass data instead of holding the placeholder.
+      try {
+        const lpOpen = document.getElementById('living-profile-modal');
+        if (lpOpen && lpOpen.classList.contains('is-open')
+            && typeof window.openLivingProfile === 'function') {
+          window.openLivingProfile();
+        }
+        const wpOpen = document.getElementById('website-preview-modal');
+        if (wpOpen && wpOpen.classList.contains('is-open')
+            && typeof window.openWebsitePreview === 'function') {
+          window.openWebsitePreview();
+        }
+      } catch (_) { /* refresh is best-effort */ }
     } catch(err) {
       showToast('Could not read file — please use a Compass session JSON');
     }
@@ -12445,7 +12461,9 @@ if (document.readyState === 'loading') {
       // sigil slots elsewhere in the DOM keep their own glyphs.
       if (typeof window.cuRenderSigilSlots === 'function') {
         try {
-          var sigilPayload = (typeof cuBuildPublishPayload === 'function') ? cuBuildPublishPayload() : null;
+          var sigilPayload = (typeof window.cuBuildPublishPayload === 'function')
+            ? window.cuBuildPublishPayload()
+            : (typeof cuBuildPublishPayload === 'function' ? cuBuildPublishPayload() : null);
           window.cuRenderSigilSlots(sigilPayload, lpBody);
         } catch (_) { /* safety net — never break the LP render */ }
       }
@@ -13317,6 +13335,7 @@ if (document.readyState === 'loading') {
         };
       } catch (e) { return { display_name: 'Anonymous', error: String(e) }; }
     }
+    window.cuBuildPublishPayload = cuBuildPublishPayload;
     window.publishToField = function () {
       cuHoldOmThen(function () {
         var payload = cuBuildPublishPayload();
@@ -13710,6 +13729,22 @@ if (document.readyState === 'loading') {
       '</section>';
 
       wpBody.innerHTML = html;
+
+      // ── Personal Home / Website Preview sigil ────────────────────────
+      // The Threshold view and each Room aside both paint a
+      // .lp-hero-slot.is-sigil placeholder (✦ / ॐ). Replace it with the
+      // deterministic sigil SVG so the home + room sigils match the
+      // Living Profile preview, cOMmons cover, and cOMmons Profile for
+      // the same identity. Scoped to wpBody so it never touches the LP
+      // modal sigil (which renderLivingProfile fills separately).
+      if (typeof window.cuRenderSigilSlots === 'function') {
+        try {
+          var phSigilPayload = (typeof window.cuBuildPublishPayload === 'function')
+            ? window.cuBuildPublishPayload()
+            : (typeof cuBuildPublishPayload === 'function' ? cuBuildPublishPayload() : null);
+          window.cuRenderSigilSlots(phSigilPayload, wpBody);
+        } catch (_) { /* preview should never break the PH render */ }
+      }
 
       // Wire source toggle — also flips show-sources on the card so
       // per-section provenance chips become visible.
