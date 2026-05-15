@@ -5,7 +5,7 @@
 const fs = require("fs");
 const path = require("path");
 const db = require("./db");
-const sigil = require("../../sdk/sigil.js");
+const sigil = require("./sigil.js");
 
 const SEED_DIR_CANDIDATES = [
   path.join(__dirname, "..", "seeds"),

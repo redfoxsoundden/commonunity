@@ -1,6 +1,6 @@
 const path = require("path");
 const db = require("./db");
-const sigil = require("../../sdk/sigil.js");
+const sigil = require("./sigil.js");
 const views = require("./views");
 const { currentUser, registerAuthRoutes } = require("./auth");
 const { importVesnaSeed, importEdaSeed, importMarkusSeed } = require("./importers");
