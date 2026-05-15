@@ -80,8 +80,21 @@ test("proposeHandle: 'Vesna Lucca' → 'vesna-lucca'", () => {
   assert.equal(sigil.proposeHandle("Vesna Lucca"), "vesna-lucca");
 });
 
-test("proposeHandle: handles accents and multi-spaces", () => {
-  assert.equal(sigil.proposeHandle("  Éda  Çarmıklı  "), "eda-carmkl");
+test("proposeHandle: Turkish letters transliterate (ç→c, ı→i, ş→s, ğ→g)", () => {
+  // The shipped name in Eda's Compass JSON is "Eda Çarmıklı".
+  // Latinised handle should naturally fall out as "eda-carmikli".
+  assert.equal(sigil.proposeHandle("Eda Çarmıklı"), "eda-carmikli");
+  assert.equal(sigil.proposeHandle("Şahin Oğuz"), "sahin-oguz");
+});
+
+test("proposeHandle: Scandinavian + German letters transliterate", () => {
+  assert.equal(sigil.proposeHandle("Björn Ström"), "bjorn-strom");
+  assert.equal(sigil.proposeHandle("Æsa Ørbæk"), "aesa-orbaek");
+  assert.equal(sigil.proposeHandle("Großmann"), "grossmann");
+});
+
+test("proposeHandle: trims whitespace + collapses multi-spaces", () => {
+  assert.equal(sigil.proposeHandle("  Éda  Çarmıklı  "), "eda-carmikli");
 });
 
 test("encodeSigilSeed: composes all signals deterministically", () => {

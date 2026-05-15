@@ -1,8 +1,11 @@
-// CLI seeder: ensures beta users exist + imports Vesna profile.
+// CLI seeder: ensures beta users exist + imports Vesna + Eda profiles.
 // Usage:  node src/seed.js
+//
+// Markus is on the BETA_USERS list (he gets a magic-link seat) but no
+// public profile is created until his own Compass JSON is provided.
 
 const db = require("./db");
-const { importVesnaSeed } = require("./importers");
+const { importVesnaSeed, importEdaSeed } = require("./importers");
 const { BETA_USERS } = require("./auth");
 
 function main() {
@@ -12,10 +15,19 @@ function main() {
     console.log(`  · ${u.email} (id=${u.id})`);
   }
 
-  console.log("[field/seed] importing Vesna Lucca seed profile…");
+  console.log("[field/seed] importing Vesna Lucca…");
   try {
     const r = importVesnaSeed();
-    console.log(`  · published profile for ${r.user.email} as @${r.user.handle}`);
+    console.log(`  · published @${r.user.handle} (${r.user.email})`);
+    console.log(`  · source: ${r.source_file}`);
+  } catch (e) {
+    console.warn(`  ! ${e.message}`);
+  }
+
+  console.log("[field/seed] importing Eda Çarmıklı…");
+  try {
+    const r = importEdaSeed();
+    console.log(`  · published @${r.user.handle} (${r.user.email})`);
     console.log(`  · source: ${r.source_file}`);
   } catch (e) {
     console.warn(`  ! ${e.message}`);

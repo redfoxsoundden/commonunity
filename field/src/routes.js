@@ -3,7 +3,7 @@ const db = require("./db");
 const sigil = require("../../sdk/sigil.js");
 const views = require("./views");
 const { currentUser, registerAuthRoutes } = require("./auth");
-const { importVesnaSeed } = require("./importers");
+const { importVesnaSeed, importEdaSeed } = require("./importers");
 
 function ensureAuth(req, res, next) {
   const u = currentUser(req);
@@ -145,18 +145,34 @@ function registerRoutes(app) {
     res.json({ ok: true, presences });
   });
 
-  // Dev-only convenience: seed Vesna from the workspace JSON.
+  // Dev-only convenience: seed Vesna / Eda from the workspace JSON files.
   // Disabled in production unless EXPLICIT_SEED_ENDPOINT=1.
-  app.post("/field-api/dev/seed-vesna", (req, res) => {
+  function devOnly(req, res) {
     if (process.env.NODE_ENV === "production" && process.env.EXPLICIT_SEED_ENDPOINT !== "1") {
-      return res.status(403).json({ ok: false, error: "disabled in production" });
+      res.status(403).json({ ok: false, error: "disabled in production" });
+      return false;
     }
-    try {
-      const result = importVesnaSeed();
-      res.json({ ok: true, ...result });
-    } catch (e) {
-      res.status(500).json({ ok: false, error: e.message });
+    return true;
+  }
+  app.post("/field-api/dev/seed-vesna", (req, res) => {
+    if (!devOnly(req, res)) return;
+    try { res.json({ ok: true, ...importVesnaSeed() }); }
+    catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
+  app.post("/field-api/dev/seed-eda", (req, res) => {
+    if (!devOnly(req, res)) return;
+    try { res.json({ ok: true, ...importEdaSeed() }); }
+    catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
+  // Seed both at once — convenience for local smoke tests.
+  app.post("/field-api/dev/seed-all", (req, res) => {
+    if (!devOnly(req, res)) return;
+    const results = [];
+    for (const fn of [importVesnaSeed, importEdaSeed]) {
+      try { results.push({ ok: true, ...fn() }); }
+      catch (e) { results.push({ ok: false, error: e.message }); }
     }
+    res.json({ ok: true, results });
   });
 }
 

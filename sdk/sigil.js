@@ -82,10 +82,29 @@ function gematria(name) {
 
 // ─────────────────────────────────────────────────────────────────────────
 // Handle proposal — kebab-case, deterministic, with collision suffix hint.
+// Transliterates common non-ASCII letters that don't decompose via NFD
+// (Turkish ı/İ/ş/ğ, German ß, Scandinavian æ/ø/å, etc.) so the proposed
+// handle reflects the spelling the person actually goes by.
 // ─────────────────────────────────────────────────────────────────────────
+const TRANSLIT_MAP = {
+  // Turkish
+  "ı": "i", "İ": "i", "ş": "s", "Ş": "s", "ğ": "g", "Ğ": "g",
+  "ç": "c", "Ç": "c", "ö": "o", "Ö": "o", "ü": "u", "Ü": "u",
+  // German
+  "ß": "ss",
+  // Scandinavian / extended
+  "æ": "ae", "Æ": "ae", "ø": "o", "Ø": "o", "å": "a", "Å": "a",
+  "œ": "oe", "Œ": "oe",
+  // Eastern European
+  "ł": "l", "Ł": "l", "đ": "d", "Đ": "d",
+};
+function transliterate(s) {
+  return String(s || "").split("").map(ch => TRANSLIT_MAP[ch] || ch).join("");
+}
+
 function proposeHandle(displayName) {
   if (!displayName) return null;
-  const base = String(displayName)
+  const base = transliterate(displayName)
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()

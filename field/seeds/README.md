@@ -4,32 +4,56 @@
 is `cOMmons`.)
 
 Drop seed JSON files into this directory. `npm run seed` (or
-`POST /field-api/dev/seed-vesna` while running in dev) will pick them up.
+`POST /field-api/dev/seed-vesna`, `…/seed-eda`, `…/seed-all` while
+running in dev) will pick them up. Raw `*.json` files in this directory
+are git-ignored — they contain private Compass artifacts and must not be
+committed.
+
+## Phase 1 beta seats
+
+| Name | Email | Compass JSON | Public profile |
+|---|---|---|---|
+| Markus Lehto | `markuslehto@mac.com` | not yet provided | **seat reserved**; magic-link sign-in works, but no auto-seeded public profile until JSON arrives — he publishes from Studio himself |
+| Vesna Lucca | `vesna.lucca@gmail.com` | `vesna-lucca-compass-2026-05-12.json` | seeded by importer |
+| Eda Çarmıklı | `eda@jointidea.com` | `eda-armkl-compass-2026-05-15.json` | seeded by importer; public handle pinned to `eda-carmikli` (Latinised) |
+
+These are the defaults in `field/.env.example`. The Markus seat exists
+on purpose so the magic-link flow works the moment he asks for one — but
+the seeder is *deliberate* about not fabricating a public profile from
+nothing. Once his Compass JSON is added under `field/seeds/`, copy the
+two-line `importMarkusSeed` pattern from `importers.js` or wait for him
+to publish via Studio.
 
 ## Vesna Lucca
 
-The importer looks for `vesna-lucca-compass-2026-05-12.json` here first, then
-falls back to `/home/user/workspace/vesna-lucca-compass-2026-05-12.json`.
+The importer looks for `vesna-lucca-compass-2026-05-12.json` here first,
+then falls back to `/home/user/workspace/vesna-lucca-compass-2026-05-12.json`.
+Default tone: 528 Hz / heart / water / tonal centre C.
+
+## Eda Çarmıklı
+
+The importer looks for `eda-armkl-compass-2026-05-15.json` (the
+shipped filename, hyphenated without the cedilla / dotless ı) here first,
+then falls back to `/home/user/workspace/` or to either
+`eda-carmikli-compass.json` / `eda.json` aliases. Default tone:
+396 Hz / root / earth / tonal centre G (Solfeggio Ut, "Liberation",
+matching her published themes of constructive paying-it-forward
+leadership).
+
+The public handle is **pinned to `eda-carmikli`** — the auto-proposer
+also produces `eda-carmikli` from `Eda Çarmıklı` via the Turkish
+transliteration map (`ı→i`, `ç→c`), but pinning it keeps the URL stable
+across any future spelling edits in the source JSON.
+
+## Privacy
 
 The Compass JSON is a private artifact — it contains raw transcript text
 under `points.{work,lens,field,call}.raw` and Q&A answers under
-`qa_answers`. The importer **strips those fields** and only publishes the
-curated `web_heading` / `web_intro` / `web_closing` / `highlights` /
+`qa_answers`. The importer **strips those fields** and only publishes
+the curated `web_heading` / `web_intro` / `web_closing` / `highlights` /
 `summary` / `theme` fields plus the `gk_num` / `gk_line` identifiers.
-
-If you need to seed without committing the raw JSON to git, place it here
-locally (this directory is in `.gitignore` for `.json` files) — see below.
-
-## Eda Carmikli, Markus Lehto
-
-Email seats are reserved via `BETA_USERS` (env). Compass JSONs are not yet
-available in the workspace. To seed, either:
-
-1. Drop their Compass JSON into this directory as
-   `eda.json` / `markus.json` and add an importer call in
-   `field/src/seed.js`, or
-2. Wait for them to publish from Studio. Their seats already exist; the
-   first magic-link sign-in will create their `users` row.
+Tests guard this: `field/tests/run.js` asserts no transcript text or
+`qa_answers` substring leaks into the published profile.
 
 ## Payload schema (also used by `POST /field-api/profile`)
 

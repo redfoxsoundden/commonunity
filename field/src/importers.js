@@ -85,26 +85,55 @@ function compassJsonToFieldProfile(raw) {
   };
 }
 
-function importVesnaSeed({ email } = {}) {
-  const file =
-    findSeedFile("vesna-lucca-compass-2026-05-12.json") ||
-    findSeedFile("vesna.json");
-  if (!file) {
-    throw new Error("Vesna seed file not found. Place vesna-lucca-compass-2026-05-12.json in field/seeds/ or /home/user/workspace/.");
+// Generic Compass-JSON → published Field profile importer.
+// Accepts a list of candidate filenames so callers can name a primary path
+// plus aliases. Strips raw/qa fields. Stamps the sigil from encoded seed.
+//
+// Params:
+//   filenames      — array of candidate filenames to look for in SEED_DIR_CANDIDATES
+//   email          — beta account email this seed publishes under
+//   handleOverride — optional; if the auto-proposed handle would be wrong
+//                    (e.g. user has a known Latinised spelling), pin it
+//   tone           — { tonal_center, dominant_hz, elemental_alignment, chakra_focus }
+//                    optional; default is the 528 Hz / heart demonstration tone
+//   missingMessage — message to throw if no file is found
+function importCompassSeed({ filenames, email, handleOverride, tone, missingMessage } = {}) {
+  if (!Array.isArray(filenames) || filenames.length === 0) {
+    throw new Error("importCompassSeed: filenames[] required");
   }
+  if (!email) throw new Error("importCompassSeed: email required");
+
+  let file = null;
+  for (const name of filenames) {
+    const found = findSeedFile(name);
+    if (found) { file = found; break; }
+  }
+  if (!file) {
+    throw new Error(missingMessage ||
+      `Compass seed not found. Place one of [${filenames.join(", ")}] in field/seeds/ or /home/user/workspace/.`);
+  }
+
   const raw = JSON.parse(fs.readFileSync(file, "utf8"));
   const fieldProfile = compassJsonToFieldProfile(raw);
-  // The seed JSON has no tonal centre; choose 528 Hz as a demonstration tone
-  // (configurable; documented in seeds/README.md).
-  fieldProfile.frequency_signature = {
+
+  // Apply handle override (Latin spelling preferred over transliteration if asked).
+  if (handleOverride) fieldProfile.handle = handleOverride;
+
+  // Tone: caller may pin one. Default is 528 Hz / heart (used for Vesna in the
+  // first seed). Eda's seed uses 396 Hz / root (her Life's Work is GK 45 — a
+  // Throat gate but root-grounded — see seeds/README.md for the rationale).
+  fieldProfile.frequency_signature = tone || {
     tonal_center: "C",
     dominant_hz: 528,
     elemental_alignment: "water",
     chakra_focus: "heart",
   };
 
-  const userEmail = email || process.env.VESNA_EMAIL || "vesna@example.com";
-  const user = db.upsertUser({ email: userEmail, handle: fieldProfile.handle, display_name: fieldProfile.display_name });
+  const user = db.upsertUser({
+    email,
+    handle: fieldProfile.handle,
+    display_name: fieldProfile.display_name,
+  });
 
   const seed = sigil.encodeSigilSeed({
     display_name: fieldProfile.display_name,
@@ -127,7 +156,60 @@ function importVesnaSeed({ email } = {}) {
     published_at: new Date().toISOString(),
   });
 
-  return { user: { id: user.id, email: user.email, handle: user.handle }, source_file: file };
+  return {
+    user: { id: user.id, email: user.email, handle: user.handle },
+    source_file: file,
+  };
 }
 
-module.exports = { importVesnaSeed, compassJsonToFieldProfile, curateCompassPoint, findSeedFile };
+function importVesnaSeed({ email } = {}) {
+  return importCompassSeed({
+    filenames: ["vesna-lucca-compass-2026-05-12.json", "vesna.json"],
+    email: email || process.env.VESNA_EMAIL || "vesna.lucca@gmail.com",
+    tone: {
+      tonal_center: "C",
+      dominant_hz: 528,
+      elemental_alignment: "water",
+      chakra_focus: "heart",
+    },
+    missingMessage: "Vesna seed file not found. Place vesna-lucca-compass-2026-05-12.json in field/seeds/ or /home/user/workspace/.",
+  });
+}
+
+function importEdaSeed({ email } = {}) {
+  // The JSON filename ships as "eda-armkl-…" (without the cedilla c and
+  // dotless ı the full surname carries); we accept that, plus the obvious
+  // Latinised alias. The auto-proposed handle from "Eda Çarmıklı" now
+  // transliterates correctly to "eda-carmikli" via sigil.proposeHandle, but
+  // we pin it here anyway so the public URL is stable across future name
+  // edits in the JSON.
+  return importCompassSeed({
+    filenames: [
+      "eda-armkl-compass-2026-05-15.json",
+      "eda-carmikli-compass.json",
+      "eda.json",
+    ],
+    email: email || process.env.EDA_EMAIL || "eda@jointidea.com",
+    handleOverride: "eda-carmikli",
+    tone: {
+      // Her Life's Work GK 45 sits at the Throat in HD; she gathers people
+      // (Sacral resonance). The 396 Hz / Solfeggio Ut "Liberation" family
+      // matches her published themes of constructive paying-it-forward
+      // leadership. Configurable; documented in seeds/README.md.
+      tonal_center: "G",
+      dominant_hz: 396,
+      elemental_alignment: "earth",
+      chakra_focus: "root",
+    },
+    missingMessage: "Eda seed file not found. Place eda-armkl-compass-2026-05-15.json in field/seeds/ or /home/user/workspace/.",
+  });
+}
+
+module.exports = {
+  importCompassSeed,
+  importVesnaSeed,
+  importEdaSeed,
+  compassJsonToFieldProfile,
+  curateCompassPoint,
+  findSeedFile,
+};

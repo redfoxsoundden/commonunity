@@ -91,6 +91,8 @@ fields only — raw transcript text and Q&A answers are stripped before storage.
 | `/field-api/tones/inbox` | GET | Owner's tone inbox |
 | `/field-api/presences/me` | GET | "Who has entered my Field" |
 | `/field-api/dev/seed-vesna` | POST | Dev: import Vesna seed (disabled in prod) |
+| `/field-api/dev/seed-eda` | POST | Dev: import Eda Çarmıklı seed (disabled in prod) |
+| `/field-api/dev/seed-all` | POST | Dev: import all available seeds (disabled in prod) |
 
 ## Anti-addiction guardrails (encoded, not aspirational)
 

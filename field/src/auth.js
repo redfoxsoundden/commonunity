@@ -8,7 +8,11 @@
 
 const db = require("./db");
 
-const BETA_USERS = (process.env.BETA_USERS || "markus@jointidea.com;vesna@example.com;eda@example.com")
+// Default Phase 1 beta seats. Override via the BETA_USERS env var.
+// Markus's seat is reserved but no public profile is created until his
+// Compass JSON arrives; the magic-link still works the moment he requests
+// one so he can sign in and publish.
+const BETA_USERS = (process.env.BETA_USERS || "markuslehto@mac.com;vesna.lucca@gmail.com;eda@jointidea.com")
   .split(/[;,]/).map(s => s.trim().toLowerCase()).filter(Boolean);
 
 function isBetaEmail(email) {
