@@ -4406,6 +4406,26 @@ input, textarea { font: inherit; color: inherit; }
       color-mix(in srgb, var(--call, #f6a3b6) 22%, transparent),
       color-mix(in srgb, var(--rose-color, #c4b5fd) 32%, transparent));
 }
+/* When the deterministic sigil engine has rendered into the slot, the
+   inlined <svg> owns the visual — hide the placeholder ॐ glyph + label
+   so they don't double up under the rendered art. */
+.lp-hero-slot.is-sigil.cu-sigil-rendered {
+  /* Drop the CSS conic background; the SVG provides its own composition.
+     Keep border-radius so the SVG's rounded clipPath aligns with the slot. */
+  background: transparent;
+  padding: 0;
+}
+.lp-hero-slot.is-sigil.cu-sigil-rendered > .lp-hero-slot-glyph,
+.lp-hero-slot.is-sigil.cu-sigil-rendered > .lp-hero-slot-label {
+  display: none;
+}
+.lp-hero-slot.is-sigil.cu-sigil-rendered > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 .lp-hero-slot-glyph {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 40px;
@@ -12196,6 +12216,9 @@ if (document.readyState === 'loading') {
           '<button type="button" class="lp-door-action" id="lp-door-note-toggle" aria-controls="lp-door-note-panel" aria-expanded="false">' +
             '<span class="lp-door-action-glyph" aria-hidden="true">✎</span>Leave a note' +
           '</button>' +
+          '<button type="button" class="lp-door-action lp-publish-field" id="lp-publish-field" title="Publish your Living Profile to the CommonUnity cOMmons">' +
+            '<span class="lp-door-action-glyph" aria-hidden="true">ॐ</span>Publish to cOMmons' +
+          '</button>' +
         '</div>' +
         '<div class="lp-door-knock-state" id="lp-door-knock-state" role="status" aria-live="polite"></div>' +
         '<div class="lp-door-note-panel" id="lp-door-note-panel">' +
@@ -12412,6 +12435,21 @@ if (document.readyState === 'loading') {
 
       lpBody.innerHTML = html;
 
+      // ── Living Profile sigil preview ─────────────────────────────────
+      // Render the deterministic personal sigil into every
+      // .lp-hero-slot.is-sigil inside the Living Profile body. Uses the
+      // same input contract Studio sends on publish (display_name,
+      // birthdate, gene_keys, compass, frequency_signature, seed_syllable)
+      // so the preview matches the cOMmons cover + cOMmons Profile for
+      // the same identity. Scoped to lpBody so the Personal Home / home
+      // sigil slots elsewhere in the DOM keep their own glyphs.
+      if (typeof window.cuRenderSigilSlots === 'function') {
+        try {
+          var sigilPayload = (typeof cuBuildPublishPayload === 'function') ? cuBuildPublishPayload() : null;
+          window.cuRenderSigilSlots(sigilPayload, lpBody);
+        } catch (_) { /* safety net — never break the LP render */ }
+      }
+
       // Wire go-deeper CTA — opens Personal Home preview.
       var goDeeperBtn = document.getElementById('lp-go-deeper-btn');
       if (goDeeperBtn) {
@@ -12465,6 +12503,13 @@ if (document.readyState === 'loading') {
         knockTopBtn.addEventListener('click', function () {
           setKnockState('You knocked. The studio noticed — this is a local prototype, no message is sent yet.');
         });
+      }
+      // ── Publish to Field (Mi→Fa threshold) ────────────────────────────
+      // Holds the moment with a brief OM sigil overlay before the actual
+      // POST. The veil is sound/visual presence only — no CTA, no nudge.
+      var publishBtn = document.getElementById('lp-publish-field');
+      if (publishBtn && typeof window.publishToField === 'function') {
+        publishBtn.addEventListener('click', function () { window.publishToField(); });
       }
       var noteToggle = document.getElementById('lp-door-note-toggle');
       var notePanel  = document.getElementById('lp-door-note-panel');
@@ -12902,6 +12947,407 @@ if (document.readyState === 'loading') {
     });
     window.openLivingProfile = openLivingProfile;
     window.buildLivingProfile = buildLivingProfile;
+
+    // ============================================================
+    // Publish to Field (Mi→Fa shock-point holder)
+    // Posts the assembled Living Profile to the Field service. The
+    // FIELD_URL is read from window.CU_FIELD_URL (set via <meta> or
+    // a global script tag) and defaults to /field-api on the same
+    // origin. The OM veil is the held moment, not a confirmation
+    // dialog — sound + sigil + line, then recedes. See Spec §3.2.
+    // ============================================================
+    function cuPublishFieldUrl() {
+      return (window.CU_FIELD_URL || (location.origin.indexOf('localhost') !== -1 ? 'http://localhost:5050' : ''));
+    }
+    function cuMountOmVeil() {
+      var v = document.getElementById('cu-om-veil');
+      if (v) return v;
+      v = document.createElement('div');
+      v.id = 'cu-om-veil';
+      // Use the homepage / studio shared lockup so the veil belongs to the
+      // same visual world. Cormorant Garamond italic for the holding line.
+      v.innerHTML =
+        '<div style="text-align:center;max-width:36rem;padding:0 2rem;">' +
+          '<svg class="cu-om-lockup" viewBox="-30 0 760 132" aria-hidden="true" style="display:block;width:clamp(260px,46vw,460px);height:auto;margin:0 auto;filter:drop-shadow(0 0 32px rgba(212,160,74,0.45));animation:cu-om-breathe 4s ease-in-out infinite;">' +
+            '<use href="#cu-logo-lockup"/>' +
+          '</svg>' +
+          '<div class="cu-om-line" style="font-family:\'Cormorant Garamond\',Georgia,serif;color:rgba(250,248,244,0.72);margin-top:1.8rem;font-style:italic;font-size:1.2rem;line-height:1.5;">You are making your work visible. The cOMmons receives it.</div>' +
+        '</div>';
+      Object.assign(v.style, {
+        position: 'fixed', inset: '0', display: 'none',
+        background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(42,107,140,0.18), transparent 60%), radial-gradient(circle at center, rgba(11,17,32,0.96) 0%, rgba(11,17,32,1) 70%)',
+        zIndex: '99999', opacity: '0', transition: 'opacity 1200ms ease', placeItems: 'center'
+      });
+      if (!document.getElementById('cu-om-veil-style')) {
+        var st = document.createElement('style');
+        st.id = 'cu-om-veil-style';
+        st.textContent = '@keyframes cu-om-breathe { 0%,100%{transform:scale(1);opacity:.88} 50%{transform:scale(1.04);opacity:1} } #cu-om-veil.is-active { display:grid !important; opacity:1 !important; }';
+        document.head.appendChild(st);
+      }
+      document.body.appendChild(v);
+      return v;
+    }
+    function cuPlayOmTone() {
+      try {
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        var ctx = new Ctx();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 136.1; // OM, traditional
+        gain.gain.value = 0.0001;
+        osc.connect(gain).connect(ctx.destination);
+        var now = ctx.currentTime;
+        gain.gain.linearRampToValueAtTime(0.05, now + 0.8);
+        gain.gain.linearRampToValueAtTime(0.0001, now + 3.6);
+        osc.start(now); osc.stop(now + 3.7);
+      } catch (e) { /* silent */ }
+    }
+    function cuHoldOmThen(actionFn) {
+      var v = cuMountOmVeil();
+      v.classList.add('is-active');
+      cuPlayOmTone();
+      // Hold ~2.4s before action; recede ~1.2s after.
+      setTimeout(function () {
+        try { actionFn && actionFn(); } finally {
+          setTimeout(function () { v.classList.remove('is-active'); }, 800);
+        }
+      }, 2400);
+    }
+    // ── Browser-safe Sigil engine (Studio Living Profile preview) ────────
+    // Minimal port of the canonical CommonJS engine at sdk/sigil.js (also
+    // vendored at field/src/sigil.js). Keep in sync with the canonical
+    // source — the same input contract must produce the same SVG across
+    // Studio Living Profile preview, cOMmons cover, and cOMmons Profile.
+    // Inlined (not <script src>) because sdk/sigil.js uses module.exports;
+    // exposing a CJS-or-browser dual build is out of scope for this wiring.
+    (function () {
+      if (window.cuSigil) return;
+      var SOLFEGGIO = [
+        { hz: 174, name: "Ut",       theme: "Foundation",     chakra: "Root",      color: "#7a2e2e", note: "F"  },
+        { hz: 285, name: "Re-natal", theme: "Tissue",         chakra: "Sacral",    color: "#a85a2a", note: "C#" },
+        { hz: 396, name: "Ut",       theme: "Liberation",     chakra: "Root",      color: "#9c3232", note: "G"  },
+        { hz: 417, name: "Re",       theme: "Change",         chakra: "Sacral",    color: "#c46a2e", note: "G#" },
+        { hz: 528, name: "Mi",       theme: "Transformation", chakra: "Solar",     color: "#d2a13a", note: "C"  },
+        { hz: 639, name: "Fa",       theme: "Connection",     chakra: "Heart",     color: "#3a8a6f", note: "D#" },
+        { hz: 741, name: "Sol",      theme: "Expression",     chakra: "Throat",    color: "#2e6f8a", note: "F#" },
+        { hz: 852, name: "La",       theme: "Intuition",      chakra: "Third Eye", color: "#3c4a8a", note: "G#" },
+        { hz: 963, name: "Si",       theme: "Awakening",      chakra: "Crown",     color: "#7a4a8a", note: "B"  }
+      ];
+      var NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+      function frequencyToNote(hz) {
+        if (!hz || hz <= 0) return null;
+        var midi = 69 + 12 * Math.log2(hz / 440);
+        var rounded = Math.round(midi);
+        var noteName = NOTES[((rounded % 12) + 12) % 12];
+        var octave = Math.floor(rounded / 12) - 1;
+        var cents = Math.round((midi - rounded) * 100);
+        return { midi: rounded, note: noteName, octave: octave, cents: cents };
+      }
+      function frequencyToSolfeggio(hz) {
+        if (!hz || hz <= 0) return null;
+        var nearest = SOLFEGGIO[0];
+        var best = Math.abs(SOLFEGGIO[0].hz - hz);
+        for (var i = 0; i < SOLFEGGIO.length; i++) {
+          var d = Math.abs(SOLFEGGIO[i].hz - hz);
+          if (d < best) { best = d; nearest = SOLFEGGIO[i]; }
+        }
+        return Object.assign({}, nearest, { distance: best });
+      }
+      function digitalRoot(n) {
+        var x = Math.abs(Math.trunc(Number(n) || 0));
+        while (x >= 10) {
+          x = String(x).split("").reduce(function (s, d) { return s + Number(d); }, 0);
+        }
+        return x;
+      }
+      function birthdayDigitalRoot(isoDate) {
+        if (!isoDate) return null;
+        var digits = String(isoDate).replace(/\D/g, "");
+        if (!digits) return null;
+        var sum = digits.split("").reduce(function (s, d) { return s + Number(d); }, 0);
+        return { sum: sum, root: digitalRoot(sum) };
+      }
+      function gematria(name) {
+        if (!name) return null;
+        var cleaned = String(name)
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .toUpperCase()
+          .replace(/[^A-Z]/g, "");
+        var sum = cleaned.split("").reduce(function (s, ch) { return s + (ch.charCodeAt(0) - 64); }, 0);
+        return { letters: cleaned.length, sum: sum, root: digitalRoot(sum) };
+      }
+      var TRANSLIT_MAP = {
+        "ı": "i", "İ": "i", "ş": "s", "Ş": "s",
+        "ğ": "g", "Ğ": "g", "ç": "c", "Ç": "c",
+        "ö": "o", "Ö": "o", "ü": "u", "Ü": "u",
+        "ß": "ss",
+        "æ": "ae", "Æ": "ae", "ø": "o", "Ø": "o",
+        "å": "a", "Å": "a", "œ": "oe", "Œ": "oe",
+        "ł": "l", "Ł": "l", "đ": "d", "Đ": "d"
+      };
+      function transliterate(s) {
+        return String(s || "").split("").map(function (ch) { return TRANSLIT_MAP[ch] || ch; }).join("");
+      }
+      function proposeHandle(displayName) {
+        if (!displayName) return null;
+        var base = transliterate(displayName)
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .trim()
+          .replace(/\s+/g, "-");
+        return base || null;
+      }
+      function encodeSigilSeed(input) {
+        input = input || {};
+        var display_name = input.display_name;
+        var handle = input.handle;
+        var full_name = input.full_name;
+        var birthdate = input.birthdate;
+        var gene_keys = input.gene_keys || {};
+        var compass = input.compass || {};
+        var tone = input.tone || {};
+
+        var dr = birthdayDigitalRoot(birthdate);
+        var gem = gematria(full_name || display_name);
+        var note = tone.dominant_hz ? frequencyToNote(tone.dominant_hz) : null;
+        var sol  = tone.dominant_hz ? frequencyToSolfeggio(tone.dominant_hz) : null;
+
+        var gates = [];
+        ["life_work", "evolution", "radiance", "purpose"].forEach(function (k) {
+          var v = gene_keys[k];
+          if (v) {
+            var m = String(v).match(/(\d+)(?:\.(\d+))?/);
+            if (m) {
+              var n = parseInt(m[1], 10);
+              var line = m[2] ? parseInt(m[2], 10) : null;
+              if (Number.isFinite(n)) gates.push({ slot: k, gate: n, line: line });
+            }
+          }
+        });
+        ["work", "lens", "field", "call"].forEach(function (k) {
+          var p = compass[k];
+          if (p && p.gk_num) {
+            var n = parseInt(String(p.gk_num).replace(/[^\d]/g, ""), 10);
+            if (Number.isFinite(n)) gates.push({ slot: k, gate: n, line: Number(p.gk_line) || null });
+          }
+        });
+
+        var proposedHandle = handle || proposeHandle(display_name);
+        return {
+          handle: proposedHandle,
+          display_name: display_name || null,
+          gates: gates,
+          digital_root: dr ? dr.root : null,
+          gematria: gem ? { sum: gem.sum, root: gem.root } : null,
+          tone: {
+            tonal_center: tone.tonal_center || (note ? note.note : null),
+            dominant_hz: tone.dominant_hz || null,
+            derived_note: note || null,
+            solfeggio: sol || null,
+            seed_syllable: tone.seed_syllable || "Om"
+          },
+          color_primary: sol ? sol.color : "#d2a13a"
+        };
+      }
+      function fnv1a(str) {
+        var h = 0x811c9dc5;
+        var s = String(str);
+        for (var i = 0; i < s.length; i++) {
+          h ^= s.charCodeAt(i);
+          h = (h * 0x01000193) >>> 0;
+        }
+        return h >>> 0;
+      }
+      var SIGIL_PALETTE = {
+        work:  "#f59e0b",
+        lens:  "#6366f1",
+        field: "#10b981",
+        call:  "#f43f5e",
+        rose:  "#c4b5fd"
+      };
+      function arcWedge(cx, cy, r, a0, a1) {
+        var x0 = cx + Math.cos(a0) * r;
+        var y0 = cy + Math.sin(a0) * r;
+        var x1 = cx + Math.cos(a1) * r;
+        var y1 = cy + Math.sin(a1) * r;
+        var large = (a1 - a0) > Math.PI ? 1 : 0;
+        return "M " + cx + " " + cy + " L " + x0.toFixed(2) + " " + y0.toFixed(2) +
+          " A " + r + " " + r + " 0 " + large + " 1 " + x1.toFixed(2) + " " + y1.toFixed(2) + " Z";
+      }
+      function escapeXml(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&apos;");
+      }
+      function renderSigilSVG(seed, opts) {
+        opts = opts || {};
+        var size = opts.size || 256;
+        var cx = size / 2;
+        var cy = size / 2;
+        var handle = seed.handle || "anon";
+        var safeId = String(handle).replace(/[^a-zA-Z0-9_-]/g, "_");
+        var h = fnv1a(handle + "|" + (seed.display_name || ""));
+        var startDeg = 200 + (h % 360);
+        var start = (startDeg * Math.PI) / 180;
+        var wedgeColors = [
+          SIGIL_PALETTE.rose, SIGIL_PALETTE.work, SIGIL_PALETTE.lens,
+          SIGIL_PALETTE.field, SIGIL_PALETTE.call, SIGIL_PALETTE.rose
+        ];
+        var TWO_PI = Math.PI * 2;
+        var step = TWO_PI / (wedgeColors.length - 1);
+        var wedgeR = size * 0.62;
+        var wedges = wedgeColors.slice(0, -1).map(function (c, i) {
+          var a0 = start + i * step;
+          var a1 = start + (i + 1) * step;
+          return '<path d="' + arcWedge(cx, cy, wedgeR, a0, a1) + '" fill="' + c + '" fill-opacity="0.32"/>';
+        }).join("");
+        var glyph = "ॐ"; // ॐ
+        var glyphSize = size * 0.42;
+        var glyphColor = "#f1f5f9";
+        var labelSize = Math.round(size * 0.052);
+        var innerR = size * 0.36;
+        var radius = Math.round(size * 0.094);
+        return '<?xml version="1.0" encoding="UTF-8"?>' +
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + ' ' + size + '" width="' + size + '" height="' + size + '" role="img" aria-label="Personal sigil for ' + escapeXml(seed.display_name || handle) + '">' +
+          '<defs>' +
+            '<clipPath id="clip-' + safeId + '"><rect x="0" y="0" width="' + size + '" height="' + size + '" rx="' + radius + '" ry="' + radius + '"/></clipPath>' +
+            '<filter id="conic-' + safeId + '" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="' + (size * 0.07).toFixed(2) + '"/></filter>' +
+            '<radialGradient id="vignette-' + safeId + '" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#0d1526" stop-opacity="0.0"/><stop offset="100%" stop-color="#0b1120" stop-opacity="0.55"/></radialGradient>' +
+          '</defs>' +
+          '<g clip-path="url(#clip-' + safeId + ')">' +
+            '<rect width="' + size + '" height="' + size + '" fill="#0d1526"/>' +
+            '<g filter="url(#conic-' + safeId + ')">' + wedges + '</g>' +
+            '<rect width="' + size + '" height="' + size + '" fill="url(#vignette-' + safeId + ')"/>' +
+            '<circle cx="' + cx + '" cy="' + cy + '" r="' + innerR.toFixed(2) + '" fill="none" stroke="rgba(241,245,249,0.10)" stroke-width="1"/>' +
+            '<text x="' + cx + '" y="' + (cy + glyphSize * 0.36).toFixed(2) + '" text-anchor="middle" font-family="Cormorant Garamond, Georgia, \'Times New Roman\', serif" font-size="' + glyphSize.toFixed(2) + '" font-weight="500" fill="' + glyphColor + '" fill-opacity="0.92">' + glyph + '</text>' +
+            '<text x="' + cx + '" y="' + (size - labelSize * 1.3).toFixed(2) + '" text-anchor="middle" font-family="Plus Jakarta Sans, system-ui, sans-serif" font-size="' + labelSize + '" font-weight="500" letter-spacing="' + (labelSize * 0.22).toFixed(2) + '" fill="rgba(241,245,249,0.55)">DIGITAL KEY · SIGIL</text>' +
+          '</g>' +
+          '</svg>';
+      }
+      window.cuSigil = {
+        encodeSigilSeed: encodeSigilSeed,
+        renderSigilSVG: renderSigilSVG,
+        proposeHandle: proposeHandle
+      };
+    })();
+
+    // Build the sigil seed from the same publish payload contract Studio
+    // already uses (display_name / full_name / birthdate / gene_keys /
+    // compass / frequency_signature / seed_syllable) — guarantees the
+    // Studio preview matches the cOMmons cover and the cOMmons Profile.
+    function cuSigilSeedFromPayload(payload) {
+      if (!payload || !window.cuSigil) return null;
+      var fs = payload.frequency_signature || {};
+      return window.cuSigil.encodeSigilSeed({
+        display_name: payload.display_name,
+        full_name: payload.full_name,
+        handle: payload.handle, // null on preview; renderer falls back to proposeHandle(display_name)
+        birthdate: payload.birthdate,
+        gene_keys: payload.gene_keys || {},
+        compass: payload.compass || {},
+        tone: {
+          tonal_center: fs.tonal_center,
+          dominant_hz: fs.dominant_hz,
+          seed_syllable: payload.seed_syllable
+        }
+      });
+    }
+
+    // Inject the deterministic sigil SVG into every .lp-hero-slot.is-sigil
+    // currently in the DOM. Called after renderLivingProfile() paints, so
+    // the placeholder ◯/ॐ glyph + label are replaced by the real sigil.
+    // Safe to call multiple times; idempotent per render pass.
+    function cuRenderSigilSlots(payload, root) {
+      if (!window.cuSigil) return;
+      try {
+        var seed = cuSigilSeedFromPayload(payload || (typeof cuBuildPublishPayload === 'function' ? cuBuildPublishPayload() : null));
+        if (!seed) return;
+        var container = root || document;
+        var slots = container.querySelectorAll('.lp-hero-slot.is-sigil');
+        if (!slots || !slots.length) return;
+        // SVG is square; the slot CSS sizes it. Use 256 for crisp scaling.
+        var svg = window.cuSigil.renderSigilSVG(seed, { size: 256 });
+        for (var i = 0; i < slots.length; i++) {
+          var slot = slots[i];
+          // Skip slots that already carry an uploaded image (has-image wins).
+          if (slot.classList.contains('has-image')) continue;
+          slot.innerHTML = svg;
+          slot.classList.add('cu-sigil-rendered');
+          slot.setAttribute('data-cu-sigil-handle', seed.handle || '');
+        }
+      } catch (_) { /* preview should never break the LP render */ }
+    }
+    window.cuRenderSigilSlots = cuRenderSigilSlots;
+
+    function cuBuildPublishPayload() {
+      try {
+        var m = (typeof buildLivingProfile === 'function') ? buildLivingProfile() : null;
+        var cd = (window.state && window.state.compassData) || {};
+        var prof = cd.profile || {};
+        var pts = cd.points || {};
+        var fs = (cd.frequency_signature || prof.frequency_signature || {});
+        return {
+          display_name: prof.full_name || ((prof.first_name || '') + ' ' + (prof.last_name || '')).trim() || 'Anonymous',
+          full_name: prof.full_name || null,
+          handle: null, // server will propose
+          archetype_tagline: (m && m.tagline) || null,
+          essence: (m && m.essence) || (prof.essence || null),
+          statement: prof.statement_manual || prof.statement || null,
+          presence_status: 'in_the_field',
+          birthdate: prof.birthdate || prof.date_of_birth || null,
+          gene_keys: prof.gene_keys || {},
+          compass: { work: pts.work, lens: pts.lens, field: pts.field, call: pts.call },
+          frequency_signature: {
+            tonal_center: fs.tonal_center || null,
+            dominant_hz:  fs.dominant_hz  || null,
+            elemental_alignment: fs.elemental_alignment || null,
+            chakra_focus: fs.chakra_focus || null,
+          },
+          creative_stream: cd.creative_stream || [],
+          offerings: cd.offerings || [],
+          seed_syllable: cd.seed_syllable || 'Om',
+        };
+      } catch (e) { return { display_name: 'Anonymous', error: String(e) }; }
+    }
+    window.publishToField = function () {
+      cuHoldOmThen(function () {
+        var payload = cuBuildPublishPayload();
+        var url = cuPublishFieldUrl() + '/field-api/profile';
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload),
+        }).then(function (r) { return r.json(); }).then(function (j) {
+          var state = document.getElementById('lp-door-knock-state');
+          if (state) {
+            state.classList.add('is-visible');
+            if (j && j.ok && j.profile) {
+              var base = cuPublishFieldUrl() || '';
+              state.innerHTML = 'Published to the cOMmons. <a href="' + base + j.profile.url + '" target="_blank" rel="noopener" style="color:#d4a04a;">Open</a>';
+            } else {
+              state.textContent = (j && j.error)
+                ? 'Publish needs you to be signed in to the cOMmons — ' + j.error
+                : 'Could not reach the cOMmons service.';
+            }
+          }
+        }).catch(function (err) {
+          var state = document.getElementById('lp-door-knock-state');
+          if (state) {
+            state.classList.add('is-visible');
+            state.textContent = 'Could not reach the cOMmons service. Is it running on /field-api?';
+          }
+        });
+      });
+    };
 
     // ============================================================
     // PERSONAL WEBSITE PREVIEW v0.1

@@ -1,0 +1,20 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.git
+.gitignore
+.DS_Store
+data.db
+data.db-journal
+data.db-shm
+data.db-wal
+dist
+tests
+*.log
+# Raw Compass seed JSONs must never enter the image.
+# Curated public seeds under seeds/public/ ARE shipped so production
+# can boot with the three beta Living Profiles populated.
+seeds/*.json
+!seeds/README.md
+!seeds/public/
