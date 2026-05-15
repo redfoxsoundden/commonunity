@@ -6313,17 +6313,31 @@ function initInspireLayer2Buttons() {
         const el = document.querySelector(`[data-key="${point}.summary"]`);
         if (el) { el.value = text; el.dispatchEvent(new Event('input')); }
       } else if (field === 'insight') {
-        // Add as a new insight block
+        // Add as a new insight block and fill title + body
         const addBtn = document.getElementById(`${point}-add-insight`);
         if (addBtn) {
           addBtn.click();
-          // Fill the last insight block that was just created
           setTimeout(() => {
-            const blocks = document.querySelectorAll(`#${point}-insights .insight-block-text`);
+            const blocks = document.querySelectorAll(`#${point}-insights .insight-block`);
             if (blocks.length) {
-              const last = blocks[blocks.length - 1];
-              last.value = text;
-              last.dispatchEvent(new Event('input'));
+              const lastBlock = blocks[blocks.length - 1];
+              // First line goes into title, rest into body
+              const lines = text.split(/\n+/).filter(Boolean);
+              const titleEl = lastBlock.querySelector('input');
+              const bodyEl  = lastBlock.querySelector('textarea');
+              if (titleEl && lines.length > 0) {
+                titleEl.value = lines[0];
+                titleEl.dispatchEvent(new Event('input'));
+              }
+              if (bodyEl && lines.length > 1) {
+                bodyEl.value = lines.slice(1).join(' ');
+                bodyEl.dispatchEvent(new Event('input'));
+              } else if (bodyEl && lines.length === 1) {
+                // Single block of text — put it all in body, clear title
+                bodyEl.value = text;
+                bodyEl.dispatchEvent(new Event('input'));
+                if (titleEl) { titleEl.value = ''; titleEl.dispatchEvent(new Event('input')); }
+              }
             }
           }, 100);
         }
