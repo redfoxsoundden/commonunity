@@ -1,0 +1,228 @@
+/* CommonUnity Field — warm-dark, candlelit, sacred-minimal. */
+:root {
+  --bg: #0a0806;
+  --bg-warm: #16110d;
+  --gold: #d2a13a;
+  --gold-soft: #b08a36;
+  --teal: #3a8a6f;
+  --ink: #f0e6d2;
+  --ink-mute: #8a7e6c;
+  --line: rgba(208, 161, 58, 0.18);
+  --maxw: 64rem;
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --sans: "General Sans", "Inter", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--gold); text-decoration: none; }
+a:hover { color: var(--ink); }
+
+.cu-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 1.6rem;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+  background: rgba(10, 8, 6, 0.85);
+  backdrop-filter: blur(6px);
+}
+.cu-mark { display: inline-flex; align-items: center; gap: 0.6rem; }
+.cu-mark-glyph {
+  font-family: var(--serif);
+  color: var(--gold);
+  font-size: 1.6rem;
+  filter: drop-shadow(0 0 6px rgba(208,161,58,0.4));
+}
+.cu-mark-text {
+  font-family: var(--serif);
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.cu-nav { display: inline-flex; align-items: center; gap: 1.2rem; font-size: 0.9rem; }
+.cu-nav-name { color: var(--ink-mute); font-style: italic; }
+.cu-link, .cu-link-btn {
+  color: var(--gold); background: none; border: 1px solid var(--line);
+  padding: 0.4rem 0.9rem; border-radius: 999px; cursor: pointer;
+  font-family: var(--sans); font-size: 0.85rem;
+}
+.cu-link:hover, .cu-link-btn:hover { background: rgba(208,161,58,0.08); }
+
+.cu-main { max-width: var(--maxw); margin: 0 auto; padding: 3rem 1.6rem; }
+
+.cu-footer {
+  text-align: center; color: var(--ink-mute); font-size: 0.85rem;
+  padding: 4rem 1rem 3rem;
+}
+
+/* Hero */
+.cu-hero { max-width: 36rem; margin: 0 auto 4rem; text-align: center; }
+.cu-eyebrow {
+  text-transform: lowercase; letter-spacing: 0.16em; font-size: 0.78rem;
+  color: var(--gold-soft); margin: 0 0 0.6rem;
+}
+.cu-h1 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 0 0 1rem; color: var(--ink);
+  line-height: 1.2;
+}
+.cu-lede { color: var(--ink-mute); font-size: 1.05rem; }
+
+/* Gallery */
+.cu-gallery {
+  display: grid; gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+}
+.cu-card {
+  display: block; border: 1px solid var(--line); border-radius: 0.6rem;
+  padding: 1.4rem; background: var(--bg-warm);
+  transition: border-color 200ms ease, transform 200ms ease;
+}
+.cu-card:hover { border-color: var(--gold-soft); transform: translateY(-2px); }
+.cu-card-sigil { width: 100%; aspect-ratio: 1 / 1; margin-bottom: 1rem; }
+.cu-card-sigil svg { width: 100%; height: 100%; display: block; border-radius: 0.4rem; }
+.cu-card-name { font-family: var(--serif); font-size: 1.4rem; margin: 0 0 0.2rem; color: var(--ink); }
+.cu-card-tagline { color: var(--gold-soft); font-style: italic; margin: 0 0 0.6rem; font-size: 0.95rem; }
+.cu-card-essence { color: var(--ink-mute); margin: 0 0 0.8rem; font-size: 0.9rem; }
+.cu-card-presence { color: var(--gold-soft); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: lowercase; }
+.cu-empty { color: var(--ink-mute); text-align: center; }
+
+/* Profile */
+.cu-profile-head {
+  display: grid; grid-template-columns: 14rem 1fr; gap: 2rem; align-items: start;
+  margin-bottom: 3rem;
+}
+@media (max-width: 700px) {
+  .cu-profile-head { grid-template-columns: 1fr; text-align: center; }
+  .cu-sigil-wrap { margin: 0 auto; max-width: 12rem; }
+}
+.cu-sigil-wrap { width: 100%; aspect-ratio: 1 / 1; }
+.cu-sigil-wrap svg { width: 100%; height: 100%; display: block; border-radius: 0.4rem; }
+.cu-name { font-family: var(--serif); font-size: clamp(2rem, 5vw, 3rem); margin: 0 0 0.4rem; color: var(--ink); }
+.cu-tagline { color: var(--gold-soft); font-style: italic; font-size: 1.1rem; margin: 0 0 1rem; }
+.cu-presence-badge {
+  display: inline-block; font-size: 0.78rem; letter-spacing: 0.16em; text-transform: lowercase;
+  color: var(--gold-soft); border: 1px solid var(--line); padding: 0.3rem 0.7rem; border-radius: 999px;
+  margin: 0 0 1.5rem;
+}
+
+.cu-essence { max-width: 42rem; margin: 0 0 2rem; }
+.cu-essence p { font-family: var(--serif); font-size: 1.25rem; line-height: 1.5; color: var(--ink); }
+
+.cu-statement { max-width: 42rem; margin: 0 0 3rem; }
+.cu-statement blockquote {
+  border-left: 2px solid var(--gold-soft); padding-left: 1.2rem; margin: 0;
+  font-style: italic; color: var(--ink-mute);
+}
+
+/* Compass section */
+.cu-compass {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+  margin: 3rem 0;
+}
+@media (max-width: 700px) { .cu-compass { grid-template-columns: 1fr; } }
+.cu-compass-point { border-top: 1px solid var(--line); padding-top: 1.4rem; }
+.cu-compass-point header { display: flex; justify-content: space-between; align-items: baseline; }
+.cu-gk { color: var(--gold-soft); font-family: var(--serif); font-size: 0.95rem; margin: 0; }
+.cu-compass-point h3 { font-family: var(--serif); font-size: 1.4rem; font-weight: 400; margin: 0.3rem 0 0.8rem; color: var(--ink); }
+.cu-prose { color: var(--ink-mute); font-size: 0.98rem; line-height: 1.6; }
+.cu-highlights { margin: 1rem 0 0; padding-left: 1.2rem; }
+.cu-highlights li { color: var(--ink-mute); margin-bottom: 0.4rem; }
+
+/* Frequency / offerings */
+.cu-frequency, .cu-offerings { margin: 3rem 0; }
+.cu-frequency ul, .cu-offerings ul { list-style: none; padding: 0; margin: 0; }
+.cu-frequency li, .cu-offerings li {
+  padding: 0.7rem 0; border-bottom: 1px solid var(--line); color: var(--ink-mute);
+}
+.cu-frequency strong, .cu-offerings strong { color: var(--ink); font-weight: 500; }
+
+/* Interactions */
+.cu-interact { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.cu-attune {
+  background: none; border: 1px solid var(--gold-soft); color: var(--gold);
+  padding: 0.6rem 1.4rem; border-radius: 999px; cursor: pointer; font-family: var(--sans);
+  display: inline-flex; align-items: center; gap: 0.6rem;
+}
+.cu-attune:hover { background: rgba(208,161,58,0.1); }
+.cu-attune-fork {
+  display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 50%;
+  background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+}
+.cu-tone summary {
+  color: var(--gold); cursor: pointer; padding: 0.6rem 1rem; border: 1px solid var(--line); border-radius: 999px; font-size: 0.92rem;
+}
+.cu-tone-form { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem; }
+.cu-tone-form input {
+  background: var(--bg-warm); color: var(--ink); border: 1px solid var(--line);
+  padding: 0.5rem 0.8rem; border-radius: 0.4rem; font-family: var(--sans);
+}
+.cu-tone-form button {
+  background: none; border: 1px solid var(--gold-soft); color: var(--gold);
+  padding: 0.5rem 1rem; border-radius: 0.4rem; cursor: pointer;
+}
+
+/* Owner-only field echoes */
+.cu-field-echoes {
+  margin: 4rem 0; padding: 1.6rem; border: 1px dashed var(--line); border-radius: 0.6rem;
+}
+.cu-field-echoes h2 { font-family: var(--serif); margin-top: 0; color: var(--ink); }
+.cu-sub { color: var(--ink-mute); font-size: 0.9rem; }
+.cu-echo-line strong { color: var(--gold); font-size: 1.3rem; font-family: var(--serif); }
+.cu-presences { list-style: none; padding: 0; margin: 0; }
+.cu-presences li { padding: 0.4rem 0; color: var(--ink-mute); font-size: 0.92rem; }
+
+/* Enter form */
+.cu-enter { max-width: 28rem; margin: 4rem auto; text-align: center; }
+.cu-enter h1 { font-family: var(--serif); font-weight: 400; font-size: 2rem; margin: 0.5rem 0 1.2rem; }
+.cu-enter-form { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem; }
+.cu-enter-form input {
+  flex: 1; min-width: 14rem;
+  background: var(--bg-warm); color: var(--ink); border: 1px solid var(--line);
+  padding: 0.7rem 1rem; border-radius: 0.4rem; font-family: var(--sans);
+}
+.cu-enter-form button {
+  background: var(--gold); color: var(--bg); border: none; padding: 0.7rem 1.4rem;
+  border-radius: 0.4rem; cursor: pointer; font-family: var(--sans); font-weight: 500;
+}
+
+/* OM holding moment — for Mi→Fa publish threshold */
+#cu-om-veil {
+  position: fixed; inset: 0; display: none; place-items: center;
+  background: radial-gradient(circle at center, rgba(10,8,6,0.95) 0%, rgba(10,8,6,1) 70%);
+  z-index: 9999; pointer-events: none; opacity: 0;
+  transition: opacity 1200ms ease;
+}
+#cu-om-veil.is-active { display: grid; opacity: 1; pointer-events: auto; }
+#cu-om-veil .cu-om-glyph {
+  font-family: var(--serif); font-size: 8rem; color: var(--gold);
+  filter: drop-shadow(0 0 24px rgba(208,161,58,0.5));
+  animation: cu-om-breathe 4s ease-in-out infinite;
+}
+#cu-om-veil .cu-om-line {
+  font-family: var(--serif); color: var(--ink-mute); margin-top: 1.4rem; font-style: italic;
+  text-align: center;
+}
+@keyframes cu-om-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50%      { transform: scale(1.05); opacity: 1; }
+}
+
+/* Attune ripple */
+.cu-ripple {
+  position: fixed; pointer-events: none; width: 24px; height: 24px;
+  border-radius: 50%; border: 2px solid var(--gold);
+  transform: translate(-50%, -50%) scale(0.2); opacity: 0.9;
+  animation: cu-ripple 900ms ease-out forwards;
+}
+@keyframes cu-ripple {
+  to { transform: translate(-50%, -50%) scale(8); opacity: 0; }
+}

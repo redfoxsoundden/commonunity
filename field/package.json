@@ -1,0 +1,25 @@
+{
+  "name": "commonunity-field",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The CommonUnity Field — public commons / Living Profiles. Phase 1.",
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "NODE_ENV=development node src/index.js",
+    "seed": "node src/seed.js",
+    "test": "node tests/run.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "express": "^4.19.2",
+    "express-session": "^1.18.1",
+    "memorystore": "^1.6.7"
+  },
+  "devDependencies": {}
+}

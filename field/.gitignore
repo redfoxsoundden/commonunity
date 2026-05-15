@@ -1,0 +1,13 @@
+node_modules
+dist
+data.db
+data.db-journal
+data.db-shm
+data.db-wal
+.env
+.env.local
+*.log
+
+# Raw Compass seed JSONs are private — keep them out of git by default.
+seeds/*.json
+!seeds/README.md
