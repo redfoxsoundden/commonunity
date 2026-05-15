@@ -119,7 +119,7 @@ test("encodeSigilSeed: returns same output for same input (determinism)", () => 
   assert.deepEqual(a, b);
 });
 
-test("renderSigilSVG: produces valid-looking SVG with viewBox", () => {
+test("renderSigilSVG: produces valid SVG (rounded panel, 256 viewBox)", () => {
   const seed = sigil.encodeSigilSeed({
     display_name: "Test User",
     birthdate: "1990-01-01",
@@ -129,13 +129,47 @@ test("renderSigilSVG: produces valid-looking SVG with viewBox", () => {
   assert.match(svg, /<svg /);
   assert.match(svg, /viewBox="0 0 256 256"/);
   assert.match(svg, /<\/svg>$/);
-  assert.match(svg, /Om/);
 });
 
-test("renderSigilSVG: differs by handle (no two sigils equal)", () => {
+test("renderSigilSVG: uses Living Profile visual contract (conic palette + ॐ + Cormorant Garamond)", () => {
+  const seed = sigil.encodeSigilSeed({
+    display_name: "Test User",
+    birthdate: "1990-01-01",
+    tone: { dominant_hz: 528 },
+  });
+  const svg = sigil.renderSigilSVG(seed);
+  // The five canonical wedge colours from Studio's --work/--lens/--field/--call + --rose-color
+  assert.match(svg, /#f59e0b/, "must contain Work amber");
+  assert.match(svg, /#6366f1/, "must contain Lens indigo");
+  assert.match(svg, /#10b981/, "must contain Field emerald");
+  assert.match(svg, /#f43f5e/, "must contain Call rose-red");
+  assert.match(svg, /#c4b5fd/, "must contain rose accent (--rose-color)");
+  // The bīja glyph — the Devanagari ॐ that Living Profile shows.
+  assert.ok(svg.indexOf("ॐ") !== -1, "must include the Devanagari ॐ glyph");
+  // Typography honours the Living Profile font.
+  assert.match(svg, /Cormorant Garamond/);
+  // The "DIGITAL KEY · SIGIL" label from Living Profile.
+  assert.match(svg, /DIGITAL KEY · SIGIL/);
+});
+
+test("renderSigilSVG: handle drives unique rotation (no two seeds render identically)", () => {
   const a = sigil.renderSigilSVG(sigil.encodeSigilSeed({ display_name: "Vesna", birthdate: "1963-04-15", tone: { dominant_hz: 528 } }));
   const b = sigil.renderSigilSVG(sigil.encodeSigilSeed({ display_name: "Eda",   birthdate: "1980-05-20", tone: { dominant_hz: 432 } }));
   assert.notEqual(a, b);
+});
+
+test("renderSigilSVG: deterministic — same seed → byte-identical SVG", () => {
+  const input = { display_name: "Markus Lehto", birthdate: "1976-11-22", tone: { dominant_hz: 432 } };
+  const a = sigil.renderSigilSVG(sigil.encodeSigilSeed(input));
+  const b = sigil.renderSigilSVG(sigil.encodeSigilSeed(input));
+  assert.equal(a, b);
+});
+
+test("renderSigilSVG: handle-derived id is XML-safe (no unsafe chars in clip-path id)", () => {
+  // A handle with a hyphen and digits must produce a safe SVG id.
+  const seed = sigil.encodeSigilSeed({ display_name: "Vesna Lucca", birthdate: "1963-04-15" });
+  const svg = sigil.renderSigilSVG(seed);
+  assert.match(svg, /clip-vesna-lucca/);
 });
 
 test("buildDesignPrompt: includes solfeggio + gates + digital root", () => {

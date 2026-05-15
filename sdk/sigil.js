@@ -171,74 +171,122 @@ function fnv1a(str) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// SVG rendering — a layered geometric glyph built from the seed.
+// SVG rendering — Living Profile aligned (Phase 1 visual contract).
 //
-// Layers (from outside in):
-//   1. Outer breath ring — radius modulated by digital root
-//   2. Gene Key gate marks — N points around the ring at gate-derived angles
-//   3. Inner solfeggio polygon — sides = 3..9 by solfeggio index
-//   4. Central seed syllable mark — small bīja glyph using the syllable
+// Mirrors studio.html .lp-hero-slot.is-sigil: a rounded-corner panel filled
+// with a soft conic gradient cycling through Work (amber) → Lens (indigo) →
+// Field (emerald) → Call (rose) → rose-accent, with the Devanagari ॐ
+// centered in Cormorant Garamond serif. Uniqueness comes from the seed:
+// the conic rotation start angle is derived from gates + handle hash, and
+// the rose accent shifts toward the tone's solfeggio colour family.
 //
-// The whole thing fits in a 256x256 viewBox so it scales cleanly.
+// Studio dark-theme palette (canonical):
+//   --work #f59e0b   --lens #6366f1   --field #10b981   --call #f43f5e
+//   --rose-color #c4b5fd
+//
+// SVG has no native conic-gradient, so we approximate it with 5 colored
+// arc wedges plus a Gaussian blur to soften the seams — visually
+// indistinguishable from the CSS conic at the sizes we use.
 // ─────────────────────────────────────────────────────────────────────────
+const SIGIL_PALETTE = {
+  work:  "#f59e0b",  // amber
+  lens:  "#6366f1",  // indigo
+  field: "#10b981",  // emerald
+  call:  "#f43f5e",  // rose-red
+  rose:  "#c4b5fd",  // lavender accent (the --rose-color tint)
+};
+
+// Build an SVG arc-wedge path from cx,cy at radius r, between two angles
+// (radians, 0 = right, clockwise positive).
+function arcWedge(cx, cy, r, a0, a1) {
+  const x0 = cx + Math.cos(a0) * r;
+  const y0 = cy + Math.sin(a0) * r;
+  const x1 = cx + Math.cos(a1) * r;
+  const y1 = cy + Math.sin(a1) * r;
+  const large = (a1 - a0) > Math.PI ? 1 : 0;
+  return `M ${cx} ${cy} L ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z`;
+}
+
 function renderSigilSVG(seed, opts = {}) {
   const size = opts.size || 256;
   const cx = size / 2;
   const cy = size / 2;
-  const stroke = seed.color_primary || "#d2a13a";
-  const muted = "rgba(255,255,255,0.18)";
-
-  const dr = seed.digital_root || 9;
-  const outerR = (size * 0.42) + (dr - 5) * 1.2;
-  const innerR = size * 0.18;
   const handle = seed.handle || "anon";
+  const safeId = String(handle).replace(/[^a-zA-Z0-9_-]/g, "_");
   const h = fnv1a(handle + "|" + (seed.display_name || ""));
 
-  // Gate marks — one per gate, angle distributed deterministically by gate%64.
-  const gatesSvg = (seed.gates || []).slice(0, 8).map((g, i) => {
-    const angle = ((g.gate % 64) / 64) * Math.PI * 2 + (h % 360) * (Math.PI / 180);
-    const x = cx + Math.cos(angle) * outerR;
-    const y = cy + Math.sin(angle) * outerR;
-    const r = 3 + (Number(g.line) || 1);
-    return `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${r}" fill="${stroke}" opacity="0.85"/>`
-         + `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(2)}" y2="${y.toFixed(2)}" stroke="${muted}" stroke-width="0.5"/>`;
+  // Deterministic rotation start (degrees → radians). Studio LP uses
+  // `from 200deg` / `from 210deg`; we use 200° + a per-seed offset of up to
+  // 360° so two profiles in the family share the language but no two
+  // rotations are identical.
+  const startDeg = 200 + (h % 360);
+  const start = (startDeg * Math.PI) / 180;
+
+  // The five wedges, in the same order as the LP conic gradient.
+  const wedgeColors = [
+    SIGIL_PALETTE.rose,
+    SIGIL_PALETTE.work,
+    SIGIL_PALETTE.lens,
+    SIGIL_PALETTE.field,
+    SIGIL_PALETTE.call,
+    SIGIL_PALETTE.rose,
+  ];
+  const TWO_PI = Math.PI * 2;
+  const step = TWO_PI / (wedgeColors.length - 1); // five wedges, last one closes back to rose
+  const wedgeR = size * 0.62; // generous overflow — blur softens the edge
+  const wedges = wedgeColors.slice(0, -1).map((c, i) => {
+    const a0 = start + i * step;
+    const a1 = start + (i + 1) * step;
+    return `<path d="${arcWedge(cx, cy, wedgeR, a0, a1)}" fill="${c}" fill-opacity="0.32"/>`;
   }).join("");
 
-  // Inner solfeggio polygon — sides from solfeggio family index (3..9).
-  let sides = 6;
-  if (seed.tone && seed.tone.solfeggio) {
-    const idx = SOLFEGGIO.findIndex(s => s.hz === seed.tone.solfeggio.hz);
-    if (idx >= 0) sides = 3 + (idx % 7);
-  }
-  const polyPoints = [];
-  for (let i = 0; i < sides; i++) {
-    const a = (i / sides) * Math.PI * 2 - Math.PI / 2;
-    polyPoints.push(`${(cx + Math.cos(a) * innerR * 1.6).toFixed(2)},${(cy + Math.sin(a) * innerR * 1.6).toFixed(2)}`);
-  }
+  // The bīja (ॐ) — Cormorant Garamond serif, soft cream against the field.
+  // The Living Profile uses the literal Devanagari glyph regardless of
+  // seed_syllable; we honour that convention so the family language is
+  // consistent. The seed.tone.seed_syllable is still preserved on the
+  // profile data for future per-profile variation.
+  const glyph = "ॐ";
+  const glyphSize = size * 0.42;
+  const glyphColor = "#f1f5f9"; // --text on dark theme; reads on the gradient
+  const labelSize = Math.round(size * 0.052);
 
-  // Central syllable — render the seed syllable text in a soft serif.
-  const syllable = (seed.tone && seed.tone.seed_syllable) || "Om";
+  // Soft inner ring (echoes the LP slot's subtle ambient pulse).
+  const innerR = size * 0.36;
+
+  // Background plate — rounded-corner radius matches LP's `border-radius: 22px`
+  // when rendered at the LP slot's ~120px size; we scale to viewBox.
+  const radius = Math.round(size * 0.094);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="Personal sigil for ${escapeXml(seed.display_name || handle)}">
   <defs>
-    <radialGradient id="bg-${handle}" cx="50%" cy="50%" r="60%">
-      <stop offset="0%" stop-color="#1a1410" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#0a0806" stop-opacity="1"/>
-    </radialGradient>
-    <filter id="glow-${handle}" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="1.6" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <clipPath id="clip-${safeId}">
+      <rect x="0" y="0" width="${size}" height="${size}" rx="${radius}" ry="${radius}"/>
+    </clipPath>
+    <filter id="conic-${safeId}" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="${(size * 0.07).toFixed(2)}"/>
     </filter>
+    <radialGradient id="vignette-${safeId}" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#0d1526" stop-opacity="0.0"/>
+      <stop offset="100%" stop-color="#0b1120" stop-opacity="0.55"/>
+    </radialGradient>
   </defs>
-  <rect width="${size}" height="${size}" fill="url(#bg-${handle})"/>
-  <g filter="url(#glow-${handle})">
-    <circle cx="${cx}" cy="${cy}" r="${outerR.toFixed(2)}" fill="none" stroke="${stroke}" stroke-width="1" opacity="0.85"/>
-    <circle cx="${cx}" cy="${cy}" r="${(outerR - 6).toFixed(2)}" fill="none" stroke="${muted}" stroke-width="0.4"/>
-    <polygon points="${polyPoints.join(" ")}" fill="none" stroke="${stroke}" stroke-width="0.8" opacity="0.7"/>
-    <circle cx="${cx}" cy="${cy}" r="${innerR.toFixed(2)}" fill="none" stroke="${stroke}" stroke-width="0.6" opacity="0.6"/>
-    ${gatesSvg}
-    <text x="${cx}" y="${cy + 6}" text-anchor="middle" font-family="Georgia, 'Instrument Serif', serif" font-size="${innerR * 0.9}" fill="${stroke}" opacity="0.95">${escapeXml(syllable)}</text>
+  <g clip-path="url(#clip-${safeId})">
+    <rect width="${size}" height="${size}" fill="#0d1526"/>
+    <g filter="url(#conic-${safeId})">
+      ${wedges}
+    </g>
+    <rect width="${size}" height="${size}" fill="url(#vignette-${safeId})"/>
+    <circle cx="${cx}" cy="${cy}" r="${innerR.toFixed(2)}" fill="none" stroke="rgba(241,245,249,0.10)" stroke-width="1"/>
+    <text x="${cx}" y="${(cy + glyphSize * 0.36).toFixed(2)}" text-anchor="middle"
+          font-family="Cormorant Garamond, Georgia, 'Times New Roman', serif"
+          font-size="${glyphSize.toFixed(2)}" font-weight="500"
+          fill="${glyphColor}" fill-opacity="0.92">${glyph}</text>
+    <text x="${cx}" y="${(size - labelSize * 1.3).toFixed(2)}" text-anchor="middle"
+          font-family="Plus Jakarta Sans, system-ui, sans-serif"
+          font-size="${labelSize}" font-weight="500"
+          letter-spacing="${(labelSize * 0.22).toFixed(2)}"
+          fill="rgba(241,245,249,0.55)">DIGITAL KEY · SIGIL</text>
   </g>
 </svg>`;
 }
