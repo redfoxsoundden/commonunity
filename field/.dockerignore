@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.git
+.gitignore
+.DS_Store
+data.db
+data.db-journal
+data.db-shm
+data.db-wal
+dist
+tests
+*.log
+# Raw Compass seed JSONs must never enter the image.
+seeds/*.json
+!seeds/README.md
