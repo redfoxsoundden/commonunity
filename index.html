@@ -2250,6 +2250,55 @@ body.companion-mode .companion-mode-banner { display: block; }
 }
 .profile-modal-close:hover { color: var(--text); }
 
+/* ── Layer 1 inspire buttons (match Layer 2 style) ─────── */
+.inspire-btn {
+  margin-top: 6px;
+  background: none;
+  border: 1px dashed color-mix(in srgb, var(--accent,#a78bfa) 40%, transparent);
+  border-radius: 6px;
+  color: var(--accent,#a78bfa);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s, border-color 0.2s;
+  display: inline-block;
+}
+.inspire-btn:hover { opacity: 1; border-style: solid; }
+.inspire-btn.loading { opacity: 0.4; cursor: wait; }
+.inspire-row {
+  margin-top: 4px;
+}
+.inspire-suggestion {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--accent,#a78bfa) 8%, var(--surface-2,#1e1b2e));
+  border-left: 2px solid color-mix(in srgb, var(--accent,#a78bfa) 50%, transparent);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-muted, #c4b5fd);
+  display: none;
+  position: relative;
+}
+.inspire-suggestion.visible { display: block; }
+.inspire-text { display: block; }
+.inspire-dismiss {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-faint, #888);
+  opacity: 0.6;
+  line-height: 1;
+  padding: 2px 4px;
+}
+.inspire-dismiss:hover { opacity: 1; }
+
 /* ── Layer 2 inspire buttons ───────────────────────────── */
 .inspire-l2-btn {
   margin-top: 6px;
