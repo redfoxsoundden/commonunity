@@ -13,5 +13,8 @@ dist
 tests
 *.log
 # Raw Compass seed JSONs must never enter the image.
+# Curated public seeds under seeds/public/ ARE shipped so production
+# can boot with the three beta Living Profiles populated.
 seeds/*.json
 !seeds/README.md
+!seeds/public/

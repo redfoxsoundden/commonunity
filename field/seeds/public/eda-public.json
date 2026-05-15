@@ -1,0 +1,67 @@
+{
+  "profile": {
+    "first_name": "Eda",
+    "last_name": "Çarmıklı",
+    "full_name": "Eda Çarmıklı",
+    "gene_keys": {
+      "life_work": "GK 45"
+    }
+  },
+  "points": {
+    "work": {
+      "gk_num": "45",
+      "gk_line": "",
+      "theme": "I gather people into synergy and translate between worlds so we can build meaning together toward a shared dream of what's possible.",
+      "summary": "Eda brings people together across difference, weaving synergies between perspectives that others might see as separate or opposed. For over a decade, she has been a gathering point — hosting, listening, and helping communities discover shared purpose and belonging. Her work is rooted in the belief that everyone holds truth within their own story, and that real communion happens when we create space for those truths to meet.",
+      "web_heading": "I gather people into synergy",
+      "web_intro": "I bring people together across difference — not by erasing what makes us distinct, but by creating the conditions where those differences become generative. For over a decade, I have been a gathering point. I host, I listen, I translate between worlds that others see as separate or opposed. My work lives in the space between people — the alchemy that happens when perspectives meet through sincere human encounter and discover they belong to the same conversation.",
+      "web_closing": "What I do is turn togetherness into community, and community into a field where something larger can move through us.",
+      "highlights": [
+        "I create synergies between people and communities who might not otherwise find each other",
+        "I translate perspectives across divides without flattening what makes each one true",
+        "I help groups discover shared purpose without forcing agreement or erasing tension",
+        "I hold space where people can see through each other's eyes and feel genuinely seen in return"
+      ],
+      "frequency": 7
+    },
+    "lens": {
+      "gk_num": "26",
+      "gk_line": "1",
+      "theme": "Trusting life's flow enough to let my voice emerge — not through control or comprehensive knowledge, but through artful presence in service of truth.",
+      "summary": "Eda has learned to transform her strategic mind from a tool of self-protection into an instrument of service. Where she once used her understanding of human nature to control outcomes and avoid conflict, she now channels that artfulness into delivering truth with relaxed confidence. Her evolution is a journey from hidden manipulation to visible leadership — trusting life's flow while skillfully drawing attention to what wants to emerge through her.",
+      "web_heading": "From Hidden Strategy to Visible Service",
+      "web_intro": "I grew up learning how to navigate. Black Sea family, patriarchal structure — I became fluent in reading rooms, anticipating moves, clearing my own path through artful persuasion. For years I thought this was just survival. Then I discovered it was something else: a capacity to see what motivates people, what shapes their choices, what makes them say yes or no. I used it well. I also used it to stay safe, to avoid being seen too clearly myself.",
+      "web_closing": "Heart marketing resonates because it names what I already do: strategy in service of something real.",
+      "highlights": [
+        "Gene Keys taught me that pride has layers — that my willpower was not the problem, but what I was willing it toward",
+        "Art of Living cracked something open: the power of a service state, surrendering control to something greater",
+        "I have always loved selling — but now I sell truth, the tools that revealed glimpses of it in me",
+        "My words used to come from a higher plane in a way that put people into shame or guilt without my realising it",
+        "Now I trust the flow enough to let my voice emerge — not through knowing everything, but through relaxed presence"
+      ],
+      "frequency": -1
+    },
+    "field": {
+      "gk_num": "22",
+      "gk_line": "3",
+      "theme": null,
+      "summary": null,
+      "web_heading": null,
+      "web_intro": null,
+      "web_closing": null,
+      "highlights": [],
+      "frequency": -1
+    },
+    "call": {
+      "gk_num": "47",
+      "gk_line": "",
+      "theme": null,
+      "summary": null,
+      "web_heading": null,
+      "web_intro": null,
+      "web_closing": null,
+      "highlights": [],
+      "frequency": -1
+    }
+  }
+}

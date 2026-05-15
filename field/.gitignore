@@ -9,5 +9,8 @@ data.db-wal
 *.log
 
 # Raw Compass seed JSONs are private — keep them out of git by default.
+# Curated public seeds under seeds/public/ are explicitly allowed so the
+# Railway image can ship the three beta Living Profiles deterministically.
 seeds/*.json
 !seeds/README.md
+!seeds/public/

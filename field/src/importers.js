@@ -8,6 +8,10 @@ const db = require("./db");
 const sigil = require("./sigil.js");
 
 const SEED_DIR_CANDIDATES = [
+  // Curated public seeds shipped in the repo — the only safe source in production.
+  // Strip raw transcripts / qa_answers / insights upstream; see field/seeds/public/README.md.
+  path.join(__dirname, "..", "seeds", "public"),
+  // Local dev: raw Compass JSONs dropped into field/seeds/ (git-ignored).
   path.join(__dirname, "..", "seeds"),
   path.join(__dirname, "..", "..", "..", "..", ""), // workspace root
   "/home/user/workspace",
@@ -172,7 +176,7 @@ function importCompassSeed({ filenames, email, handleOverride, displayNameOverri
 
 function importVesnaSeed({ email } = {}) {
   return importCompassSeed({
-    filenames: ["vesna-lucca-compass-2026-05-12.json", "vesna.json"],
+    filenames: ["vesna-public.json", "vesna-lucca-compass-2026-05-12.json", "vesna.json"],
     email: email || process.env.VESNA_EMAIL || "vesna.lucca@gmail.com",
     tone: {
       tonal_center: "C",
@@ -193,6 +197,7 @@ function importEdaSeed({ email } = {}) {
   // edits in the JSON.
   return importCompassSeed({
     filenames: [
+      "eda-public.json",
       "eda-armkl-compass-2026-05-15.json",
       "eda-carmikli-compass.json",
       "eda.json",
@@ -222,6 +227,7 @@ function importMarkusSeed({ email } = {}) {
   // public-facing name and handle are overridden.
   return importCompassSeed({
     filenames: [
+      "markus-public.json",
       "markus-compass-2026-05-15.json",
       "markus-lehto-compass.json",
       "markus.json",

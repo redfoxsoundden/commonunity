@@ -9,6 +9,17 @@ Drop seed JSON files into this directory. `npm run seed` (or
 in this directory are git-ignored — they contain private Compass
 artifacts and must not be committed.
 
+## Production seeding (Railway)
+
+Production reads from **`field/seeds/public/`** — a committed sibling
+folder of curated, public-safe seeds shipped inside the Docker image.
+On startup, `src/index.js` calls `autoSeedBeta()` which imports the
+three Phase 1 profiles idempotently (skips when all three handles are
+already published; opt out with `FIELD_AUTO_SEED=0`, force a re-import
+with `FIELD_FORCE_SEED=1`). See `seeds/public/README.md` for the
+allow-list of fields included in the curated seeds, and for the
+re-curation workflow when a beta participant updates their Compass.
+
 ## Phase 1 beta seats
 
 | Name | Email | Compass JSON | Public profile |

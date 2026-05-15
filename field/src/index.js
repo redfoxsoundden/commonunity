@@ -24,6 +24,7 @@ let MemoryStoreCtor;
 try { if (session) MemoryStoreCtor = require("memorystore")(session); } catch { /* optional */ }
 
 const { registerRoutes } = require("./routes");
+const { autoSeedBeta } = require("./seed");
 
 const app = express();
 
@@ -97,6 +98,15 @@ app.use((err, _req, res, _next) => {
 const PORT = parseInt(process.env.PORT || "5050", 10);
 
 if (require.main === module) {
+  // Idempotent: skips when all three beta handles already exist. Failures are
+  // logged but never crash the boot — the service comes up even if a seed file
+  // is missing, so a misconfigured deploy stays diagnosable via /field-api/health.
+  try {
+    autoSeedBeta();
+  } catch (e) {
+    console.warn("[field] auto-seed failed (continuing to serve):", e.message);
+  }
+
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`[field] serving on http://0.0.0.0:${PORT}`);
     console.log(`[field] gallery:    /field`);
