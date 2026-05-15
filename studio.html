@@ -1792,9 +1792,21 @@ input, textarea { font: inherit; color: inherit; }
 }
 
 /* ── Room layout — DAW style ─────────────────────────────────── */
+/* Four tracks at desktop: archive | workbench (Field Notes) |
+   splitter | mirror (Nexus). The mirror width is driven by a CSS
+   custom property the splitter writes into. Field Notes absorbs
+   the remainder via minmax(0, 1fr). Splitter is a thin draggable
+   gutter the user can move left/right (or focus + arrow-key) to
+   give Nexus more room when answers wrap. */
 .room-body {
+  --nexus-width: 340px;
+  --room-splitter-width: 6px;
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 340px;
+  grid-template-columns:
+    220px
+    minmax(0, 1fr)
+    var(--room-splitter-width)
+    minmax(220px, var(--nexus-width));
   grid-template-rows: 1fr;
   align-items: stretch;
   gap: 0;
@@ -1805,13 +1817,17 @@ input, textarea { font: inherit; color: inherit; }
   min-width: 0;
 }
 
-/* Intermediate viewport (901–1180px): keep the three columns but
-   trim side panels so the centre Notepad stays usable. Without
-   this the Notepad shrank below ~340px and the Nexus orb / archive
-   chips pushed into the room body and overlapped. */
+/* Intermediate viewport (901–1180px): keep the four tracks but
+   trim the Archive sidebar so the Notepad has room. The
+   workbench/mirror split is still user-controllable via the
+   splitter — we don't pin a fixed Nexus width here. */
 @media (min-width: 901px) and (max-width: 1180px) {
   .room-body {
-    grid-template-columns: 180px minmax(0, 1fr) 280px;
+    grid-template-columns:
+      180px
+      minmax(0, 1fr)
+      var(--room-splitter-width)
+      minmax(220px, var(--nexus-width));
   }
 }
 
@@ -1822,6 +1838,65 @@ input, textarea { font: inherit; color: inherit; }
     height: auto;
     overflow-y: auto;
   }
+}
+
+/* ── Vertical splitter between Field Notes and Nexus ─────────
+   Visible as a slim gutter with a centred grip. Drag (pointer)
+   or focus + arrow-keys (keyboard) to resize. Hidden when the
+   layout stacks (≤ 900px) — single-column wins, no overlap. */
+.room-splitter {
+  position: relative;
+  cursor: col-resize;
+  background: color-mix(in srgb, var(--border) 70%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--rose-color,#c4b5fd) 12%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--rose-color,#c4b5fd) 12%, transparent);
+  transition: background 0.15s ease, border-color 0.15s ease;
+  touch-action: none;
+  user-select: none;
+  z-index: 5;
+}
+.room-splitter::before {
+  /* Centred grip — three short horizontal bars stacked vertically. */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--rose-color,#c4b5fd) 55%, transparent);
+  box-shadow:
+    -4px 0 0 color-mix(in srgb, var(--rose-color,#c4b5fd) 55%, transparent),
+     4px 0 0 color-mix(in srgb, var(--rose-color,#c4b5fd) 55%, transparent);
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+.room-splitter:hover,
+.room-splitter:focus-visible,
+.room-splitter.is-dragging {
+  background: color-mix(in srgb, var(--rose-color,#c4b5fd) 18%, transparent);
+  border-color: color-mix(in srgb, var(--rose-color,#c4b5fd) 45%, transparent);
+}
+.room-splitter:hover::before,
+.room-splitter:focus-visible::before,
+.room-splitter.is-dragging::before {
+  opacity: 1;
+}
+.room-splitter:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--rose-color,#c4b5fd) 60%, transparent);
+  outline-offset: -2px;
+}
+/* Wider hit area for pointer drags — keeps the visible gutter
+   slim while making the splitter easy to grab. */
+.room-splitter::after {
+  content: "";
+  position: absolute;
+  inset: 0 -6px;
+}
+
+@media (max-width: 900px) {
+  .room-splitter { display: none; }
 }
 
 /* ── Archive panel (left) ────────────────────────────────────── */
@@ -6704,6 +6779,20 @@ input, textarea { font: inherit; color: inherit; }
         </div>
       </div>
     </div>
+
+    <!-- Vertical splitter between Field Notes and Nexus.
+         Pointer-draggable; arrow keys when focused. Writes the
+         Nexus track width into --nexus-width on .room-body. -->
+    <div class="room-splitter"
+         id="room-splitter"
+         role="separator"
+         aria-orientation="vertical"
+         aria-controls="room-mirror"
+         aria-label="Resize Field Notes / Nexus split"
+         aria-valuemin="220"
+         aria-valuemax="900"
+         aria-valuenow="340"
+         tabindex="0"></div>
 
     <!-- The Nexus (right panel) -->
     <div class="room-mirror" id="room-mirror">
@@ -14647,6 +14736,188 @@ if (document.readyState === 'loading') {
   } else {
     go();
   }
+})();
+
+// ============================================================
+// ROOM SPLITTER — horizontal resize between Field Notes & Nexus
+// ============================================================
+// User-driven split: drag the gutter (or focus + arrow keys) to
+// give Nexus more horizontal room when long answers wrap. The
+// gutter writes a px value into --nexus-width on .room-body —
+// the grid template already reads that variable. The width
+// persists across reloads via localStorage. The splitter is
+// hidden under the 900px breakpoint (the room layout stacks).
+//
+// Min/max keep both panes usable: the Nexus track never collapses
+// below 220px and never grows past the larger of 900px or
+// (viewport - 360px) so Field Notes always retains ~340px.
+(function () {
+  'use strict';
+  var STORAGE_KEY = 'cu.studio.nexusWidth';
+  var MIN_NEXUS = 220;       // px — must mirror grid template
+  var MIN_NOTEPAD = 320;     // px — Field Notes never falls under this
+  var KEY_STEP = 16;         // px per arrow press
+  var KEY_STEP_BIG = 64;     // px per Shift+arrow press
+
+  function getRoot() {
+    return document.querySelector('.room-body');
+  }
+  function getSplitter() {
+    return document.getElementById('room-splitter');
+  }
+  function getMirror() {
+    return document.getElementById('room-mirror');
+  }
+  function isStacked() {
+    // Mirror the @media (max-width: 900px) stacking rule. We use
+    // window.matchMedia so the splitter disables itself the moment
+    // the layout collapses, without waiting for a render tick.
+    try { return window.matchMedia('(max-width: 900px)').matches; }
+    catch (_) { return window.innerWidth <= 900; }
+  }
+  function clampWidth(px) {
+    var root = getRoot();
+    if (!root) return px;
+    var rect = root.getBoundingClientRect();
+    // Reserve space for archive (220 desktop / 180 narrow) + the
+    // notepad minimum + the splitter gutter (6px). Pull the
+    // archive width from the live computed grid so the clamp stays
+    // honest at the 1180px breakpoint.
+    var archive = 220;
+    try {
+      var styles  = window.getComputedStyle(root);
+      var tracks  = styles.getPropertyValue('grid-template-columns').trim().split(/\s+/);
+      var first   = parseFloat(tracks[0]);
+      if (isFinite(first) && first > 0) archive = first;
+    } catch (_) {}
+    var maxFromViewport = rect.width - archive - MIN_NOTEPAD - 6;
+    var hardMax = Math.max(MIN_NEXUS, Math.min(900, maxFromViewport));
+    if (!isFinite(hardMax) || hardMax < MIN_NEXUS) hardMax = MIN_NEXUS;
+    return Math.max(MIN_NEXUS, Math.min(hardMax, px));
+  }
+  function readStored() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      var n = parseFloat(raw);
+      return isFinite(n) ? n : null;
+    } catch (_) { return null; }
+  }
+  function writeStored(px) {
+    try { window.localStorage.setItem(STORAGE_KEY, String(Math.round(px))); }
+    catch (_) {}
+  }
+  function applyWidth(px, opts) {
+    opts = opts || {};
+    var root = getRoot();
+    var splitter = getSplitter();
+    if (!root) return null;
+    var clamped = clampWidth(px);
+    root.style.setProperty('--nexus-width', clamped + 'px');
+    if (splitter) splitter.setAttribute('aria-valuenow', String(Math.round(clamped)));
+    if (opts.persist) writeStored(clamped);
+    return clamped;
+  }
+  function currentNexusPx() {
+    var mirror = getMirror();
+    if (mirror) return mirror.getBoundingClientRect().width;
+    var stored = readStored();
+    return stored || 340;
+  }
+
+  function bind() {
+    var splitter = getSplitter();
+    var root = getRoot();
+    if (!splitter || !root) return;
+
+    // Restore persisted width on first paint.
+    var stored = readStored();
+    if (stored != null) applyWidth(stored, { persist: false });
+
+    // ── Pointer drag ─────────────────────────────────────
+    var dragState = null;
+    splitter.addEventListener('pointerdown', function (e) {
+      if (isStacked()) return;
+      if (e.button !== undefined && e.button !== 0) return;
+      var rootRect = root.getBoundingClientRect();
+      dragState = {
+        pointerId: e.pointerId,
+        // The Nexus column ends at the right edge of .room-body.
+        // New nexus width = (room-body right edge) - (pointer X).
+        rightEdge: rootRect.right
+      };
+      splitter.classList.add('is-dragging');
+      document.body.style.cursor = 'col-resize';
+      try { splitter.setPointerCapture(e.pointerId); } catch (_) {}
+      e.preventDefault();
+    });
+    splitter.addEventListener('pointermove', function (e) {
+      if (!dragState || e.pointerId !== dragState.pointerId) return;
+      // The splitter has its own ::after hit pad — center on the
+      // pointer, so the new Nexus width is the distance from the
+      // pointer to the right edge.
+      var newNexus = dragState.rightEdge - e.clientX;
+      applyWidth(newNexus, { persist: false });
+    });
+    function endDrag(e) {
+      if (!dragState) return;
+      if (e && e.pointerId !== dragState.pointerId) return;
+      splitter.classList.remove('is-dragging');
+      document.body.style.cursor = '';
+      try { splitter.releasePointerCapture(dragState.pointerId); } catch (_) {}
+      dragState = null;
+      // Persist the final clamped value.
+      writeStored(currentNexusPx());
+    }
+    splitter.addEventListener('pointerup',     endDrag);
+    splitter.addEventListener('pointercancel', endDrag);
+
+    // ── Keyboard ─────────────────────────────────────────
+    splitter.addEventListener('keydown', function (e) {
+      if (isStacked()) return;
+      var step = e.shiftKey ? KEY_STEP_BIG : KEY_STEP;
+      var current = currentNexusPx();
+      var next = null;
+      if (e.key === 'ArrowLeft')  next = current + step;   // grow Nexus
+      if (e.key === 'ArrowRight') next = current - step;   // shrink Nexus
+      if (e.key === 'Home')       next = MIN_NEXUS;
+      if (e.key === 'End')        next = 900;
+      if (e.key === 'Enter' || e.key === ' ') next = 340;  // reset to default
+      if (next == null) return;
+      e.preventDefault();
+      applyWidth(next, { persist: true });
+    });
+
+    // ── Window resize: re-clamp so the stored width never causes
+    // overlap after the viewport shrinks (e.g. user pulls a desktop
+    // window down to tablet width). ──────────────────────────────
+    var resizeRaf = 0;
+    window.addEventListener('resize', function () {
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(function () {
+        resizeRaf = 0;
+        if (isStacked()) return;
+        applyWidth(currentNexusPx(), { persist: false });
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind);
+  } else {
+    bind();
+  }
+
+  // Expose minimal hooks for tests / console QA. Read-only intent.
+  window.CommonUnity = window.CommonUnity || {};
+  window.CommonUnity.roomSplitter = {
+    STORAGE_KEY: STORAGE_KEY,
+    MIN_NEXUS:   MIN_NEXUS,
+    MIN_NOTEPAD: MIN_NOTEPAD,
+    apply:       function (px) { return applyWidth(px, { persist: true }); },
+    current:     currentNexusPx,
+    clamp:       clampWidth
+  };
 })();
 </script>
 </body>

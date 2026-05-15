@@ -123,15 +123,19 @@ if (mirrorTextareaMatch) {
 // ---------------------------------------------------------------------------
 console.log('\nresponsive room layout');
 
-// .room-body — the 1fr middle track must be minmax(0, 1fr) so the
-// centre column can shrink past intrinsic content size (this is the
-// canonical fix for grid items pushing siblings out of their tracks).
+// .room-body — the middle (Field Notes) track must be minmax(0, 1fr)
+// so it can shrink past intrinsic content size. The Nexus track is
+// driven by a user-controllable --nexus-width custom property; the
+// splitter sits between them as its own track. See the dedicated
+// studio-room-splitter test for full coverage of the splitter.
 const roomBodyRule = src.match(/\/\* ── Room layout — DAW style[\s\S]*?\.room-body\s*\{[^}]*\}/);
 assert(!!roomBodyRule, 'extracted DAW-style .room-body rule');
 if (roomBodyRule) {
   const r = roomBodyRule[0];
-  assert(/grid-template-columns:\s*220px\s+minmax\(0,\s*1fr\)\s+340px/.test(r),
-    '.room-body uses minmax(0, 1fr) for the centre column');
+  assert(/minmax\(0,\s*1fr\)/.test(r),
+    '.room-body has a minmax(0, 1fr) track (Field Notes shrinks past content size)');
+  assert(/var\(--nexus-width\)/.test(r),
+    '.room-body Nexus track reads var(--nexus-width) so the splitter can drive it');
   assert(/min-width:\s*0/.test(r),
     '.room-body container has min-width:0');
 }
