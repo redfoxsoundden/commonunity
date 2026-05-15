@@ -2,7 +2,7 @@
   "name": "commonunity-field",
   "version": "0.1.0",
   "private": true,
-  "description": "The CommonUnity Field — public commons / Living Profiles. Phase 1.",
+  "description": "CommonUnity cOMmons — public Living Profiles surface (Phase 1). Folder/route kept as 'field' for backward compat; visible brand is 'cOMmons'.",
   "license": "MIT",
   "type": "commonjs",
   "main": "src/index.js",
@@ -10,7 +10,7 @@
     "start": "node src/index.js",
     "dev": "NODE_ENV=development node src/index.js",
     "seed": "node src/seed.js",
-    "test": "node tests/run.js"
+    "test": "node tests/run.js && node tests/visual-parity.test.js"
   },
   "engines": {
     "node": ">=20.0.0"

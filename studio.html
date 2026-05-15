@@ -12196,8 +12196,8 @@ if (document.readyState === 'loading') {
           '<button type="button" class="lp-door-action" id="lp-door-note-toggle" aria-controls="lp-door-note-panel" aria-expanded="false">' +
             '<span class="lp-door-action-glyph" aria-hidden="true">✎</span>Leave a note' +
           '</button>' +
-          '<button type="button" class="lp-door-action lp-publish-field" id="lp-publish-field" title="Publish your Living Profile to the CommonUnity Field">' +
-            '<span class="lp-door-action-glyph" aria-hidden="true">ॐ</span>Publish to Field' +
+          '<button type="button" class="lp-door-action lp-publish-field" id="lp-publish-field" title="Publish your Living Profile to the CommonUnity cOMmons">' +
+            '<span class="lp-door-action-glyph" aria-hidden="true">ॐ</span>Publish to cOMmons' +
           '</button>' +
         '</div>' +
         '<div class="lp-door-knock-state" id="lp-door-knock-state" role="status" aria-live="polite"></div>' +
@@ -12929,16 +12929,24 @@ if (document.readyState === 'loading') {
       if (v) return v;
       v = document.createElement('div');
       v.id = 'cu-om-veil';
-      v.innerHTML = '<div style="text-align:center"><div class="cu-om-glyph" style="font-family:Georgia,serif;font-size:8rem;color:#d2a13a;filter:drop-shadow(0 0 24px rgba(208,161,58,0.5));animation:cu-om-breathe 4s ease-in-out infinite">ॐ</div><div class="cu-om-line" style="font-family:Georgia,serif;color:#8a7e6c;margin-top:1.4rem;font-style:italic">You are making your work visible. The Field receives it.</div></div>';
+      // Use the homepage / studio shared lockup so the veil belongs to the
+      // same visual world. Cormorant Garamond italic for the holding line.
+      v.innerHTML =
+        '<div style="text-align:center;max-width:36rem;padding:0 2rem;">' +
+          '<svg class="cu-om-lockup" viewBox="-30 0 760 132" aria-hidden="true" style="display:block;width:clamp(260px,46vw,460px);height:auto;margin:0 auto;filter:drop-shadow(0 0 32px rgba(212,160,74,0.45));animation:cu-om-breathe 4s ease-in-out infinite;">' +
+            '<use href="#cu-logo-lockup"/>' +
+          '</svg>' +
+          '<div class="cu-om-line" style="font-family:\'Cormorant Garamond\',Georgia,serif;color:rgba(250,248,244,0.72);margin-top:1.8rem;font-style:italic;font-size:1.2rem;line-height:1.5;">You are making your work visible. The cOMmons receives it.</div>' +
+        '</div>';
       Object.assign(v.style, {
         position: 'fixed', inset: '0', display: 'none',
-        background: 'radial-gradient(circle at center, rgba(10,8,6,0.95) 0%, rgba(10,8,6,1) 70%)',
+        background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(42,107,140,0.18), transparent 60%), radial-gradient(circle at center, rgba(11,17,32,0.96) 0%, rgba(11,17,32,1) 70%)',
         zIndex: '99999', opacity: '0', transition: 'opacity 1200ms ease', placeItems: 'center'
       });
       if (!document.getElementById('cu-om-veil-style')) {
         var st = document.createElement('style');
         st.id = 'cu-om-veil-style';
-        st.textContent = '@keyframes cu-om-breathe { 0%,100%{transform:scale(1);opacity:.85} 50%{transform:scale(1.05);opacity:1} } #cu-om-veil.is-active { display:grid !important; opacity:1 !important; }';
+        st.textContent = '@keyframes cu-om-breathe { 0%,100%{transform:scale(1);opacity:.88} 50%{transform:scale(1.04);opacity:1} } #cu-om-veil.is-active { display:grid !important; opacity:1 !important; }';
         document.head.appendChild(st);
       }
       document.body.appendChild(v);
@@ -13017,18 +13025,18 @@ if (document.readyState === 'loading') {
             state.classList.add('is-visible');
             if (j && j.ok && j.profile) {
               var base = cuPublishFieldUrl() || '';
-              state.innerHTML = 'Published to the Field. <a href="' + base + j.profile.url + '" target="_blank" rel="noopener" style="color:#d2a13a;">Open</a>';
+              state.innerHTML = 'Published to the cOMmons. <a href="' + base + j.profile.url + '" target="_blank" rel="noopener" style="color:#d4a04a;">Open</a>';
             } else {
               state.textContent = (j && j.error)
-                ? 'Publish needs you to be signed in to the Field — ' + j.error
-                : 'Could not reach the Field service.';
+                ? 'Publish needs you to be signed in to the cOMmons — ' + j.error
+                : 'Could not reach the cOMmons service.';
             }
           }
         }).catch(function (err) {
           var state = document.getElementById('lp-door-knock-state');
           if (state) {
             state.classList.add('is-visible');
-            state.textContent = 'Could not reach the Field service. Is it running on /field-api?';
+            state.textContent = 'Could not reach the cOMmons service. Is it running on /field-api?';
           }
         });
       });

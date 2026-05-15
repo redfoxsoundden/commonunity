@@ -1,14 +1,15 @@
-/* Publish to Field — Studio integration test (Phase 1 / Mi→Fa)
+/* Publish to cOMmons — Studio integration test (Phase 1 / Mi→Fa)
  *
  * Guards:
- *   1. The hero-under CTA toolbar (lp-top-cta) renders a "Publish to Field"
- *      button with id="lp-publish-field".
+ *   1. The hero-under CTA toolbar (lp-top-cta) renders a "Publish to cOMmons"
+ *      button with id="lp-publish-field" (id stable for backward compat).
  *   2. window.publishToField is defined in the inline script.
- *   3. The Mi→Fa OM-veil holder (cuMountOmVeil / cuHoldOmThen) exists.
- *   4. The publish payload builder reads from window.state.compassData and
- *      includes compass + frequency_signature + gene_keys (so the Field can
- *      compute the sigil server-side).
- *   5. The publisher POSTs to /field-api/profile with credentials.
+ *   3. The Mi→Fa OM-veil holder (cuMountOmVeil / cuHoldOmThen) uses the
+ *      shared #cu-logo-lockup symbol so the held moment belongs to the
+ *      same visual world as the homepage / studio.
+ *   4. The publisher POSTs to /field-api/profile with credentials.
+ *   5. Visible copy says "cOMmons", not "Field" (the visible-brand rename
+ *      Markus asked for — file paths and API routes stay /field for now).
  *
  * Usage:  node tests/publish-to-field.test.js
  */
@@ -77,5 +78,23 @@ if (/Publish.*\d+\s*(attunements|likes|followers)/i.test(src)) {
   pass('Publish UI surfaces no counts (anti-addiction guardrail)');
 }
 
+// Visible brand label uses "cOMmons", not the old "Publish to Field" string.
+if (!/Publish to cOMmons/.test(src)) {
+  fail('Publish button label must say "Publish to cOMmons" (visible brand rename)');
+} else {
+  pass('Publish button label uses "cOMmons" brand');
+}
+
+// The held OM moment must use the shared homepage/studio lockup, not the
+// literal ॐ glyph from the first cut.
+const veilSliceStart = src.indexOf('cuMountOmVeil');
+const veilSliceEnd = src.indexOf('cuPlayOmTone', veilSliceStart);
+const veilSlice = veilSliceStart >= 0 ? src.slice(veilSliceStart, veilSliceEnd > 0 ? veilSliceEnd : veilSliceStart + 4000) : '';
+if (!/#cu-logo-lockup/.test(veilSlice)) {
+  fail('OM veil must reuse the shared #cu-logo-lockup symbol (homepage parity)');
+} else {
+  pass('OM veil uses the shared CommonUnity lockup');
+}
+
 if (failed) { console.error('\n' + failed + ' test(s) failed'); process.exit(1); }
-console.log('\nAll publish-to-field tests passed.');
+console.log('\nAll publish-to-cOMmons tests passed.');

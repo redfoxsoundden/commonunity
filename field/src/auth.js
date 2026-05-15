@@ -84,7 +84,7 @@ function registerAuthRoutes(app) {
   app.get("/auth/callback", (req, res) => {
     const token = String(req.query.token || "");
     const row = db.consumeMagicToken(token);
-    if (!row) return res.status(400).send(renderError("This link is no longer valid. Request a new one from the Field entrance."));
+    if (!row) return res.status(400).send(renderError("This link is no longer valid. Request a new one from the cOMmons entrance."));
     const user = db.upsertUser({ email: row.email });
     req.session.userId = user.id;
     res.redirect("/field");
@@ -104,13 +104,22 @@ function registerAuthRoutes(app) {
 }
 
 function renderError(msg) {
-  return `<!doctype html><meta charset="utf-8"><title>The Field</title>
-  <body style="background:#0a0806;color:#d2a13a;font-family:Georgia,serif;display:grid;place-items:center;height:100vh;margin:0;">
-    <div style="max-width:32rem;text-align:center;padding:2rem;line-height:1.6;">
-      <p style="font-size:1.2rem;">${escapeHtml(msg)}</p>
-      <p><a href="/field" style="color:#d2a13a;">Return to the Field</a></p>
-    </div>
-  </body>`;
+  // Inline the homepage palette so the error page belongs to the same world
+  // even when the main stylesheet hasn't loaded yet.
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>cOMmons · CommonUnity</title>
+  <link rel="stylesheet" href="/field-static/style.css">
+  </head>
+  <body>
+    <main class="cu-main"><div class="wrap">
+      <section class="cu-section">
+        <div class="cu-enter">
+          <p class="cu-eyebrow">threshold</p>
+          <p class="cu-lede">${escapeHtml(msg)}</p>
+          <p style="margin-top:18px"><a href="/field/enter" style="color:var(--gold-soft);border-bottom:1px solid rgba(212,160,74,0.35);">Request a new link</a></p>
+        </div>
+      </section>
+    </div></main>
+  </body></html>`;
 }
 
 function escapeHtml(s) {

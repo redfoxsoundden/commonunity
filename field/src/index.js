@@ -69,8 +69,21 @@ if (session) {
 // ─── Static (CSS, JS, favicon) ───────────────────────────────────────────
 app.use("/field-static", express.static(path.join(__dirname, "..", "public")));
 app.get("/favicon.svg", (_req, res) => {
+  // Same OM mark as the homepage — typographic OM in gold with crescent + bindu.
   res.set("Content-Type", "image/svg+xml");
-  res.send(`<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#0a0806"/><text x="16" y="22" text-anchor="middle" font-family="Georgia,serif" font-size="20" fill="#d2a13a">ॐ</text></svg>`);
+  res.send(`<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <defs>
+    <filter id="g" x="-50%" y="-80%" width="200%" height="260%">
+      <feGaussianBlur stdDeviation="2.6" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="96" height="96" rx="20" fill="#0b1120"/>
+  <path d="M 28 32 Q 47 42 67 32" fill="none" stroke="#d4a04a" stroke-width="2.4" stroke-linecap="round" opacity="0.94" filter="url(#g)"/>
+  <path d="M 47 16 L 51 22 L 47 28 L 43 22 Z" fill="#d4a04a" opacity="0.96" filter="url(#g)"/>
+  <text x="48" y="84" text-anchor="middle" font-family="Josefin Sans, Plus Jakarta Sans, system-ui, sans-serif" font-weight="600" font-size="48" letter-spacing="1.5" filter="url(#g)" fill="#d4a04a">OM</text>
+</svg>`);
 });
 
 registerRoutes(app);

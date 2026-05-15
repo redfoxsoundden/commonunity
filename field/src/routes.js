@@ -29,12 +29,7 @@ function registerRoutes(app) {
 
   app.get("/field/:handle", (req, res) => {
     const profile = db.getProfileByHandle(req.params.handle);
-    if (!profile) return res.status(404).send(views.layout({
-      title: "Not found",
-      description: "",
-      user: currentUser(req),
-      body: `<section class="cu-enter"><h1>This profile is not in the Field.</h1><p><a href="/field">Return to the commons</a>.</p></section>`,
-    }));
+    if (!profile) return res.status(404).send(views.renderNotFound({ user: currentUser(req) }));
     const user = currentUser(req);
     const isOwner = user && user.id === profile.user_id;
 

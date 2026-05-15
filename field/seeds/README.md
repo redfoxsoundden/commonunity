@@ -1,4 +1,7 @@
-# Field seeds
+# cOMmons seeds
+
+(Folder is still `field/seeds/` for backward compat; the visible brand
+is `cOMmons`.)
 
 Drop seed JSON files into this directory. `npm run seed` (or
 `POST /field-api/dev/seed-vesna` while running in dev) will pick them up.

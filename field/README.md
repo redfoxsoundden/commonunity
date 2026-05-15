@@ -1,10 +1,36 @@
-# CommonUnity Field — Phase 1
+# CommonUnity cOMmons — Phase 1
 
-The public commons of CommonUnity. Living Profiles, Attune, Enter Their Field,
-Tone, and the Mi→Fa publish threshold. Phase 1 scope per `/home/user/workspace/CommonUnity_Field_Specification_v0.1.md`.
+The public commons of CommonUnity. Living Profiles, Attune, Enter the
+cOMmons, Tone, and the Mi→Fa publish threshold. Phase 1 scope per
+`/home/user/workspace/CommonUnity_Field_Specification_v0.1.md`.
+
+**About the name.** The spec calls this surface "the Field", but Compass
+already has a point named Field. To resolve the visible collision without
+renaming Compass code, the public-facing brand is **cOMmons** (the OM is
+discovered inside the word, the same way it's discovered inside
+COMMONUNITY in the lockup). Folder, routes (`/field`, `/field-api`), and
+API names are kept stable for backward compatibility — only the visible
+copy says "cOMmons".
 
 This is a small Node service that lives **inside** the canonical
-`HearthVS/commonunity` repo, parallel to `tuner/`. It is not a separate repo.
+`HearthVS/commonunity` repo, parallel to `tuner/`. It is not a separate
+repo.
+
+## Design parity
+
+All visual tokens — colours, fonts, ambient backdrop, header blur, logo
+lockup, OM mark — are inherited verbatim from `homepage.html`. The
+`field/tests/visual-parity.test.js` test guards this: if anyone touches
+homepage palette/fonts and forgets to mirror, that test fails.
+
+- Palette: `#0b1120` deep navy base, `#FAF8F4` cream, `#B8872E`/`#d4a04a`
+  gold, `#2A6B8C`/`#3a8aae` teal-cool, `#5C7A3E` forest.
+- Fonts: Plus Jakarta Sans (body), Cormorant Garamond (display, italics),
+  Josefin Sans (the COMMONUNITY mark itself).
+- Logo: the exact `#logo-lockup` and `#logo-mark` SVG symbols from
+  `homepage.html`, referenced via `<use href="#logo-lockup"/>`.
+- Cards/frames: the same floating-glow pattern as the homepage
+  `.nexus-mockup` (radial wash + 28×28 grid backdrop + soft line border).
 
 ```
 field/
@@ -113,19 +139,20 @@ Final routing intent: `commonunity.io/field/*` (path-based, not
 3. Set `FIELD_BASE_URL=https://commonunity.io` and
    `ALLOWED_ORIGINS=https://commonunity.io` in production.
 
-## Studio → Field
+## Studio → cOMmons
 
-Studio's existing Living Profile preview now has a **Publish to Field** button
-in the hero-under CTA toolbar (`lp-top-cta`). Clicking it:
+Studio's existing Living Profile preview now has a **Publish to cOMmons**
+button in the hero-under CTA toolbar (`lp-top-cta`). Clicking it:
 
-1. Activates the Mi→Fa OM holding moment (gold-on-black sigil, 136.1 Hz OM
-   tone, 2.4s hold, then recedes — no CTA, no nudge, per spec §3.2).
+1. Activates the Mi→Fa OM holding moment — the same COMMONUNITY lockup as
+   the homepage (gold OM glowing inside the word), 136.1 Hz OM tone, 2.4s
+   hold, then recedes. No CTA, no nudge, per spec §3.2.
 2. POSTs the assembled Living Profile snapshot to `/field-api/profile`.
 3. Writes the published URL into the existing knock-state region.
 
-The Field service URL is read from `window.CU_FIELD_URL` (or defaults to
-`http://localhost:5050` in local dev). For production, set this via a meta tag
-or script in `studio.html` once the deploy URL is known.
+The cOMmons service URL is read from `window.CU_FIELD_URL` (or defaults
+to `http://localhost:5050` in local dev). For production, set this via a
+meta tag or script in `studio.html` once the deploy URL is known.
 
 ## What is *not* in Phase 1
 
