@@ -10,7 +10,7 @@
     "start": "node src/index.js",
     "dev": "NODE_ENV=development node src/index.js",
     "seed": "node src/seed.js",
-    "test": "node tests/run.js && node tests/seed-public.test.js && node tests/visual-parity.test.js"
+    "test": "node tests/run.js && node tests/seed-public.test.js && node tests/visual-parity.test.js && node tests/projections.test.js && node tests/sigil-determinism.test.js"
   },
   "engines": {
     "node": ">=20.0.0"

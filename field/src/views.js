@@ -94,16 +94,20 @@ ${extraScripts}
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Gallery
+// Gallery — consumes CommonsCoverCard[] from field/src/projections.js.
+// Sigil-first: the SVG is the primary attractor; name + tagline + presence
+// sit underneath. Card data is already privacy-projected; this view never
+// reaches into raw DB fields.
 // ─────────────────────────────────────────────────────────────────────────
-function renderGallery({ user, profiles }) {
-  const cards = profiles.map(p => `
-    <a class="cu-card" href="/field/${escapeHtml(p.handle)}">
-      <div class="cu-card-sigil">${p.sigil_svg || ''}</div>
-      <h2 class="cu-card-name">${escapeHtml(p.display_name)}</h2>
-      ${p.archetype_tagline ? `<p class="cu-card-tagline">${escapeHtml(p.archetype_tagline)}</p>` : ""}
-      ${p.essence ? `<p class="cu-card-essence">${escapeHtml(p.essence.slice(0, 180))}${p.essence.length > 180 ? "…" : ""}</p>` : ""}
-      <p class="cu-card-presence">${escapeHtml(p.presence_status === "away" ? "Away" : "In the cOMmons")}</p>
+function renderGallery({ user, cards }) {
+  const list = Array.isArray(cards) ? cards : [];
+  const items = list.map(c => `
+    <a class="cu-card" href="${escapeHtml(c.profile_url || "#")}">
+      <div class="cu-card-sigil">${c.sigil_svg || ''}</div>
+      <h2 class="cu-card-name">${escapeHtml(c.display_name)}</h2>
+      ${c.tagline ? `<p class="cu-card-tagline">${escapeHtml(c.tagline)}</p>` : ""}
+      ${c.essence_preview ? `<p class="cu-card-essence">${escapeHtml(c.essence_preview)}</p>` : ""}
+      <p class="cu-card-presence">${escapeHtml(c.presence_label || "In the cOMmons")}</p>
     </a>
   `).join("\n");
 
@@ -115,9 +119,9 @@ function renderGallery({ user, profiles }) {
     </section>
     <section class="cu-section cu-section--tight">
       <div class="cu-gallery">
-        ${profiles.length === 0
+        ${list.length === 0
           ? `<p class="cu-empty">No Living Profiles have been published yet. The cOMmons is still gathering itself.</p>`
-          : cards}
+          : items}
       </div>
     </section>`;
   return layout({
@@ -131,11 +135,13 @@ function renderGallery({ user, profiles }) {
 // Profile page
 // ─────────────────────────────────────────────────────────────────────────
 function renderProfile({ user, profile, isOwner, presences, attuneCount }) {
+  // `profile` is a CommonsProfilePublic projection (see field/src/projections.js).
+  // Raw compass JSON / sigil_seed / birthdate / gene_keys are not on this object.
   const compass = profile.compass || {};
   const compassPoint = (key, label) => {
     const p = compass[key];
     if (!p) return "";
-    const heading = (p.web_heading || p.summary || p.theme || "").trim();
+    const heading = (p.web_heading || p.theme || "").trim();
     const intro = (p.web_intro || "").trim();
     const highlights = (p.highlights || []).slice(0, 5);
     const gk = p.gk_num ? `GK ${p.gk_num}${p.gk_line ? "." + p.gk_line : ""}` : "";
@@ -193,7 +199,7 @@ function renderProfile({ user, profile, isOwner, presences, attuneCount }) {
           <div class="cu-profile-id">
             <h1 class="cu-name">${escapeHtml(profile.display_name)}</h1>
             ${profile.archetype_tagline ? `<p class="cu-tagline">${escapeHtml(profile.archetype_tagline)}</p>` : ""}
-            <p class="cu-presence-badge">${escapeHtml(profile.presence_status === "away" ? "Away" : "In the cOMmons")}</p>
+            <p class="cu-presence-badge">${escapeHtml(profile.presence_label || (profile.presence_status === "away" ? "Away" : "In the cOMmons"))}</p>
             ${interactBlock}
           </div>
         </header>

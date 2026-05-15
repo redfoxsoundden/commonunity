@@ -56,6 +56,10 @@ const SCHEMA_SQL = [
     offerings_json TEXT,
     sigil_seed_json TEXT,
     sigil_svg TEXT,
+    birthdate TEXT,
+    gene_keys_json TEXT,
+    seed_syllable TEXT,
+    human_design_type TEXT,
     published_at TEXT,
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`,
@@ -98,9 +102,33 @@ const mem = {
 
 function nowIso() { return new Date().toISOString(); }
 
+// Idempotent column-add migration. sqlite doesn't have ADD COLUMN IF NOT EXISTS
+// pre-3.35; check pragma table_info to be safe across both Railway and dev.
+const PROFILE_COLUMN_ADDS = [
+  { name: "birthdate",          ddl: "ALTER TABLE profiles ADD COLUMN birthdate TEXT" },
+  { name: "gene_keys_json",     ddl: "ALTER TABLE profiles ADD COLUMN gene_keys_json TEXT" },
+  { name: "seed_syllable",      ddl: "ALTER TABLE profiles ADD COLUMN seed_syllable TEXT" },
+  { name: "human_design_type",  ddl: "ALTER TABLE profiles ADD COLUMN human_design_type TEXT" },
+];
+
+function migrateProfilesTable() {
+  if (!useSqlite) return;
+  let existing;
+  try {
+    existing = new Set(sqlite.prepare("PRAGMA table_info(profiles)").all().map(r => r.name));
+  } catch { return; }
+  for (const col of PROFILE_COLUMN_ADDS) {
+    if (!existing.has(col.name)) {
+      try { sqlite.exec(col.ddl); }
+      catch (e) { console.warn(`[field/db] migration add column ${col.name} failed:`, e.message); }
+    }
+  }
+}
+
 function init() {
   if (useSqlite) {
     for (const sql of SCHEMA_SQL) sqlite.exec(sql);
+    migrateProfilesTable();
   }
 }
 init();
@@ -204,6 +232,10 @@ function upsertProfile(userId, p) {
     offerings_json: p.offerings ? JSON.stringify(p.offerings) : null,
     sigil_seed_json: p.sigil_seed ? JSON.stringify(p.sigil_seed) : null,
     sigil_svg: p.sigil_svg || null,
+    birthdate: p.birthdate || null,
+    gene_keys_json: p.gene_keys ? JSON.stringify(p.gene_keys) : null,
+    seed_syllable: p.seed_syllable || null,
+    human_design_type: p.human_design_type || null,
     published_at: p.published_at || now,
     updated_at: now,
   };
@@ -213,22 +245,26 @@ function upsertProfile(userId, p) {
       sqlite.prepare(`UPDATE profiles SET
         handle=?, display_name=?, archetype_tagline=?, essence=?, statement=?, presence_status=?,
         compass_json=?, frequency_signature_json=?, creative_stream_json=?, offerings_json=?,
-        sigil_seed_json=?, sigil_svg=?, published_at=?, updated_at=?
+        sigil_seed_json=?, sigil_svg=?, birthdate=?, gene_keys_json=?, seed_syllable=?,
+        human_design_type=?, published_at=?, updated_at=?
         WHERE user_id=?`).run(
         fields.handle, fields.display_name, fields.archetype_tagline, fields.essence,
         fields.statement, fields.presence_status, fields.compass_json, fields.frequency_signature_json,
         fields.creative_stream_json, fields.offerings_json, fields.sigil_seed_json, fields.sigil_svg,
+        fields.birthdate, fields.gene_keys_json, fields.seed_syllable, fields.human_design_type,
         fields.published_at, fields.updated_at, userId
       );
     } else {
       sqlite.prepare(`INSERT INTO profiles
         (user_id, handle, display_name, archetype_tagline, essence, statement, presence_status,
          compass_json, frequency_signature_json, creative_stream_json, offerings_json,
-         sigil_seed_json, sigil_svg, published_at, updated_at)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
+         sigil_seed_json, sigil_svg, birthdate, gene_keys_json, seed_syllable, human_design_type,
+         published_at, updated_at)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
         userId, fields.handle, fields.display_name, fields.archetype_tagline, fields.essence,
         fields.statement, fields.presence_status, fields.compass_json, fields.frequency_signature_json,
         fields.creative_stream_json, fields.offerings_json, fields.sigil_seed_json, fields.sigil_svg,
+        fields.birthdate, fields.gene_keys_json, fields.seed_syllable, fields.human_design_type,
         fields.published_at, fields.updated_at
       );
     }
@@ -250,6 +286,7 @@ function deserializeProfileRow(row) {
     creative_stream: parse(row.creative_stream_json),
     offerings: parse(row.offerings_json),
     sigil_seed: parse(row.sigil_seed_json),
+    gene_keys: parse(row.gene_keys_json),
   };
 }
 

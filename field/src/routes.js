@@ -2,6 +2,7 @@ const path = require("path");
 const db = require("./db");
 const sigil = require("./sigil.js");
 const views = require("./views");
+const projections = require("./projections");
 const { currentUser, registerAuthRoutes } = require("./auth");
 const { importVesnaSeed, importEdaSeed, importMarkusSeed } = require("./importers");
 
@@ -16,10 +17,13 @@ function registerRoutes(app) {
   registerAuthRoutes(app);
 
   // ─── Public pages ─────────────────────────────────────────────────────
+  // All public reads pass through field/src/projections.js. The raw DB row
+  // never reaches a view — only the safe projection does.
   app.get(["/", "/field"], (req, res) => {
     const user = currentUser(req);
-    const profiles = db.listPublishedProfiles({ limit: 60 });
-    res.send(views.renderGallery({ user, profiles }));
+    const rows = db.listPublishedProfiles({ limit: 60 });
+    const cards = projections.toCommonsCoverCards(rows);
+    res.send(views.renderGallery({ user, cards }));
   });
 
   app.get("/field/enter", (req, res) => {
@@ -28,22 +32,23 @@ function registerRoutes(app) {
   });
 
   app.get("/field/:handle", (req, res) => {
-    const profile = db.getProfileByHandle(req.params.handle);
-    if (!profile) return res.status(404).send(views.renderNotFound({ user: currentUser(req) }));
+    const row = db.getProfileByHandle(req.params.handle);
+    if (!row) return res.status(404).send(views.renderNotFound({ user: currentUser(req) }));
     const user = currentUser(req);
-    const isOwner = user && user.id === profile.user_id;
+    const isOwner = user && user.id === row.user_id;
 
     // Log presence — visiting a profile is "entering their field"
     if (user && !isOwner) {
-      db.recordPresence({ visitorUserId: user.id, profileUserId: profile.user_id });
+      db.recordPresence({ visitorUserId: user.id, profileUserId: row.user_id });
     } else if (!user) {
       // anonymous presence: log a coarse label only, never the IP
-      db.recordPresence({ visitorLabel: "anonymous", profileUserId: profile.user_id });
+      db.recordPresence({ visitorLabel: "anonymous", profileUserId: row.user_id });
     }
 
-    const presences = isOwner ? db.recentPresencesFor(profile.user_id, 24) : [];
-    const attuneCount = isOwner ? db.attunementCountFor(profile.user_id) : 0;
+    const presences = isOwner ? db.recentPresencesFor(row.user_id, 24) : [];
+    const attuneCount = isOwner ? db.attunementCountFor(row.user_id) : 0;
 
+    const profile = projections.toCommonsProfilePublic(row);
     res.send(views.renderProfile({ user, profile, isOwner, presences, attuneCount }));
   });
 
@@ -61,10 +66,8 @@ function registerRoutes(app) {
   });
 
   app.get("/field-api/profiles", (_req, res) => {
-    const profiles = db.listPublishedProfiles({ limit: 100 }).map(p => ({
-      handle: p.handle, display_name: p.display_name, archetype_tagline: p.archetype_tagline,
-      essence: p.essence, presence_status: p.presence_status, published_at: p.published_at,
-    }));
+    // Public listing → cover-card projection only.
+    const profiles = projections.toCommonsCoverCards(db.listPublishedProfiles({ limit: 100 }));
     res.json({ ok: true, profiles });
   });
 
@@ -113,6 +116,14 @@ function registerRoutes(app) {
       offerings: body.offerings,
       sigil_seed: seed,
       sigil_svg: svg,
+      // Persist the deterministic-sigil inputs so re-renders (e.g. cover
+      // thumbnail variants, Studio preview) reproduce the same glyph from the
+      // same input contract. birthdate is private — never surfaced by the
+      // public projection layer (see field/src/projections.js).
+      birthdate: body.birthdate || null,
+      gene_keys: body.gene_keys || {},
+      seed_syllable: body.seed_syllable || "Om",
+      human_design_type: body.human_design_type || null,
       published_at: new Date().toISOString(),
     });
 

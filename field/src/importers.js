@@ -77,6 +77,8 @@ function compassJsonToFieldProfile(raw) {
     presence_status: "in_the_field",
     birthdate,
     gene_keys: prof.gene_keys || {},
+    human_design_type: prof.human_design_type || prof.hd_type || null,
+    seed_syllable: prof.seed_syllable || "Om",
     compass,
     frequency_signature: {
       tonal_center: null,
@@ -165,6 +167,13 @@ function importCompassSeed({ filenames, email, handleOverride, displayNameOverri
     ...fieldProfile,
     sigil_seed: seed,
     sigil_svg: svg,
+    // Persist sigil-deterministic fields so future renders are stable even if
+    // the curated seed JSON changes shape. These are stored alongside the
+    // computed sigil_seed; projections may surface only the non-sensitive parts.
+    birthdate: fieldProfile.birthdate || null,
+    gene_keys: fieldProfile.gene_keys || {},
+    seed_syllable: fieldProfile.seed_syllable || "Om",
+    human_design_type: fieldProfile.human_design_type || null,
     published_at: new Date().toISOString(),
   });
 
