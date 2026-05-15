@@ -12969,13 +12969,26 @@ if (document.readyState === 'loading') {
     // ============================================================
     // Publish to Field (Mi→Fa shock-point holder)
     // Posts the assembled Living Profile to the Field service. The
-    // FIELD_URL is read from window.CU_FIELD_URL (set via <meta> or
-    // a global script tag) and defaults to /field-api on the same
-    // origin. The OM veil is the held moment, not a confirmation
-    // dialog — sound + sigil + line, then recedes. See Spec §3.2.
+    // FIELD_URL is read (in priority order) from:
+    //   1. window.CU_FIELD_URL — set via <meta>/script for env overrides
+    //   2. a <meta name="cu-field-url" content="..."> tag
+    //   3. http://localhost:5050 when running on localhost
+    //   4. the production cOMmons URL (beta default)
+    // The OM veil is the held moment, not a confirmation dialog —
+    // sound + sigil + line, then recedes. See Spec §3.2.
     // ============================================================
+    var CU_FIELD_URL_PROD_DEFAULT = 'https://commons-production-8914.up.railway.app';
     function cuPublishFieldUrl() {
-      return (window.CU_FIELD_URL || (location.origin.indexOf('localhost') !== -1 ? 'http://localhost:5050' : ''));
+      if (window.CU_FIELD_URL) return window.CU_FIELD_URL;
+      try {
+        var meta = document.querySelector('meta[name="cu-field-url"]');
+        if (meta && meta.content) return meta.content;
+      } catch (_) {}
+      if (typeof location !== 'undefined' && location.origin &&
+          location.origin.indexOf('localhost') !== -1) {
+        return 'http://localhost:5050';
+      }
+      return CU_FIELD_URL_PROD_DEFAULT;
     }
     function cuMountOmVeil() {
       var v = document.getElementById('cu-om-veil');
@@ -13339,30 +13352,38 @@ if (document.readyState === 'loading') {
     window.publishToField = function () {
       cuHoldOmThen(function () {
         var payload = cuBuildPublishPayload();
-        var url = cuPublishFieldUrl() + '/field-api/profile';
+        var base = cuPublishFieldUrl();
+        var url = base + '/field-api/profile';
+        var responseStatus = 0;
         fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify(payload),
-        }).then(function (r) { return r.json(); }).then(function (j) {
+        }).then(function (r) {
+          responseStatus = r.status;
+          return r.json().catch(function () { return null; });
+        }).then(function (j) {
           var state = document.getElementById('lp-door-knock-state');
-          if (state) {
-            state.classList.add('is-visible');
-            if (j && j.ok && j.profile) {
-              var base = cuPublishFieldUrl() || '';
-              state.innerHTML = 'Published to the cOMmons. <a href="' + base + j.profile.url + '" target="_blank" rel="noopener" style="color:#d4a04a;">Open</a>';
-            } else {
-              state.textContent = (j && j.error)
-                ? 'Publish needs you to be signed in to the cOMmons — ' + j.error
-                : 'Could not reach the cOMmons service.';
-            }
+          if (!state) return;
+          state.classList.add('is-visible');
+          if (j && j.ok && j.profile) {
+            state.innerHTML = 'Published to the cOMmons. <a href="' + base + j.profile.url + '" target="_blank" rel="noopener" style="color:#d4a04a;">Open</a>';
+          } else if (responseStatus === 401 || responseStatus === 403) {
+            var enterUrl = base + '/field/enter';
+            state.innerHTML = 'Publish needs you to be signed in to the cOMmons. ' +
+              '<a href="' + enterUrl + '" target="_blank" rel="noopener" style="color:#d4a04a;">Enter the cOMmons</a>';
+          } else if (j && j.error) {
+            state.textContent = 'The cOMmons replied with an error: ' + j.error;
+          } else {
+            state.textContent = 'Could not reach the cOMmons service at ' + base + '.';
           }
         }).catch(function (err) {
           var state = document.getElementById('lp-door-knock-state');
           if (state) {
             state.classList.add('is-visible');
-            state.textContent = 'Could not reach the cOMmons service. Is it running on /field-api?';
+            state.textContent = 'Could not reach the cOMmons service at ' + base + '. ' +
+              '(' + (err && err.message ? err.message : 'network error') + ')';
           }
         });
       });
