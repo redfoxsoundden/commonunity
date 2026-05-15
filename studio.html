@@ -166,6 +166,24 @@ input, textarea { font: inherit; color: inherit; }
   }
 }
 
+/* ── Tablet (601–960px): shrink the portal so the fixed 340px
+   sidebar doesn't get pushed off-screen on browser resize. The
+   prior breakpoint jumped straight from a two-column desktop
+   layout to a single mobile column, so any width in between
+   would force the portal canvas (min(420, 55vw)) wider than the
+   space left next to the sidebar, and the room tiles inside
+   .entrance-right overflowed the viewport. */
+@media (min-width: 601px) and (max-width: 960px) {
+  .entrance-right {
+    width: 300px;
+  }
+  .portal-wrap,
+  .torus-canvas {
+    width: min(320px, 40vw);
+    height: min(320px, 40vw);
+  }
+}
+
 /* Left column — torus portal */
 .entrance-left {
   flex: 1;
@@ -191,7 +209,13 @@ input, textarea { font: inherit; color: inherit; }
   backdrop-filter: blur(8px);
   gap: var(--space-4);
   overflow-y: auto;
+  /* overflow-x:hidden keeps room tiles and CTA buttons inside the
+     sidebar when the viewport narrows — without it they leak into
+     the portal column on browser-resize between desktop and mobile
+     breakpoints. min-width:0 lets the column shrink past its
+     intrinsic content size at the 601–960px breakpoint. */
   overflow-x: hidden;
+  min-width: 0;
   height: 100dvh;
   max-height: 100dvh;
   position: sticky;
@@ -1252,7 +1276,14 @@ input, textarea { font: inherit; color: inherit; }
   top: 0;
   z-index: 20;
   gap: var(--space-4);
+  /* Wrap the toolbar instead of pushing children off-screen at
+     narrow widths. flex-shrink stays at 0 so the toolbar height
+     remains the dock for room-body's 100dvh - 56px calc; wrapping
+     adds a row when needed but the body's overflow:hidden absorbs
+     any minor mismatch. */
+  flex-wrap: wrap;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .room-back {
@@ -1763,12 +1794,25 @@ input, textarea { font: inherit; color: inherit; }
 /* ── Room layout — DAW style ─────────────────────────────────── */
 .room-body {
   display: grid;
-  grid-template-columns: 220px 1fr 340px;
+  grid-template-columns: 220px minmax(0, 1fr) 340px;
   grid-template-rows: 1fr;
   align-items: stretch;
   gap: 0;
   height: calc(100dvh - 56px);
+  /* min-height: 0 on grid items via min-width fix below; container
+     hides any accidental overflow rather than pushing siblings. */
   overflow: hidden;
+  min-width: 0;
+}
+
+/* Intermediate viewport (901–1180px): keep the three columns but
+   trim side panels so the centre Notepad stays usable. Without
+   this the Notepad shrank below ~340px and the Nexus orb / archive
+   chips pushed into the room body and overlapped. */
+@media (min-width: 901px) and (max-width: 1180px) {
+  .room-body {
+    grid-template-columns: 180px minmax(0, 1fr) 280px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1788,7 +1832,13 @@ input, textarea { font: inherit; color: inherit; }
   background: var(--bg);
   background-image: var(--bg-gradient);
   background-attachment: fixed;
+  /* min-width:0 lets a grid column shrink past its intrinsic
+     content size — without it long words / Gene Key chips could
+     push the column wider than its track and overlap the centre.
+     min-height:0 keeps the inner scroll area from forcing the row
+     taller than 100dvh. */
   min-height: 0;
+  min-width: 0;
 }
 
 /* Archive surface — framed card matching notepad and Nexus */
@@ -1919,6 +1969,12 @@ input, textarea { font: inherit; color: inherit; }
   background: var(--bg);
   background-image: var(--bg-gradient);
   background-attachment: fixed;
+  /* See .room-archive — min-width:0 is required for the centre
+     grid track to shrink correctly on narrow viewports so the
+     Field Notes textarea wraps instead of pushing the Nexus panel
+     off-screen. */
+  min-width: 0;
+  min-height: 0;
 }
 
 .notepad-surface {
@@ -2026,10 +2082,15 @@ input, textarea { font: inherit; color: inherit; }
   font-size: var(--text-base);
   color: var(--text);
   line-height: 1.9;
-  resize: none;
+  /* User-resizable: drag bottom-right to grow when writing longer
+     entries. Min keeps the panel usable at narrow viewports; max
+     stays under viewport height so it never pushes the entries
+     list off-screen. */
+  resize: vertical;
   font-family: var(--font-body);
   outline: none;
   min-height: 200px;
+  max-height: 80vh;
 }
 .notepad-textarea::placeholder {
   color: var(--text-faint);
@@ -2084,7 +2145,10 @@ input, textarea { font: inherit; color: inherit; }
   transition: background 0.6s ease;
   isolation: isolate;
   align-self: stretch;
+  /* Same fix as .room-archive / .room-workbench — keeps the panel
+     inside its grid track when the viewport narrows. */
   min-height: 0;
+  min-width: 0;
 }
 .room-mirror.orb-active {
   background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--rose-color,#c4b5fd) 18%, var(--bg)) 0%, var(--bg) 65%);
@@ -2404,8 +2468,11 @@ input, textarea { font: inherit; color: inherit; }
   background: color-mix(in srgb, var(--card) 60%, transparent);
   display: flex;
   gap: var(--space-2);
+  /* flex-end keeps the send button aligned with the bottom of the
+     textarea as the user drags it taller. */
   align-items: flex-end;
-  transition: all 0.4s ease;
+  min-width: 0;
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 .room-mirror.orb-active .mirror-input-area {
   background: color-mix(in srgb, var(--rose-color,#c4b5fd) 8%, var(--card));
@@ -2415,16 +2482,23 @@ input, textarea { font: inherit; color: inherit; }
 }
 .mirror-input {
   flex: 1;
+  /* Allow longer Nexus replies — was capped at 100px which made
+     anything past a sentence scroll inside a 3-line viewport.
+     User-resizable vertically; min keeps the input compact at
+     rest, max stays under viewport height so the orb above stays
+     visible while dragging. */
   background: transparent;
   border: none;
   font-size: var(--text-sm);
   color: var(--text);
-  resize: none;
-  min-height: 40px;
-  max-height: 100px;
+  resize: vertical;
+  min-height: 56px;
+  max-height: 60vh;
   font-family: var(--font-body);
   line-height: 1.6;
   outline: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 .mirror-input::placeholder { color: var(--text-faint); font-style: italic; }
 .mirror-send {
@@ -6372,12 +6446,10 @@ input, textarea { font: inherit; color: inherit; }
       Load
     </button>
     <input type="file" id="studio-load-file" accept=".json" style="display:none">
-    <button type="button" class="studio-path-btn" id="studio-path-open-header"
-            title="Living Profile · Personal Home · Personal OS — your three Studio levels">
-      <span class="spb-dot" aria-hidden="true"></span>
-      Studio Path
-      <span class="spb-levels">L1·L2·L3</span>
-    </button>
+    <!-- Studio Path header button removed for v0.1 dashboard de-crowding;
+         Living Profile remains as the single-click L1 entry. The Studio
+         Path modal is still reachable from the entrance trail CTA and
+         from the Oṁ widget so no functionality is lost. -->
     <button type="button" class="studio-path-btn studio-path-lp-btn" id="studio-path-living-profile-header"
             title="Open the Living Profile builder (Level 1)">
       <span class="spb-dot" aria-hidden="true"></span>
@@ -6719,7 +6791,7 @@ input, textarea { font: inherit; color: inherit; }
       <div class="mirror-input-area nexus-dormant-hidden" id="mirror-input-row">
         <textarea class="mirror-input" id="mirror-input"
           placeholder="enter the nexus…"
-          rows="2"></textarea>
+          rows="4"></textarea>
         <button class="mirror-send" id="mirror-send-btn" title="Send">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
