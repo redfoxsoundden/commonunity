@@ -60,6 +60,20 @@ async function deliverMagicLink({ email, link }) {
   }
 }
 
+// Resolve the public base URL used in magic-link emails. Order:
+//   1. FIELD_BASE_URL / CU_FIELD_URL (explicit config wins)
+//   2. RAILWAY_PUBLIC_DOMAIN (Railway-injected public hostname; force https)
+//   3. Request host header (dev / localhost fallback)
+// Why: Railway's internal Host header (e.g. commons-production-xxxx.railway.internal)
+// is unreachable from email clients. The internal host bled into magic-link URLs.
+function publicBaseUrl(req) {
+  const configured = process.env.FIELD_BASE_URL || process.env.CU_FIELD_URL;
+  if (configured) return String(configured).replace(/\/+$/, "");
+  const railwayDomain = process.env.RAILWAY_PUBLIC_DOMAIN;
+  if (railwayDomain) return `https://${railwayDomain}`;
+  return `${req.protocol}://${req.get("host")}`;
+}
+
 function registerAuthRoutes(app) {
   app.post("/auth/request-link", async (req, res) => {
     const email = String((req.body && req.body.email) || "").toLowerCase().trim();
@@ -78,7 +92,7 @@ function registerAuthRoutes(app) {
     }
 
     const token = db.createMagicToken(email, 30);
-    const base = process.env.FIELD_BASE_URL || `${req.protocol}://${req.get("host")}`;
+    const base = publicBaseUrl(req);
     const link = `${base}/auth/callback?token=${token}`;
     const delivery = await deliverMagicLink({ email, link });
     res.json({ ok: true, queued: true, dev: delivery.delivered ? undefined : { link } });
@@ -129,4 +143,4 @@ function escapeHtml(s) {
   return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-module.exports = { registerAuthRoutes, currentUser, isBetaEmail, BETA_USERS };
+module.exports = { registerAuthRoutes, currentUser, isBetaEmail, BETA_USERS, publicBaseUrl, deliverMagicLink };
