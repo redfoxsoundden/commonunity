@@ -1,11 +1,8 @@
-// CLI seeder: ensures beta users exist + imports Vesna + Eda profiles.
-// Usage:  node src/seed.js
-//
-// Markus is on the BETA_USERS list (he gets a magic-link seat) but no
-// public profile is created until his own Compass JSON is provided.
+// CLI seeder: ensures beta users exist + imports Vesna, Eda, and Markus
+// profiles. Usage:  node src/seed.js
 
 const db = require("./db");
-const { importVesnaSeed, importEdaSeed } = require("./importers");
+const { importVesnaSeed, importEdaSeed, importMarkusSeed } = require("./importers");
 const { BETA_USERS } = require("./auth");
 
 function main() {
@@ -15,22 +12,21 @@ function main() {
     console.log(`  · ${u.email} (id=${u.id})`);
   }
 
-  console.log("[field/seed] importing Vesna Lucca…");
-  try {
-    const r = importVesnaSeed();
-    console.log(`  · published @${r.user.handle} (${r.user.email})`);
-    console.log(`  · source: ${r.source_file}`);
-  } catch (e) {
-    console.warn(`  ! ${e.message}`);
-  }
+  const seeds = [
+    { name: "Vesna Lucca",   fn: importVesnaSeed },
+    { name: "Eda Çarmıklı",  fn: importEdaSeed },
+    { name: "Markus Lehto",  fn: importMarkusSeed },
+  ];
 
-  console.log("[field/seed] importing Eda Çarmıklı…");
-  try {
-    const r = importEdaSeed();
-    console.log(`  · published @${r.user.handle} (${r.user.email})`);
-    console.log(`  · source: ${r.source_file}`);
-  } catch (e) {
-    console.warn(`  ! ${e.message}`);
+  for (const { name, fn } of seeds) {
+    console.log(`[field/seed] importing ${name}…`);
+    try {
+      const r = fn();
+      console.log(`  · published @${r.user.handle} (${r.user.email})`);
+      console.log(`  · source: ${r.source_file}`);
+    } catch (e) {
+      console.warn(`  ! ${e.message}`);
+    }
   }
 
   console.log("[field/seed] done.");

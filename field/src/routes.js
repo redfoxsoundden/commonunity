@@ -3,7 +3,7 @@ const db = require("./db");
 const sigil = require("../../sdk/sigil.js");
 const views = require("./views");
 const { currentUser, registerAuthRoutes } = require("./auth");
-const { importVesnaSeed, importEdaSeed } = require("./importers");
+const { importVesnaSeed, importEdaSeed, importMarkusSeed } = require("./importers");
 
 function ensureAuth(req, res, next) {
   const u = currentUser(req);
@@ -164,11 +164,16 @@ function registerRoutes(app) {
     try { res.json({ ok: true, ...importEdaSeed() }); }
     catch (e) { res.status(500).json({ ok: false, error: e.message }); }
   });
-  // Seed both at once — convenience for local smoke tests.
+  app.post("/field-api/dev/seed-markus", (req, res) => {
+    if (!devOnly(req, res)) return;
+    try { res.json({ ok: true, ...importMarkusSeed() }); }
+    catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
+  // Seed all three beta profiles at once — convenience for local smoke tests.
   app.post("/field-api/dev/seed-all", (req, res) => {
     if (!devOnly(req, res)) return;
     const results = [];
-    for (const fn of [importVesnaSeed, importEdaSeed]) {
+    for (const fn of [importVesnaSeed, importEdaSeed, importMarkusSeed]) {
       try { results.push({ ok: true, ...fn() }); }
       catch (e) { results.push({ ok: false, error: e.message }); }
     }

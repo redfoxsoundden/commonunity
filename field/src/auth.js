@@ -9,9 +9,8 @@
 const db = require("./db");
 
 // Default Phase 1 beta seats. Override via the BETA_USERS env var.
-// Markus's seat is reserved but no public profile is created until his
-// Compass JSON arrives; the magic-link still works the moment he requests
-// one so he can sign in and publish.
+// All three seats are seeded with real public profiles by `npm run seed`
+// (Markus → markus-lehto, Vesna → vesna-lucca, Eda → eda-carmikli).
 const BETA_USERS = (process.env.BETA_USERS || "markuslehto@mac.com;vesna.lucca@gmail.com;eda@jointidea.com")
   .split(/[;,]/).map(s => s.trim().toLowerCase()).filter(Boolean);
 

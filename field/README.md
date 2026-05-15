@@ -57,19 +57,20 @@ field/
 cd field
 cp .env.example .env
 npm install              # express, express-session, memorystore, better-sqlite3
-npm run seed             # creates beta users + imports Vesna
+npm run seed             # creates beta users + imports Vesna, Eda, and Markus
 npm start                # → http://localhost:5050/field
 ```
 
-The seeder reads the Vesna Compass JSON from any of these locations
-(first match wins):
+The seeder reads each person's Compass JSON from any of these locations
+(first match wins per person):
 
-1. `field/seeds/vesna-lucca-compass-2026-05-12.json`
-2. `/home/user/workspace/vesna-lucca-compass-2026-05-12.json`
-3. `field/seeds/vesna.json`
+- Vesna: `field/seeds/vesna-lucca-compass-2026-05-12.json`, `/home/user/workspace/vesna-lucca-compass-2026-05-12.json`, or `field/seeds/vesna.json`
+- Eda: `field/seeds/eda-armkl-compass-2026-05-15.json`, `/home/user/workspace/eda-armkl-compass-2026-05-15.json`, or aliases (`eda-carmikli-compass.json`, `eda.json`)
+- Markus: `field/seeds/markus-compass-2026-05-15.json`, `/home/user/workspace/markus-compass-2026-05-15.json`, or aliases (`markus-lehto-compass.json`, `markus.json`)
 
 Drop the JSON into `field/seeds/` for production. The importer curates web-safe
-fields only — raw transcript text and Q&A answers are stripped before storage.
+fields only — raw transcript text, Q&A answers, observations, and the LLM
+insight blocks are all stripped before storage.
 
 ## Phase 1 routes
 
@@ -92,6 +93,7 @@ fields only — raw transcript text and Q&A answers are stripped before storage.
 | `/field-api/presences/me` | GET | "Who has entered my Field" |
 | `/field-api/dev/seed-vesna` | POST | Dev: import Vesna seed (disabled in prod) |
 | `/field-api/dev/seed-eda` | POST | Dev: import Eda Çarmıklı seed (disabled in prod) |
+| `/field-api/dev/seed-markus` | POST | Dev: import Markus Lehto seed (disabled in prod) |
 | `/field-api/dev/seed-all` | POST | Dev: import all available seeds (disabled in prod) |
 
 ## Anti-addiction guardrails (encoded, not aspirational)

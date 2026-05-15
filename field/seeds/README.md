@@ -4,31 +4,42 @@
 is `cOMmons`.)
 
 Drop seed JSON files into this directory. `npm run seed` (or
-`POST /field-api/dev/seed-vesna`, `…/seed-eda`, `…/seed-all` while
-running in dev) will pick them up. Raw `*.json` files in this directory
-are git-ignored — they contain private Compass artifacts and must not be
-committed.
+`POST /field-api/dev/seed-vesna`, `…/seed-eda`, `…/seed-markus`,
+`…/seed-all` while running in dev) will pick them up. Raw `*.json` files
+in this directory are git-ignored — they contain private Compass
+artifacts and must not be committed.
 
 ## Phase 1 beta seats
 
 | Name | Email | Compass JSON | Public profile |
 |---|---|---|---|
-| Markus Lehto | `markuslehto@mac.com` | not yet provided | **seat reserved**; magic-link sign-in works, but no auto-seeded public profile until JSON arrives — he publishes from Studio himself |
+| Markus Lehto | `markuslehto@mac.com` | `markus-compass-2026-05-15.json` | seeded by importer; public handle pinned to `markus-lehto`; display name lifted from JSON's `full_name: "Markus"` to `Markus Lehto` so it matches the URL |
 | Vesna Lucca | `vesna.lucca@gmail.com` | `vesna-lucca-compass-2026-05-12.json` | seeded by importer |
 | Eda Çarmıklı | `eda@jointidea.com` | `eda-armkl-compass-2026-05-15.json` | seeded by importer; public handle pinned to `eda-carmikli` (Latinised) |
 
-These are the defaults in `field/.env.example`. The Markus seat exists
-on purpose so the magic-link flow works the moment he asks for one — but
-the seeder is *deliberate* about not fabricating a public profile from
-nothing. Once his Compass JSON is added under `field/seeds/`, copy the
-two-line `importMarkusSeed` pattern from `importers.js` or wait for him
-to publish via Studio.
+These are the defaults in `field/.env.example`.
 
 ## Vesna Lucca
 
 The importer looks for `vesna-lucca-compass-2026-05-12.json` here first,
 then falls back to `/home/user/workspace/vesna-lucca-compass-2026-05-12.json`.
 Default tone: 528 Hz / heart / water / tonal centre C.
+
+## Markus Lehto
+
+The importer looks for `markus-compass-2026-05-15.json` here first, then
+falls back to `/home/user/workspace/` or to either
+`markus-lehto-compass.json` / `markus.json` aliases. Default tone:
+639 Hz / heart / air / tonal centre D♯ (Solfeggio Fa, "Connection",
+matching his published themes of weaving coherence between people,
+ideas, and frequencies).
+
+The public handle is **pinned to `markus-lehto`**. The source JSON only
+carries `full_name: "Markus"` (no surname), so `importMarkusSeed` also
+lifts the display name to `Markus Lehto` so the gallery card and profile
+heading match the public URL. The JSON itself remains the authoritative
+source for birthdate, gene_keys, and curated compass content — only the
+name and handle are overridden at publish time.
 
 ## Eda Çarmıklı
 

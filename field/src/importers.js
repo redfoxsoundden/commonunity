@@ -90,14 +90,18 @@ function compassJsonToFieldProfile(raw) {
 // plus aliases. Strips raw/qa fields. Stamps the sigil from encoded seed.
 //
 // Params:
-//   filenames      — array of candidate filenames to look for in SEED_DIR_CANDIDATES
-//   email          — beta account email this seed publishes under
-//   handleOverride — optional; if the auto-proposed handle would be wrong
-//                    (e.g. user has a known Latinised spelling), pin it
-//   tone           — { tonal_center, dominant_hz, elemental_alignment, chakra_focus }
-//                    optional; default is the 528 Hz / heart demonstration tone
-//   missingMessage — message to throw if no file is found
-function importCompassSeed({ filenames, email, handleOverride, tone, missingMessage } = {}) {
+//   filenames           — array of candidate filenames to look for in SEED_DIR_CANDIDATES
+//   email               — beta account email this seed publishes under
+//   handleOverride      — optional; if the auto-proposed handle would be wrong
+//                          (e.g. user has a known Latinised spelling), pin it
+//   displayNameOverride — optional; if the Compass JSON only carries a first
+//                          name but the person publishes under a fuller name
+//                          (e.g. Markus's JSON ships full_name="Markus"; we
+//                          publish him as "Markus Lehto" to match his handle)
+//   tone                — { tonal_center, dominant_hz, elemental_alignment, chakra_focus }
+//                          optional; default is the 528 Hz / heart demonstration tone
+//   missingMessage      — message to throw if no file is found
+function importCompassSeed({ filenames, email, handleOverride, displayNameOverride, tone, missingMessage } = {}) {
   if (!Array.isArray(filenames) || filenames.length === 0) {
     throw new Error("importCompassSeed: filenames[] required");
   }
@@ -118,6 +122,10 @@ function importCompassSeed({ filenames, email, handleOverride, tone, missingMess
 
   // Apply handle override (Latin spelling preferred over transliteration if asked).
   if (handleOverride) fieldProfile.handle = handleOverride;
+
+  // Apply display-name override (used when the source JSON only carries a
+  // first name but the person publishes under a fuller name).
+  if (displayNameOverride) fieldProfile.display_name = displayNameOverride;
 
   // Tone: caller may pin one. Default is 528 Hz / heart (used for Vesna in the
   // first seed). Eda's seed uses 396 Hz / root (her Life's Work is GK 45 — a
@@ -205,10 +213,43 @@ function importEdaSeed({ email } = {}) {
   });
 }
 
+function importMarkusSeed({ email } = {}) {
+  // Markus's Compass JSON carries only first_name="Markus" / full_name="Markus".
+  // He publishes under the handle "markus-lehto" (his surname is Lehto), so we
+  // pin the handle and lift the display name to "Markus Lehto" so the gallery
+  // card and profile heading match the public URL. The JSON itself stays the
+  // authoritative source of birthdate + gene_keys + compass content; only the
+  // public-facing name and handle are overridden.
+  return importCompassSeed({
+    filenames: [
+      "markus-compass-2026-05-15.json",
+      "markus-lehto-compass.json",
+      "markus.json",
+    ],
+    email: email || process.env.MARKUS_EMAIL || "markuslehto@mac.com",
+    handleOverride: "markus-lehto",
+    displayNameOverride: "Markus Lehto",
+    tone: {
+      // Markus's Life's Work GK 14 — "Bounteousness" — sits at the Sacral in
+      // HD. His session palette note describes hard-won wisdom moving toward
+      // a different kind of power that does not need to prove itself. 639 Hz
+      // (Solfeggio Fa, "Connection", Heart) matches his published themes of
+      // weaving coherence between people and frequencies. Configurable;
+      // documented in seeds/README.md.
+      tonal_center: "D#",
+      dominant_hz: 639,
+      elemental_alignment: "air",
+      chakra_focus: "heart",
+    },
+    missingMessage: "Markus seed file not found. Place markus-compass-2026-05-15.json in field/seeds/ or /home/user/workspace/.",
+  });
+}
+
 module.exports = {
   importCompassSeed,
   importVesnaSeed,
   importEdaSeed,
+  importMarkusSeed,
   compassJsonToFieldProfile,
   curateCompassPoint,
   findSeedFile,
