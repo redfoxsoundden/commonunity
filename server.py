@@ -1288,3 +1288,162 @@ async def waitlist_submit(
 
     return RedirectResponse(url="/home?joined=1", status_code=303)
 
+
+# ── Om Cipher v1 ─────────────────────────────────────────────────────────
+# Additive routes. Feature-flagged via OM_CIPHER_ENABLED. Never imports back
+# into the existing /generate pipeline. See om_cipher_engine.py.
+
+import threading as _om_threading
+import uuid as _om_uuid
+
+import om_cipher_engine as _om_engine
+
+
+class BhramariCapture(BaseModel):
+    hz: Optional[float] = None
+    metadata: Optional[dict] = None
+
+
+class OmCipherInput(BaseModel):
+    member_id: Optional[str] = None
+    birth_date: Optional[str] = None
+    birth_time: Optional[str] = None
+    birth_place: Optional[dict] = None
+    legal_name: Optional[str] = None
+    preferred_name: Optional[str] = None
+    compass: Optional[dict] = None
+    human_design: Optional[dict] = None
+    seed_syllable: Optional[str] = None
+    bhramari_baseline: Optional[BhramariCapture] = None
+
+
+class ResonanceEventInput(BaseModel):
+    hz: float
+    metadata: Optional[dict] = None
+    capture_method: Optional[str] = None
+    source_surface: Optional[str] = None
+
+
+# In-memory v1 store. The implementation plan calls for SQL tables; v1 ships
+# an additive in-memory shim so the routes can be wired and exercised end-to-
+# end without a migration. Persistence belongs to the next phase.
+_OM_STORE_LOCK = _om_threading.Lock()
+_OM_RECORDS: dict[str, dict] = {}
+_OM_EVENTS: dict[str, list[dict]] = {}
+
+
+def _om_disabled_response():
+    raise HTTPException(status_code=404, detail="om_cipher disabled")
+
+
+@app.post("/api/om-cipher/generate")
+async def om_cipher_generate(body: OmCipherInput):
+    if not _om_engine.is_enabled():
+        _om_disabled_response()
+    payload = body.dict()
+    bhramari = payload.pop("bhramari_baseline", None) or None
+    payload["bhramari_baseline"] = bhramari
+    member_id = payload.get("member_id") or str(_om_uuid.uuid4())
+    record = _om_engine.generate(payload)
+    if record.get("pending"):
+        raise HTTPException(status_code=400, detail=record.get("reason", "invalid input"))
+    with _OM_STORE_LOCK:
+        existing = _OM_RECORDS.get(member_id)
+        if existing and existing.get("input_hash") == record["input_hash"]:
+            # Idempotent — already generated with this exact identity bundle.
+            return {"ok": True, "member_id": member_id, "om_cipher": existing, "reused": True}
+        record["member_id"] = member_id
+        _OM_RECORDS[member_id] = record
+    return {"ok": True, "member_id": member_id, "om_cipher": record}
+
+
+@app.get("/api/om-cipher/{member_id}")
+async def om_cipher_get(member_id: str):
+    if not _om_engine.is_enabled():
+        _om_disabled_response()
+    with _OM_STORE_LOCK:
+        rec = _OM_RECORDS.get(member_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="not found")
+    return {"ok": True, "om_cipher": rec}
+
+
+@app.get("/api/om-cipher/{member_id}/public")
+async def om_cipher_public(member_id: str):
+    if not _om_engine.is_enabled():
+        _om_disabled_response()
+    with _OM_STORE_LOCK:
+        rec = _OM_RECORDS.get(member_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="not found")
+    if rec.get("visibility_tier") != "shared":
+        raise HTTPException(status_code=404, detail="private")
+    proj = _om_engine.to_public_projection(rec, tier="shared")
+    return {"ok": True, "public": proj}
+
+
+@app.get("/api/om-cipher/{member_id}/badge")
+async def om_cipher_badge(member_id: str):
+    if not _om_engine.is_enabled():
+        _om_disabled_response()
+    with _OM_STORE_LOCK:
+        rec = _OM_RECORDS.get(member_id)
+    if not rec:
+        raise HTTPException(status_code=404, detail="not found")
+    proj = _om_engine.to_public_projection(rec, tier="badge")
+    return {"ok": True, "badge": proj}
+
+
+@app.post("/api/om-cipher/{member_id}/resonance-events")
+async def om_cipher_resonance_event(member_id: str, body: ResonanceEventInput):
+    if not _om_engine.is_enabled():
+        _om_disabled_response()
+    if not _om_engine.is_bhramari_enabled():
+        raise HTTPException(status_code=404, detail="bhramari capture disabled")
+    with _OM_STORE_LOCK:
+        rec = _OM_RECORDS.get(member_id)
+    capture = {
+        "hz": body.hz,
+        "metadata": body.metadata or {},
+        "source_surface": body.source_surface or "unknown",
+    }
+    if body.capture_method:
+        capture["metadata"]["capture_method"] = body.capture_method
+    try:
+        event = _om_engine.append_resonance_event(
+            rec or {"member_id": member_id}, capture,
+            event_id=str(_om_uuid.uuid4()),
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    with _OM_STORE_LOCK:
+        _OM_EVENTS.setdefault(member_id, []).append(event)
+    return {"ok": True, "event": event}
+
+
+@app.get("/api/om-cipher/{member_id}/resonance-events")
+async def om_cipher_resonance_events(member_id: str):
+    if not _om_engine.is_enabled():
+        _om_disabled_response()
+    with _OM_STORE_LOCK:
+        events = list(_OM_EVENTS.get(member_id, []))
+    return {"ok": True, "events": list(reversed(events))}
+
+
+class OmCipherVisibilityInput(BaseModel):
+    visibility_tier: str  # "private" | "shared"
+
+
+@app.patch("/api/om-cipher/{member_id}/visibility")
+async def om_cipher_visibility(member_id: str, body: OmCipherVisibilityInput):
+    if not _om_engine.is_enabled():
+        _om_disabled_response()
+    if body.visibility_tier not in ("private", "shared"):
+        raise HTTPException(status_code=400, detail="invalid visibility_tier")
+    with _OM_STORE_LOCK:
+        rec = _OM_RECORDS.get(member_id)
+        if not rec:
+            raise HTTPException(status_code=404, detail="not found")
+        rec["visibility_tier"] = body.visibility_tier
+    return {"ok": True, "visibility_tier": body.visibility_tier}
+

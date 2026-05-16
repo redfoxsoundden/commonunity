@@ -6,6 +6,12 @@ const projections = require("./projections");
 const { currentUser, registerAuthRoutes } = require("./auth");
 const { importVesnaSeed, importEdaSeed, importMarkusSeed } = require("./importers");
 
+// Om Cipher v1 — additive, feature-flagged. The engine is in the repo root
+// `sdk/` so both server.py and this service share derivation logic. The
+// flag check returns false when the env is absent; everything below is a
+// no-op in that case (existing publish flow continues unchanged).
+const omCipher = require("../../sdk/om_cipher.js");
+
 function ensureAuth(req, res, next) {
   const u = currentUser(req);
   if (!u) return res.status(401).json({ ok: false, error: "auth required" });
@@ -103,6 +109,36 @@ function registerRoutes(app) {
     });
     const svg = sigil.renderSigilSVG(seed);
 
+    // Om Cipher (additive). Generated only when the feature flag is on; the
+    // public projection is safe-by-construction (no raw inputs / no
+    // metadata) so it can flow through projections.js without further
+    // filtering. Generation is best-effort: a failure here never blocks
+    // the existing publish flow.
+    let omCipherPublic = null;
+    try {
+      if (omCipher.isEnabled()) {
+        const cipherInput = {
+          birth_date: body.birthdate || null,
+          legal_name: body.full_name || body.display_name,
+          compass: body.compass || {},
+          seed_syllable: body.seed_syllable || "Om",
+          human_design: body.human_design_type
+            ? { type: body.human_design_type }
+            : null,
+          bhramari_baseline: tone.dominant_hz
+            ? { hz: Number(tone.dominant_hz), metadata: { source: "studio-frequency-signature" } }
+            : null,
+        };
+        const cipher = omCipher.generate(cipherInput);
+        if (!cipher.pending) {
+          omCipherPublic = omCipher.toPublicProjection(cipher, "badge");
+        }
+      }
+    } catch (_) {
+      // Never break the publish flow over an Om Cipher derivation issue.
+      omCipherPublic = null;
+    }
+
     const profile = db.upsertProfile(u.id, {
       handle: finalHandle,
       display_name: body.display_name,
@@ -127,7 +163,9 @@ function registerRoutes(app) {
       published_at: new Date().toISOString(),
     });
 
-    res.json({ ok: true, profile: { handle: profile.handle, url: `/field/${profile.handle}` } });
+    const resp = { ok: true, profile: { handle: profile.handle, url: `/field/${profile.handle}` } };
+    if (omCipherPublic) resp.om_cipher_public = omCipherPublic;
+    res.json(resp);
   });
 
   app.post("/field-api/attune/:handle", ensureAuth, (req, res) => {
