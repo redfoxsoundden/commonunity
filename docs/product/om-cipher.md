@@ -1,6 +1,6 @@
 # Om Cipher — Product Surface
 
-Status: v0.1 stub. For foundational framing see [`../foundation/om-cipher.md`](../foundation/om-cipher.md). For full input contract and visual mappings see [`../foundation/commonunity-architecture-v0.2.md`](../foundation/commonunity-architecture-v0.2.md).
+Status: v0.1 stub. For foundational framing see [`../foundation/om-cipher.md`](../foundation/om-cipher.md). For full input contract and visual mappings see [`../foundation/commonunity-architecture-v0.2.md`](../foundation/commonunity-architecture-v0.2.md). For the canonical v1 build plan — including the Bhramari baseline + append-only refinement model — see [`./om-cipher-v1-implementation-plan.md`](./om-cipher-v1-implementation-plan.md).
 
 This document covers Om Cipher **as a product layer** — where it appears for the member, what they do with it, and how it is rendered across surfaces.
 
@@ -20,9 +20,9 @@ This document covers Om Cipher **as a product layer** — where it appears for t
 ## Member actions on the cipher
 
 - **View** in any of the surfaces above.
-- **Refresh frequency signature** by a new Bhramari capture (updates color and cymatic core, not the geometric scaffolding).
+- **Refresh frequency signature** by a new Bhramari capture. In v1 this stores a new append-only resonance event (it does **not** rewrite the Compass-sealed baseline); display can use the latest event. Full color + cymatic core influence ships in v1.1+. The geometric scaffolding is identity-bound and never changes from a Bhramari refinement. See the implementation plan ([`./om-cipher-v1-implementation-plan.md`](./om-cipher-v1-implementation-plan.md), §1d, §7).
 - **Export** (planned): high-resolution SVG/PNG, print-ready PDF, animated version, AR object.
-- **Refine** through Studio tools (e.g. updated Gene Keys data, name handle adjustments).
+- **Refine** through Studio tools (e.g. updated Gene Keys data, name handle adjustments). Note: Gene Keys, name, birthdate, and Human Design fields are Compass-sealed identity inputs and are not editable post-seal in v1; Bhramari is the one input that supports ongoing refinement.
 
 ## What the member does NOT do
 
