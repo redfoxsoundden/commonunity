@@ -47,14 +47,18 @@ function isEnabled(override) {
   if (override === true || override === false) return override;
   const env =
     (typeof process !== "undefined" && process.env && process.env.OM_CIPHER_ENABLED) || "";
-  return String(env).toLowerCase() === "true" || env === "1";
+  if (String(env).toLowerCase() === "true" || env === "1") return true;
+  if (typeof window !== "undefined" && window.CU_OM_CIPHER_ENABLED === true) return true;
+  return false;
 }
 
 function isBhramariEnabled(override) {
   if (override === true || override === false) return override;
   const env =
     (typeof process !== "undefined" && process.env && process.env.BHRAMARI_CAPTURE_ENABLED) || "";
-  return String(env).toLowerCase() === "true" || env === "1";
+  if (String(env).toLowerCase() === "true" || env === "1") return true;
+  if (typeof window !== "undefined" && window.CU_BHRAMARI_CAPTURE_ENABLED === true) return true;
+  return false;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -569,7 +573,7 @@ function appendResonanceEvent(record, capture, options) {
   };
 }
 
-module.exports = {
+const _exports = {
   // entry points
   generate,
   toPublicProjection,
@@ -589,3 +593,15 @@ module.exports = {
   digitalRootKeepMaster,
   sha256Hex,
 };
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = _exports;
+}
+if (typeof window !== "undefined") {
+  // Browser bridge — same surface as require("sdk/om_cipher.js").
+  // Studio reads window.cuOmCipher (mirrors the existing window.cuSigil
+  // pattern). Feature-flag check still applies; the bridge does not
+  // imply the cipher is enabled. Set window.CU_OM_CIPHER_ENABLED = true
+  // to enable in-browser generation for preview/testing.
+  window.cuOmCipher = _exports;
+}

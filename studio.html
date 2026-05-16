@@ -12626,6 +12626,11 @@ if (document.readyState === 'loading') {
             ? window.cuBuildPublishPayload()
             : (typeof cuBuildPublishPayload === 'function' ? cuBuildPublishPayload() : null);
           window.cuRenderSigilSlots(sigilPayload, lpBody);
+          // Om Cipher v1 — additive metadata line below the sigil. No-op
+          // when window.CU_OM_CIPHER_ENABLED !== true.
+          if (typeof window.cuAttachOmCipherMeta === 'function') {
+            window.cuAttachOmCipherMeta(sigilPayload, lpBody);
+          }
         } catch (_) { /* safety net — never break the LP render */ }
       }
 
@@ -13478,6 +13483,128 @@ if (document.readyState === 'loading') {
       } catch (_) { /* preview should never break the LP render */ }
     }
     window.cuRenderSigilSlots = cuRenderSigilSlots;
+
+    // Om Cipher flag init — honour ?om_cipher=1 / ?bhramari=1 query
+    // params so the feature can be exercised manually without rebuilding.
+    // Defaults remain false; absence of the query param is the off state.
+    try {
+      var _ocs = window.location.search || '';
+      if (/[?&]om_cipher=1\b/.test(_ocs)) window.CU_OM_CIPHER_ENABLED = true;
+      if (/[?&]bhramari=1\b/.test(_ocs))  window.CU_BHRAMARI_CAPTURE_ENABLED = true;
+    } catch (_) { /* ignore */ }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Om Cipher v1 — browser bridge (display-only subset).
+    //
+    // Canonical engine lives at sdk/om_cipher.js (Node + Python mirror at
+    // om_cipher_engine.py). This bridge derives only the small set of
+    // display fragments the LP sigil slot surfaces:
+    //   - digital root (master-number preserving)
+    //   - primary Gene Keys gate + line label (read from sealed compass)
+    //   - nearest semitone label (if Bhramari capture is present)
+    //
+    // Gated by window.CU_OM_CIPHER_ENABLED (default false). If the flag is
+    // off, every helper below returns null and the LP render is byte-
+    // identical to today. The Bhramari read is independently gated by
+    // window.CU_BHRAMARI_CAPTURE_ENABLED.
+    // ─────────────────────────────────────────────────────────────────────
+    (function () {
+      if (window.cuOmCipherDisplay) return;
+      var GK_LINE_NAMES = {
+        work:  {1:"Creator",2:"Dancer",3:"Changer",4:"Server",5:"Fixer",6:"Teacher"},
+        lens:  {1:"Solitude",2:"Marriage",3:"Interaction",4:"Friendship",5:"Impact",6:"Nurture"},
+        field: {1:"Self & Empowerment",2:"Passion & Relationships",3:"Energy & Experience",
+                4:"Love & Community",5:"Power & Projection",6:"Education & Surrender"},
+        call:  {1:"Physicality",2:"Posture",3:"Movement",4:"Breath",5:"Voice",6:"Intent"},
+      };
+      var NOTES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+      function masterReduce(n) {
+        var x = Math.abs(Math.trunc(Number(n) || 0));
+        while (x > 9 && x !== 11 && x !== 22 && x !== 33) {
+          x = String(x).split("").reduce(function (s, d) { return s + Number(d); }, 0);
+        }
+        return x;
+      }
+      function digitalRoot(isoDate) {
+        if (!isoDate) return null;
+        var digits = String(isoDate).replace(/\D/g, "");
+        if (!digits) return null;
+        var raw = digits.split("").reduce(function (s, d) { return s + Number(d); }, 0);
+        return masterReduce(raw);
+      }
+      function gkPrimary(compass) {
+        if (!compass || !compass.work) return null;
+        var num = parseInt(String(compass.work.gk_num || "").replace(/[^\d]/g, ""), 10);
+        if (!isFinite(num) || num < 1 || num > 64) return null;
+        var line = parseInt(String(compass.work.gk_line || "").replace(/[^\d]/g, ""), 10);
+        if (!isFinite(line) || line < 1 || line > 6) line = null;
+        return {
+          gate: num,
+          line: line,
+          label: line ? (GK_LINE_NAMES.work[line] || null) : null,
+        };
+      }
+      function semitone(hz) {
+        if (!hz || hz <= 0) return null;
+        var midi = 69 + 12 * Math.log2(hz / 440);
+        var rounded = Math.round(midi);
+        var note = NOTES[((rounded % 12) + 12) % 12];
+        var octave = Math.floor(rounded / 12) - 1;
+        return note + octave;
+      }
+      // Returns null when the feature flag is off — keeps callers
+      // branch-free: `var d = cuOmCipherDisplay(payload); if (d) {...}`.
+      window.cuOmCipherDisplay = function (payload) {
+        if (window.CU_OM_CIPHER_ENABLED !== true) return null;
+        if (!payload) return null;
+        var root = digitalRoot(payload.birthdate);
+        var gk = gkPrimary(payload.compass);
+        var fs = payload.frequency_signature || {};
+        var note = null;
+        if (window.CU_BHRAMARI_CAPTURE_ENABLED === true && fs.dominant_hz) {
+          note = semitone(Number(fs.dominant_hz));
+        }
+        var line = [];
+        if (root != null) line.push("Root " + root);
+        if (gk) line.push("Gate " + gk.gate + (gk.line ? "." + gk.line : "") +
+                         (gk.label ? " · " + gk.label : ""));
+        if (note) line.push("Resonance " + note);
+        if (!line.length) return null;
+        return {
+          digital_root: root,
+          gk_primary: gk,
+          bhramari_semitone: note,
+          label: line.join(" · "),
+        };
+      };
+    })();
+
+    // Additively annotate any rendered .lp-hero-slot.is-sigil with the Om
+    // Cipher metadata line. Skipped silently when the flag is off or no
+    // fragments are derivable. Sigil graphic itself is unchanged.
+    function cuAttachOmCipherMeta(payload, root) {
+      if (typeof window.cuOmCipherDisplay !== 'function') return;
+      try {
+        var meta = window.cuOmCipherDisplay(payload || (typeof cuBuildPublishPayload === 'function' ? cuBuildPublishPayload() : null));
+        if (!meta || !meta.label) return;
+        var container = root || document;
+        var slots = container.querySelectorAll('.lp-hero-slot.is-sigil');
+        for (var i = 0; i < slots.length; i++) {
+          var slot = slots[i];
+          // Remove any prior badge so re-renders don't duplicate.
+          var prior = slot.parentNode && slot.parentNode.querySelector('.cu-om-cipher-meta');
+          if (prior) prior.parentNode.removeChild(prior);
+          var badge = document.createElement('div');
+          badge.className = 'cu-om-cipher-meta';
+          badge.setAttribute('data-cu-om-cipher', 'true');
+          badge.style.cssText = 'margin-top:8px;font-family:Plus Jakarta Sans,system-ui,sans-serif;' +
+            'font-size:11px;letter-spacing:.06em;color:rgba(241,245,249,0.62);text-align:center;';
+          badge.textContent = meta.label;
+          if (slot.parentNode) slot.parentNode.appendChild(badge);
+        }
+      } catch (_) { /* never break the LP render */ }
+    }
+    window.cuAttachOmCipherMeta = cuAttachOmCipherMeta;
 
     function cuBuildPublishPayload() {
       try {
