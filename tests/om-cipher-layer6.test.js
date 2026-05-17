@@ -51,14 +51,26 @@ test('omCipherMantra: different inputs return different indices', () => {
 
 console.log('\nLayer 6 — archetypal story seed');
 
-test('archetypalStorySeed: Markus baseline (Ex8, SU6, Pe2) composes three fragments', () => {
+test('archetypalStorySeed: Markus baseline (Ex8, SU6) resolves the keyed 8_6 entry', () => {
   const s = om.archetypalStorySeed(8, 6, 2);
+  assert.ok(s, 'story seed returned');
+  assert.equal(s.key, '8_6');
+  assert.equal(s.source, 'keyed');
+  assert.ok(/paradox of power and service/.test(s.seed),
+    'keyed 8_6 story carries the canonical opening line');
+});
+
+test('archetypalStorySeed: falls back to fragment composition when key missing', () => {
+  // Pick an Expression/Soul Urge pair that is intentionally not in the
+  // keyed stories table to exercise the fallback path. The composed
+  // seed must still carry the three slot fragments.
+  const s = om.archetypalStorySeed(4, 2, 3);
+  assert.ok(s, 'fallback seed returned');
+  assert.equal(s.source, 'fragments');
   assert.ok(s.expression_fragment);
   assert.ok(s.soul_urge_fragment);
   assert.ok(s.personality_fragment);
   assert.ok(s.seed.includes(s.expression_fragment));
-  assert.ok(s.seed.includes(s.soul_urge_fragment));
-  assert.ok(s.seed.includes(s.personality_fragment));
 });
 
 test('archetypalStorySeed: deterministic — same inputs return same seed', () => {

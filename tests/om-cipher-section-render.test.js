@@ -274,14 +274,13 @@ test('activation sequence line populated from display bridge', () => {
   assert.ok(!act.classList.contains('is-pending'));
 });
 
-test('cipher name composed from gematria + lunar phase tokens', () => {
+test('cipher name = derived "Markus of the Autumn Gate" (solar 3 / lunar 6)', () => {
   const win = makeWindow(true);
   const r = makeRenderer(win);
   const sec = buildSection();
   r.render({}, sec);
   const nameEl = sec.querySelector('[data-cu-om-cipher-name]');
-  assert.ok(nameEl.textContent.startsWith('Markus'), 'name leads with preferred name');
-  assert.ok(nameEl.textContent.includes('Master Builder'), 'name carries Life Path label');
+  assert.equal(nameEl.textContent, 'Markus of the Autumn Gate');
   assert.ok(!nameEl.classList.contains('is-pending'));
 });
 
@@ -345,7 +344,10 @@ test('falls back to legacy dob / pob aliases', () => {
   const r = makeRenderer(win);
   const input = r.buildInput(null);
   assert.equal(input.birth_date, '1973-11-18');
-  assert.equal(input.birth_place.city, 'Sudbury, Canada');
+  // Freeform birthplace string is normalised into structured slots so
+  // the foundation card reads `Sudbury, Canada` from {city, country}.
+  assert.equal(input.birth_place.city, 'Sudbury');
+  assert.equal(input.birth_place.country, 'Canada');
 });
 
 test('falls back to state.birthData + state.person (Studio calculator profile, no Compass seal)', () => {
@@ -367,7 +369,8 @@ test('falls back to state.birthData + state.person (Studio calculator profile, n
   const input = r.buildInput(null);
   assert.equal(input.birth_date, '1973-11-18');
   assert.equal(input.birth_time, '03:21');
-  assert.equal(input.birth_place.city, 'Sudbury, Canada');
+  assert.equal(input.birth_place.city, 'Sudbury');
+  assert.equal(input.birth_place.country, 'Canada');
   assert.equal(input.preferred_name, 'Markus');
   assert.equal(input._cu_sealed, false, 'profile-only inputs must be marked as draft');
 });

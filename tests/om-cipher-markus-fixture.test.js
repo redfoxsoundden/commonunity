@@ -44,6 +44,7 @@ function extractFn(name) {
 const SRC_MERGE_GK   = extractFn('cuMergeGeneKeysSlots');
 const SRC_BUILD_INPUT = extractFn('cuBuildOmCipherInput');
 const SRC_CIPHER_NAME = extractFn('cuCipherNameFromRecord');
+const SRC_CIPHER_SUB  = extractFn('cuCipherSubtitleFromRecord');
 const SRC_ACTIVATION  = extractFn('cuActivationLineFromDisplay');
 let SRC_RENDER = extractFn('cuRenderOmCipherSection');
 SRC_RENDER = SRC_RENDER
@@ -125,6 +126,7 @@ function buildSection() {
   leaf(sec, 'div', {}, ['lp-hero-slot', 'is-sigil']);
   leaf(sec, 'em', { 'data-cu-om-cipher-seed': '1' });
   leaf(sec, 'h4', { 'data-cu-om-cipher-name': '1' });
+  leaf(sec, 'p',  { 'data-cu-om-cipher-subtitle': '1' });
   leaf(sec, 'p',  { 'data-cu-om-cipher-mantra': '1' });
   leaf(sec, 'p',  { 'data-cu-om-cipher-field-pattern': '1' });
   leaf(sec, 'p',  { 'data-cu-om-cipher-narrative': '1' });
@@ -163,6 +165,7 @@ function makeRenderer(win) {
     SRC_MERGE_GK + '\n' +
     'window.cuMergeGeneKeysSlots = cuMergeGeneKeysSlots;\n' +
     SRC_CIPHER_NAME + '\n' +
+    SRC_CIPHER_SUB + '\n' +
     SRC_ACTIVATION + '\n' +
     SRC_BUILD_INPUT + '\n' +
     SRC_RENDER + '\n' +
@@ -191,7 +194,11 @@ test('birthData=null at top level → buildInput still resolves from compassData
   const input = r.buildInput(null);
   assert.equal(input.birth_date, '1973-11-18');
   assert.equal(input.birth_time, '03:21');
-  assert.equal(input.birth_place.city, 'Sudbury ontario canada');
+  // Birthplace is normalised into structured {city, province, country}
+  // with title case so the foundation card reads `Sudbury, Ontario, Canada`.
+  assert.equal(input.birth_place.city, 'Sudbury');
+  assert.equal(input.birth_place.province, 'Ontario');
+  assert.equal(input.birth_place.country, 'Canada');
 });
 
 // ── 2. Legal name prefers compassData.guide ("Markus Lehto") so
@@ -294,36 +301,43 @@ test('activation sequence carries Challenge 2 + Stability 4 with line roles', ()
     'expected Stability 4 with Love & Community + Breath; got: ' + act.textContent);
 });
 
-// ── 9. Cipher name leads with preferred name + Life Path label. ───
-test('cipher name leads with "Markus" and carries Master Builder label', () => {
+// ── 9. Cipher name is derived (`[Preferred] of the [Temporal Qualifier]`).
+//      For Markus (solar 3 / lunar 6) the temporal phrase resolves to
+//      "of the Autumn Gate". The Master Builder descriptor lives in the
+//      subtitle surface, not the primary name.
+test('cipher name = "Markus of the Autumn Gate"; subtitle carries Master Builder', () => {
   const win = makeWindow(FIXTURE);
   const r = makeRenderer(win);
   const sec = buildSection();
   r.render({}, sec);
   const nameEl = sec.querySelector('[data-cu-om-cipher-name]');
-  assert.ok(nameEl.textContent.startsWith('Markus'), 'cipher name starts with Markus');
-  assert.ok(nameEl.textContent.includes('Master Builder'),
-    'cipher name carries LP22 Master Builder label; got: ' + nameEl.textContent);
+  assert.equal(nameEl.textContent, 'Markus of the Autumn Gate');
+  const subEl = sec.querySelector('[data-cu-om-cipher-subtitle]');
+  assert.ok(subEl, 'subtitle surface exists');
+  assert.ok(/Master Builder/.test(subEl.textContent),
+    'subtitle carries LP22 Master Builder label; got: ' + subEl.textContent);
 });
 
 // ── 10. Narrative surface is the Layer 6 archetypal story seed —
 //       deterministic mirror, NOT a personal biography (that lives
 //       in the Living Profile). For Markus (Ex8, SU6, Pe2) the seed
 //       composes the three fragments from archetypal_stories.json.
-test('narrative surface renders the Layer 6 archetypal story seed', () => {
+test('narrative surface renders the Layer 6 archetypal story seed (keyed 8_6)', () => {
   const win = makeWindow(FIXTURE);
   const r = makeRenderer(win);
   const sec = buildSection();
   r.render({}, sec);
   const narr = sec.querySelector('[data-cu-om-cipher-narrative]');
   assert.ok(!narr.classList.contains('is-pending'),
-    'narrative should not be pending — Layer 6 seed available for Ex8/SU6/Pe2');
-  // The Markus baseline pins Expression 8 / Soul Urge 6 / Personality 2.
-  // Each fragment is a deterministic line from archetypal_stories.json.
-  assert.ok(/answerable for large weight|steadiness at scale/.test(narr.textContent),
-    'narrative carries the Expression-8 fragment; got: ' + narr.textContent.slice(0, 120));
-  assert.ok(/hearth for others|home that is also/.test(narr.textContent),
-    'narrative carries the Soul-Urge-6 fragment; got: ' + narr.textContent.slice(0, 120));
+    'narrative should not be pending — keyed 8_6 entry available');
+  // Markus = Expression 8 / Soul Urge 6 → keyed lookup `8_6`.
+  assert.ok(/paradox of power and service/.test(narr.textContent),
+    'narrative carries the keyed 8_6 story seed; got: ' + narr.textContent.slice(0, 160));
+  assert.ok(/you build so others have somewhere to stand/i.test(narr.textContent),
+    'narrative carries the 8_6 closing line; got: ' + narr.textContent.slice(0, 160));
+  // No instruction text embedded in the story content itself.
+  assert.ok(!/Living Profile/.test(narr.textContent),
+    'story content must not contain UI instruction text');
 });
 
 console.log('\n' + (failed === 0 ? '✅ all passed' : '❌ ' + failed + ' failed') +
