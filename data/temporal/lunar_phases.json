@@ -1,0 +1,14 @@
+{
+  "source": "Internal — Om Cipher v1",
+  "note": "Eight-step lunar phase wheel. Approximated synodically (29.53059 days; baseline new moon 2000-01-06). Used by the canonical engine.",
+  "phases": {
+    "0": { "name": "New Moon",         "keynote": "seed" },
+    "1": { "name": "Waxing Crescent",  "keynote": "intention" },
+    "2": { "name": "First Quarter",    "keynote": "decision" },
+    "3": { "name": "Waxing Gibbous",   "keynote": "refine" },
+    "4": { "name": "Full Moon",        "keynote": "illumination" },
+    "5": { "name": "Waning Gibbous",   "keynote": "share" },
+    "6": { "name": "Last Quarter",     "keynote": "release" },
+    "7": { "name": "Waning Crescent",  "keynote": "rest" }
+  }
+}
