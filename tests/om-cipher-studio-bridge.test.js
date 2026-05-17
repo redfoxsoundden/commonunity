@@ -48,7 +48,7 @@ test("returns null when CU_OM_CIPHER_ENABLED is unset", () => {
   assert.equal(r, null);
 });
 
-test("returns label when flag is on", () => {
+test("returns Activation Sequence label when flag is on", () => {
   fakeWindow.CU_OM_CIPHER_ENABLED = true;
   fakeWindow.CU_BHRAMARI_CAPTURE_ENABLED = false;
   const r = cuOmCipherDisplay({
@@ -62,7 +62,8 @@ test("returns label when flag is on", () => {
   assert.equal(r.gk_primary.label, "Fixer");
   assert.equal(r.bhramari_semitone, null, "Bhramari off → no semitone");
   assert.ok(r.label.includes("Root 8"));
-  assert.ok(r.label.includes("Gate 34.5"));
+  // Only work has a line; pair fragment surfaces just the work label.
+  assert.ok(r.label.includes("Challenge 5: Fixer"));
   assert.ok(!r.label.includes("Resonance"));
 });
 
@@ -96,11 +97,99 @@ test("graceful fallback: empty payload → null", () => {
 test("preserves master numbers (11/22/33)", () => {
   fakeWindow.CU_OM_CIPHER_ENABLED = true;
   fakeWindow.CU_BHRAMARI_CAPTURE_ENABLED = false;
-  // 2000-09-09 → 2+0+0+0+0+9+0+9 = 20 → 2 (sanity check)
-  // 1965-03-17 → 1+9+6+5+0+3+1+7 = 32 → 5
-  // Construct one that hits 29 → 11:
-  const r = cuOmCipherDisplay({ birthdate: "9909-09-02" }); // 9+9+0+9+0+9+0+2 = 38 → 11
+  // 9909-09-02 → 9+9+0+9+0+9+0+2 = 38 → 11
+  const r = cuOmCipherDisplay({ birthdate: "9909-09-02" });
   assert.equal(r.digital_root, 11);
+});
+
+console.log("\nom_cipher studio bridge — Activation Sequence pairs");
+
+test("Challenge pair (work/lens) renders single label when lines match (line 2)", () => {
+  fakeWindow.CU_OM_CIPHER_ENABLED = true;
+  fakeWindow.CU_BHRAMARI_CAPTURE_ENABLED = false;
+  const r = cuOmCipherDisplay({
+    birthdate: "1988-04-23",
+    compass: {
+      work: { gk_num: "34", gk_line: "2" },
+      lens: { gk_num: "11", gk_line: "2" },
+    },
+  });
+  // Work line 2 = Dancer; Lens line 2 = Marriage.
+  assert.ok(r.label.includes("Challenge 2: Dancer / Marriage"), r.label);
+});
+
+test("Stability pair (field/call) renders single label when lines match (line 4)", () => {
+  fakeWindow.CU_OM_CIPHER_ENABLED = true;
+  const r = cuOmCipherDisplay({
+    birthdate: "1988-04-23",
+    compass: {
+      field: { gk_num: "21", gk_line: "4" },
+      call:  { gk_num: "57", gk_line: "4" },
+    },
+  });
+  // Field line 4 = Love & Community; Call line 4 = Breath.
+  assert.ok(r.label.includes("Stability 4: Love & Community / Breath"), r.label);
+});
+
+test("Full Activation Sequence (user case: work/lens line 2, field/call line 4)", () => {
+  fakeWindow.CU_OM_CIPHER_ENABLED = true;
+  fakeWindow.CU_BHRAMARI_CAPTURE_ENABLED = true;
+  const r = cuOmCipherDisplay({
+    birthdate: "1988-04-23",
+    compass: {
+      work:  { gk_num: "34", gk_line: "2" },
+      lens:  { gk_num: "11", gk_line: "2" },
+      field: { gk_num: "21", gk_line: "4" },
+      call:  { gk_num: "57", gk_line: "4" },
+    },
+    frequency_signature: { dominant_hz: 136.1 },
+  });
+  // Expect: Root 8 · Challenge 2: Dancer / Marriage · Stability 4: Love & Community / Breath · Resonance C#3
+  assert.ok(r.label.includes("Root 8"));
+  assert.ok(r.label.includes("Challenge 2: Dancer / Marriage"));
+  assert.ok(r.label.includes("Stability 4: Love & Community / Breath"));
+  assert.ok(r.label.includes("Resonance C#3"));
+  assert.equal(r.gk_all.work.label, "Dancer");
+  assert.equal(r.gk_all.lens.label, "Marriage");
+  assert.equal(r.gk_all.field.label, "Love & Community");
+  assert.equal(r.gk_all.call.label, "Breath");
+});
+
+test("Mismatched lines render per-slot labels (no pretense of pair unity)", () => {
+  fakeWindow.CU_OM_CIPHER_ENABLED = true;
+  const r = cuOmCipherDisplay({
+    birthdate: "1988-04-23",
+    compass: {
+      work: { gk_num: "34", gk_line: "5" }, // Fixer
+      lens: { gk_num: "11", gk_line: "2" }, // Marriage
+    },
+  });
+  assert.ok(r.label.includes("Challenge 5: Fixer / 2: Marriage"), r.label);
+});
+
+test("Missing line on one half of the pair still surfaces the other", () => {
+  fakeWindow.CU_OM_CIPHER_ENABLED = true;
+  const r = cuOmCipherDisplay({
+    birthdate: "1988-04-23",
+    compass: {
+      work: { gk_num: "34", gk_line: "2" },
+      lens: { gk_num: "11" }, // no line
+    },
+  });
+  assert.ok(r.label.includes("Challenge 2: Dancer"), r.label);
+  assert.ok(!r.label.includes("Marriage"));
+});
+
+test("Manual Hz feeds resonance display via frequency_signature.dominant_hz", () => {
+  fakeWindow.CU_OM_CIPHER_ENABLED = true;
+  fakeWindow.CU_BHRAMARI_CAPTURE_ENABLED = true;
+  // 220 Hz → A3
+  const r = cuOmCipherDisplay({
+    birthdate: "1988-04-23",
+    frequency_signature: { dominant_hz: 220 },
+  });
+  assert.equal(r.bhramari_semitone, "A3");
+  assert.ok(r.label.includes("Resonance A3"));
 });
 
 console.log("\n" + (failed === 0 ? "✅ all passed" : "❌ " + failed + " failed") +

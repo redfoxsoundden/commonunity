@@ -11936,13 +11936,35 @@ if (document.readyState === 'loading') {
         foundationBlock.current_location || foundationBlock.location || foundationBlock.city ||
         cd.current_location || cd.location || cd.city
       );
+      // Bhramari baseline — optional measured resonance. Lives at
+      // profile.frequency_signature.dominant_hz (the canonical Om Cipher
+      // input). Mirrored to profile.bhramari_baseline_hz for legibility
+      // in export. Display formats Hz + nearest semitone if both flags
+      // are on; otherwise just Hz.
+      var fsBlock = p.frequency_signature || foundationBlock.frequency_signature || cd.frequency_signature || {};
+      var bhramariHz = Number(fsBlock.dominant_hz || p.bhramari_baseline_hz || foundationBlock.bhramari_baseline_hz || 0);
+      var bhramariVal = '';
+      if (bhramariHz > 0) {
+        var hzStr = (Math.round(bhramariHz * 10) / 10).toString();
+        bhramariVal = hzStr + ' Hz';
+        try {
+          if (window.CU_OM_CIPHER_ENABLED === true && window.CU_BHRAMARI_CAPTURE_ENABLED === true) {
+            var midi = Math.round(69 + 12 * Math.log2(bhramariHz / 440));
+            var notes = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+            var nm = notes[((midi % 12) + 12) % 12] + (Math.floor(midi / 12) - 1);
+            bhramariVal += ' · ' + nm;
+          }
+        } catch (_) {}
+      }
+
       var items = [
         { key: 'Birthday',            val: birthday,        field: 'birthdate' },
         { key: 'Birthplace',          val: birthplace,      field: 'birthplace' },
         { key: 'Currently in',        val: currentLocation, field: 'current_location' },
         { key: 'Human Design',        val: hdLine,          field: 'human_design' },
         { key: 'Gene Keys',           val: gkLifeWork,      field: 'gene_keys' },
-        { key: 'Sun · Moon · Rising', val: joinNonEmpty([astro.sun, astro.moon, astro.rising]), field: 'astrology' }
+        { key: 'Sun · Moon · Rising', val: joinNonEmpty([astro.sun, astro.moon, astro.rising]), field: 'astrology' },
+        { key: 'Bhramari baseline',   val: bhramariVal,     field: 'bhramari_hz' }
       ];
       return items;
     }
@@ -12885,12 +12907,19 @@ if (document.readyState === 'loading') {
           current_location: 'Currently in',
           human_design: 'Human Design',
           gene_keys: 'Gene Keys',
-          astrology: 'Sun · Moon · Rising'
+          astrology: 'Sun · Moon · Rising',
+          bhramari_hz: 'Bhramari baseline (Hz)'
         };
         if (label) label.textContent = labelMap[field] || field;
-        if (hint) hint.textContent = (field === 'human_design' || field === 'astrology' || field === 'gene_keys')
-          ? 'No automatic chart calculation yet — enter manually. Saved locally with your session.'
-          : 'Saved locally with your session.';
+        if (hint) {
+          if (field === 'bhramari_hz') {
+            hint.textContent = 'Measure your humming pitch on a tuner and enter the Hz (e.g. 136.1). Optional. Saved locally.';
+          } else if (field === 'human_design' || field === 'astrology' || field === 'gene_keys') {
+            hint.textContent = 'No automatic chart calculation yet — enter manually. Saved locally with your session.';
+          } else {
+            hint.textContent = 'Saved locally with your session.';
+          }
+        }
         // Read current from underlying state for accuracy.
         var fnd = profile.foundation || {};
         if (field === 'human_design') {
@@ -12902,6 +12931,12 @@ if (document.readyState === 'loading') {
         } else if (field === 'gene_keys') {
           var gk = profile.gene_keys || fnd.gene_keys || {};
           current = gk.life_work || gk.lifeWork || current;
+        } else if (field === 'bhramari_hz') {
+          var fsCur = profile.frequency_signature || fnd.frequency_signature || {};
+          var curHz = Number(fsCur.dominant_hz || profile.bhramari_baseline_hz || 0);
+          current = curHz > 0 ? String(Math.round(curHz * 10) / 10) : '';
+          input.setAttribute('inputmode', 'decimal');
+          input.setAttribute('placeholder', 'e.g. 136.1');
         } else {
           current = profile[field] || fnd[field] || current;
         }
@@ -12982,6 +13017,21 @@ if (document.readyState === 'loading') {
           } else if (field === 'gene_keys') {
             p.foundation.gene_keys = { life_work: val };
             p.gene_keys = { life_work: val };
+          } else if (field === 'bhramari_hz') {
+            // Parse Hz; empty clears the field. Mirror into the canonical
+            // frequency_signature.dominant_hz so the Om Cipher bridge,
+            // sigil tone, and JSON export all see the same value.
+            var hz = parseFloat(String(val).replace(/[^0-9.\-]/g, ''));
+            if (!p.frequency_signature || typeof p.frequency_signature !== 'object') p.frequency_signature = {};
+            if (isFinite(hz) && hz > 0) {
+              p.frequency_signature.dominant_hz = hz;
+              p.bhramari_baseline_hz = hz;
+              p.foundation.bhramari_baseline_hz = hz;
+            } else {
+              delete p.frequency_signature.dominant_hz;
+              delete p.bhramari_baseline_hz;
+              if (p.foundation) delete p.foundation.bhramari_baseline_hz;
+            }
           } else {
             p.foundation[field] = val;
             p[field] = val;
@@ -13532,17 +13582,26 @@ if (document.readyState === 'loading') {
         var raw = digits.split("").reduce(function (s, d) { return s + Number(d); }, 0);
         return masterReduce(raw);
       }
-      function gkPrimary(compass) {
-        if (!compass || !compass.work) return null;
-        var num = parseInt(String(compass.work.gk_num || "").replace(/[^\d]/g, ""), 10);
+      function parseSlot(slotPoint, slotName) {
+        if (!slotPoint) return null;
+        var num = parseInt(String(slotPoint.gk_num || "").replace(/[^\d]/g, ""), 10);
         if (!isFinite(num) || num < 1 || num > 64) return null;
-        var line = parseInt(String(compass.work.gk_line || "").replace(/[^\d]/g, ""), 10);
+        var line = parseInt(String(slotPoint.gk_line || "").replace(/[^\d]/g, ""), 10);
         if (!isFinite(line) || line < 1 || line > 6) line = null;
         return {
           gate: num,
           line: line,
-          label: line ? (GK_LINE_NAMES.work[line] || null) : null,
+          label: line ? ((GK_LINE_NAMES[slotName] || {})[line] || null) : null,
         };
+      }
+      function gkAll(compass) {
+        if (!compass) return null;
+        var out = {};
+        ["work", "lens", "field", "call"].forEach(function (s) {
+          var p = parseSlot(compass[s], s);
+          if (p) out[s] = p;
+        });
+        return Object.keys(out).length ? out : null;
       }
       function semitone(hz) {
         if (!hz || hz <= 0) return null;
@@ -13552,27 +13611,61 @@ if (document.readyState === 'loading') {
         var octave = Math.floor(rounded / 12) - 1;
         return note + octave;
       }
+      // Build the Activation Sequence fragments:
+      //   - Challenge pair: Work + Lens (the line of challenge).
+      //   - Stability pair: Field + Call (the line of core stability).
+      // When the two lines in a pair match (the canonical Gene Keys
+      // teaching), render a single "Challenge N: A / B" label. When they
+      // diverge, fall back to per-slot labels separated by a slash so the
+      // mismatch is visible rather than swallowed.
+      function pairFragment(prefix, a, b) {
+        if (!a && !b) return null;
+        function slotLabel(s) {
+          if (!s || s.line == null) return null;
+          return s.line + (s.label ? ": " + s.label : "");
+        }
+        if (a && b && a.line != null && b.line != null && a.line === b.line) {
+          var parts = [a.label, b.label].filter(Boolean).join(" / ");
+          return prefix + " " + a.line + (parts ? ": " + parts : "");
+        }
+        var bits = [slotLabel(a), slotLabel(b)].filter(Boolean);
+        if (!bits.length) return null;
+        return prefix + " " + bits.join(" / ");
+      }
       // Returns null when the feature flag is off — keeps callers
       // branch-free: `var d = cuOmCipherDisplay(payload); if (d) {...}`.
       window.cuOmCipherDisplay = function (payload) {
         if (window.CU_OM_CIPHER_ENABLED !== true) return null;
         if (!payload) return null;
         var root = digitalRoot(payload.birthdate);
-        var gk = gkPrimary(payload.compass);
+        var gk = gkAll(payload.compass);
+        var gkPrim = (gk && (gk.work || gk.lens || gk.field || gk.call)) || null;
         var fs = payload.frequency_signature || {};
         var note = null;
         if (window.CU_BHRAMARI_CAPTURE_ENABLED === true && fs.dominant_hz) {
           note = semitone(Number(fs.dominant_hz));
         }
+        var challenge = gk ? pairFragment("Challenge", gk.work, gk.lens) : null;
+        var stability = gk ? pairFragment("Stability", gk.field, gk.call) : null;
         var line = [];
         if (root != null) line.push("Root " + root);
-        if (gk) line.push("Gate " + gk.gate + (gk.line ? "." + gk.line : "") +
-                         (gk.label ? " · " + gk.label : ""));
+        if (challenge) line.push(challenge);
+        if (stability) line.push(stability);
+        // Fallback: when no Activation Sequence detail derives (e.g. no
+        // line info on any slot), still surface the primary gate label
+        // so the strip is informative.
+        if (!challenge && !stability && gkPrim) {
+          line.push("Gate " + gkPrim.gate + (gkPrim.line ? "." + gkPrim.line : "") +
+                    (gkPrim.label ? " · " + gkPrim.label : ""));
+        }
         if (note) line.push("Resonance " + note);
         if (!line.length) return null;
         return {
           digital_root: root,
-          gk_primary: gk,
+          gk_primary: gkPrim,
+          gk_all: gk,
+          challenge_fragment: challenge,
+          stability_fragment: stability,
           bhramari_semitone: note,
           label: line.join(" · "),
         };
