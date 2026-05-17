@@ -14109,6 +14109,13 @@ if (document.readyState === 'loading') {
         var pts  = cd.points  || {};
         var fnd  = prof.foundation || {};
         var fs   = (cd.frequency_signature || prof.frequency_signature || {});
+        // Studio-calculator output (state.birthData) and the Studio
+        // companion name (state.person) are valid fallback sources for
+        // identity inputs when a formal Compass profile has not yet
+        // been sealed. The engine only requires birth_date to derive a
+        // sigil — name/time/place enrich the metadata layers.
+        var bd       = (window.state && window.state.birthData) || {};
+        var personNm = (window.state && window.state.person) || null;
         function pick() {
           for (var i = 0; i < arguments.length; i++) {
             var v = arguments[i];
@@ -14118,30 +14125,45 @@ if (document.readyState === 'loading') {
         }
         var legalName = pick(
           prof.legal_name, prof.full_name, fnd.legal_name, fnd.full_name,
-          payload && payload.full_name, payload && payload.display_name
+          payload && payload.full_name, payload && payload.display_name,
+          cd.companion, personNm
         );
         var preferredName = pick(
-          prof.preferred_name, prof.first_name, fnd.preferred_name
+          prof.preferred_name, prof.first_name, fnd.preferred_name,
+          cd.companion, personNm
         );
         var birthDate = pick(
           prof.birth_date, prof.birthdate, prof.date_of_birth, prof.dob,
           fnd.birth_date, fnd.birthdate, fnd.dob,
           cd.birth_date, cd.birthdate, cd.dob,
-          payload && payload.birthdate
+          payload && payload.birthdate,
+          bd.dob
         );
         var birthTime = pick(
           prof.birth_time, prof.birthtime,
           fnd.birth_time, fnd.birthtime,
-          cd.birth_time, cd.birthtime
+          cd.birth_time, cd.birthtime,
+          bd.tob
         );
         var birthPlace = null;
         var bp = pick(prof.birth_place, fnd.birth_place, cd.birth_place);
         if (bp && typeof bp === 'object') birthPlace = bp;
         else {
-          var bpStr = pick(prof.birthplace, prof.pob, fnd.birthplace, fnd.pob, cd.birthplace, cd.pob);
+          var bpStr = pick(
+            prof.birthplace, prof.pob, fnd.birthplace, fnd.pob,
+            cd.birthplace, cd.pob, bd.pob
+          );
           if (bpStr) birthPlace = { city: String(bpStr) };
         }
         var hz = Number(fs.dominant_hz || prof.bhramari_baseline_hz || fnd.bhramari_baseline_hz || 0);
+        // Treat as Compass-sealed only when the profile carries an
+        // explicit identity name AND birth date. Otherwise the engine
+        // still generates — we mark the output as a draft so the UI
+        // can label seal/cipher name honestly.
+        var hasSealedName = !!(prof.legal_name || prof.full_name || fnd.legal_name || fnd.full_name);
+        var hasSealedDate = !!(prof.birth_date || prof.birthdate || prof.date_of_birth || prof.dob ||
+                               fnd.birth_date || fnd.birthdate || fnd.dob);
+        var sealed = hasSealedName && hasSealedDate;
         return {
           birth_date: birthDate,
           birth_time: birthTime || null,
@@ -14157,6 +14179,8 @@ if (document.readyState === 'loading') {
           human_design: prof.human_design || null,
           seed_syllable: cd.seed_syllable || prof.seed_syllable || 'Om',
           bhramari_baseline: hz > 0 ? { hz: hz, metadata: null } : null,
+          // Non-canonical UI hint (engine ignores it — see canonicalInputJson):
+          _cu_sealed: sealed,
         };
       } catch (_) { return null; }
     }
@@ -14208,7 +14232,13 @@ if (document.readyState === 'loading') {
           section.setAttribute('data-cu-om-cipher-state', 'pending-engine');
           return;
         }
-        section.setAttribute('data-cu-om-cipher-state', 'sealed');
+        // 'sealed' once the Compass profile has both legal_name and
+        // birth_date; otherwise 'draft' — the engine still generates
+        // a real sigil and gematria from whatever inputs are present
+        // (e.g. Studio calculator output), but the UI labels it as a
+        // draft until the formal Compass seal lands.
+        var sealed = input._cu_sealed === true;
+        section.setAttribute('data-cu-om-cipher-state', sealed ? 'sealed' : 'draft');
 
         // ── Canonical SVG sigil ───────────────────────────────
         var slot = section.querySelector('.lp-hero-slot.is-sigil');
@@ -14217,9 +14247,24 @@ if (document.readyState === 'loading') {
           slot.classList.add('cu-om-cipher-sigil-rendered');
           slot.setAttribute('data-cu-om-cipher-sigil', '1');
         }
-        // Seal hash (short)
+        // Seal hash (short). Labelled as Draft until Compass-sealed so
+        // the surface tells the truth about its provenance.
         var seedEl = section.querySelector('[data-cu-om-cipher-seed]');
-        if (seedEl) seedEl.textContent = (rec.seed || '').slice(0, 8) + '…' + (rec.seed || '').slice(-4);
+        if (seedEl) {
+          var seedShort = (rec.seed || '').slice(0, 8) + '…' + (rec.seed || '').slice(-4);
+          seedEl.textContent = sealed ? seedShort : (seedShort + ' · Draft');
+        }
+        // Caption text — keep cipher-seal label in sync with state.
+        var seedCap = section.querySelector('[data-cu-om-cipher-seed-hash]');
+        if (seedCap) {
+          var seedCapPrefix = sealed ? 'Cipher seal: ' : 'Draft seal: ';
+          // Preserve the <em data-cu-om-cipher-seed> child verbatim.
+          var emEl = seedCap.querySelector('[data-cu-om-cipher-seed]');
+          if (emEl) {
+            seedCap.innerHTML = seedCapPrefix;
+            seedCap.appendChild(emEl);
+          }
+        }
 
         // ── Cipher Name (deterministic, no invention) ─────────
         var nameEl = section.querySelector('[data-cu-om-cipher-name]');
