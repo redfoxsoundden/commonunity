@@ -1,6 +1,6 @@
 # Om Cipher — Foundational Framing
 
-Status: v0.1 stub. Canonical source: [`commonunity-architecture-v0.2.md`](./commonunity-architecture-v0.2.md), sections *"Om Cipher"*, *"Om Cipher v1 engine model"*, *"Bhramari / Humming Bee activation"*. For the product surface, see [`../product/om-cipher.md`](../product/om-cipher.md).
+Status: v0.1 stub. Canonical source: [`commonunity-architecture-v0.2.md`](./commonunity-architecture-v0.2.md), sections *"Om Cipher"*, *"Om Cipher v1 engine model"*, *"Bhramari / Humming Bee activation"*. For the product surface, see [`../product/om-cipher.md`](../product/om-cipher.md). For the canonical v1 build plan, see [`../product/om-cipher-v1-implementation-plan.md`](../product/om-cipher-v1-implementation-plan.md).
 
 ## What Om Cipher is
 
@@ -52,6 +52,20 @@ See the full input-to-visual mapping, Gene Key geometry families, Human Design c
 Bhramari pranayama (especially with Shanmukhi mudra) is the somatic activation for Om Cipher. The member hums into the system; the system captures fundamental frequency, dominant harmonic, harmonic spread, tonal stability, and resonance envelope.
 
 In v1 this is a ritual and resonance signature, not biometric security. The captured tone influences sigil color (via frequency-to-light mapping through octave equivalence), cymatic core geometry, motion, and the harmonic palette.
+
+### Bhramari baseline + append-only refinement (v1 principle)
+
+Bhramari is **core to the ritual experience**, not decorative. Unlike birthdate, name, Gene Keys, and Human Design — which are fixed identity inputs that are Compass-sealed once and permanently immutable — Bhramari is a **somatic measurement** of how the body sounds today. A person's hum drifts with breath, posture, season, and practice; treating it as permanently immutable would betray both the physiology and the ritual.
+
+Therefore, in v1:
+
+- An initial Bhramari capture at Compass is stored as the **sealed baseline** (`bhramari_baseline_hz` + measurement metadata).
+- Subsequent captures are stored as **append-only resonance events** in `om_cipher_resonance_events`. The baseline is never rewritten; history accumulates alongside it.
+- Bhramari capture is **optional** at Compass. If absent, Om Cipher still generates fully from fixed identity inputs.
+- The capture method, metadata shape, and confidence scoring are **versioned and refineable** as we learn from real captures, without invalidating earlier ones.
+- Visual use in v1 is intentionally minimal (a palette accent and metadata exposure). The full Bhramari-driven cymatic, harmonic, and motion layers ship in v1.1+.
+
+See [`../product/om-cipher-v1-implementation-plan.md`](../product/om-cipher-v1-implementation-plan.md), sections §1d, §2 Layer 5/7, §6, §7, and §12 for the full contract.
 
 ## Open implementation work
 

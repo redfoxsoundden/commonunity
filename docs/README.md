@@ -35,6 +35,7 @@ The rule of thumb: **if it must remain true across threads, sessions, and contri
   /product                               ← member-facing layers
     compass.md
     om-cipher.md                         ← product surface of the cipher
+    om-cipher-v1-implementation-plan.md  ← canonical v1 build plan (incl. Bhramari)
     living-profile.md
     studio.md
     commons.md
