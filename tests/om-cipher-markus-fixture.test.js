@@ -1,0 +1,326 @@
+// Fixture-pinned regression for the OM Cipher Studio render path.
+//
+// Loads a real Studio JSON export (Markus, 2026-05-15) into a fake
+// window.state, extracts cuBuildOmCipherInput + cuRenderOmCipherSection
+// from studio.html, and verifies:
+//
+//   1. cuBuildOmCipherInput resolves canonical values even though the
+//      top-level `birthData` field of the export is null — every alias
+//      lives under `compassData`.
+//   2. Identity uses compassData.guide ("Markus Lehto") as legal_name
+//      so Expression/Soul/Personality match the Markus baseline.
+//   3. The Activation Sequence is wired from compassData.gk_profile
+//      (cs/ce/us/ue + line aliases) and surfaces in the rendered line.
+//   4. The renderer paints: real SVG sigil (not the static ॐ badge),
+//      a Draft/Sealed seal (not "pending"), full gematria grid, and
+//      activation copy with line roles.
+//
+// Run:  node tests/om-cipher-markus-fixture.test.js
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const assert = require('node:assert/strict');
+
+const om = require('../sdk/om_cipher.js');
+const html = fs.readFileSync(path.join(__dirname, '..', 'studio.html'), 'utf8');
+const FIXTURE = JSON.parse(fs.readFileSync(
+  path.join(__dirname, 'fixtures', 'markus-studio-2026-05-15.json'), 'utf8'));
+
+// ─── Extract source from studio.html ─────────────────────────────────
+function extractFn(name) {
+  const re = new RegExp('function\\s+' + name + '\\s*\\(');
+  const start = html.search(re);
+  assert.ok(start > 0, 'could not locate function ' + name);
+  let depth = 0, i = html.indexOf('{', start);
+  for (; i < html.length; i++) {
+    const c = html[i];
+    if (c === '{') depth++;
+    else if (c === '}') { depth--; if (depth === 0) { i++; break; } }
+  }
+  return html.slice(start, i);
+}
+
+const SRC_MERGE_GK   = extractFn('cuMergeGeneKeysSlots');
+const SRC_BUILD_INPUT = extractFn('cuBuildOmCipherInput');
+const SRC_CIPHER_NAME = extractFn('cuCipherNameFromRecord');
+const SRC_ACTIVATION  = extractFn('cuActivationLineFromDisplay');
+let SRC_RENDER = extractFn('cuRenderOmCipherSection');
+SRC_RENDER = SRC_RENDER
+  .replace(/try\s*\{\s*\n\s*if\s*\(window\.CU_OM_CIPHER_ENABLED/, '{ if (window.CU_OM_CIPHER_ENABLED')
+  .replace(/\}\s*catch\s*\(_\)\s*\{[^}]*\}\s*\}\s*$/, '} }');
+
+// Also pull the IIFE that defines window.cuOmCipherDisplay — the
+// renderer relies on it for the Activation Sequence label.
+const bridgeStart = html.indexOf("Om Cipher v1 — browser bridge");
+const iifeStart   = html.indexOf("(function () {", bridgeStart);
+const iifeEnd     = html.indexOf("})();", iifeStart);
+assert.ok(iifeStart > 0 && iifeEnd > iifeStart, 'browser-bridge IIFE not located');
+const SRC_BRIDGE = html.slice(iifeStart, iifeEnd + '})();'.length);
+
+// ─── Minimal fake DOM (mirrors om-cipher-section-render.test.js) ─────
+class FakeClassList {
+  constructor() { this.set = new Set(); }
+  add(c) { this.set.add(c); }
+  remove(c) { this.set.delete(c); }
+  contains(c) { return this.set.has(c); }
+  toString() { return Array.from(this.set).join(' '); }
+}
+class FakeEl {
+  constructor(tag) {
+    this.tagName = (tag || 'div').toUpperCase();
+    this.children = [];
+    this.parentNode = null;
+    this.attrs = {};
+    this.classList = new FakeClassList();
+    this._inner = '';
+    this.textContent = '';
+  }
+  set innerHTML(v) { this._inner = v; }
+  get innerHTML() { return this._inner; }
+  appendChild(c) { c.parentNode = this; this.children.push(c); return c; }
+  setAttribute(k, v) { this.attrs[k] = String(v); }
+  getAttribute(k) { return this.attrs[k] != null ? this.attrs[k] : null; }
+  querySelector(sel) { const all = [this, ...this._descendants()]; for (const el of all) if (matches(el, sel)) return el; return null; }
+  querySelectorAll(sel) { const all = [this, ...this._descendants()]; return all.filter(el => matches(el, sel)); }
+  closest(sel) { let n = this; while (n) { if (matches(n, sel)) return n; n = n.parentNode; } return null; }
+  _descendants() { const out = []; (function walk(node) { for (const c of node.children) { out.push(c); walk(c); } })(this); return out; }
+}
+function matches(el, sel) {
+  if (!el) return false;
+  if (sel.startsWith('[') && sel.endsWith(']')) {
+    const inner = sel.slice(1, -1);
+    const eq = inner.indexOf('=');
+    if (eq < 0) return el.attrs[inner] != null;
+    const k = inner.slice(0, eq);
+    let v = inner.slice(eq + 1).trim();
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) v = v.slice(1, -1);
+    return el.attrs[k] === v;
+  }
+  if (sel.startsWith('.')) {
+    const parts = sel.slice(1).split('.');
+    return parts.every(p => el.classList.contains(p));
+  }
+  const dot = sel.indexOf('.');
+  if (dot > 0) {
+    const tag = sel.slice(0, dot).toUpperCase();
+    const rest = '.' + sel.slice(dot + 1);
+    if (el.tagName !== tag) return false;
+    return matches(el, rest);
+  }
+  return el.tagName === sel.toUpperCase();
+}
+
+function buildSection() {
+  const sec = new FakeEl('section');
+  sec.setAttribute('data-cu-om-cipher-section', '1');
+  sec.classList.add('lp-om-cipher-section');
+  function leaf(parent, tag, attrs, classes) {
+    const e = new FakeEl(tag);
+    Object.entries(attrs || {}).forEach(([k, v]) => e.setAttribute(k, v));
+    (classes || []).forEach(c => e.classList.add(c));
+    parent.appendChild(e);
+    return e;
+  }
+  leaf(sec, 'div', {}, ['lp-hero-slot', 'is-sigil']);
+  leaf(sec, 'em', { 'data-cu-om-cipher-seed': '1' });
+  leaf(sec, 'h4', { 'data-cu-om-cipher-name': '1' });
+  leaf(sec, 'p',  { 'data-cu-om-cipher-mantra': '1' });
+  leaf(sec, 'p',  { 'data-cu-om-cipher-field-pattern': '1' });
+  leaf(sec, 'p',  { 'data-cu-om-cipher-narrative': '1' });
+  leaf(sec, 'p',  { 'data-cu-om-cipher-contemplation': '1' });
+  leaf(sec, 'p',  { 'data-cu-om-cipher-activation': '1' });
+  leaf(sec, 'p',  { 'data-cu-om-cipher-bhramari': '1' });
+  ['life_path','expression','soul_urge','personality','lunar_phase','solar_quarter','temporal_gate'].forEach(k => {
+    const item = leaf(sec, 'div', { 'data-cu-om-cipher-gematria': k }, ['oc-source-item', 'is-pending']);
+    leaf(item, 'dt');
+    leaf(item, 'dd');
+  });
+  return sec;
+}
+
+// ─── Compose a window from the exact exported JSON shape ─────────────
+function makeWindow(exported) {
+  const win = {
+    CU_OM_CIPHER_ENABLED: true,
+    CU_BHRAMARI_CAPTURE_ENABLED: true,
+    cuOmCipher: om,
+    state: {
+      person: exported.person || null,
+      birthData: exported.birthData || null,
+      compassData: exported.compassData || {},
+    },
+  };
+  // Mount the studio.html browser-bridge so cuOmCipherDisplay is real.
+  new Function('window', SRC_BRIDGE)(win);
+  return win;
+}
+
+function makeRenderer(win) {
+  const ctx = { document: { querySelectorAll: () => [] } };
+  const fn = new Function(
+    'window', 'document', 'cuBuildPublishPayload',
+    SRC_MERGE_GK + '\n' +
+    'window.cuMergeGeneKeysSlots = cuMergeGeneKeysSlots;\n' +
+    SRC_CIPHER_NAME + '\n' +
+    SRC_ACTIVATION + '\n' +
+    SRC_BUILD_INPUT + '\n' +
+    SRC_RENDER + '\n' +
+    'return { render: cuRenderOmCipherSection, buildInput: cuBuildOmCipherInput, merge: cuMergeGeneKeysSlots };'
+  );
+  // The renderer reads window.cuOmCipherDisplay — already mounted in
+  // makeWindow via the browser-bridge IIFE. Provide a stub payload
+  // builder so the inner branch resolves without buildLivingProfile.
+  return fn(win, ctx.document, function () { return null; });
+}
+
+let passed = 0, failed = 0;
+function test(name, body) {
+  try { body(); console.log('  ✓', name); passed++; }
+  catch (e) { console.error('  ✗', name, '\n   ', e.stack || e.message); failed++; }
+}
+
+console.log('OM Cipher fixture — Markus Studio export 2026-05-15');
+
+// ── 1. buildInput resolves identity from compassData even though
+//      top-level birthData is null. ────────────────────────────────
+test('birthData=null at top level → buildInput still resolves from compassData', () => {
+  assert.equal(FIXTURE.birthData, null, 'fixture precondition: top-level birthData is null');
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const input = r.buildInput(null);
+  assert.equal(input.birth_date, '1973-11-18');
+  assert.equal(input.birth_time, '03:21');
+  assert.equal(input.birth_place.city, 'Sudbury ontario canada');
+});
+
+// ── 2. Legal name prefers compassData.guide ("Markus Lehto") so
+//      Expression/Soul/Personality match the Markus baseline. ─────
+test('legal_name = compassData.guide ("Markus Lehto"), preferred_name = "Markus"', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const input = r.buildInput(null);
+  assert.equal(input.legal_name, 'Markus Lehto');
+  assert.equal(input.preferred_name, 'Markus');
+});
+
+// ── 3. Compass slots carry Gene Keys gate + line merged from
+//      compassData.gk_profile (cs/ce/us/ue + line aliases). ────────
+test('compass slots populated from gk_profile: GK14.2 / GK8.2 / GK29.4 / GK30.4', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const input = r.buildInput(null);
+  // String/number tolerant — bridge parses with parseInt anyway.
+  assert.equal(Number(input.compass.work.gk_num),  14);
+  assert.equal(Number(input.compass.work.gk_line), 2);
+  assert.equal(Number(input.compass.lens.gk_num),  8);
+  assert.equal(Number(input.compass.lens.gk_line), 2);
+  assert.equal(Number(input.compass.field.gk_num),  29);
+  assert.equal(Number(input.compass.field.gk_line), 4);
+  assert.equal(Number(input.compass.call.gk_num),  30);
+  assert.equal(Number(input.compass.call.gk_line), 4);
+});
+
+// ── 4. Canonical engine on the fixture input matches the Markus
+//      baseline (Life Path 22, Expression 8, Soul 6, Personality 2). ─
+test('canonical engine on fixture matches Markus baseline (LP22 / Ex8 / SU6 / Pe2)', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const input = r.buildInput(null);
+  const rec = om.generate(input, { featureFlag: true });
+  assert.equal(rec.metadata.life_path.value, 22);
+  assert.equal(rec.metadata.life_path.is_master, true);
+  assert.equal(rec.metadata.expression.value, 8);
+  assert.equal(rec.metadata.soul_urge.value, 6);
+  assert.equal(rec.metadata.personality.value, 2);
+});
+
+// ── 5. Renderer paints a real SVG sigil (not the static ॐ badge). ─
+test('renderer paints SVG sigil into the hero slot (not ॐ fallback)', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const sec = buildSection();
+  const slot = sec.querySelector('.lp-hero-slot.is-sigil');
+  slot.innerHTML = '<span>ॐ</span>';
+  r.render({}, sec);
+  assert.ok(slot.innerHTML.startsWith('<svg'), 'slot innerHTML should start with <svg>');
+  assert.ok(slot.classList.contains('cu-om-cipher-sigil-rendered'));
+  assert.equal(slot.getAttribute('data-cu-om-cipher-sigil'), '1');
+});
+
+// ── 6. Section is sealed (profile carries legal name + birth_date)
+//      and the seed shows a hash, not "pending". ───────────────────
+test('section state is "sealed" + seed shows hash (no Draft/pending)', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const sec = buildSection();
+  r.render({}, sec);
+  assert.equal(sec.getAttribute('data-cu-om-cipher-state'), 'sealed');
+  const seed = sec.querySelector('[data-cu-om-cipher-seed]');
+  assert.match(seed.textContent, /^[0-9a-f]{8}…[0-9a-f]{4}$/, 'seed format <8>…<4>');
+  assert.ok(!/Draft/.test(seed.textContent), 'sealed seed must not be labelled Draft');
+});
+
+// ── 7. Gematria grid populated; Life Path is 22 + master. ─────────
+test('gematria grid filled — Life Path 22 (master), Expression 8, Soul 6, Personality 2', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const sec = buildSection();
+  r.render({}, sec);
+  const lp = sec.querySelector('[data-cu-om-cipher-gematria="life_path"]');
+  assert.ok(lp.querySelector('dd').textContent.startsWith('22'));
+  assert.ok(lp.classList.contains('is-master'));
+  assert.ok(!lp.classList.contains('is-pending'));
+  ['expression','soul_urge','personality','lunar_phase','solar_quarter','temporal_gate'].forEach(k => {
+    const el = sec.querySelector('[data-cu-om-cipher-gematria="' + k + '"]');
+    assert.ok(el.querySelector('dd').textContent.length > 0, k + ' painted');
+    assert.ok(!el.classList.contains('is-pending'), k + ' not pending');
+  });
+});
+
+// ── 8. Activation Sequence line surfaces all four GK pair labels. ──
+test('activation sequence carries Challenge 2 + Stability 4 with line roles', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const sec = buildSection();
+  r.render({}, sec);
+  const act = sec.querySelector('[data-cu-om-cipher-activation]');
+  assert.ok(!act.classList.contains('is-pending'), 'activation not pending');
+  // Challenge pair (work/lens) — both line 2 → "Challenge 2: Dancer / Marriage"
+  assert.ok(/Challenge 2:.*Dancer.*Marriage/.test(act.textContent),
+    'expected Challenge 2 with Dancer + Marriage; got: ' + act.textContent);
+  // Stability pair (field/call) — both line 4 → "Stability 4: Love & Community / Breath"
+  assert.ok(/Stability 4:.*Love & Community.*Breath/.test(act.textContent),
+    'expected Stability 4 with Love & Community + Breath; got: ' + act.textContent);
+});
+
+// ── 9. Cipher name leads with preferred name + Life Path label. ───
+test('cipher name leads with "Markus" and carries Master Builder label', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const sec = buildSection();
+  r.render({}, sec);
+  const nameEl = sec.querySelector('[data-cu-om-cipher-name]');
+  assert.ok(nameEl.textContent.startsWith('Markus'), 'cipher name starts with Markus');
+  assert.ok(nameEl.textContent.includes('Master Builder'),
+    'cipher name carries LP22 Master Builder label; got: ' + nameEl.textContent);
+});
+
+// ── 10. Narrative draws from compassData.points.work when no
+//       personal_story is set (user's own captured words). ─────────
+test('narrative surface uses points.work summary (not pending placeholder)', () => {
+  const win = makeWindow(FIXTURE);
+  const r = makeRenderer(win);
+  const sec = buildSection();
+  r.render({}, sec);
+  const narr = sec.querySelector('[data-cu-om-cipher-narrative]');
+  assert.ok(!narr.classList.contains('is-pending'),
+    'narrative should not be pending when points.work has summary');
+  const expectedFragment = (FIXTURE.compassData.points.work.summary || '').slice(0, 30);
+  assert.ok(narr.textContent.includes(expectedFragment),
+    'narrative should draw from points.work.summary');
+});
+
+console.log('\n' + (failed === 0 ? '✅ all passed' : '❌ ' + failed + ' failed') +
+  ` (${passed} passed, ${failed} failed)`);
+if (failed > 0) process.exit(1);

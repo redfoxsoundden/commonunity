@@ -37,6 +37,7 @@ function extractFn(name) {
   return html.slice(start, i);
 }
 
+const SRC_MERGE_GK    = extractFn('cuMergeGeneKeysSlots');
 const SRC_CIPHER_NAME = extractFn('cuCipherNameFromRecord');
 const SRC_ACTIVATION  = extractFn('cuActivationLineFromDisplay');
 const SRC_BUILD_INPUT = extractFn('cuBuildOmCipherInput');
@@ -179,6 +180,8 @@ function makeRenderer(win) {
   // Use Function constructor to evaluate the extracted source.
   const fn = new Function(
     'window', 'document', 'cuOmCipherDisplay', 'cuBuildPublishPayload',
+    SRC_MERGE_GK + '\n' +
+    'window.cuMergeGeneKeysSlots = cuMergeGeneKeysSlots;\n' +
     SRC_CIPHER_NAME + '\n' +
     SRC_ACTIVATION + '\n' +
     SRC_BUILD_INPUT + '\n' +
