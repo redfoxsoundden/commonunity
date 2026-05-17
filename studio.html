@@ -5916,12 +5916,43 @@ input, textarea { font: inherit; color: inherit; }
   background: color-mix(in srgb, var(--rose-color, #c4b5fd) 8%, var(--input-bg));
 }
 
-/* Field Imprints layout — sigil on the left, foundation grid on the right. */
+/* OM Cipher (formerly Field Imprints) — sigil on the left,
+   source-data grid on the right. */
 .lp-field-imprints-body {
   display: grid;
   grid-template-columns: 160px 1fr;
   gap: clamp(var(--space-4), 3vw, var(--space-6));
   align-items: start;
+}
+
+/* OM Cipher visual differentiation — keeps the Living Profile
+   foundation card structure but tilts the hue toward the call /
+   rose palette so the section reads as adjacent-but-distinct from
+   the Living Profile card above. Subtle, not a redesign. */
+.lp-om-cipher {
+  border-color: color-mix(in srgb, var(--call, #f6a3b6) 30%, var(--border));
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--call, #f6a3b6) 12%, transparent), transparent 55%),
+    radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--rose-color, #c4b5fd) 10%, transparent), transparent 60%),
+    color-mix(in srgb, var(--input-bg) 30%, transparent);
+}
+.lp-om-cipher .lp-foundation-title em {
+  color: color-mix(in srgb, var(--call, #f6a3b6) 80%, var(--text));
+}
+.lp-om-cipher .lp-foundation-eye {
+  color: color-mix(in srgb, var(--call, #f6a3b6) 78%, var(--text-muted));
+}
+.lp-om-cipher .lp-foundation-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+.lp-om-cipher .lp-foundation-head .lp-foundation-eye { flex-basis: 100%; }
+.lp-om-cipher-edit { margin-left: auto; }
+.lp-om-cipher.is-editing {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--call, #f6a3b6) 45%, transparent);
+  transition: box-shadow 280ms ease-out;
 }
 @media (max-width: 720px) {
   .lp-field-imprints-body { grid-template-columns: 1fr; justify-items: center; }
@@ -11512,8 +11543,16 @@ if (document.readyState === 'loading') {
         return companionTrim + ' ' + l;
       }
 
-      // 2) Full / display / name fields on the profile.
-      var full = cleanName(p.full_name || p.fullName || p.display_name || p.displayName || p.name);
+      // 2) Full / display / name fields on the profile. Also accept
+      //    the canonical OM Cipher source-data aliases `legal_name`
+      //    and `preferred_name` (the engine reads from these), so a
+      //    profile JSON that carries only those still resolves.
+      var full = cleanName(
+        p.full_name || p.fullName ||
+        p.legal_name || p.legalName ||
+        p.preferred_name || p.preferredName ||
+        p.display_name || p.displayName || p.name
+      );
       if (full && /\s/.test(full)) return full;
       // Single-word full_name still wins over companion when companion is empty.
       if (full && !companion) return full;
@@ -11919,16 +11958,26 @@ if (document.readyState === 'loading') {
       // block → top-level compassData → state.birthData. This means a
       // session imported with bare top-level fields (`dob`, `pob`) or
       // only the Studio calculator output still fills the foundation.
+      // Canonical OM Cipher input aliases (engine-side):
+      //   birth_date  birth_time  birth_place
+      // are accepted alongside the older birthdate/birthplace/dob
+      // shapes so an imported profile JSON resolves either way.
       var birthday = strOrEmpty(
-        p.birthdate || p.birthday || p.date_of_birth || p.dateOfBirth || p.dob ||
-        foundationBlock.birthdate || foundationBlock.birthday || foundationBlock.date_of_birth || foundationBlock.dob ||
-        cd.birthdate || cd.birthday || cd.date_of_birth || cd.dob ||
+        p.birthdate || p.birthday || p.birth_date || p.birthDate ||
+        p.date_of_birth || p.dateOfBirth || p.dob ||
+        foundationBlock.birthdate || foundationBlock.birthday || foundationBlock.birth_date || foundationBlock.date_of_birth || foundationBlock.dob ||
+        cd.birthdate || cd.birthday || cd.birth_date || cd.date_of_birth || cd.dob ||
         bd.dob
       );
+      var birthtime = strOrEmpty(
+        p.birth_time || p.birthTime || p.birthtime || p.time_of_birth ||
+        foundationBlock.birth_time || foundationBlock.birthtime || foundationBlock.time_of_birth ||
+        cd.birth_time || cd.birthtime
+      );
       var birthplace = strOrEmpty(
-        p.birthplace || p.place_of_birth || p.placeOfBirth || p.pob ||
-        foundationBlock.birthplace || foundationBlock.place_of_birth || foundationBlock.pob ||
-        cd.birthplace || cd.place_of_birth || cd.pob ||
+        p.birthplace || p.place_of_birth || p.placeOfBirth || p.birth_place || p.birthPlace || p.pob ||
+        foundationBlock.birthplace || foundationBlock.place_of_birth || foundationBlock.birth_place || foundationBlock.pob ||
+        cd.birthplace || cd.place_of_birth || cd.birth_place || cd.pob ||
         bd.pob
       );
       var currentLocation = strOrEmpty(
@@ -11966,6 +12015,11 @@ if (document.readyState === 'loading') {
         { key: 'Sun · Moon · Rising', val: joinNonEmpty([astro.sun, astro.moon, astro.rising]), field: 'astrology' },
         { key: 'Bhramari baseline',   val: bhramariVal,     field: 'bhramari_hz' }
       ];
+      // Birth time is optional — only surface the row when the JSON
+      // actually carries it (canonical OM Cipher `birth_time` field).
+      if (birthtime) {
+        items.splice(1, 0, { key: 'Birth time', val: birthtime, field: 'birth_time' });
+      }
       return items;
     }
 
@@ -12430,17 +12484,22 @@ if (document.readyState === 'loading') {
         '</div>' +
       '</section>';
 
-      // ── Field Imprints (sigil + foundation fields) ────────
-      // The ground a profile stands on — sigil/avatar PLUS birth,
-      // place, design, gene keys, astrology. Items missing data
-      // render as "Not set yet" and are click-to-edit so the owner
-      // can fill them in directly from the profile view. Edits are
-      // persisted via saveState() into compassData.profile.foundation.
+      // ── OM Cipher (sigil + source-data fields) ────────────
+      // Your field pattern — sigil/avatar PLUS the source data the
+      // gematria/Bhramari layer reads from: name, birth date / time
+      // / place, design, gene keys, astrology, baseline Hz. Items
+      // missing data render as "Not set yet" and are click-to-edit
+      // so the owner can correct them directly from the profile
+      // view. Section is kept adjacent to (but visually distinct
+      // from) the Living Profile card. Class `lp-field-imprints`
+      // is preserved for backward-compat with existing CSS/tests.
       var foundationItems = model.foundation || [];
       if (foundationItems.length) {
-        html += '<section class="lp-foundation lp-field-imprints" aria-label="Field Imprints">' +
+        html += '<section class="lp-foundation lp-field-imprints lp-om-cipher" aria-label="OM Cipher">' +
           '<header class="lp-foundation-head">' +
-            '<h3 class="lp-foundation-title">Field <em>Imprints</em></h3>' +
+            '<span class="lp-foundation-eye">Your Field Pattern</span>' +
+            '<h3 class="lp-foundation-title">OM <em>Cipher</em></h3>' +
+            '<button type="button" class="lp-edit-btn lp-om-cipher-edit" data-lp-om-cipher-edit="1" aria-label="Edit OM Cipher source data">Edit source</button>' +
           '</header>' +
           '<div class="lp-field-imprints-body">' +
             '<div class="lp-field-imprints-sigil" aria-label="Digital key · sigil">' +
@@ -12779,6 +12838,24 @@ if (document.readyState === 'loading') {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
         });
       });
+      // OM Cipher "Edit source" button — small reveal that pulses
+      // the section so the click-to-edit rows are obvious, then
+      // opens the editor on the Birthday row (most common mistake).
+      var omCipherEdit = lpBody.querySelector('[data-lp-om-cipher-edit]');
+      if (omCipherEdit) {
+        omCipherEdit.addEventListener('click', function (e) {
+          e.preventDefault();
+          var section = omCipherEdit.closest('.lp-om-cipher');
+          if (section) {
+            section.classList.add('is-editing');
+            setTimeout(function () { section.classList.remove('is-editing'); }, 1600);
+          }
+          var firstRow = lpBody.querySelector('.lp-om-cipher [data-lp-edit="foundation"]');
+          if (firstRow) {
+            openLpEditPopover('foundation', firstRow.getAttribute('data-lp-field'), firstRow);
+          }
+        });
+      }
       // Get-in-touch contact rows reuse the same popover. The "Open"
       // anchor inside a populated row carries data-lp-no-edit so a
       // click on it (after stopPropagation in onclick) doesn't open
@@ -12903,6 +12980,7 @@ if (document.readyState === 'loading') {
       if (type === 'foundation') {
         var labelMap = {
           birthdate: 'Birthday',
+          birth_time: 'Birth time',
           birthplace: 'Birthplace',
           current_location: 'Currently in',
           human_design: 'Human Design',

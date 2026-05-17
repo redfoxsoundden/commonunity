@@ -38,13 +38,15 @@ assert(heroTextIdx !== -1 && slotIdx !== -1 && heroTextIdx < slotIdx,
 assert(!/lp-hero[\s\S]{0,800}lp-hero-slot is-sigil/.test(src.slice(heroOpen, heroOpen + 2000)),
   'sigil hero-slot is NOT rendered inside the .lp-hero section anymore');
 
-console.log('\nField Imprints');
-assert(/lp-field-imprints/.test(src), 'lp-field-imprints class exists');
-assert(!/Field Imprints · the ground beneath/.test(src), 'Field Imprints eyebrow removed');
-assert(/Field <em>Imprints<\/em>/.test(src), 'Field Imprints title present');
-assert(/lp-field-imprints-sigil/.test(src), 'sigil placeholder lives inside Field Imprints');
+console.log('\nOM Cipher (was: Field Imprints)');
+assert(/lp-field-imprints/.test(src), 'lp-field-imprints class kept for backward compat');
+assert(/lp-om-cipher/.test(src), 'new lp-om-cipher class is applied to the section');
+assert(/OM <em>Cipher<\/em>/.test(src), 'OM Cipher title present');
+assert(/Your Field Pattern/.test(src), 'Your Field Pattern subtitle present');
+assert(!/Field <em>Imprints<\/em>/.test(src), 'old "Field Imprints" title removed');
+assert(/lp-field-imprints-sigil/.test(src), 'sigil placeholder still lives inside the section');
 assert(/Cosmic <em>identity<\/em>/.test(src) === false,
-  'old "Cosmic identity" heading replaced by Field Imprints');
+  'old "Cosmic identity" heading replaced');
 assert(/data-lp-edit="foundation"/.test(src), 'foundation items expose data-lp-edit for click-to-edit');
 assert(/data-lp-field="birthdate"/.test(src) || /data-lp-field="' \+ lpEscape\(fkey\)/.test(src),
   'foundation items carry a data-lp-field key (birthdate, birthplace, etc.)');
