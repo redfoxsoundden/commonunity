@@ -52,24 +52,33 @@ test('stroke colour uses derived palette primary (oklch), not arbitrary debug co
   assert.ok(!/stroke="#0f0"/i.test(svg));
 });
 
-test('no visible outer control-point dots (no r="6" outside centre)', () => {
-  // The old build emitted N outer circles of r=6 at the polygon vertices.
-  // The revised sigil keeps only the centre anchor (cx=256 cy=256 r=6).
+test('no visible outer control-point dots (no circles outside centre anchor)', () => {
+  // The revised sigil keeps only the centre anchor circle (radius 5).
+  // No enclosing frame circle and no per-point construction dots.
   const circles = svg.match(/<circle[^>]*>/g) || [];
-  // We allow the enclosing frame circle (r=200) and the centre anchor.
   const centreLike = circles.filter(c => /cx="256"\s+cy="256"/.test(c));
-  const outerDots = circles.filter(c =>
-    /r="6"/.test(c) && !/cx="256"\s+cy="256"/.test(c)
-  );
+  const outerDots = circles.filter(c => !/cx="256"\s+cy="256"/.test(c));
   assert.equal(outerDots.length, 0,
     'no outer construction dots; found: ' + JSON.stringify(outerDots));
   assert.ok(centreLike.length >= 1, 'centre anchor present');
 });
 
-test('primary stroke width is in the 2–3px range for the dominant path', () => {
-  // The dominant star path uses stroke-width="2.25".
+test('primary stroke width is in the 2–3px range for the dominant ring', () => {
+  // The dominant connecting ring uses stroke-width="2.5".
   assert.ok(/stroke-width="2(?:\.\d+)?"/.test(svg) || /stroke-width="3"/.test(svg),
     'expected dominant stroke 2–3px; got: ' + svg.slice(0, 200));
+});
+
+test('contains seed-derived radial spokes (Layer A) — not a regular polygon', () => {
+  // Sigil has N line elements representing spokes from centre.
+  const lines = svg.match(/<line\b/g) || [];
+  assert.ok(lines.length === 9 || lines.length === 11,
+    'expected 9 or 11 spokes; got ' + lines.length);
+});
+
+test('contains a single connecting-ring path (Layer B) with stroke-width 2.5', () => {
+  const ringMatch = svg.match(/<path d="[^"]+" fill="none" stroke="[^"]+" stroke-width="2\.5"/);
+  assert.ok(ringMatch, 'connecting ring path with width 2.5 present');
 });
 
 test('palette-derived glow filter is applied (subtle depth, not noise)', () => {
@@ -77,9 +86,11 @@ test('palette-derived glow filter is applied (subtle depth, not noise)', () => {
   assert.ok(/feGaussianBlur/.test(svg));
 });
 
-test('outer enclosing frame circle is present (mandala containment)', () => {
-  assert.ok(/<circle cx="256" cy="256" r="200"[^>]*fill="none"/.test(svg),
-    'frame circle present');
+test('palette-derived drop-shadow glow on the SVG (subtle depth, not noise)', () => {
+  // The outer <svg> carries a derived drop-shadow filter so the form has
+  // depth without adding any literal noise to the geometry.
+  assert.ok(/style="filter:drop-shadow\(0 0 8px oklch\(0\.55 0\.227 \d+ \/ 0\.35\)\)"/.test(svg),
+    'drop-shadow with palette-derived oklch present; got: ' + svg.slice(0, 400));
 });
 
 test('parity: Python engine emits matching aesthetic markers', () => {

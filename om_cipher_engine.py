@@ -316,14 +316,15 @@ def _build_palette(lp: Optional[int],
                    primary_gate: Optional[int],
                    bhramari_hue_deg: Optional[int]) -> dict:
     base_hue = life_path_hue(lp)
-    lunar = lunar_phase if isinstance(lunar_phase, int) else 0
-    sat_mod = ((lunar - 3.5) / 3.5) * 0.15
-    sat = max(0.25, min(0.85, 0.55 + sat_mod))
-    lit = 0.5
-    primary = f"oklch({lit:.2f} {sat:.2f} {base_hue})"
-    secondary = f"oklch({lit:.2f} {sat:.2f} {(base_hue + 180) % 360})"
+    _ = lunar_phase  # preserved upstream; primary OKLCH is pinned.
+    # OKLCH primary is pinned to `oklch(0.55 0.227 <hue>)` so the canonical
+    # colour matches the v1 spec exactly for every life-path family.
+    chroma = 0.227
+    lit = 0.55
+    primary = f"oklch({lit:.2f} {chroma:.3f} {base_hue})"
+    secondary = f"oklch({lit:.2f} {chroma:.3f} {(base_hue + 180) % 360})"
     gate_offset = (primary_gate * 7) % 360 if primary_gate else 30
-    accent = f"oklch({lit:.2f} {(sat * 0.9):.2f} {(base_hue + gate_offset) % 360})"
+    accent = f"oklch({lit:.2f} {(chroma * 0.9):.3f} {(base_hue + gate_offset) % 360})"
     out = {
         "primary_hue": base_hue,
         "secondary_hue": (base_hue + 180) % 360,
@@ -331,7 +332,7 @@ def _build_palette(lp: Optional[int],
     }
     if isinstance(bhramari_hue_deg, int):
         blended = round(base_hue * 0.9 + bhramari_hue_deg * 0.1) % 360
-        out["palette_resonance_accent"] = f"oklch({lit:.2f} {sat:.2f} {blended})"
+        out["palette_resonance_accent"] = f"oklch({lit:.2f} {chroma:.3f} {blended})"
     return out
 
 
@@ -368,65 +369,49 @@ def _canonical_input_json(payload: dict) -> str:
 
 # ── Sigil ───────────────────────────────────────────────────────────────
 
+def _seeded_random_float(seed_hex: str, i: int) -> float:
+    salt = _sha256(f"{seed_hex or ''}:{i}")
+    n = int(salt[:8], 16)
+    return n / 0xffffffff
+
+
 def _build_sigil_svg(point_count: int, seed_hex: str, palette: dict) -> str:
+    # Member-unique radial yantra: N points at seed-derived (angle, radius),
+    # straight spokes from centre + irregular polygon ring across the
+    # sorted points + small centre node. No regular polygon.
     n = 11 if point_count == 11 else 9
-    cx, cy, r = 256, 256, 200
-    points = []
+    cx, cy = 256, 256
+    RENDER_R = 220
+
+    raw = []
     for i in range(n):
-        a = (math.pi * 2 * i) / n - math.pi / 2
-        points.append((round(cx + r * math.cos(a), 3), round(cy + r * math.sin(a), 3)))
+        angle = _seeded_random_float(seed_hex, i) * math.pi * 2
+        radius = 0.65 + _seeded_random_float(seed_hex, i + 100) * 0.25
+        raw.append((angle, radius))
+    raw.sort(key=lambda p: p[0])
+    xy = [(round(cx + RENDER_R * r_ * math.cos(a_), 3),
+           round(cy + RENDER_R * r_ * math.sin(a_), 3))
+          for (a_, r_) in raw]
 
-    def _gcd(a, b):
-        while b:
-            a, b = b, a % b
-        return a
+    primary = (palette or {}).get("palette", ["oklch(0.55 0.227 72)"])[0]
+    primary_hue = (palette or {}).get("primary_hue", 72)
 
-    seed_num = int(seed_hex[:8], 16) if seed_hex else 1
-    stride = (seed_num % (n - 2)) + 2
-    while _gcd(stride, n) != 1:
-        stride = (stride % (n - 1)) + 1
-    order = []
-    cur = 0
-    for _ in range(n):
-        order.append(cur)
-        cur = (cur + stride) % n
-
-    seed_num2 = int(seed_hex[8:16], 16) if seed_hex and len(seed_hex) >= 16 else 3
-    stride2 = (seed_num2 % (n - 2)) + 2
-    if stride2 == stride:
-        stride2 = (stride2 % (n - 1)) + 1
-    while _gcd(stride2, n) != 1 or stride2 == stride:
-        stride2 = (stride2 % (n - 1)) + 1
-    order2 = []
-    cur = 0
-    for _ in range(n):
-        order2.append(cur)
-        cur = (cur + stride2) % n
-
-    def _path(o):
-        parts = []
-        for i, idx in enumerate(o):
-            p = points[idx]
-            parts.append(("M" if i == 0 else "L") + str(p[0]) + "," + str(p[1]))
-        return " ".join(parts) + " Z"
-
-    star_d = _path(order)
-    inner_d = _path(order2)
-    primary = (palette or {}).get("palette", ["oklch(0.55 0.18 72)"])[0]
-
-    frame = (
-        f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" '
-        f'stroke="{primary}" stroke-width="1" opacity="0.45"/>'
+    spokes = "".join(
+        f'<line x1="{cx}" y1="{cy}" x2="{x}" y2="{y}" '
+        f'stroke="{primary}" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>'
+        for (x, y) in xy
     )
-    inner_path = (
-        f'<path d="{inner_d}" fill="none" stroke="{primary}" '
-        f'stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round" opacity="0.55"/>'
+    ring_d = " ".join(
+        ("M" if i == 0 else "L") + str(x) + "," + str(y)
+        for i, (x, y) in enumerate(xy)
+    ) + " Z"
+    ring = (
+        f'<path d="{ring_d}" fill="none" stroke="{primary}" '
+        f'stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>'
     )
-    star_path = (
-        f'<path d="{star_d}" fill="none" stroke="{primary}" '
-        f'stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>'
-    )
-    center = f'<circle cx="{cx}" cy="{cy}" r="6" fill="{primary}"/>'
+    center = f'<circle cx="{cx}" cy="{cy}" r="5" fill="{primary}"/>'
+
+    glow_color = f"oklch(0.55 0.227 {primary_hue} / 0.35)"
     filter_def = (
         '<defs><filter id="cu-sigil-glow" x="-20%" y="-20%" width="140%" height="140%">'
         '<feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>'
@@ -435,10 +420,11 @@ def _build_sigil_svg(point_count: int, seed_hex: str, palette: dict) -> str:
     )
     return (
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" '
-        'width="512" height="512" class="cu-om-cipher-sigil-svg">'
+        'width="512" height="512" class="cu-om-cipher-sigil-svg" '
+        f'style="filter:drop-shadow(0 0 8px {glow_color})">'
         + filter_def
         + '<g filter="url(#cu-sigil-glow)">'
-        + frame + inner_path + star_path + center
+        + spokes + ring + center
         + '</g></svg>'
     )
 
@@ -477,6 +463,63 @@ SOLAR_QUARTER_LABELS = {
     2: "Summer — fullness",
     3: "Autumn — harvest",
 }
+
+
+# ── Temporal phrase lookup (Solar Quarter × Lunar Phase) ────────────────
+TEMPORAL_PHRASES = {
+    "0_0": "of the Winter Seed",
+    "0_1": "of the Winter Quickening",
+    "0_2": "of the Winter Threshold",
+    "0_3": "of the Winter Forging",
+    "0_4": "of the Winter Lantern",
+    "0_5": "of the Winter Hearth",
+    "0_6": "of the Winter Release",
+    "0_7": "of the Winter Stillness",
+    "1_0": "of the Spring Awakening",
+    "1_1": "of the Spring Rising",
+    "1_2": "of the Spring Threshold",
+    "1_3": "of the Spring Tending",
+    "1_4": "of the Spring Bloom",
+    "1_5": "of the Spring Offering",
+    "1_6": "of the Spring Release",
+    "1_7": "of the Spring Quiet",
+    "2_0": "of the Summer Spark",
+    "2_1": "of the Summer Tending",
+    "2_2": "of the Summer Crossing",
+    "2_3": "of the Summer Ripening",
+    "2_4": "of the Summer Crown",
+    "2_5": "of the Summer Harvest",
+    "2_6": "of the Summer Release",
+    "2_7": "of the Summer Long Light",
+    "3_0": "of the Autumn Seed",
+    "3_1": "of the Autumn Turning",
+    "3_2": "of the Autumn Threshold",
+    "3_3": "of the Autumn Gathering",
+    "3_4": "of the Autumn Harvest",
+    "3_5": "of the Autumn Offering",
+    "3_6": "of the Autumn Gate",
+    "3_7": "of the Autumn Rest",
+}
+
+
+def temporal_phrase(solar_quarter: Optional[int],
+                    lunar_phase: Optional[int]) -> Optional[str]:
+    if solar_quarter is None or lunar_phase is None:
+        return None
+    return TEMPORAL_PHRASES.get(f"{solar_quarter}_{lunar_phase}")
+
+
+def derive_cipher_name(preferred_name: Optional[str],
+                       solar_quarter: Optional[int],
+                       lunar_phase: Optional[int]) -> Optional[str]:
+    if not preferred_name:
+        return None
+    parts = str(preferred_name).strip().split()
+    if not parts:
+        return None
+    who = parts[0]
+    phrase = temporal_phrase(solar_quarter, lunar_phase)
+    return f"{who} {phrase}" if phrase else who
 
 
 # ── Layer 6 — Contemplative outputs ─────────────────────────────────────
@@ -525,9 +568,23 @@ def archetypal_story_seed(expression_value: Optional[int],
                           soul_urge_value: Optional[int],
                           personality_value: Optional[int]) -> Optional[dict]:
     data = _LAYER6.get("ARCHETYPAL_STORIES")
-    if not data or "fragments" not in data:
+    if not data:
         return None
-    frags = data["fragments"]
+    # Primary: keyed lookup by `{expression}_{soul_urge}`.
+    if expression_value is not None and soul_urge_value is not None:
+        key = f"{expression_value}_{soul_urge_value}"
+        stories = data.get("stories") or {}
+        if key in stories:
+            s = stories[key]
+            return {
+                "seed": s.get("story_seed"),
+                "key": s.get("key") or key,
+                "keynote": s.get("keynote"),
+                "source": "keyed",
+            }
+    frags = data.get("fragments")
+    if not frags:
+        return None
 
     def pick(slot: str, val: Optional[int]) -> Optional[str]:
         if val is None:
@@ -540,8 +597,13 @@ def archetypal_story_seed(expression_value: Optional[int],
     bits = [b for b in (ex, su, pe) if b]
     if not bits:
         return None
+    key = (f"{expression_value}_{soul_urge_value}"
+           if expression_value is not None and soul_urge_value is not None else None)
     return {
         "seed": " ".join(bits),
+        "key": key,
+        "keynote": None,
+        "source": "fragments",
         "expression_fragment": ex,
         "soul_urge_fragment": su,
         "personality_fragment": pe,
@@ -696,6 +758,13 @@ def generate(payload: dict, *, feature_flag: Optional[bool] = None,
         "cipher_contemplation": cipher_contemplation(
             temporal["lunar_phase"], temporal["solar_quarter"]
         ) if temporal else None,
+        "cipher_name": derive_cipher_name(
+            payload.get("preferred_name")
+            or (str(payload["legal_name"]).strip().split()[0]
+                if payload.get("legal_name") else None),
+            temporal["solar_quarter"] if temporal else None,
+            temporal["lunar_phase"] if temporal else None,
+        ),
         "palette_rationale": (
             f"Hue {palette['primary_hue']}° from Life Path "
             f"{lp['reduced'] if lp else '-'}; "

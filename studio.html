@@ -12255,6 +12255,73 @@ if (document.readyState === 'loading') {
       return items;
     }
 
+    // ── OM Cipher · Foundation display helpers ─────────────────
+    // Title-case + comma a freeform `Sudbury ontario canada` so the
+    // sealed-data card reads `Sudbury, Ontario, Canada`. Structured
+    // {city, province, country} input is preferred — this is the
+    // last-mile fix for legacy single-string captures.
+    function ocFormatBirthplaceString(raw) {
+      if (!raw) return null;
+      var s = String(raw).trim().replace(/\s+/g, ' ').replace(/[,]+/g, ',');
+      if (!s) return null;
+      // Already has commas → just title-case each token.
+      var parts = s.split(',').map(function (p) { return p.trim(); }).filter(Boolean);
+      if (parts.length === 1) {
+        // Space-separated. Treat as `[city...] province country` only if
+        // the trailing two tokens are a known province/country pair
+        // pattern; otherwise leave as-is, title-cased.
+        var toks = parts[0].split(' ');
+        if (toks.length >= 3) {
+          parts = [
+            toks.slice(0, toks.length - 2).join(' '),
+            toks[toks.length - 2],
+            toks[toks.length - 1],
+          ];
+        }
+      }
+      function titleCase(t) {
+        return t.replace(/\b([a-z])([a-z']*)/gi, function (_m, a, b) {
+          return a.toUpperCase() + b.toLowerCase();
+        });
+      }
+      return parts.map(titleCase).join(', ');
+    }
+
+    // Western Sun sign from ISO date. Pure local lookup, no ephemeris.
+    // Boundary dates use the standard tropical-zodiac cusps; results
+    // are accurate to the day for the common case.
+    function ocSunSignFromDate(iso) {
+      if (!iso) return null;
+      var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso));
+      if (!m) return null;
+      var mo = parseInt(m[2], 10), d = parseInt(m[3], 10);
+      var ranges = [
+        ['Capricorn',  [12,22], [1,19]],
+        ['Aquarius',   [1,20],  [2,18]],
+        ['Pisces',     [2,19],  [3,20]],
+        ['Aries',      [3,21],  [4,19]],
+        ['Taurus',     [4,20],  [5,20]],
+        ['Gemini',     [5,21],  [6,20]],
+        ['Cancer',     [6,21],  [7,22]],
+        ['Leo',        [7,23],  [8,22]],
+        ['Virgo',      [8,23],  [9,22]],
+        ['Libra',      [9,23],  [10,22]],
+        ['Scorpio',    [10,23], [11,21]],
+        ['Sagittarius',[11,22], [12,21]],
+      ];
+      for (var i = 0; i < ranges.length; i++) {
+        var name = ranges[i][0], s = ranges[i][1], e = ranges[i][2];
+        // Same-year range
+        if (s[0] === e[0]) {
+          if (mo === s[0] && d >= s[1] && d <= e[1]) return name;
+        } else {
+          // Crosses year boundary (Capricorn) — keep checks per month.
+          if ((mo === s[0] && d >= s[1]) || (mo === e[0] && d <= e[1])) return name;
+        }
+      }
+      return null;
+    }
+
     // Build the structured Living Profile model from current state.
     // Each section returns { value, source, tags } where source is
     // 'compass' | 'captured' | 'mixed' | 'empty' so the UI can show
@@ -12730,7 +12797,58 @@ if (document.readyState === 'loading') {
       // Backward-compat classes `lp-foundation lp-field-imprints
       // lp-om-cipher` are preserved so existing CSS / tests / DOM
       // queries continue to resolve.
-      var foundationItems = model.foundation || [];
+      // Cipher Foundation = sealed source data only. Filter out fields
+      // that don't belong in the locked layer:
+      //   - "Currently in" is a Living Profile field (changes), not a
+      //     sealed birth-data field.
+      //   - "Human Design" is only sealed once derived; until then it
+      //     surfaces as a pending v1.1 note outside the locked grid.
+      //   - "Sun · Moon · Rising" is split: Sun sign is deterministically
+      //     derivable from birth_date and is added here; Moon/Rising
+      //     require a full chart and surface as a pending v1.1 note.
+      var ocPendingNotes = [];
+      var foundationItems = (model.foundation || []).filter(function (it) {
+        if (!it) return false;
+        if (it.field === 'current_location') return false;
+        if (it.field === 'human_design') {
+          if (!it.val) {
+            ocPendingNotes.push('Human Design · pending full chart calculation · v1.1');
+            return false;
+          }
+        }
+        if (it.field === 'astrology') {
+          // Replace combined Sun·Moon·Rising with Sun-only (derived from
+          // birth_date). Moon/Rising surface separately as pending v1.1.
+          return false;
+        }
+        return true;
+      });
+      // Display normalisation: title-case `Sudbury ontario canada` →
+      // `Sudbury, Ontario, Canada` when the source is a single freeform
+      // string. Structured {city, province, country} shapes assemble
+      // through ocFormatBirthplace below.
+      foundationItems = foundationItems.map(function (it) {
+        if (it && it.field === 'birthplace' && typeof it.val === 'string' && it.val) {
+          var v = ocFormatBirthplaceString(it.val);
+          if (v) return Object.assign({}, it, { val: v });
+        }
+        return it;
+      });
+      // Inject derived Sun sign (date-range lookup) and pending notes
+      // for Moon / Rising.
+      try {
+        var ocBd = (function () {
+          for (var i = 0; i < foundationItems.length; i++) {
+            if (foundationItems[i].field === 'birthdate') return foundationItems[i].val;
+          }
+          return null;
+        })();
+        var sun = ocBd ? ocSunSignFromDate(ocBd) : null;
+        if (sun) {
+          foundationItems.push({ key: 'Sun sign', val: sun, field: 'sun_sign' });
+        }
+        ocPendingNotes.push('Moon · Rising · pending full chart calculation · v1.1');
+      } catch (_) {}
       var placeholderCipherName  = 'Awaiting Compass seal';
       var placeholderMantra      = 'Derived once source data is sealed — the evolving personal mantra lives in your Living Profile.';
       var placeholderField       = 'Pending source data';
@@ -12757,6 +12875,7 @@ if (document.readyState === 'loading') {
             '<div class="oc-id-row">' +
               '<span class="oc-eyebrow">Cipher Name</span>' +
               '<h4 class="oc-cipher-name" data-cu-om-cipher-name>' + lpEscape(placeholderCipherName) + '</h4>' +
+              '<p class="oc-cipher-subtitle" data-cu-om-cipher-subtitle style="margin:4px 0 0;font-size:12px;letter-spacing:0.06em;color:rgba(241,245,249,0.62);"></p>' +
             '</div>' +
             '<div class="oc-id-row">' +
               '<span class="oc-eyebrow">Om Cipher Mantra</span>' +
@@ -12826,6 +12945,13 @@ if (document.readyState === 'loading') {
                 }).join('') +
               '</dl>'
             : '<p class="oc-foundation-empty">Sealed inputs will appear once your Compass profile carries name, birth date, and birth place.</p>') +
+          (ocPendingNotes.length
+            ? '<ul class="oc-foundation-pending" aria-label="Pending chart calculations" style="margin:10px 0 0;padding:0;list-style:none;font-size:11px;letter-spacing:0.06em;color:rgba(241,245,249,0.55);">' +
+                ocPendingNotes.map(function (n) {
+                  return '<li style="margin:4px 0;">' + lpEscape(n) + '</li>';
+                }).join('') +
+              '</ul>'
+            : '') +
         '</div>' +
       '</section>';
 
@@ -14217,7 +14343,40 @@ if (document.readyState === 'loading') {
             fnd.birthplace, fnd.place_of_birth, fnd.pob,
             cd.birthplace, cd.place_of_birth, cd.pob, bd.pob
           );
-          if (bpStr) birthPlace = { city: String(bpStr) };
+          if (bpStr) {
+            // Parse `city province country` (space- or comma-separated)
+            // into structured slots so downstream consumers receive the
+            // normalised shape. The engine canonical seed does NOT use
+            // birth_place, so this is a display-time normalisation only.
+            var bpRaw = String(bpStr);
+            var bpParts = bpRaw.split(',').map(function (p) { return p.trim(); }).filter(Boolean);
+            if (bpParts.length === 1) {
+              var bpToks = bpParts[0].split(/\s+/);
+              if (bpToks.length >= 3) {
+                bpParts = [
+                  bpToks.slice(0, bpToks.length - 2).join(' '),
+                  bpToks[bpToks.length - 2],
+                  bpToks[bpToks.length - 1],
+                ];
+              }
+            }
+            function bpTitle(t) {
+              return t.replace(/\b([a-z])([a-z']*)/gi, function (_m, a, b) {
+                return a.toUpperCase() + b.toLowerCase();
+              });
+            }
+            if (bpParts.length >= 3) {
+              birthPlace = {
+                city: bpTitle(bpParts[0]),
+                province: bpTitle(bpParts[1]),
+                country: bpTitle(bpParts[2]),
+              };
+            } else if (bpParts.length === 2) {
+              birthPlace = { city: bpTitle(bpParts[0]), country: bpTitle(bpParts[1]) };
+            } else {
+              birthPlace = { city: bpTitle(bpRaw) };
+            }
+          }
         }
         var hz = Number(fs.dominant_hz || prof.bhramari_baseline_hz || fnd.bhramari_baseline_hz || 0);
         var compassSlots = cuMergeGeneKeysSlots(pts, cd.gk_profile);
@@ -14246,13 +14405,15 @@ if (document.readyState === 'loading') {
     }
     window.cuBuildOmCipherInput = cuBuildOmCipherInput;
 
-    // Synthesise the Cipher Name deterministically from canonical metadata.
-    // No invention: the name is just the three sealed gematria labels
-    // joined with the lunar phase token. Stays in lock-step with the
-    // engine — same data → same name, always.
+    // Cipher Name: prefer the engine-derived `cipher_name` (e.g. "Markus
+    // of the Autumn Gate"). The three-part description (Markus · Master
+    // Builder · Last Quarter) is preserved as a subtitle so the existing
+    // label still surfaces — just not as the primary name.
     function cuCipherNameFromRecord(rec, input) {
       if (!rec || rec.pending) return null;
       var meta = rec.metadata || {};
+      if (meta.cipher_name) return meta.cipher_name;
+      // Fallback (engine pre-cipher_name) — keep the older descriptor.
       var lp = meta.life_path && meta.life_path.label;
       var lun = meta.lunar_phase && meta.lunar_phase.label;
       var preferred = (input && input.preferred_name) || (input && input.legal_name);
@@ -14263,6 +14424,23 @@ if (document.readyState === 'loading') {
       if (lun) bits.push(lun.split(' — ')[0]);
       if (!bits.length) return null;
       return bits.join(' · ');
+    }
+
+    // Subtitle (descriptive): `[Preferred] · [LP label] · [Lunar label]`.
+    // Retained as a secondary reference label below the primary cipher
+    // name so the older display still surfaces.
+    function cuCipherSubtitleFromRecord(rec, input) {
+      if (!rec || rec.pending) return null;
+      var meta = rec.metadata || {};
+      var lp = meta.life_path && meta.life_path.label;
+      var lun = meta.lunar_phase && meta.lunar_phase.label;
+      var preferred = (input && input.preferred_name) || (input && input.legal_name);
+      var who = preferred ? String(preferred).split(/\s+/)[0] : null;
+      var bits = [];
+      if (who) bits.push(who);
+      if (lp)  bits.push(lp.split(' — ')[0]);
+      if (lun) bits.push(lun.split(' — ')[0]);
+      return bits.length ? bits.join(' · ') : null;
     }
 
     // Build the canonical Activation Sequence line from the engine record
@@ -14363,6 +14541,18 @@ if (document.readyState === 'loading') {
             nameEl.classList.add('is-pending');
           }
         }
+        // Subtitle: keep the 3-part descriptor as a secondary label.
+        var subEl = section.querySelector('[data-cu-om-cipher-subtitle]');
+        if (subEl) {
+          var sub = cuCipherSubtitleFromRecord(rec, input);
+          if (sub) {
+            subEl.textContent = sub;
+            subEl.classList.remove('is-pending');
+          } else {
+            subEl.textContent = '';
+            subEl.classList.add('is-pending');
+          }
+        }
 
         // ── Om Cipher Mantra (Layer 6 deterministic mirror) ─────
         // The Om Cipher mantra is the deterministic mirror selected from
@@ -14438,16 +14628,15 @@ if (document.readyState === 'loading') {
         if (contEl) {
           var l6cont = rec.metadata && rec.metadata.cipher_contemplation;
           if (l6cont && l6cont.phrase) {
-            contEl.textContent = l6cont.combined || l6cont.phrase;
+            // Spec: panel shows the short first-person phrase only.
+            // Extended/seasonal form is reserved for an expand surface.
+            contEl.textContent = l6cont.phrase;
             contEl.classList.remove('is-pending');
           } else {
-            var lunLab = rec.metadata && rec.metadata.lunar_phase && rec.metadata.lunar_phase.label;
-            if (lunLab) {
-              contEl.textContent = 'Sit with the ' + lunLab.toLowerCase() + ' quality of your cipher today.';
-              contEl.classList.add('is-pending');
-            } else {
-              contEl.classList.add('is-pending');
-            }
+            // No template-string fallback: a phrase is either available
+            // (data/om_cipher/contemplations.json is loaded) or pending.
+            contEl.textContent = 'A contemplation phrase will surface once your cipher is sealed.';
+            contEl.classList.add('is-pending');
           }
         }
 

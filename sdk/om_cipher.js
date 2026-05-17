@@ -385,13 +385,18 @@ function lifePathHue(lp) {
 function buildPalette(lp, lunarPhase, primaryGate, bhramariHueDeg) {
   const baseHue = lifePathHue(lp);
   const lunar = Number.isFinite(lunarPhase) ? lunarPhase : 0;
-  const satMod = ((lunar - 3.5) / 3.5) * 0.15; // ±0.15
-  const sat = Math.max(0.25, Math.min(0.85, 0.55 + satMod));
-  const lit = 0.5;
-  const primary = `oklch(${lit.toFixed(2)} ${sat.toFixed(2)} ${baseHue})`;
-  const secondary = `oklch(${lit.toFixed(2)} ${sat.toFixed(2)} ${(baseHue + 180) % 360})`;
+  // OKLCH primary is pinned to `oklch(0.55 0.227 <hue>)` so the canonical
+  // colour matches the v1 spec exactly for every life-path family. Lunar
+  // phase is preserved upstream — modulation is intentionally not applied
+  // to colour at this layer (it shapes contemplation / story / mantra
+  // instead, where the modulation reads as meaning rather than tint).
+  const chroma = 0.227;
+  const lit = 0.55;
+  void lunar; // referenced for documentation; engine pins primary lightness.
+  const primary = `oklch(${lit.toFixed(2)} ${chroma.toFixed(3)} ${baseHue})`;
+  const secondary = `oklch(${lit.toFixed(2)} ${chroma.toFixed(3)} ${(baseHue + 180) % 360})`;
   const gateOffset = primaryGate ? (primaryGate * 7) % 360 : 30;
-  const accent = `oklch(${lit.toFixed(2)} ${(sat * 0.9).toFixed(2)} ${(baseHue + gateOffset) % 360})`;
+  const accent = `oklch(${lit.toFixed(2)} ${(chroma * 0.9).toFixed(3)} ${(baseHue + gateOffset) % 360})`;
   const out = {
     primary_hue: baseHue,
     secondary_hue: (baseHue + 180) % 360,
@@ -399,88 +404,87 @@ function buildPalette(lp, lunarPhase, primaryGate, bhramariHueDeg) {
   };
   if (Number.isFinite(bhramariHueDeg)) {
     const blended = Math.round(baseHue * 0.9 + bhramariHueDeg * 0.1) % 360;
-    out.palette_resonance_accent = `oklch(${lit.toFixed(2)} ${sat.toFixed(2)} ${blended})`;
+    out.palette_resonance_accent = `oklch(${lit.toFixed(2)} ${chroma.toFixed(3)} ${blended})`;
   }
   return out;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Deterministic sigil SVG. 512×512 viewBox, centre node, N outer nodes
-// arranged on a circle. The polygon traversal order is seeded from the
-// SHA-256 of the canonical seed string so the path is repeatable but not
-// trivially the canonical n-gon.
+// Deterministic sigil SVG. 512×512 viewBox, centre node, N outer points
+// placed at SEED-DERIVED angles and radii so the geometry is unique to
+// each member. Two layers:
+//   A — straight spokes from centre to each point (rays, not closed)
+//   B — connecting ring across the sorted points (irregular polygon)
+// Plus a small filled centre node. No regular polygon, no construction
+// dots — the form is a member-specific yantra.
 // ─────────────────────────────────────────────────────────────────────────
+function _seededRandomFloat(seedHex, i) {
+  // Pull a 32-bit window from the SHA-256 hex using a salted offset and
+  // hash with the seed. Deterministic for (seedHex, i).
+  const salt = sha256Hex(String(seedHex || "") + ":" + String(i));
+  const n = parseInt(salt.slice(0, 8), 16);
+  return n / 0xffffffff;
+}
+
 function buildSigilSvg(pointCount, seedHex, palette) {
   const N = pointCount === 11 ? 11 : 9;
-  const cx = 256, cy = 256, r = 200;
-  const points = [];
+  const cx = 256, cy = 256;
+  // Unit-circle scale ⇒ render radius. Spec ranges are 0.65–0.90 of the
+  // sigil's outer reach. We map unit radius to a 200px-half plate so the
+  // sigil fills the 512 viewBox the way a yantra fills a mandala disc.
+  const RENDER_R = 220;
+
+  const pts = [];
   for (let i = 0; i < N; i++) {
-    const a = (Math.PI * 2 * i) / N - Math.PI / 2;
-    points.push({
-      x: +(cx + r * Math.cos(a)).toFixed(3),
-      y: +(cy + r * Math.sin(a)).toFixed(3),
-    });
+    const angle = _seededRandomFloat(seedHex, i) * Math.PI * 2;
+    const radius = 0.65 + _seededRandomFloat(seedHex, i + 100) * 0.25;
+    pts.push({ angle, radius });
   }
-  // Stable traversal: walk by a stride taken from the seed hex bytes.
-  // Stride is coprime with N to ensure a complete cycle.
-  const seedNum = parseInt((seedHex || "0").slice(0, 8), 16) || 1;
-  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
-  let stride = (seedNum % (N - 2)) + 2;
-  while (gcd(stride, N) !== 1) stride = (stride % (N - 1)) + 1;
-  const order = [];
-  let cur = 0;
-  for (let i = 0; i < N; i++) { order.push(cur); cur = (cur + stride) % N; }
-  const starD = order.map((idx, i) => {
-    const p = points[idx];
-    return (i === 0 ? "M" : "L") + p.x + "," + p.y;
-  }).join(" ") + " Z";
+  // Sort points by angle so the connecting ring traces a coherent loop.
+  pts.sort((a, b) => a.angle - b.angle);
 
-  // A second, paired traversal — inverse stride — laid faintly under the
-  // primary so the sigil reads as woven sacred geometry rather than a
-  // single polygon. Stride2 is chosen deterministically from a different
-  // window of the seed hex.
-  const seedNum2 = parseInt((seedHex || "0").slice(8, 16), 16) || 3;
-  let stride2 = (seedNum2 % (N - 2)) + 2;
-  if (stride2 === stride) stride2 = (stride2 % (N - 1)) + 1;
-  while (gcd(stride2, N) !== 1 || stride2 === stride) {
-    stride2 = (stride2 % (N - 1)) + 1;
-  }
-  const order2 = [];
-  cur = 0;
-  for (let i = 0; i < N; i++) { order2.push(cur); cur = (cur + stride2) % N; }
-  const innerD = order2.map((idx, i) => {
-    const p = points[idx];
-    return (i === 0 ? "M" : "L") + p.x + "," + p.y;
-  }).join(" ") + " Z";
+  const xy = pts.map(p => ({
+    x: +(cx + RENDER_R * p.radius * Math.cos(p.angle)).toFixed(3),
+    y: +(cy + RENDER_R * p.radius * Math.sin(p.angle)).toFixed(3),
+  }));
 
-  const primary = (palette && palette.palette && palette.palette[0]) || "oklch(0.55 0.18 72)";
-  // Outer enclosing circle (radius matches scaffold so the form reads as
-  // a contained mandala, not a free-floating polygon).
-  const frame = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${primary}" stroke-width="1" opacity="0.45"/>`;
-  // Inner traversal — same hue, lighter weight + transparency. No node
-  // dots, no construction artifacts — just nested geometry.
-  const innerPath =
-    `<path d="${innerD}" fill="none" stroke="${primary}" stroke-width="1.25" ` +
-    `stroke-linejoin="round" stroke-linecap="round" opacity="0.55"/>`;
-  // Primary star — the dominant unified stroke of the sacred form.
-  const starPath =
-    `<path d="${starD}" fill="none" stroke="${primary}" stroke-width="2.25" ` +
-    `stroke-linejoin="round" stroke-linecap="round"/>`;
-  // Deliberate centre anchor — small filled circle in primary colour.
-  const center = `<circle cx="${cx}" cy="${cy}" r="6" fill="${primary}"/>`;
-  // Subtle palette-derived glow. The filter is inert if the renderer
-  // does not support it; in modern browsers it gives the form depth
-  // without adding any literal noise to the geometry.
+  const primary = (palette && palette.palette && palette.palette[0]) || "oklch(0.55 0.227 72)";
+  const primaryHue = (palette && palette.primary_hue != null) ? palette.primary_hue : 72;
+
+  // Layer A — straight spokes from centre to each point (not closed).
+  // Renders as a unique radial ray pattern. Stroke 1.5, opacity 0.7.
+  const spokes = xy.map(p => (
+    `<line x1="${cx}" y1="${cy}" x2="${p.x}" y2="${p.y}" ` +
+    `stroke="${primary}" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>`
+  )).join("");
+
+  // Layer B — connecting ring across sorted points (irregular polygon).
+  // Stroke 2.5, opacity 1.0. Closed path so the form reads as an
+  // enclosing irregular polygon — the member's unique outer shape.
+  const ringD = xy.map((p, i) => (i === 0 ? "M" : "L") + p.x + "," + p.y).join(" ") + " Z";
+  const ring =
+    `<path d="${ringD}" fill="none" stroke="${primary}" stroke-width="2.5" ` +
+    `stroke-linejoin="round" stroke-linecap="round" opacity="1"/>`;
+
+  // Centre anchor — filled circle in primary colour, radius 5px (spec).
+  const center = `<circle cx="${cx}" cy="${cy}" r="5" fill="${primary}"/>`;
+
+  // Subtle palette-derived glow. Inert when the renderer ignores filters.
+  // Uses the primary hue at reduced opacity so depth comes from the
+  // colour the member is keyed to, not arbitrary noise.
+  const glowColor = `oklch(0.55 0.227 ${primaryHue} / 0.35)`;
   const filterDef =
     `<defs><filter id="cu-sigil-glow" x="-20%" y="-20%" width="140%" height="140%">` +
     `<feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>` +
     `<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>` +
     `</filter></defs>`;
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" class="cu-om-cipher-sigil-svg">` +
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" ` +
+    `class="cu-om-cipher-sigil-svg" ` +
+    `style="filter:drop-shadow(0 0 8px ${glowColor})">` +
     filterDef +
     `<g filter="url(#cu-sigil-glow)">` +
-    frame + innerPath + starPath + center +
+    spokes + ring + center +
     `</g>` +
     `</svg>`
   );
@@ -661,6 +665,11 @@ function generate(input, options) {
     cipher_contemplation: temporal
       ? cipherContemplation(temporal.lunar_phase, temporal.solar_quarter)
       : null,
+    cipher_name: deriveCipherName(
+      input.preferred_name || (input.legal_name ? String(input.legal_name).trim().split(/\s+/)[0] : null),
+      temporal ? temporal.solar_quarter : null,
+      temporal ? temporal.lunar_phase : null
+    ),
     palette_rationale:
       `Hue ${palette.primary_hue}° from Life Path ${lp ? lp.reduced : "-"}; ` +
       `lunar phase ${temporal ? temporal.lunar_phase : "-"} modulates saturation; ` +
@@ -801,6 +810,69 @@ const SOLAR_QUARTER_LABELS = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────
+// Temporal phrase lookup — Solar Quarter × Lunar Phase. Used by the
+// derived Cipher Name (`[Preferred Name] of the [Temporal Qualifier]`).
+// Each season carries a phase-specific qualifier so the title is
+// archetypal yet unique. For Markus (solar 3 / lunar 6) the lookup
+// resolves to "of the Autumn Gate".
+// ─────────────────────────────────────────────────────────────────────────
+const TEMPORAL_PHRASES = {
+  // Winter (0)
+  "0_0": "of the Winter Seed",
+  "0_1": "of the Winter Quickening",
+  "0_2": "of the Winter Threshold",
+  "0_3": "of the Winter Forging",
+  "0_4": "of the Winter Lantern",
+  "0_5": "of the Winter Hearth",
+  "0_6": "of the Winter Release",
+  "0_7": "of the Winter Stillness",
+  // Spring (1)
+  "1_0": "of the Spring Awakening",
+  "1_1": "of the Spring Rising",
+  "1_2": "of the Spring Threshold",
+  "1_3": "of the Spring Tending",
+  "1_4": "of the Spring Bloom",
+  "1_5": "of the Spring Offering",
+  "1_6": "of the Spring Release",
+  "1_7": "of the Spring Quiet",
+  // Summer (2)
+  "2_0": "of the Summer Spark",
+  "2_1": "of the Summer Tending",
+  "2_2": "of the Summer Crossing",
+  "2_3": "of the Summer Ripening",
+  "2_4": "of the Summer Crown",
+  "2_5": "of the Summer Harvest",
+  "2_6": "of the Summer Release",
+  "2_7": "of the Summer Long Light",
+  // Autumn (3)
+  "3_0": "of the Autumn Seed",
+  "3_1": "of the Autumn Turning",
+  "3_2": "of the Autumn Threshold",
+  "3_3": "of the Autumn Gathering",
+  "3_4": "of the Autumn Harvest",
+  "3_5": "of the Autumn Offering",
+  "3_6": "of the Autumn Gate",
+  "3_7": "of the Autumn Rest",
+};
+
+function temporalPhrase(solarQuarter, lunarPhase) {
+  if (solarQuarter == null || lunarPhase == null) return null;
+  const key = `${solarQuarter}_${lunarPhase}`;
+  return TEMPORAL_PHRASES[key] || null;
+}
+
+// Derived Cipher Name: `[Preferred Name] [temporal phrase]`.
+// e.g. for Markus (solar 3, lunar 6): "Markus of the Autumn Gate".
+function deriveCipherName(preferredName, solarQuarter, lunarPhase) {
+  if (!preferredName) return null;
+  const who = String(preferredName).trim().split(/\s+/)[0];
+  if (!who) return null;
+  const phrase = temporalPhrase(solarQuarter, lunarPhase);
+  if (!phrase) return who;
+  return `${who} ${phrase}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Layer 6 — Contemplative outputs.
 // Deterministic mirrors derived from sealed Layer 1-2 outputs. The user's
 // evolving personal mantra / story / contemplation live in the Living
@@ -845,8 +917,24 @@ function omCipherMantra(lifePathValue, expressionValue, lunarPhaseValue) {
 
 function archetypalStorySeed(expressionValue, soulUrgeValue, personalityValue) {
   const data = _LAYER6.ARCHETYPAL_STORIES;
-  if (!data || !data.fragments) return null;
+  if (!data) return null;
+  // Primary lookup: keyed `${expression}_${soul_urge}` so combinations
+  // with hand-authored archetypal portraits surface intact. Falls back
+  // to fragment composition when no key is hit.
+  const key = (expressionValue != null && soulUrgeValue != null)
+    ? `${expressionValue}_${soulUrgeValue}`
+    : null;
+  if (key && data.stories && data.stories[key]) {
+    const s = data.stories[key];
+    return {
+      seed: s.story_seed,
+      key: s.key || key,
+      keynote: s.keynote || null,
+      source: "keyed",
+    };
+  }
   const frags = data.fragments;
+  if (!frags) return null;
   function pick(slot, val) {
     const dict = frags[slot] || {};
     if (val != null && dict[String(val)]) return dict[String(val)];
@@ -859,6 +947,9 @@ function archetypalStorySeed(expressionValue, soulUrgeValue, personalityValue) {
   if (!bits.length) return null;
   return {
     seed: bits.join(" "),
+    key: key,
+    keynote: null,
+    source: "fragments",
     expression_fragment: ex,
     soul_urge_fragment: su,
     personality_fragment: pe,
@@ -904,6 +995,10 @@ const _exports = {
   omCipherMantra,
   archetypalStorySeed,
   cipherContemplation,
+  // Derived cipher name (temporal-phrase based).
+  temporalPhrase,
+  deriveCipherName,
+  TEMPORAL_PHRASES,
   // labels — public so the studio adapter can render without re-encoding.
   NUMEROLOGY_LABELS,
   LUNAR_PHASE_LABELS,
