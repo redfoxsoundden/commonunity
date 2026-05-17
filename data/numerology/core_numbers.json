@@ -1,0 +1,18 @@
+{
+  "source": "Internal — Om Cipher v1",
+  "note": "Short, original descriptive labels. No copyrighted text. Used by the canonical engine for Life Path / Expression / Soul Urge / Personality labels.",
+  "numbers": {
+    "1":  { "name": "Initiator",       "keynote": "independence, beginnings" },
+    "2":  { "name": "Mediator",        "keynote": "partnership, balance" },
+    "3":  { "name": "Expresser",       "keynote": "creativity, communication" },
+    "4":  { "name": "Builder",         "keynote": "structure, foundation" },
+    "5":  { "name": "Voyager",         "keynote": "change, freedom" },
+    "6":  { "name": "Nurturer",        "keynote": "service, harmony" },
+    "7":  { "name": "Seeker",          "keynote": "introspection, study" },
+    "8":  { "name": "Manifestor",      "keynote": "power, mastery" },
+    "9":  { "name": "Completer",       "keynote": "release, compassion" },
+    "11": { "name": "Illuminator",     "keynote": "intuition, vision",          "master": true },
+    "22": { "name": "Master Builder",  "keynote": "material vision realized",   "master": true },
+    "33": { "name": "Master Teacher",  "keynote": "devotion, healing",          "master": true }
+  }
+}

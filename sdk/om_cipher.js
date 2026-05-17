@@ -8,32 +8,36 @@
  *
  * Reference: docs/product/om-cipher-v1-implementation-plan.md
  *
- * Scope (v1):
- *   - Layer 1   Digital root from birthdate
- *   - Layer 2   Name resonance (Pythagorean + Chaldean gematria)
- *   - Layer 3   Gene Keys gate/line read from sealed Compass input
- *   - Layer 4   Temporal: day-of-week ordinal, solar quadrant, lunar phase
- *               (mean-anomaly approx; no external ephemeris). HD fields are
- *               sealed pass-through; HD computation is deferred.
- *   - Layer 5   Seed = SHA-256 of canonical string (Bhramari included only
- *               when a baseline capture exists)
- *   - Layer 7   Resonance palette (root hue + lunar sat + optional Bhramari
- *               accent stop, ≤ ~10% perceptual shift)
+ * Canonical derivation (engine-first):
+ *   Layer 1   Life Path = reduce(day) + reduce(month) + reduce(year),
+ *             then reduce preserving master numbers 11/22/33.
+ *             Expression / Soul Urge / Personality from Pythagorean
+ *             gematria of legal_name (reduced to single digit; master
+ *             preservation applies to Life Path only).
+ *   Layer 2   Temporal resonance — lunar phase (synodic approx with
+ *             baseline 2000-01-06, 29.53059), solar quarter by month
+ *             (winter Dec–Feb, spring Mar–May, summer Jun–Aug, autumn
+ *             Sep–Nov), temporal gate hour//2 (null if no birth_time).
+ *   Layer 3   Gene Keys gate/line read from sealed Compass input.
+ *             V1 does not compute Gene Keys internally; if Compass
+ *             provides pre-resolved activation lines they are surfaced
+ *             from the static 4×6 line table (original/internal labels).
+ *   Layer 4   Canonical seed string `LP:..|EX:..|SU:..|PE:..|LUN:..|
+ *             SOL:..|TG:..` (TG omitted when birth_time is null).
+ *             SHA-256 of that string is the 64-char om_cipher_seed.
+ *   Layer 5   Sigil scaffold count: 11 if birth_time, else 9.
+ *   Layer 6   Palette — primary hue from Life Path with master-specific
+ *             family (22→72, 11→36, 33→108; else root × 40 mod 360);
+ *             lunar phase modulates saturation; secondary hue is the
+ *             complement. OKLCH strings.
  *
  * Bhramari handling:
- *   - Optional. Missing baseline never blocks generation.
- *   - Baseline + metadata sealed alongside identity but not part of
- *     identity_input_hash (so two members with identical identity get the
- *     same input_hash regardless of whether one hummed).
- *   - Refinement events are append-only history (see `appendResonanceEvent`).
- *     They never alter seed, sigil scaffolding, or input_hash.
- *
- * Privacy:
- *   - `generate()` returns a private/internal record. Pass it through
- *     `toPublicProjection()` before exposing to cOMmons / Field surfaces.
- *   - Raw `bhramari_baseline_hz` and full metadata are never in the public
- *     projection. Only semitone + rounded hz may flow if `visibility_tier`
- *     is "shared".
+ *   - Optional. Missing baseline never blocks generation. The baseline
+ *     is sealed alongside identity but excluded from the canonical seed
+ *     string so two members with identical identity hash identically
+ *     regardless of whether one captured a hum.
+ *   - Refinement events are append-only history; they never alter seed,
+ *     scaffolding, or input_hash.
  */
 
 "use strict";
@@ -62,9 +66,9 @@ function isBhramariEnabled(override) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// SHA-256 — works in Node (require("crypto")) and the browser (SubtleCrypto
-// is async; provide a small synchronous JS fallback so the engine stays
-// deterministic and side-effect-free at call time).
+// SHA-256 — works in Node (require("crypto")) and the browser. Provides a
+// synchronous JS fallback so the engine stays deterministic and side-
+// effect-free at call time.
 // ─────────────────────────────────────────────────────────────────────────
 function sha256Hex(input) {
   const str = String(input);
@@ -80,8 +84,6 @@ function sha256Hex(input) {
   return sha256JS(str);
 }
 
-// Minimal synchronous SHA-256 in pure JS (Wikipedia pseudocode). Only used
-// when the Node crypto module isn't available (e.g. browser bridge).
 function sha256JS(ascii) {
   function rightRotate(n, x) { return (x >>> n) | (x << (32 - n)); }
   const K = new Uint32Array([
@@ -97,19 +99,15 @@ function sha256JS(ascii) {
   let H = new Uint32Array([
     0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19,
   ]);
-  // UTF-8 encode
   const utf8 = unescape(encodeURIComponent(ascii));
   const bytes = new Uint8Array(utf8.length + 1);
   for (let i = 0; i < utf8.length; i++) bytes[i] = utf8.charCodeAt(i);
   bytes[utf8.length] = 0x80;
-  // pad
   const bitLen = utf8.length * 8;
   const padLen = (Math.ceil((utf8.length + 9) / 64) * 64) - utf8.length - 1;
   const out = new Uint8Array(utf8.length + 1 + padLen + 8);
   out.set(bytes.subarray(0, utf8.length + 1));
-  // big-endian 64-bit length
   for (let i = 0; i < 4; i++) out[out.length - 5 - i] = (bitLen >>> (i * 8)) & 0xff;
-  // process blocks
   const W = new Uint32Array(64);
   for (let off = 0; off < out.length; off += 64) {
     for (let i = 0; i < 16; i++) {
@@ -140,7 +138,8 @@ function sha256JS(ascii) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Layer 1 — Digital root from birthdate (theosophical; preserves 11/22/33).
+// Reductions. `digitalRootKeepMaster` preserves 11/22/33 at every step;
+// `digitalRoot` always reduces to a single digit.
 // ─────────────────────────────────────────────────────────────────────────
 function digitalRootKeepMaster(n) {
   let x = Math.abs(Math.trunc(Number(n) || 0));
@@ -156,6 +155,9 @@ function digitalRoot(n) {
   return x;
 }
 
+// `birthRoot` retained as a helper for compatibility — pure digit sum of
+// the ISO date, master-preserving. Not the canonical Life Path; see
+// `lifePath()` below for the v1 canonical reduction.
 function birthRoot(isoDate) {
   if (!isoDate) return null;
   const digits = String(isoDate).replace(/\D/g, "");
@@ -164,21 +166,38 @@ function birthRoot(isoDate) {
   return { raw, reduced: digitalRootKeepMaster(raw) };
 }
 
+// Canonical Life Path. Reduce each component (day, month, year) — keeping
+// masters at the component step — then sum and reduce once more, again
+// keeping masters. Preserves the raw component sum on the return value.
+function lifePath(isoDate) {
+  if (!isoDate) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(isoDate));
+  if (!m) return null;
+  const year = parseInt(m[1], 10);
+  const month = parseInt(m[2], 10);
+  const day = parseInt(m[3], 10);
+  const rDay = digitalRootKeepMaster(day);
+  const rMonth = digitalRootKeepMaster(month);
+  const rYear = digitalRootKeepMaster(year);
+  const raw = rDay + rMonth + rYear;
+  return {
+    day: rDay,
+    month: rMonth,
+    year: rYear,
+    raw,
+    reduced: digitalRootKeepMaster(raw),
+  };
+}
+
 // ─────────────────────────────────────────────────────────────────────────
-// Layer 2 — Gematria. Pythagorean (A=1..9 cyclic) and Chaldean.
-// Soul Urge = vowels only; Personality = consonants only; Expression = all.
+// Pythagorean gematria. Expression/Soul Urge/Personality reduce to a
+// single digit — master numbers are *not* preserved here (the v1 canonical
+// seed uses single-digit name resonances; see implementation plan).
 // ─────────────────────────────────────────────────────────────────────────
 const PYTHAGOREAN = {
   A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,
   J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,
   S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8,
-};
-// Chaldean letter values (1-8; no 9). Y is a vowel only when between consonants
-// in classical Chaldean — for v1 simplicity Y is treated as consonant.
-const CHALDEAN = {
-  A:1,B:2,C:3,D:4,E:5,F:8,G:3,H:5,I:1,
-  J:1,K:2,L:3,M:4,N:5,O:7,P:8,Q:1,R:2,
-  S:3,T:4,U:6,V:6,W:6,X:5,Y:1,Z:7,
 };
 const VOWELS = new Set(["A","E","I","O","U"]);
 
@@ -189,32 +208,33 @@ function normaliseName(name) {
     .replace(/[^A-Z]/g, "");
 }
 
-function gematriaSum(name, table, filter) {
+function gematriaSumPyth(name, filter) {
   const cleaned = normaliseName(name);
   if (!cleaned) return null;
   let sum = 0;
   for (const ch of cleaned) {
     if (filter && !filter(ch)) continue;
-    const v = table[ch];
+    const v = PYTHAGOREAN[ch];
     if (v) sum += v;
   }
   if (sum === 0) return null;
-  return { raw: sum, reduced: digitalRootKeepMaster(sum) };
+  return { raw: sum, reduced: digitalRoot(sum) };
 }
 
 function nameResonance(legalName) {
   if (!legalName) return null;
-  const expression  = gematriaSum(legalName, PYTHAGOREAN);
-  const soulUrge    = gematriaSum(legalName, PYTHAGOREAN, ch => VOWELS.has(ch));
-  const personality = gematriaSum(legalName, PYTHAGOREAN, ch => !VOWELS.has(ch));
-  const chaldean    = gematriaSum(legalName, CHALDEAN);
-  return { expression, soul_urge: soulUrge, personality, chaldean };
+  return {
+    expression:  gematriaSumPyth(legalName),
+    soul_urge:   gematriaSumPyth(legalName, ch => VOWELS.has(ch)),
+    personality: gematriaSumPyth(legalName, ch => !VOWELS.has(ch)),
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Layer 3 — Gene Keys / I Ching primary gate from sealed Compass input.
-// `compass` shape matches existing PointData: { work, lens, field, call }
-// each with { gk_num, gk_line }. The "Work" gate is the v1 identity anchor.
+// Gene Keys / I Ching primary gate from sealed Compass input. `compass`
+// shape matches existing PointData: { work, lens, field, call } each with
+// { gk_num, gk_line }. The "Work" gate is the v1 identity anchor.
+// V1 uses static, original line labels (no copyrighted text).
 // ─────────────────────────────────────────────────────────────────────────
 const GK_LINE_NAMES = {
   work:  {1:"Creator", 2:"Dancer", 3:"Changer", 4:"Server", 5:"Fixer", 6:"Teacher"},
@@ -252,12 +272,34 @@ function gkLayer(compass) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Layer 4 — Temporal resonance.
-//   - day_of_week ordinal (0 = Sunday)
-//   - solar_quarter 0..3 from month (0: winter, 1: spring, 2: summer, 3: autumn)
-//   - lunar_phase 0..7 via simple mean-anomaly approximation
-//   - temporal_gate 0..11 (two-hour windows) if birth_time present, else null
+// Temporal resonance.
+//   - solar_quarter: 0 winter (Dec–Feb), 1 spring (Mar–May),
+//     2 summer (Jun–Aug), 3 autumn (Sep–Nov).
+//   - lunar_phase 0..7 via synodic-month approximation, baseline
+//     2000-01-06 (a known new moon), period 29.53059.
+//   - temporal_gate 0..11 (two-hour windows) if birth_time present.
 // ─────────────────────────────────────────────────────────────────────────
+function solarQuarterFromMonth(mo) {
+  // 0 winter Dec-Feb, 1 spring Mar-May, 2 summer Jun-Aug, 3 autumn Sep-Nov.
+  if (mo === 12 || mo === 1 || mo === 2) return 0;
+  if (mo >= 3 && mo <= 5) return 1;
+  if (mo >= 6 && mo <= 8) return 2;
+  return 3;
+}
+
+function lunarPhaseFromDate(y, mo, d) {
+  // Julian Day via Meeus simplification.
+  const Y = mo <= 2 ? y - 1 : y;
+  const M = mo <= 2 ? mo + 12 : mo;
+  const A = Math.floor(Y / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  const JD = Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M + 1)) + d + B - 1524.5;
+  const synodic = 29.53059;
+  const refJD = 2451550.1; // 2000-01-06 (known new moon)
+  let phase = ((JD - refJD) % synodic + synodic) % synodic;
+  return Math.floor((phase / synodic) * 8) % 8;
+}
+
 function temporalLayer(isoDate, hhmm) {
   if (!isoDate) return null;
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(isoDate));
@@ -266,17 +308,8 @@ function temporalLayer(isoDate, hhmm) {
   const dt = new Date(Date.UTC(y, mo - 1, d));
   if (Number.isNaN(dt.getTime())) return null;
   const dow = dt.getUTCDay();
-  const solar_quarter = Math.floor(((mo - 1) % 12) / 3); // 0..3
-  // Lunar phase: mean-synodic approximation. JD = Julian Day (Meeus simplified).
-  const Y = mo <= 2 ? y - 1 : y;
-  const M = mo <= 2 ? mo + 12 : mo;
-  const A = Math.floor(Y / 100);
-  const B = 2 - A + Math.floor(A / 4);
-  const JD = Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M + 1)) + d + B - 1524.5;
-  const synodic = 29.5305882;
-  const refJD = 2451550.1; // 2000-01-06 (known new moon)
-  let phase = ((JD - refJD) % synodic + synodic) % synodic;
-  const lunar_phase = Math.floor((phase / synodic) * 8) % 8;
+  const solar_quarter = solarQuarterFromMonth(mo);
+  const lunar_phase = lunarPhaseFromDate(y, mo, d);
   let temporal_gate = null;
   if (hhmm) {
     const t = /^(\d{1,2}):(\d{2})/.exec(String(hhmm));
@@ -289,9 +322,8 @@ function temporalLayer(isoDate, hhmm) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Bhramari helpers — Hz → nearest semitone label + octave-equivalent visible
-// hue. We octave-fold to the audible band and map onto the visible spectrum
-// (~380–740 nm) as a single accent hue. Used by the public projection.
+// Bhramari helpers — Hz → nearest semitone label + octave-equivalent
+// visible hue. Pure aesthetic mapping; intentional ≤ ~10% perceptual shift.
 // ─────────────────────────────────────────────────────────────────────────
 const NOTES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 
@@ -307,85 +339,163 @@ function hzToSemitone(hz) {
   };
 }
 
-// Octave-fold the hz up into the visible-light band (THz) and convert
-// to a hue degree. Pure aesthetic mapping; intentional ≤ ~10% perceptual
-// shift in the palette.
 function hzToVisibleHueDeg(hz) {
   if (!hz || hz <= 0) return null;
-  // Fold to one octave above 440 (i.e., 440..880).
   let f = hz;
   while (f < 440) f *= 2;
   while (f >= 880) f /= 2;
-  const t = (f - 440) / (880 - 440); // 0..1
-  // Hue spans 0..360 from red to violet.
+  const t = (f - 440) / (880 - 440);
   return Math.round(t * 360) % 360;
 }
 
-// Round Hz to 1 decimal place — what may flow to the shared tier.
 function roundHz(hz) {
   if (!hz || hz <= 0) return null;
   return Math.round(hz * 10) / 10;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Layer 5 — Seed string + SHA-256.
+// Canonical seed string.
+// Order is fixed (LP, EX, SU, PE, LUN, SOL, TG) so the byte sequence is
+// deterministic across engines. Missing components are omitted from the
+// string; the order of the remaining keys is preserved.
 // ─────────────────────────────────────────────────────────────────────────
+const CANONICAL_SEED_ORDER = ["LP", "EX", "SU", "PE", "LUN", "SOL", "TG", "BHR"];
+
 function canonicalSeedString(parts) {
-  return Object.keys(parts)
-    .sort()
+  return CANONICAL_SEED_ORDER
+    .filter(k => parts[k] != null)
     .map(k => `${k}:${parts[k]}`)
     .join("|");
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Layer 7 — Resonance palette. Returns OKLCH-style triples (h, s, l) as
-// CSS color strings so downstream renderers can use them directly without
-// adopting a colour library.
+// Hue from Life Path.
+// Master numbers map to their own hue family:
+//   11 → 36   22 → 72   33 → 108
+// Non-masters map to (lp × 40) mod 360 (so 1 → 40, 2 → 80, …, 9 → 0).
 // ─────────────────────────────────────────────────────────────────────────
-function buildPalette(root, lunarPhase, primaryGate, bhramariHueDeg) {
-  const safeRoot = Number.isFinite(root) ? root : 1;
-  const baseHue = (safeRoot * 40) % 360;
-  // ±15% sat from lunar phase (0..7)
+const MASTER_HUES = { 11: 36, 22: 72, 33: 108 };
+
+function lifePathHue(lp) {
+  if (lp == null) return 0;
+  if (MASTER_HUES[lp] != null) return MASTER_HUES[lp];
+  return (lp * 40) % 360;
+}
+
+function buildPalette(lp, lunarPhase, primaryGate, bhramariHueDeg) {
+  const baseHue = lifePathHue(lp);
   const lunar = Number.isFinite(lunarPhase) ? lunarPhase : 0;
-  const satMod = ((lunar - 3.5) / 3.5) * 0.15; // -0.15 .. +0.15
+  const satMod = ((lunar - 3.5) / 3.5) * 0.15; // ±0.15
   const sat = Math.max(0.25, Math.min(0.85, 0.55 + satMod));
   const lit = 0.5;
-  const primary = `oklch(${lit.toFixed(2)} ${(sat).toFixed(2)} ${baseHue})`;
-  const secondary = `oklch(${lit.toFixed(2)} ${(sat).toFixed(2)} ${(baseHue + 180) % 360})`;
-  // Tertiary derived from primary gate; static accent band.
+  const primary = `oklch(${lit.toFixed(2)} ${sat.toFixed(2)} ${baseHue})`;
+  const secondary = `oklch(${lit.toFixed(2)} ${sat.toFixed(2)} ${(baseHue + 180) % 360})`;
   const gateOffset = primaryGate ? (primaryGate * 7) % 360 : 30;
   const accent = `oklch(${lit.toFixed(2)} ${(sat * 0.9).toFixed(2)} ${(baseHue + gateOffset) % 360})`;
-  const palette = [primary, secondary, accent];
   const out = {
     primary_hue: baseHue,
     secondary_hue: (baseHue + 180) % 360,
-    palette,
+    palette: [primary, secondary, accent],
   };
-  // Bhramari accent: a single extra stop, intentionally subtle (≤ ~10% shift).
   if (Number.isFinite(bhramariHueDeg)) {
     const blended = Math.round(baseHue * 0.9 + bhramariHueDeg * 0.1) % 360;
-    out.palette_resonance_accent = `oklch(${lit.toFixed(2)} ${(sat).toFixed(2)} ${blended})`;
+    out.palette_resonance_accent = `oklch(${lit.toFixed(2)} ${sat.toFixed(2)} ${blended})`;
   }
   return out;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Deterministic sigil SVG. 512×512 viewBox, centre node, N outer nodes
+// arranged on a circle. The polygon traversal order is seeded from the
+// SHA-256 of the canonical seed string so the path is repeatable but not
+// trivially the canonical n-gon.
+// ─────────────────────────────────────────────────────────────────────────
+function buildSigilSvg(pointCount, seedHex, palette) {
+  const N = pointCount === 11 ? 11 : 9;
+  const cx = 256, cy = 256, r = 200;
+  const points = [];
+  for (let i = 0; i < N; i++) {
+    const a = (Math.PI * 2 * i) / N - Math.PI / 2;
+    points.push({
+      x: +(cx + r * Math.cos(a)).toFixed(3),
+      y: +(cy + r * Math.sin(a)).toFixed(3),
+    });
+  }
+  // Stable traversal: walk by a stride taken from the seed hex bytes.
+  // Stride is coprime-ish with N to ensure a complete cycle.
+  const seedNum = parseInt((seedHex || "0").slice(0, 8), 16) || 1;
+  let stride = (seedNum % (N - 2)) + 2; // 2..N-1
+  // Ensure gcd(stride, N) === 1 — bump until it does.
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  while (gcd(stride, N) !== 1) stride = (stride % (N - 1)) + 1;
+  const order = [];
+  let cur = 0;
+  for (let i = 0; i < N; i++) { order.push(cur); cur = (cur + stride) % N; }
+  const pathD = order.map((idx, i) => {
+    const p = points[idx];
+    return (i === 0 ? "M" : "L") + p.x + "," + p.y;
+  }).join(" ") + " Z";
+  const primary = (palette && palette.palette && palette.palette[0]) || "oklch(0.5 0.55 200)";
+  const accent  = (palette && palette.palette && palette.palette[2]) || primary;
+  let nodes = "";
+  for (const p of points) {
+    nodes += `<circle cx="${p.x}" cy="${p.y}" r="6" fill="${accent}"/>`;
+  }
+  nodes += `<circle cx="${cx}" cy="${cy}" r="10" fill="${primary}"/>`;
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">` +
+    `<path d="${pathD}" fill="none" stroke="${primary}" stroke-width="2" stroke-linejoin="round"/>` +
+    nodes +
+    `</svg>`
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Compass-sealed input hash. SHA-256 of the canonical JSON projection of
+// the identity-only fields (Bhramari excluded). Stable across engines.
+// ─────────────────────────────────────────────────────────────────────────
+function canonicalInputJson(input) {
+  const bp = input.birth_place || {};
+  const obj = {
+    birth_date: input.birth_date || null,
+    birth_time: input.birth_time || null,
+    birth_place: bp ? {
+      lat: bp.lat != null ? +bp.lat : null,
+      lng: bp.lng != null ? +bp.lng : null,
+      city: bp.city || null,
+      country: bp.country || null,
+    } : null,
+    legal_name: input.legal_name ? String(input.legal_name).normalize("NFC") : null,
+    preferred_name: input.preferred_name ? String(input.preferred_name).normalize("NFC") : null,
+  };
+  // Stable JSON: sorted keys at each level.
+  function stable(v) {
+    if (Array.isArray(v)) return "[" + v.map(stable).join(",") + "]";
+    if (v && typeof v === "object") {
+      const keys = Object.keys(v).sort();
+      return "{" + keys.map(k => JSON.stringify(k) + ":" + stable(v[k])).join(",") + "}";
+    }
+    return JSON.stringify(v == null ? null : v);
+  }
+  return stable(obj);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Public — `generate(input)`.
-// Input shape (all but birth_date optional in fallback mode):
+// Input shape (only birth_date is required for canonical generation):
 //   {
-//     birth_date:  "YYYY-MM-DD",
-//     birth_time:  "HH:MM" | null,
-//     birth_place: { lat, lng, city, country } | null,
-//     legal_name:  string,
+//     birth_date:     "YYYY-MM-DD",
+//     birth_time:     "HH:MM" | null,
+//     birth_place:    { lat, lng, city, country } | null,
+//     legal_name:     string,
 //     preferred_name: string | null,
 //     compass: { work, lens, field, call } each { gk_num, gk_line },
 //     human_design: { type, authority, profile, definition } | null,
 //     seed_syllable: string | null,
 //     bhramari_baseline: { hz, metadata } | null,
 //   }
-//
-// Returns the *private/internal* record (full metadata). Wrap with
-// `toPublicProjection` before exposing to cOMmons / Field.
+// Returns the *private/internal* record. Wrap with `toPublicProjection`
+// before exposing to cOMmons / Field.
 // ─────────────────────────────────────────────────────────────────────────
 function generate(input, options) {
   const opts = options || {};
@@ -396,29 +506,24 @@ function generate(input, options) {
     return { pending: true, reason: "missing_birth_date" };
   }
 
-  const birth = birthRoot(input.birth_date);
+  const lp = lifePath(input.birth_date);
   const name = nameResonance(input.legal_name || input.preferred_name);
   const gk = gkLayer(input.compass);
   const temporal = temporalLayer(input.birth_date, input.birth_time || null);
   const primaryGate = gk && gk.work ? gk.work.gate : (gk && gk.lens && gk.lens.gate) || null;
 
-  // Bhramari handling — optional, capture-flag-aware. If the capture-flag
-  // is off, ignore any inbound baseline (treats data as if it weren't there
-  // for v1 generation; persistence at the storage layer is its own concern).
   const bhramariOn = isBhramariEnabled(opts.bhramariFlag);
   const baselineHz =
     (bhramariOn && input.bhramari_baseline && Number(input.bhramari_baseline.hz)) || null;
   const baselineMetadata =
     (bhramariOn && input.bhramari_baseline && input.bhramari_baseline.metadata) || null;
 
-  // Layer 5 — canonical seed string. Ordered alphabetically for stability;
-  // omit BHR entirely if no baseline (per spec).
+  // Canonical seed string parts.
   const seedParts = {};
-  if (birth) seedParts.BR = birth.reduced;
+  if (lp) seedParts.LP = lp.reduced;
   if (name && name.expression) seedParts.EX = name.expression.reduced;
   if (name && name.soul_urge) seedParts.SU = name.soul_urge.reduced;
   if (name && name.personality) seedParts.PE = name.personality.reduced;
-  if (gk && gk.work) seedParts.GK = `${gk.work.gate}.${gk.work.line || 0}`;
   if (temporal) {
     seedParts.LUN = temporal.lunar_phase;
     seedParts.SOL = temporal.solar_quarter;
@@ -429,34 +534,58 @@ function generate(input, options) {
   const canonical = canonicalSeedString(seedParts);
   const seed = sha256Hex(canonical);
 
-  // Input hash — identity fields only (Bhramari excluded so identical
-  // identity records hash identically regardless of capture status).
-  const identityCanonical = canonicalSeedString(
-    Object.keys(seedParts).reduce((acc, k) => {
-      if (k !== "BHR") acc[k] = seedParts[k];
-      return acc;
-    }, {})
-  );
-  const input_hash = sha256Hex(identityCanonical);
+  // Identity-only seed (BHR excluded) — same canonical key order.
+  const identityParts = Object.assign({}, seedParts);
+  delete identityParts.BHR;
+  const identityCanonical = canonicalSeedString(identityParts);
+  const seed_identity = sha256Hex(identityCanonical);
 
-  // Palette (Layer 7).
+  // Compass-sealed input hash — SHA-256 of canonical JSON projection of
+  // the sealed inputs (identity layer). Distinct from the seed; the seed
+  // captures derived numerology, the input_hash captures the raw bundle.
+  const input_hash = sha256Hex(canonicalInputJson(input));
+
+  // Palette.
   const bhramariHueDeg = baselineHz ? hzToVisibleHueDeg(baselineHz) : null;
   const palette = buildPalette(
-    birth && birth.reduced,
+    lp && lp.reduced,
     temporal && temporal.lunar_phase,
     primaryGate,
     bhramariHueDeg
   );
 
-  // Sigil scaffold count — identity-bound (does *not* shift with refinement).
+  // Sigil scaffold.
   const sigil_points = input.birth_time ? 11 : 9;
+  const sigil_svg = buildSigilSvg(sigil_points, seed, palette);
 
+  // Metadata — descriptive labels for downstream display.
   const metadata = {
-    digital_root: birth ? { value: birth.reduced, raw: birth.raw } : null,
-    expression: name && name.expression ? { value: name.expression.reduced } : null,
-    soul_urge: name && name.soul_urge ? { value: name.soul_urge.reduced } : null,
-    personality: name && name.personality ? { value: name.personality.reduced } : null,
-    chaldean: name && name.chaldean ? { value: name.chaldean.reduced } : null,
+    life_path: lp ? {
+      value: lp.reduced,
+      raw: lp.raw,
+      day: lp.day, month: lp.month, year: lp.year,
+      is_master: lp.reduced === 11 || lp.reduced === 22 || lp.reduced === 33,
+      label: NUMEROLOGY_LABELS[lp.reduced] || null,
+    } : null,
+    // Back-compat alias: `digital_root` mirrors the Life Path for the
+    // small set of pre-existing consumers (studio bridge, badge). New
+    // code should read `life_path` directly.
+    digital_root: lp ? { value: lp.reduced, raw: lp.raw } : null,
+    expression: name && name.expression ? {
+      value: name.expression.reduced,
+      raw: name.expression.raw,
+      label: NUMEROLOGY_LABELS[name.expression.reduced] || null,
+    } : null,
+    soul_urge: name && name.soul_urge ? {
+      value: name.soul_urge.reduced,
+      raw: name.soul_urge.raw,
+      label: NUMEROLOGY_LABELS[name.soul_urge.reduced] || null,
+    } : null,
+    personality: name && name.personality ? {
+      value: name.personality.reduced,
+      raw: name.personality.raw,
+      label: NUMEROLOGY_LABELS[name.personality.reduced] || null,
+    } : null,
     gk_primary: gk && gk.work ? gk.work : null,
     gk_all: gk || null,
     hd_type: input.human_design && input.human_design.type || null,
@@ -464,13 +593,26 @@ function generate(input, options) {
     hd_profile: input.human_design && input.human_design.profile || null,
     hd_definition: input.human_design && input.human_design.definition || null,
     seed_syllable: input.seed_syllable || null,
-    lunar_phase: temporal ? { value: temporal.lunar_phase } : null,
-    solar_quarter: temporal ? { value: temporal.solar_quarter } : null,
-    temporal_gate: temporal ? { value: temporal.temporal_gate } : null,
+    lunar_phase: temporal ? {
+      value: temporal.lunar_phase,
+      label: LUNAR_PHASE_LABELS[temporal.lunar_phase] || null,
+    } : null,
+    solar_quarter: temporal ? {
+      value: temporal.solar_quarter,
+      label: SOLAR_QUARTER_LABELS[temporal.solar_quarter] || null,
+    } : null,
+    temporal_gate: temporal ? {
+      value: temporal.temporal_gate,
+      label: temporal.temporal_gate != null
+        ? `Two-hour window ${temporal.temporal_gate} (${String(temporal.temporal_gate * 2).padStart(2,"0")}:00–${String(temporal.temporal_gate * 2 + 2).padStart(2,"0")}:00 UTC)`
+        : null,
+    } : null,
+    seed_string: canonical,
     palette_rationale:
-      `Hue ${palette.primary_hue}° from root ${birth ? birth.reduced : "-"}; ` +
-      (primaryGate ? `gate ${primaryGate} accent band; ` : "") +
-      (temporal ? `lunar phase ${temporal.lunar_phase}` : "") +
+      `Hue ${palette.primary_hue}° from Life Path ${lp ? lp.reduced : "-"}; ` +
+      `lunar phase ${temporal ? temporal.lunar_phase : "-"} modulates saturation; ` +
+      `secondary ${palette.secondary_hue}° is the complement` +
+      (primaryGate ? `; gate ${primaryGate} sets accent offset` : "") +
       (bhramariHueDeg != null ? `; Bhramari accent at ${bhramariHueDeg}°` : ""),
     sigil_points,
     seed_hash: seed.slice(0, 16) + "..." + seed.slice(-4),
@@ -487,9 +629,7 @@ function generate(input, options) {
         ? baselineMetadata.stability : null,
       confidence: baselineMetadata && baselineMetadata.confidence != null
         ? baselineMetadata.confidence : null,
-      note:
-        "Optional measured resonance. Refinement history available via " +
-        "/resonance-events.",
+      note: "Optional measured resonance. Refinement history via /resonance-events.",
     };
   }
 
@@ -498,11 +638,12 @@ function generate(input, options) {
     pending: false,
     generated_at: opts.now || new Date().toISOString(),
     seed,
+    seed_string: canonical,
+    seed_identity,
     input_hash,
     palette,
+    sigil_svg,
     metadata,
-    // Sealed inputs — full bundle preserved for the private API tier. Never
-    // include this in any public projection.
     sealed_inputs: {
       birth_date: input.birth_date,
       birth_time: input.birth_time || null,
@@ -521,9 +662,8 @@ function generate(input, options) {
 
 // ─────────────────────────────────────────────────────────────────────────
 // Public projection — strips private fields. Two tiers:
-//   - "badge"   → only safe glyph + palette + primary GK label
-//   - "shared"  → adds semitone-level Bhramari (no raw hz/metadata)
-// Anything richer remains private and stays on the originating record.
+//   "badge"  → safe glyph + palette + primary GK label
+//   "shared" → adds semitone-level Bhramari (no raw hz/metadata)
 // ─────────────────────────────────────────────────────────────────────────
 function toPublicProjection(record, tier) {
   if (!record || record.pending) return null;
@@ -536,13 +676,14 @@ function toPublicProjection(record, tier) {
       ? `Gate ${meta.gk_primary.gate}${meta.gk_primary.line ? "." + meta.gk_primary.line : ""}` +
         (meta.gk_primary.label ? ` · ${meta.gk_primary.label}` : "")
       : null,
-    digital_root_label: meta.digital_root ? meta.digital_root.value : null,
+    life_path_label: meta.life_path ? meta.life_path.value : null,
+    // Back-compat: digital_root_label mirrors life_path for old consumers.
+    digital_root_label: meta.life_path ? meta.life_path.value : null,
     sigil_points: meta.sigil_points || 9,
   };
   if (t === "shared") {
     if (meta.bhramari && meta.bhramari.nearest_semitone) {
       out.bhramari_semitone = meta.bhramari.nearest_semitone;
-      // Rounded hz is permissible in the shared tier; raw precision stays private.
       out.bhramari_hz_rounded = roundHz(record.bhramari_baseline_hz);
     }
     if (meta.lunar_phase) out.lunar_phase = meta.lunar_phase.value;
@@ -551,17 +692,14 @@ function toPublicProjection(record, tier) {
   return out;
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// Append-only resonance event helper. Pure function — the caller persists
-// the returned row. Never alters `record`.
-// ─────────────────────────────────────────────────────────────────────────
+// Append-only resonance event — pure helper; caller persists.
 function appendResonanceEvent(record, capture, options) {
   const opts = options || {};
   if (!capture || !Number(capture.hz)) {
     throw new Error("resonance event requires hz");
   }
   return {
-    id: opts.id || null, // caller assigns UUID
+    id: opts.id || null,
     member_id: (record && record.member_id) || null,
     captured_at: (capture.metadata && capture.metadata.captured_at) ||
                  opts.now || new Date().toISOString(),
@@ -573,15 +711,52 @@ function appendResonanceEvent(record, capture, options) {
   };
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Static descriptive labels. Short, original phrasing — no copyrighted text.
+// ─────────────────────────────────────────────────────────────────────────
+const NUMEROLOGY_LABELS = {
+  1:  "Initiator — independence, beginnings",
+  2:  "Mediator — partnership, balance",
+  3:  "Expresser — creativity, communication",
+  4:  "Builder — structure, foundation",
+  5:  "Voyager — change, freedom",
+  6:  "Nurturer — service, harmony",
+  7:  "Seeker — introspection, study",
+  8:  "Manifestor — power, mastery",
+  9:  "Completer — release, compassion",
+  11: "Illuminator — intuition, vision",
+  22: "Master Builder — material vision realized",
+  33: "Master Teacher — devotion, healing",
+};
+
+const LUNAR_PHASE_LABELS = {
+  0: "New Moon — seed",
+  1: "Waxing Crescent — intention",
+  2: "First Quarter — decision",
+  3: "Waxing Gibbous — refine",
+  4: "Full Moon — illumination",
+  5: "Waning Gibbous — share",
+  6: "Last Quarter — release",
+  7: "Waning Crescent — rest",
+};
+
+const SOLAR_QUARTER_LABELS = {
+  0: "Winter — incubation",
+  1: "Spring — emergence",
+  2: "Summer — fullness",
+  3: "Autumn — harvest",
+};
+
 const _exports = {
   // entry points
   generate,
   toPublicProjection,
   appendResonanceEvent,
-  // flag check (exported so HTTP layers can short-circuit)
+  // flag checks
   isEnabled,
   isBhramariEnabled,
-  // helpers (exported so tests + the future Tuner layer can reuse them)
+  // helpers (exported for tests + downstream layers)
+  lifePath,
   birthRoot,
   nameResonance,
   gkLayer,
@@ -592,16 +767,18 @@ const _exports = {
   digitalRoot,
   digitalRootKeepMaster,
   sha256Hex,
+  lifePathHue,
+  canonicalSeedString,
+  // labels — public so the studio adapter can render without re-encoding.
+  NUMEROLOGY_LABELS,
+  LUNAR_PHASE_LABELS,
+  SOLAR_QUARTER_LABELS,
+  GK_LINE_NAMES,
 };
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = _exports;
 }
 if (typeof window !== "undefined") {
-  // Browser bridge — same surface as require("sdk/om_cipher.js").
-  // Studio reads window.cuOmCipher (mirrors the existing window.cuSigil
-  // pattern). Feature-flag check still applies; the bridge does not
-  // imply the cipher is enabled. Set window.CU_OM_CIPHER_ENABLED = true
-  // to enable in-browser generation for preview/testing.
   window.cuOmCipher = _exports;
 }

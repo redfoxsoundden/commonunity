@@ -1,0 +1,16 @@
+{
+  "source": "Internal — Om Cipher v1",
+  "note": "Solar season quarter derived from birth month. Northern-hemisphere conventional naming.",
+  "by_month": {
+    "12": 0, "1": 0, "2": 0,
+    "3": 1, "4": 1, "5": 1,
+    "6": 2, "7": 2, "8": 2,
+    "9": 3, "10": 3, "11": 3
+  },
+  "quarters": {
+    "0": { "name": "Winter", "keynote": "incubation" },
+    "1": { "name": "Spring", "keynote": "emergence" },
+    "2": { "name": "Summer", "keynote": "fullness" },
+    "3": { "name": "Autumn", "keynote": "harvest" }
+  }
+}

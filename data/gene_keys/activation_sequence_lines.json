@@ -1,0 +1,39 @@
+{
+  "source": "Internal — Om Cipher v1",
+  "note": "Original, short line descriptions for the four Activation Sequence spheres (Work, Lens, Field, Call) × six lines. No copyrighted text. The engine does not compute Gene Keys; these labels are surfaced when Compass supplies a pre-resolved gate/line.",
+  "spheres": ["work", "lens", "field", "call"],
+  "lines": {
+    "work": {
+      "1": { "name": "Creator",  "keynote": "originates the form" },
+      "2": { "name": "Dancer",   "keynote": "moves with the field" },
+      "3": { "name": "Changer",  "keynote": "experiments and revises" },
+      "4": { "name": "Server",   "keynote": "carries the work to others" },
+      "5": { "name": "Fixer",    "keynote": "meets the problem head-on" },
+      "6": { "name": "Teacher",  "keynote": "embodies and transmits" }
+    },
+    "lens": {
+      "1": { "name": "Solitude",     "keynote": "clarity through inward focus" },
+      "2": { "name": "Marriage",     "keynote": "clarity through close pairing" },
+      "3": { "name": "Interaction",  "keynote": "clarity through varied contact" },
+      "4": { "name": "Friendship",   "keynote": "clarity through chosen circle" },
+      "5": { "name": "Impact",       "keynote": "clarity through wider reach" },
+      "6": { "name": "Nurture",      "keynote": "clarity through care of others" }
+    },
+    "field": {
+      "1": { "name": "Self & Empowerment",       "keynote": "grounding in own sovereignty" },
+      "2": { "name": "Passion & Relationships",  "keynote": "vitality through bond" },
+      "3": { "name": "Energy & Experience",      "keynote": "vitality through experimentation" },
+      "4": { "name": "Love & Community",         "keynote": "vitality through belonging" },
+      "5": { "name": "Power & Projection",       "keynote": "vitality through wider influence" },
+      "6": { "name": "Education & Surrender",    "keynote": "vitality through learning and yielding" }
+    },
+    "call": {
+      "1": { "name": "Physicality", "keynote": "answer through body" },
+      "2": { "name": "Posture",     "keynote": "answer through stance" },
+      "3": { "name": "Movement",    "keynote": "answer through motion" },
+      "4": { "name": "Breath",      "keynote": "answer through breath" },
+      "5": { "name": "Voice",       "keynote": "answer through sound" },
+      "6": { "name": "Intent",      "keynote": "answer through will" }
+    }
+  }
+}
