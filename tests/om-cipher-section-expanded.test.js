@@ -54,34 +54,41 @@ console.log('\nreserved hero surfaces (cipher name, mantra, field pattern)');
 ok('cipher name surface present',                      /data-cu-om-cipher-name\b/.test(src));
 ok('cipher name placeholder "Awaiting Compass seal"',  /Awaiting Compass seal/.test(src));
 ok('mantra surface present',                           /data-cu-om-cipher-mantra\b/.test(src));
-ok('mantra placeholder "Not generated yet"',           /Not generated yet/.test(src));
+ok('mantra placeholder explains Layer-6/Living-Profile split',
+   /Living Profile/.test(src) && /personal mantra/i.test(src));
 ok('field pattern surface present',                    /data-cu-om-cipher-field-pattern\b/.test(src));
 ok('field pattern placeholder "Pending source data"',  /Pending source data/.test(src));
 ok('"Your Field Pattern" eyebrow still rendered',      /Your Field Pattern/.test(src));
 ok('"Cipher Name" eyebrow rendered',                   />\s*Cipher Name\s*</.test(src));
-ok('"Personal Mantra" eyebrow rendered',               />\s*Personal Mantra\s*</.test(src));
+ok('"Om Cipher Mantra" eyebrow rendered (Layer 6 — not "Personal Mantra")',
+   />\s*Om Cipher Mantra\s*</.test(src) && !/>Personal Mantra</.test(src));
 
 console.log('\nnarrative + contemplation cards');
 ok('narrative card present',                           /data-cu-om-cipher-narrative-card/.test(src));
 ok('narrative copy hook present',                      /data-cu-om-cipher-narrative\b/.test(src));
-ok('"Personal Story" eyebrow rendered',                />\s*Personal Story\s*</.test(src));
+ok('"Cipher Story Seed · Archetypal Pattern" eyebrow rendered (not "Personal Story")',
+   /Cipher Story Seed/.test(src) && /Archetypal Pattern/.test(src) && !/>Personal Story</.test(src));
 ok('contemplation card present',                       /data-cu-om-cipher-contemplation-card/.test(src));
 ok('contemplation copy hook present',                  /data-cu-om-cipher-contemplation\b/.test(src));
-ok('"Contemplation" eyebrow rendered',                 />\s*Contemplation\s*</.test(src));
+ok('"Cipher Contemplation" eyebrow rendered (Layer 6, not generic "Contemplation")',
+   />\s*Cipher Contemplation\s*</.test(src));
 
 console.log('\ngematria source-pattern grid');
 ['life_path','expression','soul_urge','personality','lunar_phase','solar_quarter','temporal_gate'].forEach(function (k) {
   ok('gematria slot present: ' + k,
      new RegExp('data-cu-om-cipher-gematria="' + k + '"').test(src));
 });
-ok('"Source pattern" block title uses gematria sub-label',
-   /Source pattern[^<]*<span[^>]*>·\s*gematria/.test(src));
-ok('no user-facing "numerology" copy in studio.html',  !/\bnumerology\b/i.test(src));
+ok('"Source pattern · Pythagorean numerology" block label (Rev 3)',
+   /Source pattern[^<]*<span[^>]*>·\s*Pythagorean numerology/.test(src));
+ok('no user-facing "Source pattern · gematria" label remains',
+   !/Source pattern[^<]*<span[^>]*>·\s*gematria/i.test(src));
 
 console.log('\nactivation sequence + Bhramari surfaces');
-ok('activation sequence surface present',              /data-cu-om-cipher-activation\b/.test(src));
-ok('"Activation Sequence" header present',             /Activation Sequence/.test(src));
-ok('Gene Keys context label present',                  /·\s*Gene Keys/.test(src));
+ok('activation sequence surface present (hidden hook — Rev 8 dedup)',
+   /data-cu-om-cipher-activation\b/.test(src));
+// Rev 8: the visible activation lives beside the sigil; the below-sigil
+// space now carries the Cipher Seal block instead of a duplicate label.
+ok('Cipher seal block header present',                 /Cipher seal/.test(src));
 ok('Bhramari surface present',                         /data-cu-om-cipher-bhramari\b/.test(src));
 ok('"Bhramari resonance" header present',              /Bhramari resonance/.test(src));
 
@@ -101,17 +108,18 @@ ok('renderer paints seed (first 8 + last 4) into seal',
    /rec\.seed[\s\S]*\.slice\(0,\s*8\)/.test(src));
 
 console.log('\nsealed inputs (foundation) grid preserved');
-ok('"Sealed inputs" block label present',              /Sealed inputs/.test(src));
+ok('"Cipher Foundation" block label present (Rev 5: renamed from "Sealed inputs · editable")',
+   /Cipher Foundation/.test(src));
 ok('lp-foundation-grid still rendered for source data',
    /lp-foundation-grid oc-foundation-grid/.test(src));
 ok('foundation items keep data-lp-edit click-to-edit',
    /data-lp-edit="foundation"/.test(src));
 
-console.log('\nno hallucinated mantra');
-ok('mantra renderer reads sealed seed_syllable, not hardcoded text',
+console.log('\nLayer 6 — deterministic mantra mirror');
+ok('renderer reads Layer-6 om_cipher_mantra from engine metadata',
+   /om_cipher_mantra/.test(src));
+ok('renderer keeps seed_syllable as fallback path',
    /sealed_inputs[\s\S]*seed_syllable/.test(src));
-ok('renderer surfaces user-configured personal_mantra when set',
-   /personal_mantra/.test(src));
 
 console.log('\nflag gating (?om_cipher=1 query param init still in place)');
 ok('?om_cipher=1 flag init still present',             /\[\?&\]om_cipher=1/.test(src));

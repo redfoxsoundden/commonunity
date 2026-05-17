@@ -1,0 +1,20 @@
+{
+  "source": "Internal — Om Cipher v1",
+  "note": "Eight short, original contemplative phrases — one per lunar phase. Read-only mirror surfaced in the Om Cipher panel. Living Profile is where evolving personal contemplation lives.",
+  "phases": {
+    "0": "I plant what I cannot yet see.",
+    "1": "I tend what has not yet grown.",
+    "2": "I act before certainty arrives.",
+    "3": "I refine as I go.",
+    "4": "I stand in the light of what I built.",
+    "5": "I share what I have learned.",
+    "6": "I do less now, and allow more.",
+    "7": "I release what no longer serves the whole."
+  },
+  "solar_modifier": {
+    "0": "Winter holds the silence.",
+    "1": "Spring quickens the seed.",
+    "2": "Summer ripens the form.",
+    "3": "Autumn loosens the grip."
+  }
+}

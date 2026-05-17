@@ -375,12 +375,14 @@ def _build_sigil_svg(point_count: int, seed_hex: str, palette: dict) -> str:
     for i in range(n):
         a = (math.pi * 2 * i) / n - math.pi / 2
         points.append((round(cx + r * math.cos(a), 3), round(cy + r * math.sin(a), 3)))
-    seed_num = int(seed_hex[:8], 16) if seed_hex else 1
-    stride = (seed_num % (n - 2)) + 2
+
     def _gcd(a, b):
         while b:
             a, b = b, a % b
         return a
+
+    seed_num = int(seed_hex[:8], 16) if seed_hex else 1
+    stride = (seed_num % (n - 2)) + 2
     while _gcd(stride, n) != 1:
         stride = (stride % (n - 1)) + 1
     order = []
@@ -388,24 +390,56 @@ def _build_sigil_svg(point_count: int, seed_hex: str, palette: dict) -> str:
     for _ in range(n):
         order.append(cur)
         cur = (cur + stride) % n
-    path_d_parts = []
-    for i, idx in enumerate(order):
-        p = points[idx]
-        path_d_parts.append(("M" if i == 0 else "L") + str(p[0]) + "," + str(p[1]))
-    path_d = " ".join(path_d_parts) + " Z"
-    primary = (palette or {}).get("palette", ["oklch(0.5 0.55 200)"])[0]
-    pal = (palette or {}).get("palette") or []
-    accent = pal[2] if len(pal) > 2 else primary
-    nodes = "".join(
-        f'<circle cx="{p[0]}" cy="{p[1]}" r="6" fill="{accent}"/>' for p in points
+
+    seed_num2 = int(seed_hex[8:16], 16) if seed_hex and len(seed_hex) >= 16 else 3
+    stride2 = (seed_num2 % (n - 2)) + 2
+    if stride2 == stride:
+        stride2 = (stride2 % (n - 1)) + 1
+    while _gcd(stride2, n) != 1 or stride2 == stride:
+        stride2 = (stride2 % (n - 1)) + 1
+    order2 = []
+    cur = 0
+    for _ in range(n):
+        order2.append(cur)
+        cur = (cur + stride2) % n
+
+    def _path(o):
+        parts = []
+        for i, idx in enumerate(o):
+            p = points[idx]
+            parts.append(("M" if i == 0 else "L") + str(p[0]) + "," + str(p[1]))
+        return " ".join(parts) + " Z"
+
+    star_d = _path(order)
+    inner_d = _path(order2)
+    primary = (palette or {}).get("palette", ["oklch(0.55 0.18 72)"])[0]
+
+    frame = (
+        f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" '
+        f'stroke="{primary}" stroke-width="1" opacity="0.45"/>'
     )
-    nodes += f'<circle cx="{cx}" cy="{cy}" r="10" fill="{primary}"/>'
+    inner_path = (
+        f'<path d="{inner_d}" fill="none" stroke="{primary}" '
+        f'stroke-width="1.25" stroke-linejoin="round" stroke-linecap="round" opacity="0.55"/>'
+    )
+    star_path = (
+        f'<path d="{star_d}" fill="none" stroke="{primary}" '
+        f'stroke-width="2.25" stroke-linejoin="round" stroke-linecap="round"/>'
+    )
+    center = f'<circle cx="{cx}" cy="{cy}" r="6" fill="{primary}"/>'
+    filter_def = (
+        '<defs><filter id="cu-sigil-glow" x="-20%" y="-20%" width="140%" height="140%">'
+        '<feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>'
+        '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>'
+        '</filter></defs>'
+    )
     return (
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" '
-        'width="512" height="512">'
-        f'<path d="{path_d}" fill="none" stroke="{primary}" '
-        'stroke-width="2" stroke-linejoin="round"/>'
-        f'{nodes}</svg>'
+        'width="512" height="512" class="cu-om-cipher-sigil-svg">'
+        + filter_def
+        + '<g filter="url(#cu-sigil-glow)">'
+        + frame + inner_path + star_path + center
+        + '</g></svg>'
     )
 
 
@@ -443,6 +477,91 @@ SOLAR_QUARTER_LABELS = {
     2: "Summer — fullness",
     3: "Autumn — harvest",
 }
+
+
+# ── Layer 6 — Contemplative outputs ─────────────────────────────────────
+
+def _load_layer6_assets() -> dict:
+    base = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "data", "om_cipher")
+    out = {"MANTRA_TABLE": None, "ARCHETYPAL_STORIES": None, "CONTEMPLATIONS": None}
+    for key, fname in (
+        ("MANTRA_TABLE", "mantra_table.json"),
+        ("ARCHETYPAL_STORIES", "archetypal_stories.json"),
+        ("CONTEMPLATIONS", "contemplations.json"),
+    ):
+        path = os.path.join(base, fname)
+        try:
+            with open(path, encoding="utf-8") as f:
+                out[key] = json.load(f)
+        except (OSError, ValueError):
+            out[key] = None
+    return out
+
+
+_LAYER6 = _load_layer6_assets()
+
+
+def om_cipher_mantra(life_path_value: Optional[int],
+                     expression_value: Optional[int],
+                     lunar_phase_value: Optional[int]) -> Optional[dict]:
+    table = _LAYER6.get("MANTRA_TABLE")
+    if not table or not table.get("entries"):
+        return None
+    lp = life_path_value or 0
+    ex = expression_value or 0
+    lun = lunar_phase_value or 0
+    size = table.get("size") or len(table["entries"])
+    idx = ((lp + ex + lun) % size + size) % size
+    entry = table["entries"][idx]
+    return {
+        "index": idx,
+        "mantra": entry.get("mantra"),
+        "keynote": entry.get("keynote"),
+    }
+
+
+def archetypal_story_seed(expression_value: Optional[int],
+                          soul_urge_value: Optional[int],
+                          personality_value: Optional[int]) -> Optional[dict]:
+    data = _LAYER6.get("ARCHETYPAL_STORIES")
+    if not data or "fragments" not in data:
+        return None
+    frags = data["fragments"]
+
+    def pick(slot: str, val: Optional[int]) -> Optional[str]:
+        if val is None:
+            return None
+        return (frags.get(slot) or {}).get(str(val))
+
+    ex = pick("expression", expression_value)
+    su = pick("soul_urge", soul_urge_value)
+    pe = pick("personality", personality_value)
+    bits = [b for b in (ex, su, pe) if b]
+    if not bits:
+        return None
+    return {
+        "seed": " ".join(bits),
+        "expression_fragment": ex,
+        "soul_urge_fragment": su,
+        "personality_fragment": pe,
+    }
+
+
+def cipher_contemplation(lunar_phase_value: Optional[int],
+                         solar_quarter_value: Optional[int]) -> Optional[dict]:
+    data = _LAYER6.get("CONTEMPLATIONS")
+    if not data or "phases" not in data:
+        return None
+    phase = (data.get("phases") or {}).get(str(lunar_phase_value))
+    if not phase:
+        return None
+    solar = (data.get("solar_modifier") or {}).get(str(solar_quarter_value))
+    return {
+        "phrase": phase,
+        "solar_modifier": solar,
+        "combined": (phase + " " + solar) if solar else phase,
+    }
 
 
 # ── Entry points ────────────────────────────────────────────────────────
@@ -560,10 +679,23 @@ def generate(payload: dict, *, feature_flag: Optional[bool] = None,
             "value": temporal["temporal_gate"],
             "label": (
                 f"Two-hour window {temporal['temporal_gate']} "
-                f"({temporal['temporal_gate']*2:02d}:00–{temporal['temporal_gate']*2+2:02d}:00 UTC)"
+                f"({temporal['temporal_gate']*2:02d}:00–{temporal['temporal_gate']*2+2:02d}:00 local birth time)"
             ) if temporal["temporal_gate"] is not None else None,
         }) if temporal else None,
         "seed_string": canonical,
+        "om_cipher_mantra": om_cipher_mantra(
+            lp["reduced"] if lp else None,
+            name["expression"]["reduced"] if (name and name.get("expression")) else 0,
+            temporal["lunar_phase"] if temporal else 0,
+        ),
+        "archetypal_story_seed": archetypal_story_seed(
+            name["expression"]["reduced"] if (name and name.get("expression")) else None,
+            name["soul_urge"]["reduced"] if (name and name.get("soul_urge")) else None,
+            name["personality"]["reduced"] if (name and name.get("personality")) else None,
+        ) if name else None,
+        "cipher_contemplation": cipher_contemplation(
+            temporal["lunar_phase"], temporal["solar_quarter"]
+        ) if temporal else None,
         "palette_rationale": (
             f"Hue {palette['primary_hue']}° from Life Path "
             f"{lp['reduced'] if lp else '-'}; "

@@ -285,24 +285,31 @@ test('cipher name composed from gematria + lunar phase tokens', () => {
   assert.ok(!nameEl.classList.contains('is-pending'));
 });
 
-test('mantra uses sealed seed_syllable (no fabrication)', () => {
+test('Om Cipher mantra: Layer 6 deterministic mantra (no fabrication)', () => {
   const win = makeWindow(true);
   const r = makeRenderer(win);
   const sec = buildSection();
   r.render({}, sec);
   const mantra = sec.querySelector('[data-cu-om-cipher-mantra]');
-  assert.ok(mantra.textContent.includes('Om'), 'mantra surfaces seed-syllable');
+  // Layer 6 mantra is the deterministic mirror — quoted, drawn from the
+  // 108-entry archetypal table. We assert it's quoted and not pending,
+  // not the literal mantra string (which depends on the fixture indices).
+  assert.ok(mantra.textContent.startsWith('“'), 'mantra is quoted Layer 6 mirror');
+  assert.ok(mantra.textContent.endsWith('”'), 'mantra is quoted Layer 6 mirror');
   assert.ok(!mantra.classList.contains('is-pending'));
 });
 
-test('mantra prefers user-provided personal_mantra when set', () => {
+test('Om Cipher mantra is Layer 6 deterministic — ignores user personal_mantra here (lives in Living Profile)', () => {
   const win = makeWindow(true);
   win.state.compassData.profile.personal_mantra = 'Sat-Chit-Ananda';
   const r = makeRenderer(win);
   const sec = buildSection();
   r.render({}, sec);
   const mantra = sec.querySelector('[data-cu-om-cipher-mantra]');
-  assert.equal(mantra.textContent, 'Sat-Chit-Ananda');
+  // The Om Cipher mantra is the immutable Layer 6 mirror. User-authored
+  // mantras belong in Living Profile, not in the Om Cipher panel.
+  assert.notEqual(mantra.textContent, 'Sat-Chit-Ananda');
+  assert.ok(mantra.textContent.startsWith('“'));
 });
 
 test('flag on but no birth_date → pending-source state, surfaces left as placeholders', () => {

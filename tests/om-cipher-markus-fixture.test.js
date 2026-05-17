@@ -306,19 +306,24 @@ test('cipher name leads with "Markus" and carries Master Builder label', () => {
     'cipher name carries LP22 Master Builder label; got: ' + nameEl.textContent);
 });
 
-// ── 10. Narrative draws from compassData.points.work when no
-//       personal_story is set (user's own captured words). ─────────
-test('narrative surface uses points.work summary (not pending placeholder)', () => {
+// ── 10. Narrative surface is the Layer 6 archetypal story seed —
+//       deterministic mirror, NOT a personal biography (that lives
+//       in the Living Profile). For Markus (Ex8, SU6, Pe2) the seed
+//       composes the three fragments from archetypal_stories.json.
+test('narrative surface renders the Layer 6 archetypal story seed', () => {
   const win = makeWindow(FIXTURE);
   const r = makeRenderer(win);
   const sec = buildSection();
   r.render({}, sec);
   const narr = sec.querySelector('[data-cu-om-cipher-narrative]');
   assert.ok(!narr.classList.contains('is-pending'),
-    'narrative should not be pending when points.work has summary');
-  const expectedFragment = (FIXTURE.compassData.points.work.summary || '').slice(0, 30);
-  assert.ok(narr.textContent.includes(expectedFragment),
-    'narrative should draw from points.work.summary');
+    'narrative should not be pending — Layer 6 seed available for Ex8/SU6/Pe2');
+  // The Markus baseline pins Expression 8 / Soul Urge 6 / Personality 2.
+  // Each fragment is a deterministic line from archetypal_stories.json.
+  assert.ok(/answerable for large weight|steadiness at scale/.test(narr.textContent),
+    'narrative carries the Expression-8 fragment; got: ' + narr.textContent.slice(0, 120));
+  assert.ok(/hearth for others|home that is also/.test(narr.textContent),
+    'narrative carries the Soul-Urge-6 fragment; got: ' + narr.textContent.slice(0, 120));
 });
 
 console.log('\n' + (failed === 0 ? '✅ all passed' : '❌ ' + failed + ' failed') +
