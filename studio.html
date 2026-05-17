@@ -5962,6 +5962,233 @@ input, textarea { font: inherit; color: inherit; }
   width: 132px; height: 132px;
 }
 
+/* ─── OM Cipher · expanded foundation section ─────────────────────────
+   Ceremonial restraint: distinct background, clear hierarchy, no
+   over-decoration. Sigil becomes the visual anchor; name / mantra /
+   field pattern sit alongside; story / contemplation / source data
+   stack below in structured cards. */
+.lp-om-cipher-section {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--space-5), 3.2vw, var(--space-7));
+  padding: clamp(var(--space-5), 3.2vw, var(--space-7));
+  margin-top: clamp(var(--space-5), 3vw, var(--space-7));
+  border-radius: clamp(18px, 1.6vw, 26px);
+  position: relative;
+  isolation: isolate;
+}
+.lp-om-cipher-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--call, #f6a3b6) 14%, transparent), transparent 60%),
+    radial-gradient(circle at 92% 100%, color-mix(in srgb, var(--rose-color, #c4b5fd) 12%, transparent), transparent 65%);
+  opacity: 0.95;
+}
+.lp-om-cipher-section .oc-section-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "eye eye"
+    "title edit"
+    "lede lede";
+  row-gap: 6px;
+  column-gap: 14px;
+  align-items: baseline;
+  border-bottom: 1px solid color-mix(in srgb, var(--call, #f6a3b6) 22%, var(--border));
+  padding-bottom: clamp(var(--space-3), 1.4vw, var(--space-4));
+}
+.lp-om-cipher-section .oc-section-head .lp-foundation-eye { grid-area: eye; }
+.lp-om-cipher-section .oc-section-head .lp-foundation-title { grid-area: title; margin: 0; }
+.lp-om-cipher-section .oc-section-head .lp-om-cipher-edit { grid-area: edit; align-self: center; }
+.oc-section-lede {
+  grid-area: lede;
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 64ch;
+}
+
+/* Hero band */
+.lp-om-cipher-section .oc-hero {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) 1fr;
+  gap: clamp(var(--space-4), 2.6vw, var(--space-6));
+  align-items: start;
+}
+.oc-sigil-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.oc-sigil-stage .lp-hero-slot.is-sigil {
+  width: clamp(160px, 18vw, 200px);
+  height: clamp(160px, 18vw, 200px);
+}
+.oc-sigil-stage .lp-hero-slot.is-sigil svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.oc-sigil-caption {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-muted) 92%, transparent);
+}
+.oc-sigil-caption em {
+  font-style: normal;
+  color: color-mix(in srgb, var(--call, #f6a3b6) 70%, var(--text));
+  letter-spacing: 0.05em;
+}
+.oc-identity {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--space-3), 1.6vw, var(--space-4));
+}
+.oc-id-row { display: flex; flex-direction: column; gap: 4px; }
+.oc-eyebrow {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--call, #f6a3b6) 70%, var(--text-muted));
+}
+.oc-cipher-name {
+  margin: 0;
+  font-family: 'Cormorant Garamond', 'Cormorant', serif;
+  font-size: clamp(22px, 2.6vw, 30px);
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  color: var(--text);
+}
+.oc-cipher-name.is-pending { color: color-mix(in srgb, var(--text-faint) 90%, var(--text)); font-style: italic; }
+.oc-mantra {
+  margin: 0;
+  font-family: 'Cormorant Garamond', 'Cormorant', serif;
+  font-style: italic;
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--text) 88%, var(--text-muted));
+}
+.oc-mantra.is-pending { color: var(--text-faint); }
+.oc-field-pattern {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--text) 78%, var(--text-muted));
+}
+.oc-field-pattern.is-pending { color: var(--text-faint); font-style: italic; }
+
+/* Story + contemplation cards */
+.oc-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(var(--space-3), 1.8vw, var(--space-5));
+}
+.oc-card {
+  padding: clamp(var(--space-3), 1.8vw, var(--space-4)) clamp(var(--space-3), 2vw, var(--space-5));
+  border: 1px solid color-mix(in srgb, var(--call, #f6a3b6) 18%, var(--border));
+  border-radius: clamp(14px, 1.2vw, 18px);
+  background: color-mix(in srgb, var(--input-bg) 60%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.oc-card-body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--text) 85%, var(--text-muted));
+}
+.oc-card-body.is-pending { color: var(--text-faint); font-style: italic; }
+
+/* Source-pattern blocks */
+.oc-source-block { display: flex; flex-direction: column; gap: 10px; }
+.oc-source-title {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.oc-source-sub {
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: color-mix(in srgb, var(--text-faint) 92%, var(--text-muted));
+}
+.oc-source-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+.oc-source-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--input-bg) 70%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.oc-source-item dt {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.oc-source-item dd {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.4;
+}
+.oc-source-item.is-pending dd { color: var(--text-faint); font-style: italic; }
+.oc-source-item.is-master {
+  border-color: color-mix(in srgb, var(--call, #f6a3b6) 55%, var(--border));
+  background: color-mix(in srgb, var(--call, #f6a3b6) 8%, var(--input-bg));
+}
+.oc-source-item.is-master dd::after {
+  content: ' · master';
+  color: color-mix(in srgb, var(--call, #f6a3b6) 70%, var(--text-muted));
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+.oc-activation-line,
+.oc-bhramari-line {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: color-mix(in srgb, var(--text) 82%, var(--text-muted));
+}
+.oc-activation-line.is-pending,
+.oc-bhramari-line.is-pending { color: var(--text-faint); font-style: italic; }
+
+.oc-foundation-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important; }
+.oc-foundation-empty {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+@media (max-width: 820px) {
+  .lp-om-cipher-section .oc-hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .oc-identity { align-items: center; }
+  .oc-cards { grid-template-columns: 1fr; }
+}
+
 /* Hero edit row — small affordances under the hero text. */
 .lp-hero-edit-row {
   display: flex;
@@ -7158,6 +7385,11 @@ input, textarea { font: inherit; color: inherit; }
 
 <!-- Toast -->
 <div class="studio-toast" id="studio-toast"></div>
+
+<!-- Canonical OM Cipher engine — exposes window.cuOmCipher.
+     Loaded eagerly so the Living Profile render can call generate()
+     synchronously when the modal opens. Gated by window.CU_OM_CIPHER_ENABLED. -->
+<script src="/sdk/om_cipher.js"></script>
 
 <script>
 
@@ -12484,45 +12716,111 @@ if (document.readyState === 'loading') {
         '</div>' +
       '</section>';
 
-      // ── OM Cipher (sigil + source-data fields) ────────────
-      // Your field pattern — sigil/avatar PLUS the source data the
-      // gematria/Bhramari layer reads from: name, birth date / time
-      // / place, design, gene keys, astrology, baseline Hz. Items
-      // missing data render as "Not set yet" and are click-to-edit
-      // so the owner can correct them directly from the profile
-      // view. Section is kept adjacent to (but visually distinct
-      // from) the Living Profile card. Class `lp-field-imprints`
-      // is preserved for backward-compat with existing CSS/tests.
+      // ── OM Cipher (canonical identity section) ────────────
+      // Foundation-level section: the Compass-sealed identity engine
+      // that reads from name, birth date / time / place, Gene Keys,
+      // Human Design, Bhramari baseline. Distinct from (but adjacent
+      // to) the Living Profile card above. Reserves UI surfaces for
+      // generated cipher_name, mantra, narrative, contemplation,
+      // gematria/source pattern, activation sequence, Bhramari —
+      // any not yet sealed render meaningful placeholders rather
+      // than disappearing. Engine output is wired in via
+      // cuRenderOmCipherSection() after the modal paints.
+      //
+      // Backward-compat classes `lp-foundation lp-field-imprints
+      // lp-om-cipher` are preserved so existing CSS / tests / DOM
+      // queries continue to resolve.
       var foundationItems = model.foundation || [];
-      if (foundationItems.length) {
-        html += '<section class="lp-foundation lp-field-imprints lp-om-cipher" aria-label="OM Cipher">' +
-          '<header class="lp-foundation-head">' +
-            '<span class="lp-foundation-eye">Your Field Pattern</span>' +
-            '<h3 class="lp-foundation-title">OM <em>Cipher</em></h3>' +
-            '<button type="button" class="lp-edit-btn lp-om-cipher-edit" data-lp-om-cipher-edit="1" aria-label="Edit OM Cipher source data">Edit source</button>' +
-          '</header>' +
-          '<div class="lp-field-imprints-body">' +
-            '<div class="lp-field-imprints-sigil" aria-label="Digital key · sigil">' +
-              '<div class="lp-hero-slot is-sigil" title="Digital key / sigil — symbolic face of the digital self">' +
-                '<span class="lp-hero-slot-glyph" aria-hidden="true">ॐ</span>' +
-                '<span class="lp-hero-slot-label">Digital key<br>· sigil</span>' +
-              '</div>' +
+      var placeholderCipherName  = 'Awaiting Compass seal';
+      var placeholderMantra      = 'Not generated yet — sealed when source data completes.';
+      var placeholderField       = 'Pending source data';
+      var placeholderNarrative   = 'Your personal story emerges from the cipher once Compass is sealed.';
+      var placeholderContemp     = 'A contemplation will surface here, drawn from your field pattern.';
+      var placeholderBhramari    = 'Hum the seed-syllable to capture your Bhramari baseline, or enter it manually below.';
+      html += '<section class="lp-foundation lp-field-imprints lp-om-cipher lp-om-cipher-section" aria-label="OM Cipher" data-cu-om-cipher-section="1">' +
+        '<header class="lp-foundation-head oc-section-head">' +
+          '<span class="lp-foundation-eye">Foundation · Source pattern</span>' +
+          '<h3 class="lp-foundation-title">OM <em>Cipher</em></h3>' +
+          '<button type="button" class="lp-edit-btn lp-om-cipher-edit" data-lp-om-cipher-edit="1" aria-label="Edit OM Cipher source data">Edit source</button>' +
+          '<p class="oc-section-lede">The Compass-sealed pattern your sigil, mantra, and field signature are drawn from. Distinct from Living Profile — this is the source code.</p>' +
+        '</header>' +
+        // ── Hero band: sigil + cipher name + mantra + field pattern ─
+        '<div class="oc-hero">' +
+          '<div class="lp-field-imprints-sigil oc-sigil-stage" aria-label="Digital key · sigil">' +
+            '<div class="lp-hero-slot is-sigil oc-sigil-slot" title="Digital key / sigil — symbolic face of the digital self">' +
+              '<span class="lp-hero-slot-glyph" aria-hidden="true">ॐ</span>' +
+              '<span class="lp-hero-slot-label">Digital key<br>· sigil</span>' +
             '</div>' +
-            '<dl class="lp-foundation-grid">' +
-              foundationItems.map(function (it) {
-                var has = !!it.val;
-                var fkey = it.field || '';
-                return '<div class="lp-foundation-item' + (has ? '' : ' is-empty') + '"' +
-                  (fkey ? ' data-lp-edit="foundation" data-lp-field="' + lpEscape(fkey) + '"' : '') +
-                  (fkey ? ' tabindex="0" role="button" title="Click to edit"' : '') + '>' +
-                  '<dt class="lp-foundation-key">' + lpEscape(it.key) + '</dt>' +
-                  '<dd class="lp-foundation-val">' + lpEscape(has ? it.val : 'Not set yet') + '</dd>' +
-                '</div>';
-              }).join('') +
-            '</dl>' +
+            '<div class="oc-sigil-caption" data-cu-om-cipher-seed-hash>Cipher seal: <em data-cu-om-cipher-seed>pending</em></div>' +
           '</div>' +
-        '</section>';
-      }
+          '<div class="oc-identity">' +
+            '<div class="oc-id-row">' +
+              '<span class="oc-eyebrow">Cipher Name</span>' +
+              '<h4 class="oc-cipher-name" data-cu-om-cipher-name>' + lpEscape(placeholderCipherName) + '</h4>' +
+            '</div>' +
+            '<div class="oc-id-row">' +
+              '<span class="oc-eyebrow">Personal Mantra</span>' +
+              '<p class="oc-mantra" data-cu-om-cipher-mantra>' + lpEscape(placeholderMantra) + '</p>' +
+            '</div>' +
+            '<div class="oc-id-row">' +
+              '<span class="oc-eyebrow">Your Field Pattern</span>' +
+              '<p class="oc-field-pattern" data-cu-om-cipher-field-pattern>' + lpEscape(placeholderField) + '</p>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        // ── Story + Contemplation cards ──────────────────────
+        '<div class="oc-cards">' +
+          '<article class="oc-card oc-card-narrative" data-cu-om-cipher-narrative-card>' +
+            '<span class="oc-eyebrow">Personal Story</span>' +
+            '<p class="oc-card-body" data-cu-om-cipher-narrative>' + lpEscape(placeholderNarrative) + '</p>' +
+          '</article>' +
+          '<article class="oc-card oc-card-contemplation" data-cu-om-cipher-contemplation-card>' +
+            '<span class="oc-eyebrow">Contemplation</span>' +
+            '<p class="oc-card-body" data-cu-om-cipher-contemplation>' + lpEscape(placeholderContemp) + '</p>' +
+          '</article>' +
+        '</div>' +
+        // ── Source-pattern numbers (gematria) ────────────────
+        '<div class="oc-source-block">' +
+          '<h4 class="oc-source-title">Source pattern <span class="oc-source-sub">· gematria</span></h4>' +
+          '<dl class="oc-source-grid" data-cu-om-cipher-gematria-grid>' +
+            '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="life_path"><dt>Life Path</dt><dd>Pending source data</dd></div>' +
+            '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="expression"><dt>Expression</dt><dd>Pending source data</dd></div>' +
+            '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="soul_urge"><dt>Soul Urge</dt><dd>Pending source data</dd></div>' +
+            '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="personality"><dt>Personality</dt><dd>Pending source data</dd></div>' +
+            '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="lunar_phase"><dt>Lunar Phase</dt><dd>Pending source data</dd></div>' +
+            '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="solar_quarter"><dt>Solar Quarter</dt><dd>Pending source data</dd></div>' +
+            '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="temporal_gate"><dt>Temporal Gate</dt><dd>Pending source data</dd></div>' +
+          '</dl>' +
+        '</div>' +
+        // ── Activation Sequence (Gene Keys) ──────────────────
+        '<div class="oc-source-block oc-activation-block">' +
+          '<h4 class="oc-source-title">Activation Sequence <span class="oc-source-sub">· Gene Keys</span></h4>' +
+          '<p class="oc-activation-line" data-cu-om-cipher-activation>Pending Compass-sealed Gene Keys.</p>' +
+        '</div>' +
+        // ── Bhramari resonance ───────────────────────────────
+        '<div class="oc-source-block oc-bhramari-block">' +
+          '<h4 class="oc-source-title">Bhramari resonance <span class="oc-source-sub">· optional</span></h4>' +
+          '<p class="oc-bhramari-line" data-cu-om-cipher-bhramari>' + lpEscape(placeholderBhramari) + '</p>' +
+        '</div>' +
+        // ── Foundation data grid (birth date / time / place / etc.) ──
+        '<div class="oc-source-block oc-foundation-block">' +
+          '<h4 class="oc-source-title">Sealed inputs <span class="oc-source-sub">· editable</span></h4>' +
+          (foundationItems.length
+            ? '<dl class="lp-foundation-grid oc-foundation-grid">' +
+                foundationItems.map(function (it) {
+                  var has = !!it.val;
+                  var fkey = it.field || '';
+                  return '<div class="lp-foundation-item' + (has ? '' : ' is-empty') + '"' +
+                    (fkey ? ' data-lp-edit="foundation" data-lp-field="' + lpEscape(fkey) + '"' : '') +
+                    (fkey ? ' tabindex="0" role="button" title="Click to edit"' : '') + '>' +
+                    '<dt class="lp-foundation-key">' + lpEscape(it.key) + '</dt>' +
+                    '<dd class="lp-foundation-val">' + lpEscape(has ? it.val : 'Not set yet') + '</dd>' +
+                  '</div>';
+                }).join('') +
+              '</dl>'
+            : '<p class="oc-foundation-empty">Sealed inputs will appear once your Compass profile carries name, birth date, and birth place.</p>') +
+        '</div>' +
+      '</section>';
 
       // ── Fourfold compass entry-points ──────────────────────
       // Doorway-like cards for The Work / Lens / Field / Call —
@@ -12711,6 +13009,14 @@ if (document.readyState === 'loading') {
           // when window.CU_OM_CIPHER_ENABLED !== true.
           if (typeof window.cuAttachOmCipherMeta === 'function') {
             window.cuAttachOmCipherMeta(sigilPayload, lpBody);
+          }
+          // Om Cipher v2 — full canonical-engine section. Renders the
+          // generated SVG sigil, cipher name, mantra, field pattern,
+          // gematria grid, activation sequence, and Bhramari resonance.
+          // No-op when CU_OM_CIPHER_ENABLED is off — section keeps its
+          // placeholder copy.
+          if (typeof window.cuRenderOmCipherSection === 'function') {
+            window.cuRenderOmCipherSection(sigilPayload, lpBody);
           }
         } catch (_) { /* safety net — never break the LP render */ }
       }
@@ -13776,6 +14082,287 @@ if (document.readyState === 'loading') {
       } catch (_) { /* never break the LP render */ }
     }
     window.cuAttachOmCipherMeta = cuAttachOmCipherMeta;
+
+    // ─────────────────────────────────────────────────────────────────────
+    // OM Cipher section — full engine-driven render.
+    //
+    // Calls the canonical engine (window.cuOmCipher.generate) with the
+    // Compass-sealed input bundle, then populates the section's reserved
+    // surfaces: cipher name, mantra, field pattern, story, contemplation,
+    // gematria grid, activation sequence, Bhramari resonance, and the
+    // canonical SVG sigil (replacing the static ॐ fallback).
+    //
+    // Gated entirely by window.CU_OM_CIPHER_ENABLED:
+    //   - off → no-op; section keeps ॐ fallback + placeholder copy
+    //   - on  → engine is invoked, surfaces are populated where data
+    //           exists, otherwise meaningful placeholders remain
+    //
+    // No mantra / narrative is fabricated. Cipher Name is deterministically
+    // synthesised from canonical components (Life Path · Lunar phase) so
+    // it changes only when source data does. Mantra surfaces the
+    // configured seed-syllable ("Om") with no extra invention.
+    // ─────────────────────────────────────────────────────────────────────
+    function cuBuildOmCipherInput(payload) {
+      try {
+        var cd = (window.state && window.state.compassData) || {};
+        var prof = cd.profile || {};
+        var pts  = cd.points  || {};
+        var fnd  = prof.foundation || {};
+        var fs   = (cd.frequency_signature || prof.frequency_signature || {});
+        function pick() {
+          for (var i = 0; i < arguments.length; i++) {
+            var v = arguments[i];
+            if (v != null && v !== '') return v;
+          }
+          return null;
+        }
+        var legalName = pick(
+          prof.legal_name, prof.full_name, fnd.legal_name, fnd.full_name,
+          payload && payload.full_name, payload && payload.display_name
+        );
+        var preferredName = pick(
+          prof.preferred_name, prof.first_name, fnd.preferred_name
+        );
+        var birthDate = pick(
+          prof.birth_date, prof.birthdate, prof.date_of_birth, prof.dob,
+          fnd.birth_date, fnd.birthdate, fnd.dob,
+          cd.birth_date, cd.birthdate, cd.dob,
+          payload && payload.birthdate
+        );
+        var birthTime = pick(
+          prof.birth_time, prof.birthtime,
+          fnd.birth_time, fnd.birthtime,
+          cd.birth_time, cd.birthtime
+        );
+        var birthPlace = null;
+        var bp = pick(prof.birth_place, fnd.birth_place, cd.birth_place);
+        if (bp && typeof bp === 'object') birthPlace = bp;
+        else {
+          var bpStr = pick(prof.birthplace, prof.pob, fnd.birthplace, fnd.pob, cd.birthplace, cd.pob);
+          if (bpStr) birthPlace = { city: String(bpStr) };
+        }
+        var hz = Number(fs.dominant_hz || prof.bhramari_baseline_hz || fnd.bhramari_baseline_hz || 0);
+        return {
+          birth_date: birthDate,
+          birth_time: birthTime || null,
+          birth_place: birthPlace,
+          legal_name: legalName,
+          preferred_name: preferredName,
+          compass: {
+            work: pts.work || null,
+            lens: pts.lens || null,
+            field: pts.field || null,
+            call: pts.call || null,
+          },
+          human_design: prof.human_design || null,
+          seed_syllable: cd.seed_syllable || prof.seed_syllable || 'Om',
+          bhramari_baseline: hz > 0 ? { hz: hz, metadata: null } : null,
+        };
+      } catch (_) { return null; }
+    }
+    window.cuBuildOmCipherInput = cuBuildOmCipherInput;
+
+    // Synthesise the Cipher Name deterministically from canonical metadata.
+    // No invention: the name is just the three sealed gematria labels
+    // joined with the lunar phase token. Stays in lock-step with the
+    // engine — same data → same name, always.
+    function cuCipherNameFromRecord(rec, input) {
+      if (!rec || rec.pending) return null;
+      var meta = rec.metadata || {};
+      var lp = meta.life_path && meta.life_path.label;
+      var lun = meta.lunar_phase && meta.lunar_phase.label;
+      var preferred = (input && input.preferred_name) || (input && input.legal_name);
+      var who = preferred ? String(preferred).split(/\s+/)[0] : null;
+      var bits = [];
+      if (who) bits.push(who);
+      if (lp)  bits.push(lp.split(' — ')[0]);
+      if (lun) bits.push(lun.split(' — ')[0]);
+      if (!bits.length) return null;
+      return bits.join(' · ');
+    }
+
+    // Build the canonical Activation Sequence line from the engine record
+    // plus the existing display bridge (so Gene Keys pair logic stays
+    // single-sourced through cuOmCipherDisplay).
+    function cuActivationLineFromDisplay(meta) {
+      if (!meta || !meta.label) return null;
+      return meta.label;
+    }
+
+    function cuRenderOmCipherSection(payload, root) {
+      try {
+        if (window.CU_OM_CIPHER_ENABLED !== true) return;
+        if (!window.cuOmCipher || typeof window.cuOmCipher.generate !== 'function') return;
+        var container = root || document;
+        var section = container.querySelector('[data-cu-om-cipher-section]');
+        if (!section) return;
+
+        var input = cuBuildOmCipherInput(payload || (typeof cuBuildPublishPayload === 'function' ? cuBuildPublishPayload() : null));
+        if (!input || !input.birth_date) {
+          // Engine cannot derive without birth_date — leave placeholders.
+          section.setAttribute('data-cu-om-cipher-state', 'pending-source');
+          return;
+        }
+        var rec = window.cuOmCipher.generate(input, { featureFlag: true, bhramariFlag: window.CU_BHRAMARI_CAPTURE_ENABLED === true });
+        if (!rec || rec.pending) {
+          section.setAttribute('data-cu-om-cipher-state', 'pending-engine');
+          return;
+        }
+        section.setAttribute('data-cu-om-cipher-state', 'sealed');
+
+        // ── Canonical SVG sigil ───────────────────────────────
+        var slot = section.querySelector('.lp-hero-slot.is-sigil');
+        if (slot && rec.sigil_svg && !slot.classList.contains('has-image')) {
+          slot.innerHTML = rec.sigil_svg;
+          slot.classList.add('cu-om-cipher-sigil-rendered');
+          slot.setAttribute('data-cu-om-cipher-sigil', '1');
+        }
+        // Seal hash (short)
+        var seedEl = section.querySelector('[data-cu-om-cipher-seed]');
+        if (seedEl) seedEl.textContent = (rec.seed || '').slice(0, 8) + '…' + (rec.seed || '').slice(-4);
+
+        // ── Cipher Name (deterministic, no invention) ─────────
+        var nameEl = section.querySelector('[data-cu-om-cipher-name]');
+        var cipherName = cuCipherNameFromRecord(rec, input);
+        if (nameEl) {
+          if (cipherName) {
+            nameEl.textContent = cipherName;
+            nameEl.classList.remove('is-pending');
+          } else {
+            nameEl.classList.add('is-pending');
+          }
+        }
+
+        // ── Personal Mantra (seed-syllable, never hallucinated) ─
+        var mantraEl = section.querySelector('[data-cu-om-cipher-mantra]');
+        if (mantraEl) {
+          var seedSyl = (rec.sealed_inputs && rec.sealed_inputs.seed_syllable) || 'Om';
+          var mantraText = '“' + seedSyl + '” · sounded from your sealed centre.';
+          // If user has explicitly configured a personal mantra in compassData,
+          // surface that instead of the seed-syllable line. No invention.
+          var prof = (window.state && window.state.compassData && window.state.compassData.profile) || {};
+          if (prof.personal_mantra && String(prof.personal_mantra).trim()) {
+            mantraText = String(prof.personal_mantra).trim();
+          }
+          mantraEl.textContent = mantraText;
+          mantraEl.classList.remove('is-pending');
+        }
+
+        // ── Field Pattern line (Activation Sequence summary) ──
+        var fpEl = section.querySelector('[data-cu-om-cipher-field-pattern]');
+        var display = (typeof window.cuOmCipherDisplay === 'function')
+          ? window.cuOmCipherDisplay(payload || (typeof cuBuildPublishPayload === 'function' ? cuBuildPublishPayload() : null))
+          : null;
+        if (fpEl) {
+          var fpLabel = display && display.label ? display.label
+                    : (rec.metadata && rec.metadata.life_path
+                        ? 'Root ' + rec.metadata.life_path.value
+                        : null);
+          if (fpLabel) {
+            fpEl.textContent = fpLabel;
+            fpEl.classList.remove('is-pending');
+          } else {
+            fpEl.classList.add('is-pending');
+          }
+        }
+
+        // ── Narrative + Contemplation (compass profile if user has provided) ──
+        var narrEl = section.querySelector('[data-cu-om-cipher-narrative]');
+        var contEl = section.querySelector('[data-cu-om-cipher-contemplation]');
+        var prof2 = (window.state && window.state.compassData && window.state.compassData.profile) || {};
+        if (narrEl) {
+          var story = prof2.personal_story || prof2.story || prof2.narrative || null;
+          if (story && String(story).trim()) {
+            narrEl.textContent = String(story).trim();
+            narrEl.classList.remove('is-pending');
+          } else {
+            // Deterministic descriptor from labels (not fabrication — just
+            // re-statement of the sealed pattern in prose).
+            var lpLab = rec.metadata && rec.metadata.life_path && rec.metadata.life_path.label;
+            var solLab = rec.metadata && rec.metadata.solar_quarter && rec.metadata.solar_quarter.label;
+            if (lpLab || solLab) {
+              narrEl.textContent = [lpLab, solLab].filter(Boolean).join(' · ') +
+                ' — your story will be added here when you write it.';
+              narrEl.classList.add('is-pending');
+            } else {
+              narrEl.classList.add('is-pending');
+            }
+          }
+        }
+        if (contEl) {
+          var contemplation = prof2.contemplation || null;
+          if (contemplation && String(contemplation).trim()) {
+            contEl.textContent = String(contemplation).trim();
+            contEl.classList.remove('is-pending');
+          } else {
+            var lunLab = rec.metadata && rec.metadata.lunar_phase && rec.metadata.lunar_phase.label;
+            if (lunLab) {
+              contEl.textContent = 'Sit with the ' + lunLab.toLowerCase() + ' quality of your cipher today.';
+              contEl.classList.add('is-pending');
+            } else {
+              contEl.classList.add('is-pending');
+            }
+          }
+        }
+
+        // ── Source-pattern numbers (gematria) ─────────────────
+        var meta = rec.metadata || {};
+        function paintItem(key, valObj) {
+          var el = section.querySelector('[data-cu-om-cipher-gematria="' + key + '"]');
+          if (!el) return;
+          var dd = el.querySelector('dd');
+          if (!dd) return;
+          if (valObj && valObj.value != null) {
+            var v = String(valObj.value);
+            if (valObj.label) v += ' · ' + valObj.label;
+            dd.textContent = v;
+            el.classList.remove('is-pending');
+            if (valObj.is_master) el.classList.add('is-master');
+            else el.classList.remove('is-master');
+          } else {
+            el.classList.add('is-pending');
+            el.classList.remove('is-master');
+          }
+        }
+        paintItem('life_path',     meta.life_path);
+        paintItem('expression',    meta.expression);
+        paintItem('soul_urge',     meta.soul_urge);
+        paintItem('personality',   meta.personality);
+        paintItem('lunar_phase',   meta.lunar_phase);
+        paintItem('solar_quarter', meta.solar_quarter);
+        paintItem('temporal_gate', meta.temporal_gate);
+
+        // ── Activation Sequence line ──────────────────────────
+        var actEl = section.querySelector('[data-cu-om-cipher-activation]');
+        if (actEl) {
+          var actLabel = display && display.label;
+          if (actLabel) {
+            actEl.textContent = actLabel;
+            actEl.classList.remove('is-pending');
+          } else {
+            actEl.classList.add('is-pending');
+          }
+        }
+
+        // ── Bhramari resonance line ───────────────────────────
+        var bhrEl = section.querySelector('[data-cu-om-cipher-bhramari]');
+        if (bhrEl) {
+          if (meta.bhramari && meta.bhramari.baseline_hz) {
+            var bhrBits = [(Math.round(meta.bhramari.baseline_hz * 10) / 10) + ' Hz'];
+            if (meta.bhramari.nearest_semitone) bhrBits.push('nearest ' + meta.bhramari.nearest_semitone);
+            bhrEl.textContent = 'Sealed at ' + bhrBits.join(' · ') + '.';
+            bhrEl.classList.remove('is-pending');
+          } else if (input.bhramari_baseline && input.bhramari_baseline.hz) {
+            // Bhramari capture flag off — show baseline without semitone.
+            bhrEl.textContent = 'Baseline ' + (Math.round(input.bhramari_baseline.hz * 10) / 10) + ' Hz (enable Bhramari to surface semitone).';
+            bhrEl.classList.remove('is-pending');
+          } else {
+            bhrEl.classList.add('is-pending');
+          }
+        }
+      } catch (_) { /* never break the LP render */ }
+    }
+    window.cuRenderOmCipherSection = cuRenderOmCipherSection;
 
     function cuBuildPublishPayload() {
       try {

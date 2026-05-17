@@ -1,0 +1,125 @@
+// Static-source regression tests for the *expanded* OM Cipher section.
+//
+// PR #6 renamed Field Imprints → OM Cipher in-place. This pass replaces
+// the renamed card with a full identity section that reserves UI surfaces
+// for cipher name, mantra, field pattern, narrative, contemplation,
+// gematria source-pattern numbers, activation sequence, and Bhramari
+// resonance — with the canonical engine SVG sigil as the visual anchor.
+//
+// The section's reserved data-* hooks are stable contracts the renderer
+// (cuRenderOmCipherSection) writes into; this test pins them so future
+// refactors cannot silently strip the surfaces.
+//
+// Run:  node tests/om-cipher-section-expanded.test.js
+
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const studioPath = path.resolve(__dirname, '..', 'studio.html');
+const src = fs.readFileSync(studioPath, 'utf8');
+
+let failed = 0;
+function ok(msg, cond) {
+  if (cond) console.log('  ok  ' + msg);
+  else { console.error('  FAIL ' + msg); failed++; }
+}
+
+console.log('canonical engine wiring');
+ok('engine script tag /sdk/om_cipher.js is loaded',
+   /<script\s+src="\/sdk\/om_cipher\.js"\s*><\/script>/.test(src));
+ok('cuRenderOmCipherSection function defined',
+   /function\s+cuRenderOmCipherSection\s*\(/.test(src));
+ok('cuBuildOmCipherInput helper defined',
+   /function\s+cuBuildOmCipherInput\s*\(/.test(src));
+ok('cuRenderOmCipherSection wired into LP render path',
+   /window\.cuRenderOmCipherSection\s*===\s*'function'/.test(src) ||
+   /cuRenderOmCipherSection\s*\(\s*sigilPayload\s*,\s*lpBody\s*\)/.test(src));
+
+console.log('\nsection root + header');
+ok('section carries data-cu-om-cipher-section hook',
+   /data-cu-om-cipher-section="1"/.test(src));
+ok('section uses lp-om-cipher-section class',          /lp-om-cipher-section/.test(src));
+ok('section keeps lp-om-cipher back-compat class',     /lp-om-cipher\b/.test(src));
+ok('section keeps lp-field-imprints back-compat class', /lp-field-imprints\b/.test(src));
+ok('aria-label="OM Cipher" preserved',                 /aria-label="OM Cipher"/.test(src));
+ok('OM Cipher title (italic Cipher) preserved',        /OM <em>Cipher<\/em>/.test(src));
+ok('eyebrow uses "Foundation · Source pattern"',       /Foundation · Source pattern/.test(src));
+ok('section lede explains distinction from Living Profile',
+   /distinct from Living Profile/i.test(src));
+ok('"Edit source" affordance still present',           /data-lp-om-cipher-edit="1"/.test(src));
+
+console.log('\nreserved hero surfaces (cipher name, mantra, field pattern)');
+ok('cipher name surface present',                      /data-cu-om-cipher-name\b/.test(src));
+ok('cipher name placeholder "Awaiting Compass seal"',  /Awaiting Compass seal/.test(src));
+ok('mantra surface present',                           /data-cu-om-cipher-mantra\b/.test(src));
+ok('mantra placeholder "Not generated yet"',           /Not generated yet/.test(src));
+ok('field pattern surface present',                    /data-cu-om-cipher-field-pattern\b/.test(src));
+ok('field pattern placeholder "Pending source data"',  /Pending source data/.test(src));
+ok('"Your Field Pattern" eyebrow still rendered',      /Your Field Pattern/.test(src));
+ok('"Cipher Name" eyebrow rendered',                   />\s*Cipher Name\s*</.test(src));
+ok('"Personal Mantra" eyebrow rendered',               />\s*Personal Mantra\s*</.test(src));
+
+console.log('\nnarrative + contemplation cards');
+ok('narrative card present',                           /data-cu-om-cipher-narrative-card/.test(src));
+ok('narrative copy hook present',                      /data-cu-om-cipher-narrative\b/.test(src));
+ok('"Personal Story" eyebrow rendered',                />\s*Personal Story\s*</.test(src));
+ok('contemplation card present',                       /data-cu-om-cipher-contemplation-card/.test(src));
+ok('contemplation copy hook present',                  /data-cu-om-cipher-contemplation\b/.test(src));
+ok('"Contemplation" eyebrow rendered',                 />\s*Contemplation\s*</.test(src));
+
+console.log('\ngematria source-pattern grid');
+['life_path','expression','soul_urge','personality','lunar_phase','solar_quarter','temporal_gate'].forEach(function (k) {
+  ok('gematria slot present: ' + k,
+     new RegExp('data-cu-om-cipher-gematria="' + k + '"').test(src));
+});
+ok('"Source pattern" block title uses gematria sub-label',
+   /Source pattern[^<]*<span[^>]*>·\s*gematria/.test(src));
+ok('no user-facing "numerology" copy in studio.html',  !/\bnumerology\b/i.test(src));
+
+console.log('\nactivation sequence + Bhramari surfaces');
+ok('activation sequence surface present',              /data-cu-om-cipher-activation\b/.test(src));
+ok('"Activation Sequence" header present',             /Activation Sequence/.test(src));
+ok('Gene Keys context label present',                  /·\s*Gene Keys/.test(src));
+ok('Bhramari surface present',                         /data-cu-om-cipher-bhramari\b/.test(src));
+ok('"Bhramari resonance" header present',              /Bhramari resonance/.test(src));
+
+console.log('\ncanonical SVG sigil injection (engine-driven)');
+ok('renderer reads rec.sigil_svg into slot',           /rec\.sigil_svg/.test(src));
+ok('renderer overwrites slot innerHTML with engine SVG',
+   /slot\.innerHTML\s*=\s*rec\.sigil_svg/.test(src));
+ok('renderer tags slot with cu-om-cipher-sigil-rendered marker',
+   /cu-om-cipher-sigil-rendered/.test(src));
+ok('renderer gated by window.CU_OM_CIPHER_ENABLED',    /window\.CU_OM_CIPHER_ENABLED\s*!==\s*true/.test(src));
+ok('canonical sigil only renders when not has-image',  /has-image/.test(src));
+ok('old ॐ static glyph remains as fallback in markup', /ॐ/.test(src));
+
+console.log('\ncipher seal display');
+ok('cipher seal hash surface present',                 /data-cu-om-cipher-seed\b/.test(src));
+ok('renderer paints seed (first 8 + last 4) into seal',
+   /rec\.seed[\s\S]*\.slice\(0,\s*8\)/.test(src));
+
+console.log('\nsealed inputs (foundation) grid preserved');
+ok('"Sealed inputs" block label present',              /Sealed inputs/.test(src));
+ok('lp-foundation-grid still rendered for source data',
+   /lp-foundation-grid oc-foundation-grid/.test(src));
+ok('foundation items keep data-lp-edit click-to-edit',
+   /data-lp-edit="foundation"/.test(src));
+
+console.log('\nno hallucinated mantra');
+ok('mantra renderer reads sealed seed_syllable, not hardcoded text',
+   /sealed_inputs[\s\S]*seed_syllable/.test(src));
+ok('renderer surfaces user-configured personal_mantra when set',
+   /personal_mantra/.test(src));
+
+console.log('\nflag gating (?om_cipher=1 query param init still in place)');
+ok('?om_cipher=1 flag init still present',             /\[\?&\]om_cipher=1/.test(src));
+ok('?bhramari=1 flag init still present',              /\[\?&\]bhramari=1/.test(src));
+
+if (failed) {
+  console.error('\nFAILED: ' + failed + ' check(s).');
+  process.exit(1);
+} else {
+  console.log('\nOK: OM Cipher expanded section regressions pass.');
+}
