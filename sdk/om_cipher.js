@@ -422,30 +422,66 @@ function buildSigilSvg(pointCount, seedHex, palette) {
     });
   }
   // Stable traversal: walk by a stride taken from the seed hex bytes.
-  // Stride is coprime-ish with N to ensure a complete cycle.
+  // Stride is coprime with N to ensure a complete cycle.
   const seedNum = parseInt((seedHex || "0").slice(0, 8), 16) || 1;
-  let stride = (seedNum % (N - 2)) + 2; // 2..N-1
-  // Ensure gcd(stride, N) === 1 — bump until it does.
   function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  let stride = (seedNum % (N - 2)) + 2;
   while (gcd(stride, N) !== 1) stride = (stride % (N - 1)) + 1;
   const order = [];
   let cur = 0;
   for (let i = 0; i < N; i++) { order.push(cur); cur = (cur + stride) % N; }
-  const pathD = order.map((idx, i) => {
+  const starD = order.map((idx, i) => {
     const p = points[idx];
     return (i === 0 ? "M" : "L") + p.x + "," + p.y;
   }).join(" ") + " Z";
-  const primary = (palette && palette.palette && palette.palette[0]) || "oklch(0.5 0.55 200)";
-  const accent  = (palette && palette.palette && palette.palette[2]) || primary;
-  let nodes = "";
-  for (const p of points) {
-    nodes += `<circle cx="${p.x}" cy="${p.y}" r="6" fill="${accent}"/>`;
+
+  // A second, paired traversal — inverse stride — laid faintly under the
+  // primary so the sigil reads as woven sacred geometry rather than a
+  // single polygon. Stride2 is chosen deterministically from a different
+  // window of the seed hex.
+  const seedNum2 = parseInt((seedHex || "0").slice(8, 16), 16) || 3;
+  let stride2 = (seedNum2 % (N - 2)) + 2;
+  if (stride2 === stride) stride2 = (stride2 % (N - 1)) + 1;
+  while (gcd(stride2, N) !== 1 || stride2 === stride) {
+    stride2 = (stride2 % (N - 1)) + 1;
   }
-  nodes += `<circle cx="${cx}" cy="${cy}" r="10" fill="${primary}"/>`;
+  const order2 = [];
+  cur = 0;
+  for (let i = 0; i < N; i++) { order2.push(cur); cur = (cur + stride2) % N; }
+  const innerD = order2.map((idx, i) => {
+    const p = points[idx];
+    return (i === 0 ? "M" : "L") + p.x + "," + p.y;
+  }).join(" ") + " Z";
+
+  const primary = (palette && palette.palette && palette.palette[0]) || "oklch(0.55 0.18 72)";
+  // Outer enclosing circle (radius matches scaffold so the form reads as
+  // a contained mandala, not a free-floating polygon).
+  const frame = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${primary}" stroke-width="1" opacity="0.45"/>`;
+  // Inner traversal — same hue, lighter weight + transparency. No node
+  // dots, no construction artifacts — just nested geometry.
+  const innerPath =
+    `<path d="${innerD}" fill="none" stroke="${primary}" stroke-width="1.25" ` +
+    `stroke-linejoin="round" stroke-linecap="round" opacity="0.55"/>`;
+  // Primary star — the dominant unified stroke of the sacred form.
+  const starPath =
+    `<path d="${starD}" fill="none" stroke="${primary}" stroke-width="2.25" ` +
+    `stroke-linejoin="round" stroke-linecap="round"/>`;
+  // Deliberate centre anchor — small filled circle in primary colour.
+  const center = `<circle cx="${cx}" cy="${cy}" r="6" fill="${primary}"/>`;
+  // Subtle palette-derived glow. The filter is inert if the renderer
+  // does not support it; in modern browsers it gives the form depth
+  // without adding any literal noise to the geometry.
+  const filterDef =
+    `<defs><filter id="cu-sigil-glow" x="-20%" y="-20%" width="140%" height="140%">` +
+    `<feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>` +
+    `<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>` +
+    `</filter></defs>`;
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">` +
-    `<path d="${pathD}" fill="none" stroke="${primary}" stroke-width="2" stroke-linejoin="round"/>` +
-    nodes +
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" class="cu-om-cipher-sigil-svg">` +
+    filterDef +
+    `<g filter="url(#cu-sigil-glow)">` +
+    frame + innerPath + starPath + center +
+    `</g>` +
     `</svg>`
   );
 }
@@ -604,10 +640,27 @@ function generate(input, options) {
     temporal_gate: temporal ? {
       value: temporal.temporal_gate,
       label: temporal.temporal_gate != null
-        ? `Two-hour window ${temporal.temporal_gate} (${String(temporal.temporal_gate * 2).padStart(2,"0")}:00–${String(temporal.temporal_gate * 2 + 2).padStart(2,"0")}:00 UTC)`
+        ? `Two-hour window ${temporal.temporal_gate} (${String(temporal.temporal_gate * 2).padStart(2,"0")}:00–${String(temporal.temporal_gate * 2 + 2).padStart(2,"0")}:00 local birth time)`
         : null,
     } : null,
     seed_string: canonical,
+    om_cipher_mantra: (function () {
+      if (!lp) return null;
+      const lpv = lp.reduced;
+      const exv = name && name.expression ? name.expression.reduced : 0;
+      const lunv = temporal ? temporal.lunar_phase : 0;
+      return omCipherMantra(lpv, exv, lunv);
+    })(),
+    archetypal_story_seed: (function () {
+      if (!name) return null;
+      const ex = name.expression ? name.expression.reduced : null;
+      const su = name.soul_urge ? name.soul_urge.reduced : null;
+      const pe = name.personality ? name.personality.reduced : null;
+      return archetypalStorySeed(ex, su, pe);
+    })(),
+    cipher_contemplation: temporal
+      ? cipherContemplation(temporal.lunar_phase, temporal.solar_quarter)
+      : null,
     palette_rationale:
       `Hue ${palette.primary_hue}° from Life Path ${lp ? lp.reduced : "-"}; ` +
       `lunar phase ${temporal ? temporal.lunar_phase : "-"} modulates saturation; ` +
@@ -747,6 +800,84 @@ const SOLAR_QUARTER_LABELS = {
   3: "Autumn — harvest",
 };
 
+// ─────────────────────────────────────────────────────────────────────────
+// Layer 6 — Contemplative outputs.
+// Deterministic mirrors derived from sealed Layer 1-2 outputs. The user's
+// evolving personal mantra / story / contemplation live in the Living
+// Profile; these are the Om Cipher's read-only reflections.
+// Data assets live in `data/om_cipher/*.json` (canonical) and are mirrored
+// to `sdk/om_cipher_layer6_data.js` for the browser. Generation script:
+// `scripts/build_layer6_js.py`.
+// ─────────────────────────────────────────────────────────────────────────
+function _loadLayer6Data() {
+  try {
+    if (typeof require === "function") {
+      // eslint-disable-next-line global-require
+      return require("./om_cipher_layer6_data.js");
+    }
+  } catch (_) { /* fall through */ }
+  if (typeof window !== "undefined" && window.cuOmCipherLayer6) {
+    return window.cuOmCipherLayer6;
+  }
+  return { MANTRA_TABLE: null, ARCHETYPAL_STORIES: null, CONTEMPLATIONS: null };
+}
+
+const _LAYER6 = _loadLayer6Data();
+
+function omCipherMantra(lifePathValue, expressionValue, lunarPhaseValue) {
+  const table = _LAYER6.MANTRA_TABLE;
+  if (!table || !Array.isArray(table.entries) || table.entries.length === 0) {
+    return null;
+  }
+  const lp = Number.isFinite(lifePathValue) ? lifePathValue : 0;
+  const ex = Number.isFinite(expressionValue) ? expressionValue : 0;
+  const lun = Number.isFinite(lunarPhaseValue) ? lunarPhaseValue : 0;
+  const size = table.size || table.entries.length;
+  const idx = ((lp + ex + lun) % size + size) % size;
+  const entry = table.entries[idx];
+  if (!entry) return null;
+  return {
+    index: idx,
+    mantra: entry.mantra,
+    keynote: entry.keynote || null,
+  };
+}
+
+function archetypalStorySeed(expressionValue, soulUrgeValue, personalityValue) {
+  const data = _LAYER6.ARCHETYPAL_STORIES;
+  if (!data || !data.fragments) return null;
+  const frags = data.fragments;
+  function pick(slot, val) {
+    const dict = frags[slot] || {};
+    if (val != null && dict[String(val)]) return dict[String(val)];
+    return null;
+  }
+  const ex = pick("expression", expressionValue);
+  const su = pick("soul_urge", soulUrgeValue);
+  const pe = pick("personality", personalityValue);
+  const bits = [ex, su, pe].filter(Boolean);
+  if (!bits.length) return null;
+  return {
+    seed: bits.join(" "),
+    expression_fragment: ex,
+    soul_urge_fragment: su,
+    personality_fragment: pe,
+  };
+}
+
+function cipherContemplation(lunarPhaseValue, solarQuarterValue) {
+  const data = _LAYER6.CONTEMPLATIONS;
+  if (!data || !data.phases) return null;
+  const phase = data.phases[String(lunarPhaseValue)] || null;
+  if (!phase) return null;
+  const solarMod = (data.solar_modifier && data.solar_modifier[String(solarQuarterValue)]) || null;
+  return {
+    phrase: phase,
+    solar_modifier: solarMod,
+    combined: solarMod ? (phase + " " + solarMod) : phase,
+  };
+}
+
 const _exports = {
   // entry points
   generate,
@@ -769,6 +900,10 @@ const _exports = {
   sha256Hex,
   lifePathHue,
   canonicalSeedString,
+  // Layer 6 — contemplative outputs.
+  omCipherMantra,
+  archetypalStorySeed,
+  cipherContemplation,
   // labels — public so the studio adapter can render without re-encoding.
   NUMEROLOGY_LABELS,
   LUNAR_PHASE_LABELS,

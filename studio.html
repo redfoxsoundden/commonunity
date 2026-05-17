@@ -12732,11 +12732,11 @@ if (document.readyState === 'loading') {
       // queries continue to resolve.
       var foundationItems = model.foundation || [];
       var placeholderCipherName  = 'Awaiting Compass seal';
-      var placeholderMantra      = 'Not generated yet — sealed when source data completes.';
+      var placeholderMantra      = 'Derived once source data is sealed — the evolving personal mantra lives in your Living Profile.';
       var placeholderField       = 'Pending source data';
-      var placeholderNarrative   = 'Your personal story emerges from the cipher once Compass is sealed.';
-      var placeholderContemp     = 'A contemplation will surface here, drawn from your field pattern.';
-      var placeholderBhramari    = 'Hum the seed-syllable to capture your Bhramari baseline, or enter it manually below.';
+      var placeholderNarrative   = 'Your archetypal pattern emerges from the cipher once Compass is sealed. Your lived story lives in Living Profile.';
+      var placeholderContemp     = 'A contemplation phrase will surface here, drawn from your lunar phase. Your evolving contemplation lives in Living Profile.';
+      var placeholderBhramari    = 'Recorded in your Living Profile — hum the seed-syllable to capture a baseline, or enter it manually.';
       html += '<section class="lp-foundation lp-field-imprints lp-om-cipher lp-om-cipher-section" aria-label="OM Cipher" data-cu-om-cipher-section="1">' +
         '<header class="lp-foundation-head oc-section-head">' +
           '<span class="lp-foundation-eye">Foundation · Source pattern</span>' +
@@ -12759,7 +12759,7 @@ if (document.readyState === 'loading') {
               '<h4 class="oc-cipher-name" data-cu-om-cipher-name>' + lpEscape(placeholderCipherName) + '</h4>' +
             '</div>' +
             '<div class="oc-id-row">' +
-              '<span class="oc-eyebrow">Personal Mantra</span>' +
+              '<span class="oc-eyebrow">Om Cipher Mantra</span>' +
               '<p class="oc-mantra" data-cu-om-cipher-mantra>' + lpEscape(placeholderMantra) + '</p>' +
             '</div>' +
             '<div class="oc-id-row">' +
@@ -12771,17 +12771,17 @@ if (document.readyState === 'loading') {
         // ── Story + Contemplation cards ──────────────────────
         '<div class="oc-cards">' +
           '<article class="oc-card oc-card-narrative" data-cu-om-cipher-narrative-card>' +
-            '<span class="oc-eyebrow">Personal Story</span>' +
+            '<span class="oc-eyebrow">Cipher Story Seed · Archetypal Pattern</span>' +
             '<p class="oc-card-body" data-cu-om-cipher-narrative>' + lpEscape(placeholderNarrative) + '</p>' +
           '</article>' +
           '<article class="oc-card oc-card-contemplation" data-cu-om-cipher-contemplation-card>' +
-            '<span class="oc-eyebrow">Contemplation</span>' +
+            '<span class="oc-eyebrow">Cipher Contemplation</span>' +
             '<p class="oc-card-body" data-cu-om-cipher-contemplation>' + lpEscape(placeholderContemp) + '</p>' +
           '</article>' +
         '</div>' +
         // ── Source-pattern numbers (gematria) ────────────────
         '<div class="oc-source-block">' +
-          '<h4 class="oc-source-title">Source pattern <span class="oc-source-sub">· gematria</span></h4>' +
+          '<h4 class="oc-source-title">Source pattern <span class="oc-source-sub">· Pythagorean numerology</span></h4>' +
           '<dl class="oc-source-grid" data-cu-om-cipher-gematria-grid>' +
             '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="life_path"><dt>Life Path</dt><dd>Pending source data</dd></div>' +
             '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="expression"><dt>Expression</dt><dd>Pending source data</dd></div>' +
@@ -12792,19 +12792,26 @@ if (document.readyState === 'loading') {
             '<div class="oc-source-item is-pending" data-cu-om-cipher-gematria="temporal_gate"><dt>Temporal Gate</dt><dd>Pending source data</dd></div>' +
           '</dl>' +
         '</div>' +
-        // ── Activation Sequence (Gene Keys) ──────────────────
-        '<div class="oc-source-block oc-activation-block">' +
-          '<h4 class="oc-source-title">Activation Sequence <span class="oc-source-sub">· Gene Keys</span></h4>' +
-          '<p class="oc-activation-line" data-cu-om-cipher-activation>Pending Compass-sealed Gene Keys.</p>' +
+        // ── Cipher seal + derivation link ────────────────────
+        // Below-sigil space surfaces the full 64-char cipher seal and a
+        // pointer back to derivation. The activation-sequence text lives
+        // beside the sigil (oc-field-pattern) to avoid duplication —
+        // this block carries provenance + an aria-hidden activation line
+        // retained as a stable hook for downstream consumers.
+        '<div class="oc-source-block oc-seal-block">' +
+          '<h4 class="oc-source-title">Cipher seal <span class="oc-source-sub">· verifiable fingerprint</span></h4>' +
+          '<p class="oc-seal-full" data-cu-om-cipher-seal-full title="This is a cryptographic fingerprint of your birth data. It proves your Om Cipher was derived deterministically from your sealed inputs.">Pending derivation.</p>' +
+          '<p class="oc-activation-line" data-cu-om-cipher-activation aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">Pending Compass-sealed Gene Keys.</p>' +
         '</div>' +
         // ── Bhramari resonance ───────────────────────────────
         '<div class="oc-source-block oc-bhramari-block">' +
-          '<h4 class="oc-source-title">Bhramari resonance <span class="oc-source-sub">· optional</span></h4>' +
+          '<h4 class="oc-source-title">Bhramari resonance <span class="oc-source-sub">· from Living Profile</span></h4>' +
           '<p class="oc-bhramari-line" data-cu-om-cipher-bhramari>' + lpEscape(placeholderBhramari) + '</p>' +
         '</div>' +
         // ── Foundation data grid (birth date / time / place / etc.) ──
         '<div class="oc-source-block oc-foundation-block">' +
-          '<h4 class="oc-source-title">Sealed inputs <span class="oc-source-sub">· editable</span></h4>' +
+          '<h4 class="oc-source-title">Cipher Foundation <span class="oc-source-sub">· locked source data</span></h4>' +
+          '<p class="oc-foundation-helper">These fields are sealed inputs. To correct source data, re-enter it in Compass — direct edits here are display-only and flag a discrepancy until Compass is re-sealed.</p>' +
           (foundationItems.length
             ? '<dl class="lp-foundation-grid oc-foundation-grid">' +
                 foundationItems.map(function (it) {
@@ -14301,11 +14308,37 @@ if (document.readyState === 'loading') {
           slot.setAttribute('data-cu-om-cipher-sigil', '1');
         }
         // Seal hash (short). Labelled as Draft until Compass-sealed so
-        // the surface tells the truth about its provenance.
+        // the surface tells the truth about its provenance. The full
+        // 64-char hash is exposed via title (tooltip) and a copy-to-
+        // clipboard handler so the seal is independently verifiable.
         var seedEl = section.querySelector('[data-cu-om-cipher-seed]');
         if (seedEl) {
           var seedShort = (rec.seed || '').slice(0, 8) + '…' + (rec.seed || '').slice(-4);
           seedEl.textContent = sealed ? seedShort : (seedShort + ' · Draft');
+          seedEl.setAttribute('title',
+            'This is a cryptographic fingerprint of your birth data. It proves your Om Cipher was derived deterministically from your sealed inputs. Click to copy the full hash.');
+          seedEl.setAttribute('data-cu-om-cipher-seed-full', rec.seed || '');
+          if (seedEl.style) { try { seedEl.style.cursor = 'pointer'; } catch (_) {} }
+          if (!seedEl._cuSealCopyWired && typeof seedEl.addEventListener === 'function') {
+            seedEl.addEventListener('click', function () {
+              var full = seedEl.getAttribute('data-cu-om-cipher-seed-full') || '';
+              if (!full) return;
+              try {
+                if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(full);
+                } else {
+                  var ta = document.createElement('textarea');
+                  ta.value = full; document.body.appendChild(ta);
+                  ta.select(); try { document.execCommand('copy'); } catch (_) {}
+                  document.body.removeChild(ta);
+                }
+                var prev = seedEl.textContent;
+                seedEl.textContent = 'Copied · ' + full.slice(0, 8) + '…';
+                setTimeout(function () { seedEl.textContent = prev; }, 1200);
+              } catch (_) {}
+            });
+            seedEl._cuSealCopyWired = true;
+          }
         }
         // Caption text — keep cipher-seal label in sync with state.
         var seedCap = section.querySelector('[data-cu-om-cipher-seed-hash]');
@@ -14331,19 +14364,22 @@ if (document.readyState === 'loading') {
           }
         }
 
-        // ── Personal Mantra (seed-syllable, never hallucinated) ─
+        // ── Om Cipher Mantra (Layer 6 deterministic mirror) ─────
+        // The Om Cipher mantra is the deterministic mirror selected from
+        // the 108-entry archetypal table by (LP + EX + LUN) mod 108.
+        // Read-only here — the evolving personal mantra lives in Living
+        // Profile.
         var mantraEl = section.querySelector('[data-cu-om-cipher-mantra]');
         if (mantraEl) {
-          var seedSyl = (rec.sealed_inputs && rec.sealed_inputs.seed_syllable) || 'Om';
-          var mantraText = '“' + seedSyl + '” · sounded from your sealed centre.';
-          // If user has explicitly configured a personal mantra in compassData,
-          // surface that instead of the seed-syllable line. No invention.
-          var prof = (window.state && window.state.compassData && window.state.compassData.profile) || {};
-          if (prof.personal_mantra && String(prof.personal_mantra).trim()) {
-            mantraText = String(prof.personal_mantra).trim();
+          var l6m = rec.metadata && rec.metadata.om_cipher_mantra;
+          if (l6m && l6m.mantra) {
+            mantraEl.textContent = '“' + l6m.mantra + '”';
+            mantraEl.classList.remove('is-pending');
+          } else {
+            var seedSyl = (rec.sealed_inputs && rec.sealed_inputs.seed_syllable) || 'Om';
+            mantraEl.textContent = '“' + seedSyl + '” · sounded from your sealed centre.';
+            mantraEl.classList.remove('is-pending');
           }
-          mantraEl.textContent = mantraText;
-          mantraEl.classList.remove('is-pending');
         }
 
         // ── Field Pattern line (Activation Sequence summary) ──
@@ -14375,30 +14411,24 @@ if (document.readyState === 'loading') {
           }
         }
 
-        // ── Narrative + Contemplation (compass profile if user has provided) ──
+        // ── Cipher Story Seed / Archetypal Pattern + Cipher Contemplation ──
+        // Layer 6 deterministic mirrors — labeled clearly as archetypal
+        // patterns / lunar-phase contemplations, not personal biography.
+        // The evolving personal story and contemplation live in Living
+        // Profile.
         var narrEl = section.querySelector('[data-cu-om-cipher-narrative]');
         var contEl = section.querySelector('[data-cu-om-cipher-contemplation]');
-        var cdRoot = (window.state && window.state.compassData) || {};
-        var prof2  = cdRoot.profile || {};
-        var ptsRoot = cdRoot.points || {};
         if (narrEl) {
-          var story = prof2.personal_story || prof2.story || prof2.narrative || null;
-          if (story && String(story).trim()) {
-            narrEl.textContent = String(story).trim();
-            narrEl.classList.remove('is-pending');
-          } else if (ptsRoot.work && (ptsRoot.work.summary || ptsRoot.work.web_intro)) {
-            // Use the user's own Life's Work narrative captured in Compass —
-            // it's their words, not invention.
-            narrEl.textContent = String(ptsRoot.work.summary || ptsRoot.work.web_intro).trim();
+          var l6story = rec.metadata && rec.metadata.archetypal_story_seed;
+          if (l6story && l6story.seed) {
+            narrEl.textContent = l6story.seed;
             narrEl.classList.remove('is-pending');
           } else {
-            // Deterministic descriptor from labels (not fabrication — just
-            // re-statement of the sealed pattern in prose).
             var lpLab = rec.metadata && rec.metadata.life_path && rec.metadata.life_path.label;
             var solLab = rec.metadata && rec.metadata.solar_quarter && rec.metadata.solar_quarter.label;
             if (lpLab || solLab) {
               narrEl.textContent = [lpLab, solLab].filter(Boolean).join(' · ') +
-                ' — your story will be added here when you write it.';
+                ' — archetypal pattern. Your lived story lives in Living Profile.';
               narrEl.classList.add('is-pending');
             } else {
               narrEl.classList.add('is-pending');
@@ -14406,14 +14436,9 @@ if (document.readyState === 'loading') {
           }
         }
         if (contEl) {
-          var contemplation = prof2.contemplation || null;
-          if (contemplation && String(contemplation).trim()) {
-            contEl.textContent = String(contemplation).trim();
-            contEl.classList.remove('is-pending');
-          } else if (ptsRoot.call && (ptsRoot.call.web_closing || ptsRoot.call.web_heading)) {
-            // The "call" point holds the user's daily contemplation framing
-            // in Compass — surface their own words rather than fabricate.
-            contEl.textContent = String(ptsRoot.call.web_closing || ptsRoot.call.web_heading).trim();
+          var l6cont = rec.metadata && rec.metadata.cipher_contemplation;
+          if (l6cont && l6cont.phrase) {
+            contEl.textContent = l6cont.combined || l6cont.phrase;
             contEl.classList.remove('is-pending');
           } else {
             var lunLab = rec.metadata && rec.metadata.lunar_phase && rec.metadata.lunar_phase.label;
@@ -14453,7 +14478,8 @@ if (document.readyState === 'loading') {
         paintItem('solar_quarter', meta.solar_quarter);
         paintItem('temporal_gate', meta.temporal_gate);
 
-        // ── Activation Sequence line ──────────────────────────
+        // ── Activation Sequence line (hidden hook; visible line is
+        // beside the sigil to avoid duplication). ───────────────
         var actEl = section.querySelector('[data-cu-om-cipher-activation]');
         if (actEl) {
           var actLabel = display && display.label;
@@ -14462,6 +14488,37 @@ if (document.readyState === 'loading') {
             actEl.classList.remove('is-pending');
           } else {
             actEl.classList.add('is-pending');
+          }
+        }
+        // ── Cipher seal full hash + copy affordance ──────────────
+        var sealFullEl = section.querySelector('[data-cu-om-cipher-seal-full]');
+        if (sealFullEl) {
+          var fullHash = rec.seed || '';
+          if (fullHash) {
+            sealFullEl.textContent = fullHash;
+            if (sealFullEl.style) {
+              try {
+                sealFullEl.style.fontFamily = 'ui-monospace, SFMono-Regular, Menlo, monospace';
+                sealFullEl.style.fontSize = '11px';
+                sealFullEl.style.wordBreak = 'break-all';
+                sealFullEl.style.opacity = '0.7';
+                sealFullEl.style.cursor = 'pointer';
+              } catch (_) {}
+            }
+            sealFullEl.setAttribute('data-cu-om-cipher-seed-full', fullHash);
+            if (!sealFullEl._cuSealFullWired && typeof sealFullEl.addEventListener === 'function') {
+              sealFullEl.addEventListener('click', function () {
+                try {
+                  if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(fullHash);
+                  }
+                  var prev = sealFullEl.textContent;
+                  sealFullEl.textContent = 'Copied · ' + fullHash;
+                  setTimeout(function () { sealFullEl.textContent = prev; }, 1200);
+                } catch (_) {}
+              });
+              sealFullEl._cuSealFullWired = true;
+            }
           }
         }
 

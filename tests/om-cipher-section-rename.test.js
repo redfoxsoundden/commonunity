@@ -65,9 +65,16 @@ console.log('\nvisual differentiation (subtle, not a redesign)');
 ok('.lp-om-cipher CSS rule present',                    /\.lp-om-cipher\s*\{/.test(src));
 ok('is-editing pulse class hooked up',                  /\.lp-om-cipher\.is-editing/.test(src));
 
-console.log('\ngematria / no-user-facing-numerology');
+console.log('\nterminology / Pythagorean numerology');
 ok('gematria function name preserved',                  /function gematria\(/.test(src));
-ok('no user-facing "numerology" copy in studio.html',   !/\bnumerology\b/i.test(src));
+// Per Om Cipher revision notes (Revision 3): the user-facing source-
+// pattern label uses "Pythagorean numerology" (the actual derivation
+// system used). Gematria is reserved for Hebrew-letter sub-layers if
+// ever added — not the default Om Cipher source-pattern term.
+ok('source-pattern label reads "Pythagorean numerology"',
+   /Source pattern[\s\S]{0,60}Pythagorean numerology/i.test(src));
+ok('no user-facing "Source pattern · gematria" copy',
+   !/Source pattern[\s\S]{0,60}gematria/i.test(src.replace(/data-cu-om-cipher-gematria[^"']*/g, '')));
 
 if (failed) {
   console.error('\nFAILED: ' + failed + ' check(s).');
