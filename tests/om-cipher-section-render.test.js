@@ -338,6 +338,69 @@ test('falls back to legacy dob / pob aliases', () => {
   assert.equal(input.birth_place.city, 'Sudbury, Canada');
 });
 
+test('falls back to state.birthData + state.person (Studio calculator profile, no Compass seal)', () => {
+  // No formal Compass profile, but the Studio calculator has produced
+  // state.birthData and the visitor name lives at state.person — this is
+  // the live profile shape the renderer was previously misreading as
+  // "pending source data".
+  const win = {
+    CU_OM_CIPHER_ENABLED: true,
+    CU_BHRAMARI_CAPTURE_ENABLED: true,
+    cuOmCipher: om,
+    state: {
+      person: 'Markus',
+      birthData: { dob: '1973-11-18', tob: '03:21', pob: 'Sudbury, Canada' },
+      compassData: { points: { work: {}, lens: {}, field: {}, call: {} } },
+    },
+  };
+  const r = makeRenderer(win);
+  const input = r.buildInput(null);
+  assert.equal(input.birth_date, '1973-11-18');
+  assert.equal(input.birth_time, '03:21');
+  assert.equal(input.birth_place.city, 'Sudbury, Canada');
+  assert.equal(input.preferred_name, 'Markus');
+  assert.equal(input._cu_sealed, false, 'profile-only inputs must be marked as draft');
+});
+
+test('draft mode (profile-only) still paints a real sigil + gematria; section state = draft', () => {
+  const win = {
+    CU_OM_CIPHER_ENABLED: true,
+    CU_BHRAMARI_CAPTURE_ENABLED: true,
+    cuOmCipher: om,
+    state: {
+      person: 'Markus',
+      birthData: { dob: '1973-11-18', tob: '03:21', pob: 'Sudbury, Canada' },
+      compassData: { points: { work: {}, lens: {}, field: {}, call: {} } },
+    },
+  };
+  const r = makeRenderer(win);
+  const sec = buildSection();
+  const slot = sec.querySelector('.lp-hero-slot.is-sigil');
+  slot.innerHTML = '<span>ॐ</span>';
+  r.render({}, sec);
+  // Section is draft, not pending, not sealed.
+  assert.equal(sec.getAttribute('data-cu-om-cipher-state'), 'draft');
+  // Real SVG sigil replaces the ॐ fallback.
+  assert.ok(slot.innerHTML.startsWith('<svg'), 'engine should paint SVG sigil in draft mode');
+  // Life Path 22 still computes and is master-flagged.
+  const lp = sec.querySelector('[data-cu-om-cipher-gematria="life_path"]');
+  assert.ok(lp.querySelector('dd').textContent.startsWith('22'));
+  assert.ok(lp.classList.contains('is-master'));
+  // Cipher seal text carries the Draft suffix.
+  const seedEl = sec.querySelector('[data-cu-om-cipher-seed]');
+  assert.ok(/Draft$/.test(seedEl.textContent), 'cipher seal labelled Draft in non-sealed state');
+});
+
+test('sealed Compass profile (legal_name + birth_date) → state = sealed, no Draft suffix', () => {
+  const win = makeWindow(true);
+  const r = makeRenderer(win);
+  const sec = buildSection();
+  r.render({}, sec);
+  assert.equal(sec.getAttribute('data-cu-om-cipher-state'), 'sealed');
+  const seedEl = sec.querySelector('[data-cu-om-cipher-seed]');
+  assert.ok(!/Draft/.test(seedEl.textContent), 'sealed seal must not carry Draft suffix');
+});
+
 console.log('\n' + (failed === 0 ? '✅ all passed' : '❌ ' + failed + ' failed') +
   ` (${passed} passed, ${failed} failed)`);
 if (failed > 0) process.exit(1);
